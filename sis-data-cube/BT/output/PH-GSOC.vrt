@@ -1,0 +1,323 @@
+<VRTDataset rasterXSize="375" rasterYSize="172">
+  <SRS dataAxisToSRSAxisMapping="2,1">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform>  8.8749998899999994e+01,  9.0000000000000028e-03,  0.0000000000000000e+00,  2.8249414800000000e+01,  0.0000000000000000e+00, -9.0000000000000028e-03</GeoTransform>
+  <VRTRasterBand dataType="Float32" band="1">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGADBAU-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="2">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGADSSM1-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="3">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGADSSM2-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="4">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGADSSM3-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="5">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGASRBAU-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="6">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGASRBAUU-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="7">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGASRSSM1-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="8">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGASRSSM1U-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="9">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGASRSSM2-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="10">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGASRSSM2U-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="11">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGASRSSM3-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="12">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGASRSSM3U-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="13">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGBAUU-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="14">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRDSSM1-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="15">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRDSSM2-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="16">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRDSSM3-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="17">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRSRSSM1-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="18">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRSRSSM1U-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="19">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRSRSSM2-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="20">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRSRSSM2U-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="21">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRSRSSM3-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="22">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGRSRSSM3U-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="23">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGSOCBAU-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="24">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGSOCSSM1-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="25">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGSOCSSM2-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="26">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGSOCSSM3-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="27">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGSSMU-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="28">
+    <NoDataValue>-1</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGT0-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-1</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="29">
+    <NoDataValue>-999</NoDataValue>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="1">BT-GSOC-CORGT0U-2022-0-30.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="375" RasterYSize="172" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <DstRect xOff="0" yOff="0" xSize="375" ySize="172" />
+      <NODATA>-999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+</VRTDataset>

@@ -1,0 +1,39 @@
+MAP
+  NAME "BT-GSNM-SANDSD-2024-0-30"
+  EXTENT 88.7499989 26.699164800000002 92.1249989 28.2494148
+  UNITS DD
+  SHAPEPATH "./"
+  SIZE 800 600
+  IMAGETYPE "PNG24"
+  PROJECTION
+      "init=epsg:4326"
+  END # PROJECTION
+  WEB
+      METADATA
+          "ows_title" "BT-GSNM-SANDSD-2024-0-30 web-service" 
+          "ows_enable_request" "*" 
+          "ows_srs" "EPSG:4326 EPSG:4326 EPSG:3857"
+          "wms_getfeatureinfo_formatlist" "text/plain,text/html,application/json,geojson,application/vnd.ogc.gml,gml"
+		  "wms_feature_info_mime_type" "application/json"
+      END # METADATA
+  END # WEB
+  LAYER
+      TEMPLATE "getfeatureinfo.tmpl"
+      NAME "BT-GSNM-SANDSD-2024-0-30"
+      DATA "BT-GSNM-SANDSD-2024-0-30.tif"
+      TYPE RASTER
+      STATUS ON
+      METADATA
+        "wms_include_items" "all"
+        "gml_include_items" "all"
+      END # METADATA
+      CLASS
+        NAME "BT-GSNM-SANDSD-2024-0-30"
+        STYLE
+            COLORRANGE "#F4E7D3" "#5C4033"
+            DATARANGE 8.00042 26.035404
+            RANGEITEM "pixel"
+          END # STYLE
+      END # CLASS
+  END # LAYER
+END # MAP
