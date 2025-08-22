@@ -1,0 +1,41 @@
+Specifications:
+
+- Dockerized application
+- Based on Openlayers js library
+- Build it in folder: FAO/GloSIS/gsis-web-mapping
+- Docker compose already has an entry for this application: gsis-web-mapping. Use this docker-compose.yml and change it there if needed (this service only, the other are working fine).
+- The mockup of the web-mapping was hand made on paper an the picture of it is FAO/GloSIS/gsis-web-mapping/website_mockup.jpg.
+- As you can see in the image, the layer swhicher is on the left and is collapsible, by default it is not, only when the user wants.
+- Layer swhicher containes all grup layers including Base Maps, and below the Opacity controler. Opacity controler is inside the Layer swhicher pane.
+- Layer swhicher pane does not take all the vertical length od the screen, as shown in the image.
+- On the top right we have the North arrow and the zoom controls.
+- On the bottom right we have the scale in meters.
+- All the layers that will be present in the web-mapping already have a web-service (glosis-ws), metadata (glosis-md).
+- All layers are listed in file FAO/GloSIS/gsis-web-mapping/layer_info.csv:
+    - 1 collumn is the name layer group
+    - 2 column is the name of the file layer
+    - 3 column is the code of the soil property
+    - 4 column is the name of the soil property
+    - 5 column is the unit of measure
+    - 6 column is the soil depth
+    - 7 column link to the metadata of that layer
+    - 8 column link to download the GeoTIFF of that layer
+    - 9 column link to the WMD GetMap request of that layer
+    - 10 column link to the WMD GetLegendGraphic request of that layer
+    - 11 column link to the WMD GetFeatureInfo request of that layer
+- There are 4 layer groups (project_name), put them by this order and make them collapsible:
+    - Soil Profiles
+    - Soil Nutrients
+    - Salt-Affected Soils
+    - Organic Carbon Sequestration Potential
+    - Base Maps, the following maps and order:
+        - ESRI imagery map
+        - OpenStreetmap
+        - Open terrain map
+- Under each group should appear the list of layers (layer_id) available for tha group layer (project_name).
+- The layers should use the name of layer_id.
+- On mouse over the layer, show the property_name.
+- Next to each layer show two icons, one for metadata (metadata_url) and another for download (download_url).
+- It's only possible to select one Base Map.
+- It's only possible to select one layer from all layer grooups, except for profile layer! Because it is a point layer and can be overlaped with other layers.
+- Mobile friendly
