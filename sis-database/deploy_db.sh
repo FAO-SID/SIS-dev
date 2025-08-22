@@ -119,6 +119,7 @@ psql -h localhost -p 5432 -d sis -U sis -c "GRANT ALL ON ALL FUNCTIONS IN SCHEMA
 
 pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v -f $PROJECT_DIR/versions/sis-database_v$DATE.sql
 pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v -f $PROJECT_DIR/versions/sis-database_latest.sql
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/versions/sis-database_latest_only_schema.sql
 
 # Export table with codelists of properties, procedures, units and alowed value range
 psql -h localhost -p 5432 -d sis -U sis -c "\COPY (
