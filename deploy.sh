@@ -17,7 +17,7 @@ docker rm $(docker ps -aq)
 docker rmi $(docker images -q) --force
 docker network prune -f
 docker volume prune -f
-docker system prune -a --volumes -f   
+docker system prune -a --volumes -f
 
 # Remove old DB volume content
 rm -rf $PROJECT_DIR/sis-database/volume/*
@@ -50,11 +50,6 @@ docker exec -it sis-database psql -d sis -U sis -f /tmp/sis-database_latest.sql
 ####################
 #      Docker      #
 ####################
-
-# Build and start Docker shiny containers
-# docker compose up --build sis-shiny -d
-# Update Global.R script to sis-shiny container
-# docker cp $PROJECT_DIR/sis-shiny/global/global.R sis-shiny:/srv/shiny-server/iso28258/global.R
 
 # Build and start other Docker containers
 docker compose up --build sis-metadata -d
