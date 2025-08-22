@@ -1,0 +1,95 @@
+server:
+    url: ${PYCSW_SERVER_URL}
+    mimetype: application/xml; charset=UTF-8
+    encoding: UTF-8
+    language: en-US
+    maxrecords: 50
+    timeout: 30
+    #ogc_schemas_location: http://foo
+    # pretty_print: true
+    gzip_compresslevel: 9
+    #domainquerytype: range
+    #domaincounts: true
+    #spatial_ranking: true
+    #workers=2
+
+logging:
+    level: DEBUG
+    #logfile: /tmp/pycsw.log
+
+profiles:
+    - apiso
+
+federatedcatalogues:
+    - http://catalog.data.gov/csw
+
+manager:
+    transactions: false
+    allowed_ips:
+        - 127.0.0.1
+#    csw_harvest_pagesize: 10
+
+metadata:
+    identification:
+        title: Philippines SIS metadata catalogue
+        description: This metadata catalogue lists a set of datasets of soil data from the Philippines Soil Information System (Philippines SIS).
+        keywords:
+            - catalogue
+            - discovery
+            - metadata
+            - Philippines Soil Information System
+            - Soil
+        keywords_type: theme
+        fees: None
+        accessconstraints: None
+        terms_of_service: https://creativecommons.org/licenses/by/4.0
+        url: https://example.org
+    license:
+        name: CC-BY 4.0 license
+        url: https://creativecommons.org/licenses/by/4.0
+    provider:
+        name: Departement of Agriculture - Bureau of Soils and Water Management
+        url: http://www.bswm.da.gov.ph
+    contact:
+        name: Flores, Andrew
+        position: Position Title
+        address: SRDC Bldg. Elliptical Road corner Visayas Avenue, Diliman
+        city: Quezon
+        stateorprovince: Quezon
+        postalcode: 1128
+        country: Philippines
+        phone: +xx-xxx-xxx-xxxx
+        fax: +xx-xxx-xxx-xxxx
+        email: andrew.flores@bswm.da.gov.ph
+        url: Contact URL
+        hours: Mo-Fr 08:00-17:00
+        instructions: During hours of service. Off on weekends.
+        role: pointOfContact
+
+    inspire:
+        enabled: true
+        languages_supported:
+            - eng
+            - gre
+        default_language: eng
+        date: YYYY-MM-DD
+        gemet_keywords:
+            - Utility and governmental services
+        conformity_service: notEvaluated
+        contact_name: Organization Name
+        contact_email: Email Address
+        temp_extent:
+            begin: YYYY-MM-DD
+            end: YYYY-MM-DD
+ 
+repository:
+    database: 'postgresql://sis:sis@sis-database:5432/sis'
+    # database: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@sis-database:5432/${POSTGRES_DB}'          # DOES NOT WORK
+    # database: 'postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@sis-database:5432/$POSTGRES_DB'                # DOES NOT WORK
+    # database: 'postgresql://%(POSTGRES_USER)s:%(POSTGRES_PASSWORD)s@sis-database:5432/%(POSTGRES_DB)s'       # DOES NOT WORK
+    table: spatial_metadata.pycsw_records
+    facets:
+        - type
+        - date
+        # - title
+        # - keywords
