@@ -1,0 +1,123 @@
+{
+  "metadataStandardVersion": "1.0",
+  "referenceSystemIdentifier": "EPSG:32651",
+  "language": "eng",
+  "characterSet": "utf8",
+  "spatialRepresentationInfo": {
+  "gridSpatialRepresentation": [
+    {
+      "numberOfDimensions": "2",
+      "dimension": [
+        {
+          "dimensionName": "row",
+          "dimensionSize": "7351.0",
+          "resolution": {
+            "value": "250.0",
+            "uom": "m"
+          }
+        },
+        {
+          "dimensionName": "column",
+          "dimensionSize": "4297.0",
+          "resolution": {
+            "value": "250.0",
+            "uom": "m"
+          }
+        }
+      ],
+      "transformationParameterAvailability": false
+    }
+  ]
+},
+  "dataIdentification": {
+    "status": "completed",
+    "spatialRepresentationType": [
+      "grid"
+    ],
+    "language": "eng",
+    "abstract": "This indicates the soil reaction at 0-30, 30-60 and 60-100 cm depth. pH are classified accordingly:  pH < 4.5 Extremely acid soils include Acid Sulfate Soils (Mangrove soils, cat clays). Do not drain because by oxidation sulfuric acid will be produced and pH will drop lower still. pH 4.5 – 5.5 Very acid soils suffering often from Al toxicity. Some crops are tolerant for these conditions (Tea, Pineapple). pH 5.5 –7.2 Acid to neutral soils: these are the best pH conditions for nutrient availability and suitable for most crops. pH 7.2 – 8.5 These pH values are indicative of carbonate rich soils. Depending on the form and concentration of calcium carbonate they may result in well structured soils which may however have depth limitations when the calcium carbonate hardens in an impermeable layer and chemically forms less available carbonates affecting nutrient availability (Phosphorus, Iron). pH > 8.5 Indicates alkaline soils often highly sodic (Na reaching toxic levels), badly structured (columnar structure) and easily dispersed surface clays. ",
+    "citation": {
+      "dates": [
+        {
+          "date": "2023-12-01",
+          "dateType": "publication"
+        }
+      ],
+      "title": "Soil pH (Philippines - 250 m)"
+    },
+    "supplementalInformation": "",
+    "descriptiveKeywords": [
+      {
+        "keywords": [
+            "soil",
+            "digital-soil-mapping",
+            "ph"],
+        "type": "theme"
+      },
+      {
+        "keywords": [
+            "philippines"],
+        "type": "place"
+      },
+      {
+        "keywords": [
+            "soil-science"],
+        "type": "discipline"
+      }
+    ],
+    "resourceConstraints": {
+      "legalConstraints": {
+        "otherConstraints": [
+          "Creative Commons Attribution 4.0"
+        ],
+        "accessConstraints": [
+          "copyright"
+        ],
+        "useConstraints": [
+          "license"
+        ]
+      }
+    },
+    "extent": [
+      {
+        "geographic": {
+          "bbox": {
+            "west": "21.1",
+            "east": "4.6",
+            "north": "116.5",
+            "south": "4.6"
+          }
+        }
+      }
+    ],
+    "spatialResolution": [
+      {
+        "distance": "250.0",
+        "scaleDenominator": "",
+        "unit": "m"
+      }
+    ],
+    "topicCategory": [ 
+            "geoscientificinformation",
+            "environment"
+    ],
+    "resourceMaintenance": {
+      "maintenanceAndUpdateFrequency": "asNeeded"
+    }
+  },
+  "dataQualityInfo": {
+    "lineage": {
+      "source": [],
+      "statement": ""
+    },
+    "scope": "project"
+  },
+  "distributionFormat": [
+    {
+      "version": "Float32",
+      "name": "GeoTIFF"
+    }
+  ],
+  "fileIdentifier": "32afbc88-ebeb-11ef-bc12-6b4a6fcd8b5e",
+  "metadataStandardName": "ISO 19115/19139"
+}

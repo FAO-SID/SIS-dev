@@ -1,0 +1,123 @@
+{
+  "metadataStandardVersion": "1.0",
+  "referenceSystemIdentifier": "EPSG:32651",
+  "language": "eng",
+  "characterSet": "utf8",
+  "spatialRepresentationInfo": {
+  "gridSpatialRepresentation": [
+    {
+      "numberOfDimensions": "2",
+      "dimension": [
+        {
+          "dimensionName": "row",
+          "dimensionSize": "1838.0",
+          "resolution": {
+            "value": "1000.0",
+            "uom": "m"
+          }
+        },
+        {
+          "dimensionName": "column",
+          "dimensionSize": "1074.0",
+          "resolution": {
+            "value": "1000.0",
+            "uom": "m"
+          }
+        }
+      ],
+      "transformationParameterAvailability": false
+    }
+  ]
+},
+  "dataIdentification": {
+    "status": "completed",
+    "spatialRepresentationType": [
+      "grid"
+    ],
+    "language": "eng",
+    "abstract": "Soil exchangeable sodium percentage   derived from soil samples collected from 0-30 and 30-100 cm depth",
+    "citation": {
+      "dates": [
+        {
+          "date": "2020-08-01",
+          "dateType": "publication"
+        }
+      ],
+      "title": "Soil Exchangeable Sodium (Philippines - 1 km)"
+    },
+    "supplementalInformation": "",
+    "descriptiveKeywords": [
+      {
+        "keywords": [
+            "soil",
+            "digital-soil-mapping",
+            "exchangeable-sodium"],
+        "type": "theme"
+      },
+      {
+        "keywords": [
+            "philippines"],
+        "type": "place"
+      },
+      {
+        "keywords": [
+            "soil-science"],
+        "type": "discipline"
+      }
+    ],
+    "resourceConstraints": {
+      "legalConstraints": {
+        "otherConstraints": [
+          "Creative Commons Attribution 4.0"
+        ],
+        "accessConstraints": [
+          "copyright"
+        ],
+        "useConstraints": [
+          "license"
+        ]
+      }
+    },
+    "extent": [
+      {
+        "geographic": {
+          "bbox": {
+            "west": "21.1",
+            "east": "4.6",
+            "north": "116.5",
+            "south": "4.6"
+          }
+        }
+      }
+    ],
+    "spatialResolution": [
+      {
+        "distance": "1000.0",
+        "scaleDenominator": "",
+        "unit": "m"
+      }
+    ],
+    "topicCategory": [ 
+            "geoscientificinformation",
+            "environment"
+    ],
+    "resourceMaintenance": {
+      "maintenanceAndUpdateFrequency": "asNeeded"
+    }
+  },
+  "dataQualityInfo": {
+    "lineage": {
+      "source": [],
+      "statement": ""
+    },
+    "scope": "project"
+  },
+  "distributionFormat": [
+    {
+      "version": "Float32",
+      "name": "GeoTIFF"
+    }
+  ],
+  "fileIdentifier": "32afbc85-ebeb-11ef-bc12-6b4a6fcd8b5e",
+  "metadataStandardName": "ISO 19115/19139"
+}

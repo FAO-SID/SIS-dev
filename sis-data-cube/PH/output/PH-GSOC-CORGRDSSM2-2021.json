@@ -1,0 +1,124 @@
+{
+  "metadataStandardVersion": "1.0",
+  "referenceSystemIdentifier": "EPSG:32651",
+  "language": "eng",
+  "characterSet": "utf8",
+  "spatialRepresentationInfo": {
+  "gridSpatialRepresentation": [
+    {
+      "numberOfDimensions": "2",
+      "dimension": [
+        {
+          "dimensionName": "row",
+          "dimensionSize": "1838.0",
+          "resolution": {
+            "value": "1000.0",
+            "uom": "m"
+          }
+        },
+        {
+          "dimensionName": "column",
+          "dimensionSize": "1074.0",
+          "resolution": {
+            "value": "1000.0",
+            "uom": "m"
+          }
+        }
+      ],
+      "transformationParameterAvailability": false
+    }
+  ]
+},
+  "dataIdentification": {
+    "status": "completed",
+    "spatialRepresentationType": [
+      "grid"
+    ],
+    "language": "eng",
+    "abstract": "The data represents the spatial variability of soil organic carbon stock differences between projected SOC stocks after 20 years of implementation of sustainable soil management scenario 2 and projected SOC stocks after 20 years of business as usual management. Each pixel value indicates the relative soil organic carbon stock differences in the corresponding geographic location at 0-30 cm depth. Unit: tons C/ha",
+    "citation": {
+      "dates": [
+        {
+          "date": "2021-05-01",
+          "dateType": "publication"
+        }
+      ],
+      "title": "Soil Organic Carbon Sequestration Potential RelDiff SSM2 (Philippines - 1 km)"
+    },
+    "supplementalInformation": "",
+    "descriptiveKeywords": [
+      {
+        "keywords": [
+            "soil",
+            "digital-soil-mapping",
+            "organic-carbon",
+            "carbon"],
+        "type": "theme"
+      },
+      {
+        "keywords": [
+            "philippines"],
+        "type": "place"
+      },
+      {
+        "keywords": [
+            "soil-science"],
+        "type": "discipline"
+      }
+    ],
+    "resourceConstraints": {
+      "legalConstraints": {
+        "otherConstraints": [
+          "Creative Commons Attribution 4.0"
+        ],
+        "accessConstraints": [
+          "copyright"
+        ],
+        "useConstraints": [
+          "license"
+        ]
+      }
+    },
+    "extent": [
+      {
+        "geographic": {
+          "bbox": {
+            "west": "21.1",
+            "east": "4.6",
+            "north": "116.5",
+            "south": "4.6"
+          }
+        }
+      }
+    ],
+    "spatialResolution": [
+      {
+        "distance": "1000.0",
+        "scaleDenominator": "",
+        "unit": "m"
+      }
+    ],
+    "topicCategory": [ 
+            "geoscientificinformation",
+            "environment"
+    ],
+    "resourceMaintenance": {
+      "maintenanceAndUpdateFrequency": "asNeeded"
+    }
+  },
+  "dataQualityInfo": {
+    "lineage": {
+      "source": [],
+      "statement": ""
+    },
+    "scope": "project"
+  },
+  "distributionFormat": [
+    {
+      "version": "Float32",
+      "name": "GeoTIFF"
+    }
+  ],
+  "fileIdentifier": "32afbc7c-ebeb-11ef-bc12-6b4a6fcd8b5e",
+  "metadataStandardName": "ISO 19115/19139"
+}
