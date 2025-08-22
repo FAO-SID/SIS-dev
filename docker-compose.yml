@@ -1,0 +1,72 @@
+services:
+
+  # API (TODO)
+
+  # SIS database (PostgreSQL)
+  sis-database:
+    container_name: sis-database
+    image: postgis/postgis:17-3.5
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5442:5432"
+    volumes:
+      - ./sis-database/volume:/var/lib/postgresql/data
+    networks:
+      - sis-net
+
+  # SIS metadata (pyCSW)
+  sis-metadata:
+    container_name: sis-metadata
+    image: geopython/pycsw:3.0.0-beta1
+    environment:
+        PYCSW_SERVER_URL: http://localhost:8001
+    ports:
+      - 8001:8000
+    volumes:
+      - ./sis-metadata/pycsw.yml:/etc/pycsw/pycsw.yml
+      - ./sis-metadata/volume:/records
+    networks:
+      - sis-net
+    depends_on:
+      - sis-database
+
+  # SIS web services (MapServer)
+  sis-web-services:
+    container_name: sis-web-services
+    image: camptocamp/mapserver:8.4
+    restart: always
+    ports:
+      - "8082:80"
+    volumes:
+      - ./sis-web-services/volume:/etc/mapserver:ro
+    depends_on:
+      - sis-database
+    networks:
+      - sis-net
+
+  # SIS web mapping (Openlayers)
+  sis-web-mapping:
+    container_name: sis-web-mapping
+    build: 
+      context: ./sis-web-mapping
+      dockerfile: Dockerfile
+    ports:
+      - "1234:1234"
+    volumes:
+      - ./sis-web-mapping/public/layer_info.csv:/usr/share/nginx/html/public/layer_info.csv:ro
+    environment:
+      - NODE_ENV=production
+    networks:
+      - sis-net
+    depends_on:
+      - sis-web-services
+      - sis-metadata
+
+networks:
+  sis-net:
+    driver: bridge
+    name: sis-net

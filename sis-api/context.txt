@@ -1,0 +1,186 @@
+## Technical Context Template
+
+### Current Application Overview
+- **Type**: Web mapping application using OpenLayers
+- **Current functionality**: Interactive map with soil data layers
+- **Technology stack**: PostgreSQL, MapServer, Node.js, Docker
+- **Hosting/Deployment**: running on localhost as docker containers
+
+### Required API Specifications
+
+**1. Authentication System**
+```
+- RESTful API with JWT token-based authentication
+- Endpoints needed: `/auth/login`, `/auth/logout`, `/auth/refresh`
+- User roles: admin and basic auth
+```
+
+**2. Database Architecture**
+```
+PostgreSQL Database Requirements:
+- user table (username text, email text, first_name text, last_name text, organization text, password_hash, created_at date, last_login date, is_active boolean DEFAULT TRUE, admin boolean DEFAULT FALSE)
+- _key table (key text)
+- settings table (key text, value text, display_order smallint)
+- unit table (unit_id text, unit_name text)
+- project table (project_id text, project_name text)
+- layer table (project_id text, layer_id text, publish boolean DEFAULT TRUE, property_id text, property_name text, version text, unit_id text, dimension_des text, metadata_url text, download_url text, get_map_url text, get_legend_url text, get_feature_info_url text)
+- user_layer table (username text, project_id text)
+- user_settings table (username text, key text)
+- uploaded_data table (username text, filename text, schema_name text, table_name text, upload_date date, metadata text)
+
+
+
+**3. Core API Endpoints Needed**
+```
+Authentication:
+- POST /api/auth/login
+- POST /api/auth/logout
+- GET /api/auth/user
+
+Settings Management:
+- GET /api/user/settings
+- PUT /api/user/settings
+- POST /api/user/settings
+
+Layer Management:
+- GET /api/layer
+- GET /api/user/layer
+- PUT /api/user/layer
+- PUT /api/user/layer/:id
+- POST /api/user/layer
+
+Data Upload:
+- POST /api/data/upload
+- GET /api/data/tables
+- DELETE /api/data/tables/:id
+```
+
+**4. File Upload Requirements**
+```
+- Support for Excel (.xlsx, .xls) and CSV files
+- Automatic table creation in PostgreSQL in schema upload
+- Data validation and type inference
+- Geospatial data handling
+- File size limits and error handling
+```
+
+### Technical Preferences
+- **Backend Framework**: Python/FastAPI
+- **Database**: PostgreSQL
+- **Database ORM**: SQLAlchemy
+- **File Processing**: Libraries for Excel/CSV parsing
+- **Security**: Password hashing, input validation, rate limiting
+
+### Integration Requirements
+- API should serve GeoJSON/vector tiles for map layers
+- CORS configuration for your frontend domain
+- Database connection pooling
+- Environment-based configuration
+
+### Additional Context to Include
+1. **Current map data source**: MapServer
+2. **User base size**: 50
+3. **Data sensitivity**: No sensible data, still should be a secure application
+4. **Deployment environment**: Docker container
+5. **Existing database**: PostgreSQL, one database for all application separated by schemas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Sample Prompt Structure
+
+"I need help building a REST API for my existing web mapping application. Here's what I have and what I need:
+
+**Current setup**: PostgreSQL, MapServer, Node.js, Docker
+**Requirements**: [Paste the 5 requirements above]
+**Database schema**: [Your preferred structure]
+**Technical preferences**: [Your framework choices]
+
+
+REQUIRED API FEATURES:
+1. JWT-based authentication system
+2. PostgreSQL backend with connection pooling
+3. User settings management (customizable via settings_key table)
+4. Layer management with project-based organization
+5. Excel/CSV upload functionality that creates tables in PostgreSQL
+6. Security best practices
+7. Sample implementation code
+8. Complete API architecture design
+
+
+DATABASE SCHEMA (PostgreSQL):
+```sql
+-- Users and Authentication
+CREATE TABLE api.user (
+    email TEXT PRIMARY KEY,
+    first_name TEXT,
+    last_name TEXT,
+    organization TEXT,
+    password_hash TEXT NOT NULL,
+    created_at DATE DEFAULT CURRENT_DATE,
+    last_login DATE,
+    is_active BOOLEAN DEFAULT TRUE,
+    admin BOOLEAN DEFAULT FALSE
+);
+
+-- Settings System
+CREATE TABLE api.setting (
+    key TEXT PRIMARY KEY,
+    value TEXT,
+    display_order SMALLINT
+);
+
+-- Project and Layer Management
+CREATE TABLE api.project (
+    project_id TEXT PRIMARY KEY,
+    project_name TEXT
+);
+
+CREATE TABLE api.layer (
+    project_id TEXT REFERENCES api.project(project_id),
+    layer_id TEXT PRIMARY KEY,
+    publish BOOLEAN DEFAULT TRUE,
+    property_id TEXT,
+    property_name TEXT,
+    version TEXT,
+    unit_of_measure_id TEXT REFERENCES core.unit_of_measure(unit_of_measure_id),
+    dimension_des TEXT,
+    metadata_url TEXT,
+    download_url TEXT,
+    get_map_url TEXT,
+    get_legend_url TEXT,
+    get_feature_info_url TEXT
+);
+
+-- User Preferences
+CREATE TABLE api.user_layer (
+    email TEXT REFERENCES api.user(email),
+    project_id TEXT REFERENCES api.project(project_id),
+    PRIMARY KEY (email, project_id)
+);
+
+-- Data Upload Tracking
+CREATE TABLE api.uploaded_data (
+    id SERIAL PRIMARY KEY,
+    email TEXT REFERENCES api.user(email),
+    filename TEXT,
+    schema_name TEXT,
+    table_name TEXT,
+    upload_date DATE DEFAULT CURRENT_DATE,
+    metadata TEXT
+);
+```
+
