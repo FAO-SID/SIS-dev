@@ -17,7 +17,7 @@ docker rm $(docker ps -aq)
 docker rmi $(docker images -q) --force
 docker network prune -f
 docker volume prune -f
-docker system prune -a --volumes -f
+docker system prune -a --volumes -f   
 
 # Remove old DB volume content
 rm -rf $PROJECT_DIR/sis-database/volume/*
