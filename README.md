@@ -61,7 +61,7 @@ Create a `.env` file in your project root:
 ## Implementation Steps
 
 1. **Database - PostgreSQL**:
-   - PostgreSQL Database. Based on the [ISRIC implementation](https://github.com/ISRICWorldSoil/iso-28258) of the [domain model ISO 28258](https://www.iso.org/standard/44595.html).
+   - PostgreSQL Database. Originally based on the [ISRIC implementation](https://github.com/ISRICWorldSoil/iso-28258) of the [domain model ISO 28258](https://www.iso.org/standard/44595.html).
 
 2. **Metadata catalogue - pyCSW**:
    - Customize configuration in `md/config/` as needed
@@ -80,5 +80,5 @@ Create a `.env` file in your project root:
 
 ## Deployment Instructions
 
-Follow the steps detail in file deploy.sh (linux) or deploy.ps1 (windows)
+Follow the steps detail in file [deploy.sh](https://github.com/FAO-SID/GloSIS/blob/main/deploy.sh) (linux) or [deploy.ps1](https://github.com/FAO-SID/GloSIS/blob/main/deploy.ps1) (windows)
 
