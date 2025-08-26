@@ -1,18 +1,18 @@
 version: '3.8'
 
 services:
-  api:
+  sis-api:
     build: .
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://sis:sis_password@db:5432/sis_database
+      - DATABASE_URL=postgresql://sis:sis@db:5432/sis
       - ENVIRONMENT=development
       - SECRET_KEY=dev-secret-key-change-in-production
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://sis-redis:6379/0
     depends_on:
       - db
-      - redis
+      - sis-redis
     volumes:
       - ./uploads:/app/uploads
       - .:/app  # Mount source code for development
@@ -31,20 +31,10 @@ services:
       - ./sis-database_latest_only_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     restart: unless-stopped
 
-  redis:
+  sis-redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    restart: unless-stopped
-
-  adminer:
-    image: adminer
-    ports:
-      - "8080:8080"
-    environment:
-      - ADMINER_DEFAULT_SERVER=db
-    depends_on:
-      - db
     restart: unless-stopped
 
 volumes:

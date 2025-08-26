@@ -2,11 +2,8 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
 import logging
+import os
 
 from app.core.config import settings, create_upload_dir
 from app.api.v1.api import api_router
@@ -14,9 +11,6 @@ from app.api.v1.api import api_router
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Create rate limiter
-limiter = Limiter(key_func=get_remote_address)
 
 # Create FastAPI app
 app = FastAPI(
@@ -28,10 +22,43 @@ app = FastAPI(
     redoc_url=f"{settings.API_V1_STR}/redoc",
 )
 
-# Add rate limiting middleware
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_middleware(SlowAPIMiddleware)
+# Optional rate limiting with Redis
+try:
+    if settings.REDIS_URL and settings.REDIS_URL != "":
+        from slowapi import Limiter, _rate_limit_exceeded_handler
+        from slowapi.util import get_remote_address
+        from slowapi.errors import RateLimitExceeded
+        from slowapi.middleware import SlowAPIMiddleware
+        
+        # Create rate limiter
+        limiter = Limiter(key_func=get_remote_address)
+        app.state.limiter = limiter
+        app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+        app.add_middleware(SlowAPIMiddleware)
+        logger.info("✅ Rate limiting enabled with Redis")
+        
+        # Rate limited endpoint (only if Redis is available)
+        @app.get(f"{settings.API_V1_STR}/limited")
+        @limiter.limit("10/minute")
+        async def limited_endpoint(request):
+            """Rate limited test endpoint"""
+            return {"message": "This endpoint is rate limited to 10 requests per minute"}
+    else:
+        logger.info("⚠️  Rate limiting disabled - no Redis configured")
+        limiter = None
+        
+        # Non-rate-limited version of the endpoint
+        @app.get(f"{settings.API_V1_STR}/limited")
+        async def limited_endpoint():
+            """Test endpoint (no rate limiting)"""
+            return {"message": "This endpoint has no rate limiting (Redis not configured)"}
+            
+except ImportError:
+    logger.warning("⚠️  Rate limiting dependencies not available")
+    limiter = None
+except Exception as e:
+    logger.warning(f"⚠️  Could not initialize rate limiting: {e}")
+    limiter = None
 
 # Add CORS middleware
 app.add_middleware(
@@ -93,7 +120,8 @@ async def root():
         "message": f"Welcome to {settings.PROJECT_NAME}",
         "version": settings.PROJECT_VERSION,
         "docs": f"{settings.API_V1_STR}/docs",
-        "status": "healthy"
+        "status": "healthy",
+        "rate_limiting": "enabled" if limiter else "disabled"
     }
 
 
@@ -103,7 +131,8 @@ async def health_check():
     return {
         "status": "healthy",
         "service": settings.PROJECT_NAME,
-        "version": settings.PROJECT_VERSION
+        "version": settings.PROJECT_VERSION,
+        "rate_limiting": "enabled" if limiter else "disabled"
     }
 
 
@@ -115,6 +144,7 @@ async def api_info():
         "version": settings.PROJECT_VERSION,
         "environment": settings.ENVIRONMENT,
         "api_version": "v1",
+        "rate_limiting": "enabled" if limiter else "disabled",
         "endpoints": {
             "authentication": f"{settings.API_V1_STR}/auth",
             "api_resources": f"{settings.API_V1_STR}/api",
@@ -122,14 +152,6 @@ async def api_info():
             "documentation": f"{settings.API_V1_STR}/docs"
         }
     }
-
-
-# Rate limited endpoints
-@app.get(f"{settings.API_V1_STR}/limited")
-@limiter.limit("10/minute")
-async def limited_endpoint(request):
-    """Rate limited test endpoint"""
-    return {"message": "This endpoint is rate limited to 10 requests per minute"}
 
 
 if __name__ == "__main__":
