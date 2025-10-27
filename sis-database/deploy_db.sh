@@ -71,7 +71,6 @@ psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_028.sq
 psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_029.sql
 psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_030.sql
 psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_031.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_032.sql
 
 
 #################

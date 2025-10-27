@@ -41,7 +41,7 @@ docker compose up --build sis-database -d
 # Wait for the PostgreSQL server to be ready
 echo "Waiting for sis-database PostgreSQL to start..."
 until docker exec sis-database pg_isready -U sis -d sis; do
-  sleep 1
+  sleep 2
 done
 echo "sis-database PostgreSQL is ready."
 

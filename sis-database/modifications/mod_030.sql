@@ -1,5 +1,5 @@
 -- OBJECT: schemas
--- ISSUE: rename schemas
+-- ISSUE: redo project /organisation / individual tables
 
 
 DROP SCHEMA soil_metadata CASCADE;
