@@ -321,7 +321,7 @@ function createLayerGroupUI(groupName, layers) {
     groupDiv.className = 'layer-group';
     
     // Add collapsed class for specific groups
-    if (['Base Maps', 'Soil Profiles', 'Salt-Affected Soils', 'Organic Carbon Sequestration Potential'].includes(groupName)) {
+    if (['Base Maps', 'Soil Profiles', 'Global Soil Nutrients Map', 'Global Soil Organic Carbon Sequestration potential map'].includes(groupName)) {
         groupDiv.classList.add('collapsed');
     }
     

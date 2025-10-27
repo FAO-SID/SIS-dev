@@ -85,8 +85,7 @@ export function createLayerConfig(layerInfo) {
     const groupOrder = [
         'Soil Profiles',
         'Global Soil Nutrients Map',
-        'Global Soil Organic Carbon Sequestration Potential Map',
-        'Other maps'
+        'Global Soil Organic Carbon Sequestration potential map'
     ];
     
     groupOrder.forEach(groupName => {
