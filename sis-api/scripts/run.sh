@@ -14,6 +14,7 @@ psql -h localhost -p 5442 -U sis -d sis -c "SELECT api.insert_dummy_data(
 
 # reset api schema
 psql -h localhost -p 5442 -U sis -d sis -c "DROP SCHEMA api CASCADE"
+psql -h localhost -p 5442 -U sis -d sis -c "DROP SCHEMA soil_data_upload CASCADE"
 psql -h localhost -p 5442 -U sis -d sis -f /home/carva014/Work/Code/FAO/GloSIS-dev/sis-api/schema.sql
 
 

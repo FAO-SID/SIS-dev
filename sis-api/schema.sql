@@ -1,11 +1,7 @@
--- Schemas for REST API
+-- Schema for REST API
 CREATE SCHEMA IF NOT EXISTS api AUTHORIZATION sis;
 COMMENT ON SCHEMA api IS 'REST API tables';
 ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA api GRANT SELECT ON TABLES TO sis_r;
-
-CREATE SCHEMA IF NOT EXISTS soil_data_upload AUTHORIZATION sis;
-COMMENT ON SCHEMA soil_data_upload IS 'Schema to upload soil data';
-ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data_upload GRANT SELECT ON TABLES TO sis_r;
 
 
 ------------------------------
@@ -14,7 +10,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data_upload GRANT SELECT ON
 
 -- Users - For human users who log in through the web application
 CREATE TABLE IF NOT EXISTS api.user (
-    user_id text PRIMARY KEY,
+    user_id text PRIMARY KEY, -- e-mail/user_id
     organisation_id text,
     password_hash text NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
@@ -190,9 +186,14 @@ GRANT SELECT ON TABLE api.vw_api_observations TO sis_r;
 -- GRANT SELECT ON TABLE api.vw_api_layers TO sis_r;
 
 
-----------------------------
--- Data upload monitoring --
-----------------------------
+------------------
+-- Data upload  --
+------------------
+
+CREATE SCHEMA IF NOT EXISTS soil_data_upload AUTHORIZATION sis;
+COMMENT ON SCHEMA soil_data_upload IS 'Schema to upload soil data';
+ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data_upload GRANT SELECT ON TABLES TO sis_r;
+
 
 CREATE TABLE IF NOT EXISTS api.uploaded_dataset (
     user_id text,
