@@ -31,13 +31,13 @@ manager:
 
 metadata:
     identification:
-        title: Philippines SIS metadata catalogue
-        description: This metadata catalogue lists a set of datasets of soil data from the Philippines Soil Information System (Philippines SIS).
+        title: Bhutan SIS metadata
+        description: This metadata catalogue lists a set of datasets of soil data from the Bhutan Soil Information System (SIS).
         keywords:
             - catalogue
             - discovery
             - metadata
-            - Philippines Soil Information System
+            - Bhutan Soil Information System
             - Soil
         keywords_type: theme
         fees: None
@@ -48,20 +48,20 @@ metadata:
         name: CC-BY 4.0 license
         url: https://creativecommons.org/licenses/by/4.0
     provider:
-        name: Departement of Agriculture - Bureau of Soils and Water Management
-        url: http://www.bswm.da.gov.ph
+        name: name
+        url: url
     contact:
-        name: Flores, Andrew
+        name: name
         position: Position Title
-        address: SRDC Bldg. Elliptical Road corner Visayas Avenue, Diliman
-        city: Quezon
-        stateorprovince: Quezon
-        postalcode: 1128
-        country: Philippines
+        address: address
+        city: city
+        stateorprovince: stateorprovince
+        postalcode: postalcode
+        country: Bhutan
         phone: +xx-xxx-xxx-xxxx
         fax: +xx-xxx-xxx-xxxx
-        email: andrew.flores@bswm.da.gov.ph
-        url: Contact URL
+        email: email
+        url: url
         hours: Mo-Fr 08:00-17:00
         instructions: During hours of service. Off on weekends.
         role: pointOfContact
@@ -87,7 +87,7 @@ repository:
     # database: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@sis-database:5432/${POSTGRES_DB}'          # DOES NOT WORK
     # database: 'postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@sis-database:5432/$POSTGRES_DB'                # DOES NOT WORK
     # database: 'postgresql://%(POSTGRES_USER)s:%(POSTGRES_PASSWORD)s@sis-database:5432/%(POSTGRES_DB)s'       # DOES NOT WORK
-    table: spatial_metadata.pycsw_records
+    table: spatial_metadata.records
     facets:
         - type
         - date

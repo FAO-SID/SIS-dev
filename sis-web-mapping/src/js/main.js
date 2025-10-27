@@ -95,8 +95,8 @@ const map = new Map({
         })
     ]),
     view: new View({
-        center: fromLonLat([120, 12]), // Philippines center
-        zoom: 6
+        center: fromLonLat([89.7, 27.5]),
+        zoom: 9
     })
 });
 
@@ -473,7 +473,7 @@ async function initializeLayers() {
         opacityControl.value = 0.8;
 
         // Activate Bulk density (0-30) by default
-        const bulkDensityLayer = document.querySelector('input[id="PH-GSNM-BKD-2023-0-30"]');
+        const bulkDensityLayer = document.querySelector('input[id="BT-GSNM-BKD-2024-0-30"]');
         if (bulkDensityLayer) {
             bulkDensityLayer.checked = true;
             bulkDensityLayer.dispatchEvent(new Event('change'));

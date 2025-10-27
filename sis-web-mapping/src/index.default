@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COUNTRY_LONG Soil Information System</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.5.1/ol.css">
+    <link rel="icon" href="../public/img/logo.png">
+</head>
+<body>
+    <div class="header">
+        <img src="../public/img/logo.png" alt="COUNTRY_LONG Soil Information System" class="logo">
+        <h1>COUNTRY_LONG Soil Information System</h1>
+    </div>
+
+    <div id="map" class="map"></div>
+    
+    <div id="popup" class="popup">
+        <div id="popup-content"></div>
+        <button id="popup-closer" class="popup-closer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="display: block; margin: auto;">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+        </button>
+    </div>
+    
+    <div id="layer-switcher" class="layer-switcher">
+        <div class="layer-switcher-header">
+            <button id="collapse-btn" class="collapse-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" style="display: block; margin: auto;">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="black"/>
+                </svg>
+            </button>
+        </div>
+        <div class="layer-switcher-content">
+            <div id="layer-groups"></div>
+            <div class="opacity-control">
+                <input type="range" id="opacity" min="0" max="1" step="0.1" value="1">
+            </div>
+        </div>
+    </div>
+
+    <div class="map-controls">
+        <div class="north-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="currentColor" style="display: block; margin: auto;">
+                <path d="M16 3 L5 27 H 27 Z" fill="white" stroke="black" stroke-width="1" />
+                <text x="16" y="23" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="black" font-weight="bold">N</text>
+            </svg>
+        </div>
+        <div class="zoom-controls">
+            <button id="zoom-in">+</button>
+            <button id="zoom-out">-</button>
+        </div>
+    </div>
+
+    <div id="scale-line" class="scale-line"></div>
+
+    <div id="legend" class="legend-container">
+        <div class="legend-content"></div>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+</body>
+</html> 

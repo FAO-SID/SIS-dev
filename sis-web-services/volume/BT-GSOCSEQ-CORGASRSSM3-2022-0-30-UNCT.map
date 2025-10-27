@@ -1,0 +1,39 @@
+MAP
+  NAME "BT-GSOCSEQ-CORGASRSSM3-2022-0-30-UNCT"
+  EXTENT 88.7499989 26.699421 92.1249854 28.2494148
+  UNITS DD
+  SHAPEPATH "./"
+  SIZE 800 600
+  IMAGETYPE "PNG24"
+  PROJECTION
+      "init=epsg:4326"
+  END # PROJECTION
+  WEB
+      METADATA
+          "ows_title" "BT-GSOCSEQ-CORGASRSSM3-2022-0-30-UNCT web-service" 
+          "ows_enable_request" "*" 
+          "ows_srs" "EPSG:4326 EPSG:4326 EPSG:3857"
+          "wms_getfeatureinfo_formatlist" "text/plain,text/html,application/json,geojson,application/vnd.ogc.gml,gml"
+          "wms_feature_info_mime_type" "application/json"
+      END # METADATA
+  END # WEB
+  LAYER
+      TEMPLATE "getfeatureinfo.tmpl"
+      NAME "BT-GSOCSEQ-CORGASRSSM3-2022-0-30-UNCT"
+      DATA "BT-GSOCSEQ-CORGASRSSM3-2022-0-30-UNCT.tif"
+      TYPE RASTER
+      STATUS ON
+      METADATA
+        "wms_include_items" "all"
+        "gml_include_items" "all"
+      END # METADATA
+      CLASS
+        NAME "BT-GSOCSEQ-CORGASRSSM3-2022-0-30-UNCT"
+        STYLE
+            COLORRANGE "#F4E7D3" "#5C4033"
+            DATARANGE 15.385822 9618.928
+            RANGEITEM "pixel"
+          END # STYLE
+      END # CLASS
+  END # LAYER
+END # MAP
