@@ -97,6 +97,14 @@ docker compose exec sis-metadata pycsw-admin.py load-records -c /etc/pycsw/pycsw
 docker compose exec sis-database psql -U sis -d sis -c "SELECT identifier, title FROM spatial_metadata.records ORDER BY title LIMIT 5;"
 
 
+##################
+#     sis-api    #
+##################
+
+# Build and start container
+docker compose up --build sis-api -d
+
+
 ##########################
 #     sis-web-mapping    #
 ##########################
@@ -136,18 +144,9 @@ sed -i "s/COUNTRY_LONG/$COUNTRY_LONG/g" $PROJECT_DIR/sis-web-mapping/src/index.h
 docker compose up --build sis-web-mapping -d
 
 
-##################
-#     sis-api    #
-##################
-
-# Build and start container
-docker compose up --build sis-api -d
-
-
 ####################
 #     sis-nginx    #
 ####################
-
 
 # Build and start container
 docker compose up --build sis-nginx -d

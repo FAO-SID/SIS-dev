@@ -90,9 +90,9 @@ services:
     networks:
       - sis-net
     depends_on:
+      - sis-api
       - sis-web-services
       - sis-metadata
-      - sis-api
     restart: unless-stopped
 
   # SIS web-server (Nginx reverse proxy)
