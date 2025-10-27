@@ -11,11 +11,11 @@ ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA api GRANT SELECT ON TABLES TO si
 -- Users - For human users who log in through the web application
 CREATE TABLE IF NOT EXISTS api.user (
     user_id text PRIMARY KEY, -- e-mail/user_id
-    organisation_id text,
     password_hash text NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     is_admin BOOLEAN DEFAULT FALSE,
-    created_at date DEFAULT CURRENT_DATE,
+    created_at timestamp DEFAULT CURRENT_DATE,
+    updated_at timestamp DEFAULT CURRENT_TIMESTAMP,
     last_login timestamp
 );
 COMMENT ON TABLE api.user IS 'For human users who log in through the web application';
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS api.api_client (
     created_at date DEFAULT CURRENT_DATE,
     expires_at date,
     last_login timestamp,
-    description text,
+    description text NOT NULL DEFAULT '',
     CONSTRAINT api_client_id_pkey PRIMARY KEY (api_client_id),
     CONSTRAINT api_client_api_key_key UNIQUE (api_key)
 );
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS api.audit (
     action text,
     details jsonb,
     ip_address inet,
-    created_at timestamp,
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT audit_pkey PRIMARY KEY (audit_id),
     CONSTRAINT audit_user_id_fkey FOREIGN KEY (user_id)
         REFERENCES api.user (user_id) MATCH SIMPLE

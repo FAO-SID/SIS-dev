@@ -134,3 +134,21 @@ sed -i "s/COUNTRY_LONG/$COUNTRY_LONG/g" $PROJECT_DIR/sis-web-mapping/src/index.h
 
 # Build and start container
 docker compose up --build sis-web-mapping -d
+
+
+##################
+#     sis-api    #
+##################
+
+# Build and start container
+docker compose up --build sis-api -d
+
+
+####################
+#     sis-nginx    #
+####################
+
+
+# Build and start container
+docker compose up --build sis-nginx -d
+
