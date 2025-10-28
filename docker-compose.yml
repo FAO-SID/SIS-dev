@@ -17,10 +17,10 @@ services:
     restart: unless-stopped
 
   # SIS REST API (FastAPI)
-  api:
+  sis-api:
     container_name: sis-api
     build:
-      context: ./api
+      context: ./sis-api
       dockerfile: Dockerfile
     environment:
       DB_HOST: ${POSTGRES_HOST}
@@ -96,7 +96,7 @@ services:
     restart: unless-stopped
 
   # SIS web-server (Nginx reverse proxy)
-  nginx:
+  sis-nginx:
     image: nginx:alpine
     container_name: sis-nginx
     volumes:
@@ -106,9 +106,10 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      - sis-api
-      - sis-web-services
-      - sis-metadata
+      sis-api:
+        condition: service_healthy
+      sis-database:
+        condition: service_started
     networks:
       - sis-net
     restart: unless-stopped

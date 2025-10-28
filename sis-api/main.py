@@ -11,7 +11,7 @@ from typing import Optional, List, Annotated
 from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import jwt
+from jose import jwt
 import bcrypt
 import secrets
 import os
@@ -23,7 +23,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
+    "host": os.getenv("DB_HOST", "sis-database"),
     "port": os.getenv("DB_PORT", "5442"),
     "database": os.getenv("DB_NAME", "sis"),
     "user": os.getenv("DB_USER", "sis"),
