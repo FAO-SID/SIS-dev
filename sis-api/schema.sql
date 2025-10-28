@@ -2,6 +2,7 @@
 CREATE SCHEMA IF NOT EXISTS api AUTHORIZATION sis;
 COMMENT ON SCHEMA api IS 'REST API tables';
 ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA api GRANT SELECT ON TABLES TO sis_r;
+GRANT USAGE ON SCHEMA api TO sis_r;
 
 
 ------------------------------
@@ -101,7 +102,6 @@ GRANT SELECT ON TABLE api.layer TO sis_r;
 -- view to expose the list of soil properties and geographical extent
 CREATE OR REPLACE VIEW api.vw_api_manifest AS
 SELECT 
-    'Portugal SIS' AS sis,
     opc.property_phys_chem_id AS property,
     COUNT(DISTINCT p.profile_id) AS profiles,
     COUNT(rpc.result_phys_chem_id) AS observations,
@@ -122,11 +122,12 @@ GRANT SELECT ON TABLE api.vw_api_manifest TO sis_r;
 -- view to expose the list of profiles
 CREATE OR REPLACE VIEW api.vw_api_profiles AS
 SELECT 
-    proj.name AS project_name,
+    p.profile_id AS gid,
     p.profile_code,
+    proj.name AS project_name,
     plt.altitude,
     plt.time_stamp AS date,
-    ST_AsGeoJSON(plt."position")::json AS geometry
+    plt."position" AS geom
 FROM soil_data.profile p
     INNER JOIN soil_data.plot plt ON p.plot_id = plt.plot_id
     INNER JOIN soil_data.site s ON plt.site_id = s.site_id
@@ -193,6 +194,7 @@ GRANT SELECT ON TABLE api.vw_api_observations TO sis_r;
 CREATE SCHEMA IF NOT EXISTS soil_data_upload AUTHORIZATION sis;
 COMMENT ON SCHEMA soil_data_upload IS 'Schema to upload soil data';
 ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data_upload GRANT SELECT ON TABLES TO sis_r;
+GRANT USAGE ON SCHEMA soil_data_upload TO sis_r;
 
 
 CREATE TABLE IF NOT EXISTS api.uploaded_dataset (

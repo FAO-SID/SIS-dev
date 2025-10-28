@@ -1,7 +1,7 @@
 MAP
     NAME "Profiles"
     STATUS ON
-    EXTENT 116.258955 1.166260 127.106359 24.647697
+    EXTENT 88.7499989 26.699421 92.1249854 28.2494148
     UNITS DD
     PROJECTION
         "init=epsg:4326"
@@ -30,9 +30,8 @@ MAP
         TYPE POINT
         STATUS ON
         CONNECTIONTYPE postgis
-        CONNECTION "user=glosis password=glosis dbname=glosis host=192.168.1.118 port=5442"
-        # CONNECTION "user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} host=192.168.1.118 port=5442" # DOES NOT WORK
-        DATA "geom FROM core.profiles USING UNIQUE gid"
+        CONNECTION "user=sis password=sis dbname=sis host=sis-database port=5432"
+        DATA "geom FROM api.vw_api_profiles USING UNIQUE gid"
         METADATA
             "wms_include_items" "all"
             "gml_include_items" "all"
