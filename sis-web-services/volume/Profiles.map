@@ -30,7 +30,7 @@ MAP
         TYPE POINT
         STATUS ON
         CONNECTIONTYPE postgis
-        CONNECTION "user=sis password=sis dbname=sis host=sis-database port=5432"
+        CONNECTION "user=sis_r password=sis dbname=sis host=sis-database port=5432"
         DATA "geom FROM api.vw_api_profiles USING UNIQUE gid"
         METADATA
             "wms_include_items" "all"

@@ -49,7 +49,12 @@ services:
     container_name: sis-metadata
     image: geopython/pycsw:3.0.0-beta1
     environment:
-        PYCSW_SERVER_URL: http://localhost:8001
+      PYCSW_SERVER_URL: http://localhost:8001
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - 8001:8000
     volumes:
