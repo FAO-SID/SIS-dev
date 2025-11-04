@@ -8,7 +8,7 @@ DATE=`date +%Y-%m-%d_%H-%M`
 
 
 ####################
-#  MapServer (ws)  #
+#  MapServer       #
 ####################
 
 # Test raster WMS
