@@ -92,6 +92,8 @@ services:
       - ./sis-web-mapping/public/layer_info.csv:/usr/share/nginx/html/public/layer_info.csv:ro
     environment:
       - NODE_ENV=production
+      - API_KEY=${WEB_MAPPING_API_KEY}
+      - API_URL=http://sis-api:8000
     networks:
       - sis-net
     depends_on:

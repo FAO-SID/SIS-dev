@@ -3,7 +3,7 @@ FastAPI REST API for Soil Information System
 Supports user authentication (JWT) and API client authentication (API keys)
 """
 
-from fastapi import FastAPI, Depends, HTTPException, status, Header
+from fastapi import FastAPI, Depends, HTTPException, status, Header, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
@@ -11,23 +11,23 @@ from typing import Optional, List, Annotated
 from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from jose import jwt
+from jose import jwt, JWTError
 import bcrypt
 import secrets
 import os
 from contextlib import contextmanager
 
 # Configuration
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
 DB_CONFIG = {
-    "host": os.getenv("POSTGRES_HOST"),
-    "port": os.getenv("POSTGRES_PORT"),
-    "database": os.getenv("POSTGRES_DB"),
-    "user": os.getenv("POSTGRES_USER"),
-    "password": os.getenv("POSTGRES_PASSWORD")
+    "host": os.getenv("DB_HOST", os.getenv("POSTGRES_HOST", "sis-database")),
+    "port": os.getenv("DB_PORT", "5432"),  # Internal port is always 5432
+    "database": os.getenv("DB_NAME", os.getenv("POSTGRES_DB", "sis")),
+    "user": os.getenv("DB_USER", os.getenv("POSTGRES_USER", "sis")),
+    "password": os.getenv("DB_PASSWORD", os.getenv("POSTGRES_PASSWORD", "sis"))
 }
 
 app = FastAPI(
@@ -191,7 +191,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
                 if user is None or not user['is_active']:
                     raise credentials_exception
                 return dict(user)
-    except jwt.PyJWTError:
+    except JWTError:
         raise credentials_exception
 
 async def get_current_admin_user(current_user: dict = Depends(get_current_user)) -> dict:
@@ -203,12 +203,16 @@ async def get_current_admin_user(current_user: dict = Depends(get_current_user))
         )
     return current_user
 
-async def verify_api_key(x_api_key: Annotated[str | None, Header()] = None) -> dict:
-    """Dependency to verify API key for server-to-server authentication"""
+async def verify_api_key(
+    request: Request,
+    x_api_key: Annotated[str | None, Header()] = None
+) -> dict:
+    """Dependency to verify API key for all programmatic access"""
     if not x_api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="API key required"
+            detail="API key required. Include X-API-Key header in your request.",
+            headers={"WWW-Authenticate": "ApiKey"}
         )
     
     with get_db() as conn:
@@ -224,18 +228,25 @@ async def verify_api_key(x_api_key: Annotated[str | None, Header()] = None) -> d
             client = cur.fetchone()
             
             if not client:
+                log_audit(None, None, "api_key_invalid_attempt", 
+                         {"api_key_prefix": x_api_key[:8] + "..."}, 
+                         request.client.host)
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid API key"
                 )
             
             if not client['is_active']:
+                log_audit(None, client['api_client_id'], "api_key_inactive_attempt", 
+                         None, request.client.host)
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="API key is inactive"
                 )
             
             if client['expires_at'] and client['expires_at'] < datetime.now().date():
+                log_audit(None, client['api_client_id'], "api_key_expired_attempt", 
+                         None, request.client.host)
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="API key has expired"
@@ -252,8 +263,8 @@ async def verify_api_key(x_api_key: Annotated[str | None, Header()] = None) -> d
 # ==================== Authentication Endpoints ====================
 
 @app.post("/api/auth/login", response_model=Token)
-async def login(user_credentials: UserLogin):
-    """User login endpoint - returns JWT token"""
+async def login(user_credentials: UserLogin, request: Request):
+    """User login endpoint - returns JWT token for admin access"""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
@@ -263,7 +274,8 @@ async def login(user_credentials: UserLogin):
             user = cur.fetchone()
             
             if not user or not verify_password(user_credentials.password, user['password_hash']):
-                log_audit(user_credentials.user_id, None, "login_failed", None, None)
+                log_audit(user_credentials.user_id, None, "login_failed", 
+                         None, request.client.host)
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Incorrect username or password"
@@ -281,7 +293,7 @@ async def login(user_credentials: UserLogin):
                 (datetime.now(), user['user_id'])
             )
             
-            log_audit(user['user_id'], None, "login_success", None, None)
+            log_audit(user['user_id'], None, "login_success", None, request.client.host)
             
             access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
             access_token = create_access_token(
@@ -293,8 +305,12 @@ async def login(user_credentials: UserLogin):
 
 @app.get("/api/auth/verify")
 async def verify_token(current_user: dict = Depends(get_current_user)):
-    """Verify if token is valid"""
-    return {"user_id": current_user['user_id'], "is_admin": current_user['is_admin']}
+    """Verify if JWT token is valid"""
+    return {
+        "user_id": current_user['user_id'], 
+        "is_admin": current_user['is_admin'],
+        "message": "Token is valid"
+    }
 
 # ==================== User Management Endpoints (Admin Only) ====================
 
@@ -332,7 +348,7 @@ async def list_users(current_user: dict = Depends(get_current_admin_user)):
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
-                "SELECT user_id, is_active, is_admin, created_at, last_login FROM api.user"
+                "SELECT user_id, is_active, is_admin, created_at, last_login FROM api.user ORDER BY created_at DESC"
             )
             users = cur.fetchall()
             return [dict(user) for user in users]
@@ -365,7 +381,7 @@ async def create_api_client(
     client: APIClientCreate,
     current_user: dict = Depends(get_current_admin_user)
 ):
-    """Create a new API client (admin only)"""
+    """Create a new API client (admin only) - Returns the API key once"""
     api_key = generate_api_key()
     
     with get_db() as conn:
@@ -384,7 +400,8 @@ async def create_api_client(
                 return {
                     "message": "API client created successfully",
                     "api_client_id": client.api_client_id,
-                    "api_key": api_key
+                    "api_key": api_key,
+                    "warning": "Save this API key now. You won't be able to see it again!"
                 }
             except psycopg2.IntegrityError:
                 raise HTTPException(
@@ -399,12 +416,37 @@ async def list_api_clients(current_user: dict = Depends(get_current_admin_user))
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 """
-                SELECT api_client_id, is_active, created_at, expires_at, description
+                SELECT api_client_id, is_active, created_at, expires_at, description, last_login
                 FROM api.api_client
+                ORDER BY created_at DESC
                 """
             )
             clients = cur.fetchall()
             return [dict(client) for client in clients]
+
+@app.patch("/api/clients/{api_client_id}/status")
+async def update_api_client_status(
+    api_client_id: str,
+    is_active: bool,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Activate or deactivate an API client (admin only)"""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE api.api_client SET is_active = %s WHERE api_client_id = %s",
+                (is_active, api_client_id)
+            )
+            if cur.rowcount == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="API client not found"
+                )
+            log_audit(current_user['user_id'], None, "api_client_status_changed",
+                     {"client_id": api_client_id, "is_active": is_active}, None)
+            return {
+                "message": f"API client {'activated' if is_active else 'deactivated'} successfully"
+            }
 
 @app.delete("/api/clients/{api_client_id}")
 async def delete_api_client(
@@ -427,7 +469,7 @@ async def delete_api_client(
                      {"deleted_client": api_client_id}, None)
             return {"message": "API client deleted successfully"}
 
-# ==================== Layer Management Endpoints (Protected) ====================
+# ==================== Layer Management Endpoints (Admin/User) ====================
 
 @app.post("/api/layers", status_code=status.HTTP_201_CREATED)
 async def create_layer(layer: LayerCreate, current_user: dict = Depends(get_current_user)):
@@ -535,47 +577,56 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_u
                      {"layer_id": layer_id}, None)
             return {"message": "Layer deleted successfully"}
 
-@app.get("/api/layers", response_model=List[Layer])
-async def get_layers(
-    published: Optional[bool] = None,
-    current_user: dict = Depends(get_current_user)
-):
-    """Get all layers (authenticated users can see all, filter by published status)"""
+@app.get("/api/layers/all", response_model=List[Layer])
+async def get_all_layers(current_user: dict = Depends(get_current_user)):
+    """Get all layers including unpublished (authenticated users only)"""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            if published is not None:
-                cur.execute(
-                    "SELECT * FROM api.layer WHERE publish = %s ORDER BY layer_id",
-                    (published,)
-                )
-            else:
-                cur.execute("SELECT * FROM api.layer ORDER BY layer_id")
+            cur.execute("SELECT * FROM api.layer ORDER BY layer_id")
             layers = cur.fetchall()
             return [dict(layer) for layer in layers]
 
-# ==================== Public Data Endpoints ====================
+# ==================== Data Access Endpoints (API Key Required) ====================
 
 @app.get("/api/manifest")
-async def get_manifest():
-    """Get soil properties manifest (public endpoint)"""
+async def get_manifest(
+    request: Request,
+    api_client: dict = Depends(verify_api_key)
+):
+    """Get soil properties manifest (requires API key)"""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT * FROM api.vw_api_manifest")
             data = cur.fetchall()
+            
+            log_audit(None, api_client['api_client_id'], "manifest_accessed", 
+                     {"record_count": len(data)}, request.client.host)
+            
             return [dict(row) for row in data]
 
 @app.get("/api/profiles")
-async def get_profiles():
-    """Get soil profiles (public endpoint)"""
+async def get_profiles(
+    request: Request,
+    api_client: dict = Depends(verify_api_key)
+):
+    """Get soil profiles (requires API key)"""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT * FROM api.vw_api_profiles")
             data = cur.fetchall()
+            
+            log_audit(None, api_client['api_client_id'], "profiles_accessed",
+                     {"record_count": len(data)}, request.client.host)
+            
             return [dict(row) for row in data]
 
 @app.get("/api/observations")
-async def get_observations(profile_code: Optional[str] = None):
-    """Get observational data (public endpoint)"""
+async def get_observations(
+    request: Request,
+    profile_code: Optional[str] = None,
+    api_client: dict = Depends(verify_api_key)
+):
+    """Get observational data (requires API key)"""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             if profile_code:
@@ -586,30 +637,30 @@ async def get_observations(profile_code: Optional[str] = None):
             else:
                 cur.execute("SELECT * FROM api.vw_api_observations")
             data = cur.fetchall()
+            
+            log_audit(None, api_client['api_client_id'], "observations_accessed",
+                     {"profile_code": profile_code, "record_count": len(data)}, 
+                     request.client.host)
+            
             return [dict(row) for row in data]
 
-@app.get("/api/layers/published", response_model=List[Layer])
-async def get_published_layers():
-    """Get only published layers (public endpoint)"""
+@app.get("/api/layers", response_model=List[Layer])
+async def get_published_layers(
+    request: Request,
+    api_client: dict = Depends(verify_api_key)
+):
+    """Get only published layers (requires API key)"""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT * FROM api.layer WHERE publish = TRUE ORDER BY layer_id")
             layers = cur.fetchall()
+            
+            log_audit(None, api_client['api_client_id'], "published_layers_accessed",
+                     {"layer_count": len(layers)}, request.client.host)
+            
             return [dict(layer) for layer in layers]
 
-# ==================== Server-to-Server Endpoints (API Key Auth) ====================
-
-@app.get("/api/server/data")
-async def get_server_data(api_client: dict = Depends(verify_api_key)):
-    """Example endpoint for server-to-server communication"""
-    log_audit(None, api_client['api_client_id'], "server_data_accessed", None, None)
-    return {
-        "message": "Server-to-server endpoint",
-        "client": api_client['api_client_id'],
-        "data": "Your data here"
-    }
-
-# ==================== Health Check ====================
+# ==================== Health Check & Root ====================
 
 @app.get("/")
 async def root():
@@ -617,12 +668,16 @@ async def root():
     return {
         "message": "Soil Information System API",
         "version": "1.0.0",
-        "docs": "/docs"
+        "docs": "/docs",
+        "authentication": {
+            "admin_access": "Use POST /api/auth/login to get JWT token for admin operations",
+            "data_access": "Use X-API-Key header for all data endpoints"
+        }
     }
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint - no authentication required"""
     try:
         with get_db() as conn:
             with conn.cursor() as cur:
