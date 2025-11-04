@@ -144,6 +144,88 @@ sed -i "s/COUNTRY_LONG/$COUNTRY_LONG/g" $PROJECT_DIR/sis-web-mapping/src/index.h
 docker compose up --build sis-web-mapping -d
 
 
+
+
+# Two types of authentication:
+# 🔑 JWT tokens (for humans): Login with email/password to manage users, layers, API clients
+# 🎫 API keys (for applications): Long-lived keys for sis and external servers to access data
+
+# Step 1: Create Admin User (admin / Password: admin123). This user can manage other users and API clients
+docker exec -it sis-database psql -U sis -d sis -c "
+  INSERT INTO api.user (user_id, password_hash, is_admin, is_active) 
+  VALUES ('admin', '\$2b\$12\$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5oi2W6H9j7K4G', true, true)
+  ON CONFLICT (user_id) DO NOTHING"
+
+
+# Step 2: Login as admin123 to Get JWT Token. This token is valid for 60 minutes.
+docker exec -i sis-api python << 'EOF'
+from main import hash_password, get_db
+
+password_hash = hash_password("admin123")
+print(f"Hash: {password_hash}")
+
+with get_db() as conn:
+    with conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO api.user (user_id, password_hash, is_admin, is_active) VALUES (%s, %s, %s, %s) ON CONFLICT (user_id) DO UPDATE SET password_hash = EXCLUDED.password_hash",
+            ('admin', password_hash, True, True)
+        )
+print("Admin user created successfully!")
+EOF
+# This should return something like:
+# Hash: $2b$12$xVELIG14N4iZNn5FsMP.w.7qIdZ.lm54X6UXEdYplMIxbLEO0.YOW
+# Admin user created successfully!
+
+
+# Step 2: Login to Get JWT Token
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "admin",
+    "password": "admin123"
+  }'
+# {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImV4cCI6MTc2MjI2Mjg0OH0.WQiE38607ZoFTEDrhgQSnnQYufCleX3sTAbUCSv5vEI","token_type":"bearer"}(base) carva014@guifoes:~/Work/Code/FAO/SIS-dev$ 
+
+
+# Create the API client for sis
+curl -X POST http://localhost:8000/api/clients \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImV4cCI6MTc2MjI2Mjg0OH0.WQiE38607ZoFTEDrhgQSnnQYufCleX3sTAbUCSv5vEI" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "api_client_id": "sis",
+    "description": "Internal OpenLayers web mapping application"
+  }'
+# {
+#   "message":"API client created successfully",
+#   "api_client_id":"sis",
+#   "api_key":"tqgCPggHmxqRW6v-c3gwxOeRsWCnhgdgFqY1RQycvFM",
+#   "warning":"Save this API key now. You won't be able to see it again!"
+# }
+
+
+# Test with API key (should work)
+curl http://localhost:8000/api/manifest \
+  -H "X-API-Key: tqgCPggHmxqRW6v-c3gwxOeRsWCnhgdgFqY1RQycvFM"
+
+
+
+# Create the API client for glosis
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "admin", "password": "admin123"}'
+
+# Then create new API client
+curl -X POST http://localhost:8000/api/clients \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImV4cCI6MTc2MjI2Mzk1N30.XDd_W_uFvxKo4ExMEgb8nOfNktlIL_B7JdpcNrhabzE" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "api_client_id": "glosis",
+    "description": "GloSIS Discovery Hub access"
+  }'
+# {"message":"API client created successfully","api_client_id":"glosis","api_key":"-a4BaluRF74FH1GWd-JlnjAeqXgFZHMcNvWrrRXuU3Q","warning":"Save this API key now. You won't be able to see it again!"}
+
+
+
 ####################
 #     sis-nginx    #
 ####################
