@@ -2,7 +2,7 @@
 #ISSUE: remove Guide lines for Soil description and insert the reviewd ones from Luis Rodriguez Lado
 
 # working dir 
-PROJECT_DIR="/home/carva014/Work/Code/FAO/GloSIS-dev/sis-database"
+PROJECT_DIR="/home/carva014/Work/Code/FAO/SIS-dev/sis-database"
 
 
 psql -h localhost -p 5432 -d sis -U sis -c "

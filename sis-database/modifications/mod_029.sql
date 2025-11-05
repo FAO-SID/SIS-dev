@@ -35,7 +35,7 @@ GRANT EXECUTE ON FUNCTION soil_data.check_result_value() TO sis;
 GRANT EXECUTE ON FUNCTION soil_data.check_result_value() TO sis_r;
 COMMENT ON FUNCTION soil_data.check_result_value() IS 'Checks if the value assigned to a result record is within the numerical bounds declared in the related observations (fields value_min and value_max).';
 
-CREATE OR REPLACE TRIGGER trg_check_result_value
+CREATE TRIGGER trg_check_result_value
     BEFORE INSERT OR UPDATE 
     ON soil_data.result_phys_chem
     FOR EACH ROW

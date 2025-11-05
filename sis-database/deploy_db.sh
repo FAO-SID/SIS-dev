@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-PROJECT_DIR="/home/carva014/Work/Code/FAO/GloSIS-dev/sis-database"      # << EDIT THIS LINE!
+PROJECT_DIR="/home/carva014/Work/Code/FAO/SIS-dev"      # << EDIT THIS LINE!
 DATE=`date +%Y-%m-%d`
 
 
@@ -39,38 +39,38 @@ psql -h localhost -p 5432 -d sis -U sis -c 'CREATE EXTENSION IF NOT EXISTS "uuid
 # Modifications #
 #################
 
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/versions/sis-database_v1.5_changed.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_001.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_002.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_003.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_004.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_005.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_006.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_007.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_008.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_009.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_010.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_011.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_012.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_013.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_014.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_015.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_016.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_017.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_018.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_019.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_020.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_021.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_022.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_023.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_024.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_025.sql
-$PROJECT_DIR/modifications/mod_026.sh
-$PROJECT_DIR/modifications/mod_027.sh
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_028.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_029.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_030.sql
-psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/modifications/mod_031.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/versions/sis-database_v1.5_changed.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_001.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_002.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_003.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_004.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_005.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_006.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_007.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_008.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_009.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_010.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_011.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_012.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_013.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_014.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_015.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_016.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_017.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_018.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_019.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_020.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_021.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_022.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_023.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_024.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_025.sql
+$PROJECT_DIR/sis-database/modifications/mod_026.sh
+$PROJECT_DIR/sis-database/modifications/mod_027.sh
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_028.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_029.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_030.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/modifications/mod_031.sql
 
 
 #################
@@ -84,7 +84,7 @@ psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-p
 psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-private/Metadata/backups/data_individual_latest.sql
 psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-private/Metadata/backups/data_organisation_latest.sql
 psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-private/Metadata/backups/data_property_latest.sql
-psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-dev/sis-api/schema.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-api/schema.sql
 
 
 #################
@@ -116,9 +116,9 @@ psql -h localhost -p 5432 -d sis -U sis -c "GRANT ALL ON ALL FUNCTIONS IN SCHEMA
 #     Dump      #
 #################
 
-pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v -f $PROJECT_DIR/versions/sis-database_v$DATE.sql
-pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v -f $PROJECT_DIR/versions/sis-database_latest.sql
-pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/versions/sis-database_latest_only_schema.sql
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v -f $PROJECT_DIR/sis-database/versions/sis-database_v$DATE.sql
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v -f $PROJECT_DIR/sis-database/versions/sis-database_latest.sql
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/versions/sis-database_latest_only_schema.sql
 
 # Export table with codelists of properties, procedures, units and alowed value range
 psql -h localhost -p 5432 -d sis -U sis -c "\COPY (
@@ -126,4 +126,4 @@ psql -h localhost -p 5432 -d sis -U sis -c "\COPY (
         FROM soil_data.observation_phys_chem o
         LEFT JOIN soil_data.procedure_phys_chem p ON p.procedure_phys_chem_id = o.procedure_phys_chem_id
         ORDER BY 1, 2) 
-        TO '$PROJECT_DIR/versions/sis-database_observation_phys_chem_code_list.csv' WITH CSV HEADER"
+        TO '$PROJECT_DIR/sis-database/versions/sis-database_observation_phys_chem_code_list.csv' WITH CSV HEADER"

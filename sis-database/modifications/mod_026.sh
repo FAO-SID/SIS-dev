@@ -4,7 +4,7 @@
 # ISSUE: add data from https://github.com/glosis-ld/glosis/blob/master/csv_codelists/glosis_procedure.csv
 
 # working dir 
-PROJECT_DIR="/home/carva014/Work/Code/FAO/GloSIS-dev/sis-database"
+PROJECT_DIR="/home/carva014/Work/Code/FAO/SIS-dev/sis-database"
 
 
 psql -h localhost -p 5432 -d sis -U sis -c "
