@@ -43,8 +43,11 @@ psql -h localhost -p 5432 -U sis -d iso19139 -c "\copy (
         ORDER BY p.project_name, l.layer_id
         ) 
 TO $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY_ID}.csv WITH CSV HEADER"
+
 # Copy to sis database
 cat $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY_ID}.csv | psql -h localhost -p 5442 -d sis -U sis -c "COPY api.layer FROM STDIN WITH (FORMAT CSV, HEADER, NULL '')"
+rm $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY_ID}.csv
+
 # Add Profiles layers
 psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.layer 
     (project_id,

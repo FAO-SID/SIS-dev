@@ -1,7 +1,7 @@
 MAP
     NAME "Profiles"
     STATUS ON
-    EXTENT 88.75 26.69 92.13 28.25  # W S E N
+    EXTENT 88 26 93 29  # W S E N
     UNITS DD
     PROJECTION
         "init=epsg:4326"
