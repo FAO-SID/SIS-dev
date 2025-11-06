@@ -120,7 +120,7 @@ GRANT SELECT ON TABLE api.vw_api_manifest TO sis_r;
 
 
 -- view to expose the list of profiles
-CREATE OR REPLACE VIEW api.vw_api_profiles AS
+CREATE OR REPLACE VIEW api.vw_api_profile AS
 SELECT 
     p.profile_id AS gid,
     p.profile_code,
@@ -135,13 +135,13 @@ FROM soil_data.profile p
     LEFT JOIN soil_data.project proj ON ps.project_id = proj.project_id
 WHERE plt."position" IS NOT NULL
 ORDER BY p.profile_id;
-COMMENT ON VIEW api.vw_api_profiles IS 'View to expose the list of profiles';
-ALTER TABLE IF EXISTS api.vw_api_profiles OWNER to sis;
-GRANT SELECT ON TABLE api.vw_api_profiles TO sis_r;
+COMMENT ON VIEW api.vw_api_profile IS 'View to expose the list of profiles';
+ALTER TABLE IF EXISTS api.vw_api_profile OWNER to sis;
+GRANT SELECT ON TABLE api.vw_api_profile TO sis_r;
 
 
 -- view to expose the observational data
-CREATE OR REPLACE VIEW api.vw_api_observations AS
+CREATE OR REPLACE VIEW api.vw_api_observation AS
 SELECT p3.profile_code,
     e.upper_depth,
     e.lower_depth,
@@ -159,32 +159,9 @@ SELECT p3.profile_code,
      LEFT JOIN soil_data.result_phys_chem r ON r.specimen_id = s2.specimen_id
      LEFT JOIN soil_data.observation_phys_chem o ON o.observation_phys_chem_id = r.observation_phys_chem_id
   ORDER BY p3.profile_code, e.upper_depth, o.property_phys_chem_id;
-COMMENT ON VIEW api.vw_api_observations IS 'View to expose the observational data';
-ALTER TABLE IF EXISTS api.vw_api_observations OWNER to sis;
-GRANT SELECT ON TABLE api.vw_api_observations TO sis_r;
-
--- view with the layers to be displayed in web mapping
--- CREATE OR REPLACE VIEW api.vw_api_layers AS
--- SELECT  p.project_name, 
---         l.layer_id, 
---         p2.property_id, 
---         p2.name property_name, 
---         p2.unit_of_measure_id, 
---         l.dimension_depth || ' '||l.dimension_stats AS dimension_des, 
---         'http://localhost:8001/collections/metadata:main/items/'||m.file_identifier metadata_url, 
---         u.url download_url,
---         'http://localhost:8082/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX='||l.south_bound_latitude||'%2C'||l.west_bound_longitude||'%2C'||l.north_bound_latitude||'%2C'||l.east_bound_longitude||'&CRS=EPSG%3A4326&WIDTH='||l.raster_size_x||'&HEIGHT='||l.raster_size_y||'&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE' get_map_url,
---         'http://localhost:8082/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.1.1&LAYER='||l.layer_id||'&REQUEST=getlegendgraphic&FORMAT=image/png' get_legend_url,
---         'http://localhost:8082/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS='||l.layer_id||'&INFO_FORMAT=text%2Fhtml&I=282&J=429' get_feature_info_url
--- FROM spatial_metadata.layer l
--- LEFT JOIN spatial_metadata.mapset m ON m.mapset_id = l.mapset_id
--- LEFT JOIN spatial_metadata.project p ON p.country_id = m.country_id AND p.project_id = m.project_id
--- LEFT JOIN spatial_metadata.property p2 ON p2.property_id = m.property_id 
--- LEFT JOIN spatial_metadata.url u ON u.mapset_id = m.mapset_id AND u.url_name = 'Download '||l.dimension_depth || ' '||l.dimension_stats
--- WHERE m.country_id = '$COUNTRY_ID'
--- ORDER BY p.project_name, l.layer_id;
--- ALTER TABLE IF EXISTS api.vw_api_layers OWNER to sis;
--- GRANT SELECT ON TABLE api.vw_api_layers TO sis_r;
+COMMENT ON VIEW api.vw_api_observation IS 'View to expose the observational data';
+ALTER TABLE IF EXISTS api.vw_api_observation OWNER to sis;
+GRANT SELECT ON TABLE api.vw_api_observation TO sis_r;
 
 
 ------------------

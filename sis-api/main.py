@@ -112,6 +112,17 @@ class LayerCreate(BaseModel):
 class PublishUpdate(BaseModel):
     publish: bool
 
+class Setting(BaseModel):
+    key: str
+    value: str
+
+class SettingCreate(BaseModel):
+    key: str
+    value: str
+
+class SettingUpdate(BaseModel):
+    value: str
+
 class APIClient(BaseModel):
     api_client_id: str
     is_active: bool
@@ -471,7 +482,7 @@ async def delete_api_client(
 
 # ==================== Layer Management Endpoints (Admin/User) ====================
 
-@app.post("/api/layers", status_code=status.HTTP_201_CREATED)
+@app.post("/api/layer", status_code=status.HTTP_201_CREATED)
 async def create_layer(layer: LayerCreate, current_user: dict = Depends(get_current_user)):
     """Create a new layer (authenticated users only)"""
     with get_db() as conn:
@@ -499,7 +510,7 @@ async def create_layer(layer: LayerCreate, current_user: dict = Depends(get_curr
                     detail="Layer already exists"
                 )
 
-@app.put("/api/layers/{layer_id}")
+@app.put("/api/layer/{layer_id}")
 async def update_layer(
     layer_id: str,
     layer: Layer,
@@ -540,7 +551,7 @@ async def update_layer(
                      {"layer_id": layer_id}, None)
             return {"message": "Layer updated successfully"}
 
-@app.patch("/api/layers/{layer_id}/publish")
+@app.patch("/api/layer/{layer_id}/publish")
 async def update_layer_publish(
     layer_id: str,
     publish_data: PublishUpdate,
@@ -562,7 +573,7 @@ async def update_layer_publish(
                      {"layer_id": layer_id, "publish": publish_data.publish}, None)
             return {"message": "Layer publish status updated successfully"}
 
-@app.delete("/api/layers/{layer_id}")
+@app.delete("/api/layer/{layer_id}")
 async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_user)):
     """Delete a layer (authenticated users only)"""
     with get_db() as conn:
@@ -577,7 +588,7 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_u
                      {"layer_id": layer_id}, None)
             return {"message": "Layer deleted successfully"}
 
-@app.get("/api/layers/all", response_model=List[Layer])
+@app.get("/api/layer/all", response_model=List[Layer])
 async def get_all_layers(current_user: dict = Depends(get_current_user)):
     """Get all layers including unpublished (authenticated users only)"""
     with get_db() as conn:
@@ -585,6 +596,73 @@ async def get_all_layers(current_user: dict = Depends(get_current_user)):
             cur.execute("SELECT * FROM api.layer ORDER BY layer_id")
             layers = cur.fetchall()
             return [dict(layer) for layer in layers]
+
+# ==================== Settings Management Endpoints (Admin/User) ====================
+
+@app.post("/api/setting", status_code=status.HTTP_201_CREATED)
+async def create_setting(setting: SettingCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new setting (authenticated users only)"""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute(
+                    "INSERT INTO api.setting (key, value) VALUES (%s, %s)",
+                    (setting.key, setting.value)
+                )
+                log_audit(current_user['user_id'], None, "setting_created",
+                         {"key": setting.key}, None)
+                return {"message": "Setting created successfully", "key": setting.key}
+            except psycopg2.IntegrityError:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Setting already exists"
+                )
+
+@app.put("/api/setting/{key}")
+async def update_setting(
+    key: str,
+    setting_update: SettingUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update a setting value (authenticated users only)"""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE api.setting SET value = %s WHERE key = %s",
+                (setting_update.value, key)
+            )
+            if cur.rowcount == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Setting not found"
+                )
+            log_audit(current_user['user_id'], None, "setting_updated",
+                     {"key": key}, None)
+            return {"message": "Setting updated successfully"}
+
+@app.delete("/api/setting/{key}")
+async def delete_setting(key: str, current_user: dict = Depends(get_current_user)):
+    """Delete a setting (authenticated users only)"""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM api.setting WHERE key = %s", (key,))
+            if cur.rowcount == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Setting not found"
+                )
+            log_audit(current_user['user_id'], None, "setting_deleted",
+                     {"key": key}, None)
+            return {"message": "Setting deleted successfully"}
+
+@app.get("/api/setting/all", response_model=List[Setting])
+async def get_all_settings(current_user: dict = Depends(get_current_user)):
+    """Get all settings (authenticated users only)"""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT key, value FROM api.setting ORDER BY key")
+            settings = cur.fetchall()
+            return [dict(setting) for setting in settings]
 
 # ==================== Data Access Endpoints (API Key Required) ====================
 
@@ -604,7 +682,7 @@ async def get_manifest(
             
             return [dict(row) for row in data]
 
-@app.get("/api/profiles")
+@app.get("/api/profile")
 async def get_profiles(
     request: Request,
     api_client: dict = Depends(verify_api_key)
@@ -612,7 +690,7 @@ async def get_profiles(
     """Get soil profiles (requires API key)"""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT * FROM api.vw_api_profiles")
+            cur.execute("SELECT * FROM api.vw_api_profile")
             data = cur.fetchall()
             
             log_audit(None, api_client['api_client_id'], "profiles_accessed",
@@ -620,7 +698,7 @@ async def get_profiles(
             
             return [dict(row) for row in data]
 
-@app.get("/api/observations")
+@app.get("/api/observation")
 async def get_observations(
     request: Request,
     profile_code: Optional[str] = None,
@@ -631,11 +709,11 @@ async def get_observations(
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             if profile_code:
                 cur.execute(
-                    "SELECT * FROM api.vw_api_observations WHERE profile_code = %s",
+                    "SELECT * FROM api.vw_api_observation WHERE profile_code = %s",
                     (profile_code,)
                 )
             else:
-                cur.execute("SELECT * FROM api.vw_api_observations")
+                cur.execute("SELECT * FROM api.vw_api_observation")
             data = cur.fetchall()
             
             log_audit(None, api_client['api_client_id'], "observations_accessed",
@@ -644,7 +722,7 @@ async def get_observations(
             
             return [dict(row) for row in data]
 
-@app.get("/api/layers", response_model=List[Layer])
+@app.get("/api/layer", response_model=List[Layer])
 async def get_published_layers(
     request: Request,
     api_client: dict = Depends(verify_api_key)
@@ -659,6 +737,22 @@ async def get_published_layers(
                      {"layer_count": len(layers)}, request.client.host)
             
             return [dict(layer) for layer in layers]
+
+@app.get("/api/setting", response_model=List[Setting])
+async def get_settings(
+    request: Request,
+    api_client: dict = Depends(verify_api_key)
+):
+    """Get all settings for application configuration (requires API key)"""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT key, value FROM api.setting ORDER BY key")
+            settings = cur.fetchall()
+            
+            log_audit(None, api_client['api_client_id'], "settings_accessed",
+                     {"setting_count": len(settings)}, request.client.host)
+            
+            return [dict(setting) for setting in settings]
 
 # ==================== Health Check & Root ====================
 

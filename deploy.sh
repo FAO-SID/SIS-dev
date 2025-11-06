@@ -154,9 +154,10 @@ curl -X POST http://localhost:8000/api/clients \
 
 # Test with API key
 curl http://localhost:8000/api/manifest -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
-curl http://localhost:8000/api/profiles -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
-curl http://localhost:8000/api/observations -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
-curl http://localhost:8000/api/layers -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
+curl http://localhost:8000/api/profile -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
+curl http://localhost:8000/api/observation -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
+curl http://localhost:8000/api/layer -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
+curl http://localhost:8000/api/setting -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
 
 # Create the API client for glosis
 # {"message":"API client created successfully","api_client_id":"glosis","api_key":"-a4BaluRF74FH1GWd-JlnjAeqXgFZHMcNvWrrRXuU3Q","warning":"Save this API key now. You won't be able to see it again!"}
