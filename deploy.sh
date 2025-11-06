@@ -213,7 +213,7 @@ psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.layer
 
 # Add Profiles layers
 psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.setting(key, value) VALUES
- ('ORG_LOGO_URL','../public/img/logo.png'),
+ ('ORG_LOGO_URL','https://tse4.mm.bing.net/th/id/OIP.hV37F63PxOkqMwTAlCNnvQAAAA?r=0&pid=Api'),
  ('APP_TITLE','Bhutan Soil Information System'),
  ('LATITUDE','27.5'),
  ('LONGITUDE','89.7'),
@@ -243,30 +243,14 @@ curl -X POST http://localhost:8000/api/clients \
 ##########################
 
 
-docker-compose up -d --build --no-deps sis-api
-
-
-
-# Stop container
 docker-compose stop sis-web-mapping
-
-# Remove container
 docker-compose rm -f sis-web-mapping
-
-# Remove the image to force complete rebuild
 docker rmi sis-dev-sis-web-mapping
-
-# Also clear Parcel cache inside if needed
-docker-compose run --rm sis-web-mapping rm -rf .parcel-cache
-
-# Rebuild from scratch
-docker-compose build --no-cache sis-web-mapping
-
-# Start
+# docker-compose run --rm sis-web-mapping rm -rf .parcel-cache
+docker-compose build sis-web-mapping
 docker-compose up --no-deps -d sis-web-mapping
+# docker logs sis-web-mapping -f
 
-# Watch logs
-docker logs sis-web-mapping -f
 
 
 

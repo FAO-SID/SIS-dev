@@ -85,9 +85,9 @@ function applySettings() {
 // ==================== Map Initialization ====================
 
 function initializeMap() {
-  const latitude = parseFloat(appConfig.LATITUDE || 27.5);
-  const longitude = parseFloat(appConfig.LONGITUDE || 89.7);
-  const zoom = parseInt(appConfig.ZOOM || 9);
+  const latitude = parseFloat(appConfig.LATITUDE || 0);
+  const longitude = parseFloat(appConfig.LONGITUDE || 0);
+  const zoom = parseInt(appConfig.ZOOM || 12);
 
   // Base layers
   const baseLayers = {
