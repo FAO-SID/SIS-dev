@@ -4,12 +4,6 @@
 PROJECT_DIR="/home/carva014/Work/Code/FAO/SIS-dev"      # << EDIT THIS LINE!
 COUNTRY=BT
 COUNTRY_LONG="Bhutan"
-ORG_LOGO_URL="https:\/\/tse4.mm.bing.net\/th\/id/OIP.hV37F63PxOkqMwTAlCNnvQAAAA?r=0&pid=Api" # PH "https:\/\/www.bswm.da.gov.ph\/wp-content\/uploads\/BAGONG-PILIPINAS.png"
-LATITUDE=27.5   # 27 BT / 12 PH
-LONGITUDE=89.7  # 90 BT / 120 PH
-ZOOM=9
-LAYER_DEFAULT='BT-GSNM-BKD-2024-0-30'
-BASE_MAP_DEFAULT='esri-imagery' # esri-imagery / OpenStreetMap / Open TopoMap
 
 # Navigate to the project folder
 cd $PROJECT_DIR
@@ -116,7 +110,7 @@ docker exec -it sis-database psql -U sis -d sis -c "
 
 # Login as admin to get admin token
 # This should return something like:
-# Hash: $2b$12$xVELIG14N4iZNn5FsMP.w.7qIdZ.lm54X6UXEdYplMIxbLEO0.YOW
+# Hash: $2b$12$3p1Ot6azqWVYPVVc9Id1vebvts98XN0LdubWqEVXbGn.hfnd4vlze
 # Admin user created successfully!
 docker exec -i sis-api python << 'EOF'
 from main import hash_password, get_db
@@ -134,7 +128,7 @@ print("Admin user created successfully!")
 EOF
 
 # Login to get temporary token. This token is valid for 60 minutes.
-# {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyMzQyNDA1fQ.JX_EheNPZnONg-D8XXBLdOI2zwuvsiZpXHBl0Udg7oQ","token_type":"bearer"}
+# {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyNDMzMzE5fQ.TzN9KX6pFwfJk3lqnRLh7BMwetQad2Pq5EIj2EaoBZs","token_type":"bearer"}
 curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
@@ -143,26 +137,100 @@ curl -X POST http://localhost:8000/api/auth/login \
   }'
 
 # Create the API client for sis
-# {"message":"API client created successfully","api_client_id":"sis","api_key":"2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw","warning":"Save this API key now. You won't be able to see it again!"}
+# {"message":"API client created successfully","api_client_id":"sis","api_key":"5P3_cUmQ_jsVacn8WSOWd112gwNF9QfsRfx3t5T8SKk","warning":"Save this API key now. You won't be able to see it again!"}
 curl -X POST http://localhost:8000/api/clients \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyMzQyNDA1fQ.JX_EheNPZnONg-D8XXBLdOI2zwuvsiZpXHBl0Udg7oQ" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyNDMzMzE5fQ.TzN9KX6pFwfJk3lqnRLh7BMwetQad2Pq5EIj2EaoBZs" \
   -H "Content-Type: application/json" \
   -d '{
     "api_client_id": "sis",
     "description": "SIS OpenLayers web mapping application"
   }'
 
+# create function to insert dummy data for test
+psql -h localhost -p 5442 -U sis -d sis -f $PROJECT_DIR/sis-api/scripts/db_insert_dummy_data.sql
+
+# run function
+psql -h localhost -p 5442 -U sis -d sis -c "SELECT api.insert_dummy_data(
+                                                    p_num_plots := 200,
+                                                    p_observation_ids := ARRAY[514,635,587,683,69,30, 497,742,970,54],
+                                                    p_xmin := 88,
+                                                    p_xmax := 92,
+                                                    p_ymin := 26,
+                                                    p_ymax := 28
+                                                )"
+
+# Export overall layer info to build web-mapping interface
+psql -h localhost -p 5432 -U sis -d iso19139 -c "\copy (
+        SELECT  p.project_id,
+                p.project_name,
+                l.layer_id,
+                'TRUE' AS publish,
+                p2.name AS property_name,
+                l.dimension_depth || '-' || l.dimension_stats AS dimension,
+                m.creation_date::text AS version,
+                p2.unit_of_measure_id,
+                'http://localhost:8001/collections/metadata:main/items/'||m.file_identifier metadata_url,
+                u.url AS download_url,
+                'http://localhost:8082/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=4.584249999999999936%2C116.5172270000000054%2C21.22970700000000122%2C126.8480870000000067&CRS=EPSG%3A4326&WIDTH=567&HEIGHT=914&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE' AS get_map_url,
+                'http://localhost:8082/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.1.1&LAYER='||l.layer_id||'&REQUEST=getlegendgraphic&FORMAT=image/png' AS get_legend_url,
+                'http://localhost:8082/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS='||l.layer_id||'&INFO_FORMAT=text%2Fhtml&I=282&J=429' AS get_feature_info_url
+        FROM spatial_metadata.layer l
+        LEFT JOIN spatial_metadata.mapset m ON m.mapset_id = l.mapset_id
+        LEFT JOIN spatial_metadata.project p ON p.country_id = m.country_id AND p.project_id = m.project_id
+        LEFT JOIN spatial_metadata.property p2 ON p2.property_id = m.property_id 
+        LEFT JOIN spatial_metadata.url u ON u.mapset_id = m.mapset_id AND u.url_name = 'Download '||l.dimension_depth || ' ' || l.dimension_stats
+        WHERE m.country_id = '$COUNTRY'
+        ORDER BY p.project_name, l.layer_id
+        ) 
+TO $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv WITH CSV HEADER"
+
+# Copy to sis database
+cat $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv | psql -h localhost -p 5442 -d sis -U sis -c "COPY api.layer FROM STDIN WITH (FORMAT CSV, HEADER, NULL '')"
+rm $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv
+
+# Add Profiles layers
+psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.layer 
+    (project_id,
+     project_name,
+     layer_id,
+     publish,
+     property_name,
+     metadata_url,
+     download_url,
+     get_map_url,
+     get_legend_url,
+     get_feature_info_url)
+ VALUES ('Profiles',
+         'Profiles',
+         'Profiles',
+         'TRUE',
+         'Soil profiles',
+         'http://localhost:8001/collections/metadata:main/items/00aaaa0a-ebeb-11ef-bc12-6b4a6fcd8b5e',
+         NULL,
+         'http://localhost:8082?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=26.69988199999999878%2C88.74999900000000252%2C28.24941499999999905%2C92.12528600000000267&CRS=EPSG%3A4326&WIDTH=661&HEIGHT=304&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE',
+         'http://localhost:8082/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.1.1&LAYER=Profiles&REQUEST=getlegendgraphic&FORMAT=image/png',
+         'http://localhost:8082/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&BBOX=1.16625995882351496%2C116.25895549999999901%2C24.6476970411764853%2C127.10635850000001312&CRS=EPSG%3A4326&WIDTH=595&HEIGHT=1288&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS=Profiles&INFO_FORMAT=text%2Fhtml&I=282&J=429')"
+
+# Add Profiles layers
+psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.setting(key, value) VALUES
+ ('ORG_LOGO_URL','../public/img/logo.png'),
+ ('APP_TITLE','Bhutan Soil Information System'),
+ ('LATITUDE','27.5'),
+ ('LONGITUDE','89.7'),
+ ('ZOOM','9'),
+ ('BASE_MAP_DEFAULT','esri-imagery')"
+
 # Test with API key
-curl http://localhost:8000/api/manifest -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
-curl http://localhost:8000/api/profile -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
-curl http://localhost:8000/api/observation -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
-curl http://localhost:8000/api/layer -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
-curl http://localhost:8000/api/setting -H "X-API-Key: 2FzhTf9coyUvYbRT9Gjk-4ao8vtV-JKlcfAaB3QFbqw"
+curl http://localhost:8000/api/manifest -H "X-API-Key: 5P3_cUmQ_jsVacn8WSOWd112gwNF9QfsRfx3t5T8SKk"
+curl http://localhost:8000/api/profile -H "X-API-Key: 5P3_cUmQ_jsVacn8WSOWd112gwNF9QfsRfx3t5T8SKk"
+curl http://localhost:8000/api/observation -H "X-API-Key: 5P3_cUmQ_jsVacn8WSOWd112gwNF9QfsRfx3t5T8SKk"
+curl http://localhost:8000/api/layer -H "X-API-Key: 5P3_cUmQ_jsVacn8WSOWd112gwNF9QfsRfx3t5T8SKk"
+curl http://localhost:8000/api/setting -H "X-API-Key: 5P3_cUmQ_jsVacn8WSOWd112gwNF9QfsRfx3t5T8SKk"
 
 # Create the API client for glosis
-# {"message":"API client created successfully","api_client_id":"glosis","api_key":"-a4BaluRF74FH1GWd-JlnjAeqXgFZHMcNvWrrRXuU3Q","warning":"Save this API key now. You won't be able to see it again!"}
+# {"message":"API client created successfully","api_client_id":"glosis","api_key":"4H8YLhkteRrC5Lo9jY49bmmzEsya9a0eErJ2gtJTSz4","warning":"Save this API key now. You won't be able to see it again!"}
 curl -X POST http://localhost:8000/api/clients \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyMzQyNDA1fQ.JX_EheNPZnONg-D8XXBLdOI2zwuvsiZpXHBl0Udg7oQ" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyNDMzMzE5fQ.TzN9KX6pFwfJk3lqnRLh7BMwetQad2Pq5EIj2EaoBZs" \
   -H "Content-Type: application/json" \
   -d '{
     "api_client_id": "glosis",
@@ -173,37 +241,6 @@ curl -X POST http://localhost:8000/api/clients \
 ##########################
 #     sis-web-mapping    #
 ##########################
-
-# collapsed group layer names in main.js line 323
-# collapsed group layer names in layers.js line 84
-
-# Overwrite logo file
-cp $PROJECT_DIR/sis-web-mapping/public/img/logo_${COUNTRY}.png $PROJECT_DIR/sis-web-mapping/public/img/logo.png # index.html line 9 and 13
-
-# Overwrite layer info file
-cp $PROJECT_DIR/sis-web-mapping/public/layer_info_${COUNTRY}.csv $PROJECT_DIR/sis-web-mapping/public/layer_info.csv # layers.js line 8
-
-# Reset main.js
-cp $PROJECT_DIR/sis-web-mapping/src/js/main.default $PROJECT_DIR/sis-web-mapping/src/js/main.js
-
-# Set map center
-sed -i "s/MAP_CENTER_LONG/$LONGITUDE/g" $PROJECT_DIR/sis-web-mapping/src/js/main.js         # main.js line 98
-sed -i "s/MAP_CENTER_LAT/$LATITUDE/g" $PROJECT_DIR/sis-web-mapping/src/js/main.js           # main.js line 98
-
-# Set zoom level
-sed -i "s/MAP_ZOOM/$ZOOM/g" $PROJECT_DIR/sis-web-mapping/src/js/main.js                     # main.js line 99
-
-# Set default base map
-sed -i "s/BASE_MAP_DEFAULT/$BASE_MAP_DEFAULT/g" $PROJECT_DIR/sis-web-mapping/src/js/main.js # main.js line 465
-
-# Set default layer
-sed -i "s/LAYER_DEFAULT/$LAYER_DEFAULT/g" $PROJECT_DIR/sis-web-mapping/src/js/main.js       # main.js line 476
-
-# Reset index.html
-cp $PROJECT_DIR/sis-web-mapping/src/index.default $PROJECT_DIR/sis-web-mapping/src/index.html
-
-# Set country name
-sed -i "s/COUNTRY_LONG/$COUNTRY_LONG/g" $PROJECT_DIR/sis-web-mapping/src/index.html       # main.js line 476
 
 # Build and start container
 docker compose up --build sis-web-mapping -d

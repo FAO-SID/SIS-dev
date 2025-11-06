@@ -1,528 +1,636 @@
 import 'ol/ol.css';
 import Map from 'ol/Map';
 import View from 'ol/View';
-import TileLayer from 'ol/layer/Tile';
-import XYZ from 'ol/source/XYZ';
-import { ScaleLine, defaults as defaultControls, Attribution } from 'ol/control';
+import { Tile as TileLayer, Image as ImageLayer, Vector as VectorLayer } from 'ol/layer';
+import { OSM, XYZ, ImageWMS, Vector as VectorSource, Cluster } from 'ol/source';
 import { fromLonLat } from 'ol/proj';
+import { ScaleLine, defaults as defaultControls } from 'ol/control';
 import Overlay from 'ol/Overlay';
-import { fetchLayerInfo, createLayerConfig } from './layers';
-import ImageLayer from 'ol/layer/Image';
-import ImageWMS from 'ol/source/ImageWMS';
-import { transform, transformExtent } from 'ol/proj';
+import { Circle as CircleStyle, Fill, Stroke, Style, Text } from 'ol/style';
+import { GeoJSON } from 'ol/format';
+import api from './api-client.js';
 
-// Create popup overlay for feature information
-const popup = new Overlay({
-    element: document.getElementById('popup'),
-    positioning: 'center-center',
-    offset: [-105, 5],
-    autoPan: {
-        animation: {
-            duration: 250
-        }
+// Global variables
+let map;
+let appConfig = {};
+let currentLayers = {};
+let profileLayer;
+let activeLayer = null;
+
+// ==================== Initialization ====================
+
+async function initializeApp() {
+  try {
+    showLoading(true);
+
+    // Load settings from API
+    const settings = await api.getSettings();
+    appConfig = settingsArrayToObject(settings);
+
+    // Apply settings to UI
+    applySettings();
+
+    // Initialize map
+    initializeMap();
+
+    // Load layers from API
+    await loadLayers();
+
+    // Load profiles
+    await loadProfiles();
+
+    // Setup UI controls
+    setupControls();
+
+    // Check if user is logged in
+    if (api.restoreSession()) {
+      showAdminPanel();
     }
-});
 
-// Create legend container
-const legendContainer = document.createElement('div');
-legendContainer.id = 'legend';
-legendContainer.className = 'legend-container';
-document.body.appendChild(legendContainer);
-
-// Function to update legend
-function updateLegend(layer) {
-    const legendContainer = document.getElementById('legend');
-    const legendContent = legendContainer.querySelector('.legend-content');
-    
-    if (!layer || !layer.getVisible()) {
-        legendContainer.style.display = 'none';
-        return;
-    }
-
-    const layerId = layer.getSource().getParams().LAYERS;
-    const legendUrl = `http://localhost:8082/?map=/etc/mapserver/${layerId}.map&SERVICE=WMS&VERSION=1.1.1&LAYER=${layerId}&REQUEST=getlegendgraphic&FORMAT=image/png`;
-    
-    legendContainer.style.display = 'block';
-    legendContent.innerHTML = `<img src="${legendUrl}" alt="Legend" />`;
+    showLoading(false);
+  } catch (error) {
+    console.error('Failed to initialize app:', error);
+    showError('Failed to load application. Please check your connection and refresh.');
+    showLoading(false);
+  }
 }
 
-// Base maps configuration
-const baseMaps = {
-    'Base Maps': [
-        {
-            id: 'esri-imagery',
-            name: 'ESRI Imagery',
-            layer: new TileLayer({
-                source: new XYZ({
-                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                    attributions: 'Tiles © Esri'
-                })
-            })
-        },
-        {
-            id: 'osm',
-            name: 'OpenStreetMap',
-            layer: new TileLayer({
-                source: new XYZ({
-                    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    attributions: '© OpenStreetMap contributors'
-                })
-            })
-        },
-        {
-            id: 'topo',
-            name: 'Open TopoMap',
-            layer: new TileLayer({
-                source: new XYZ({
-                    url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-                    attributions: '© OpenStreetMap contributors, © OpenTopoMap'
-                })
-            })
-        }
-    ]
-};
+function settingsArrayToObject(settingsArray) {
+  const config = {};
+  settingsArray.forEach(s => config[s.key] = s.value);
+  return config;
+}
 
-// Initialize map
-const map = new Map({
-    target: 'map',
-    controls: defaultControls({
-        zoom: false, // Disable default zoom control
-        attribution: false, // Keep attribution control
-        rotate: true // Keep rotate control if it exists
-    }).extend([
-        new ScaleLine({
-            target: 'scale-line'
-        })
-    ]),
-    view: new View({
-        center: fromLonLat([89.7, 27.5]),
-        zoom: 9
+function applySettings() {
+  // Update logo
+  if (appConfig.ORG_LOGO_URL) {
+    document.querySelector('.header .logo').src = appConfig.ORG_LOGO_URL;
+  }
+
+  // Update title
+  if (appConfig.APP_TITLE) {
+    document.querySelector('.header h1').textContent = appConfig.APP_TITLE;
+    document.title = appConfig.APP_TITLE;
+  }
+}
+
+// ==================== Map Initialization ====================
+
+function initializeMap() {
+  const latitude = parseFloat(appConfig.LATITUDE || 27.5);
+  const longitude = parseFloat(appConfig.LONGITUDE || 89.7);
+  const zoom = parseInt(appConfig.ZOOM || 9);
+
+  // Base layers
+  const baseLayers = {
+    'esri-imagery': new TileLayer({
+      source: new XYZ({
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        attributions: 'Tiles © Esri'
+      }),
+      visible: appConfig.BASE_MAP_DEFAULT === 'esri-imagery'
+    }),
+    'osm': new TileLayer({
+      source: new OSM(),
+      visible: appConfig.BASE_MAP_DEFAULT === 'osm'
+    }),
+    'terrain': new TileLayer({
+      source: new XYZ({
+        url: 'https://tile.opentopomap.org/{z}/{x}/{y}.png',
+        attributions: '© OpenTopoMap'
+      }),
+      visible: appConfig.BASE_MAP_DEFAULT === 'terrain'
     })
-});
+  };
 
-// Add popup overlay to map
-map.addOverlay(popup);
+  map = new Map({
+    target: 'map',
+    layers: Object.values(baseLayers),
+    view: new View({
+      center: fromLonLat([longitude, latitude]),
+      zoom: zoom
+    }),
+    controls: defaultControls({ attribution: false }).extend([
+      new ScaleLine({ target: 'scale-line' })
+    ])
+  });
 
-// Handle popup closer
-document.getElementById('popup-closer').onclick = () => {
+  // Store base layers for later use
+  map.set('baseLayers', baseLayers);
+
+  // Setup popup
+  setupPopup();
+}
+
+// ==================== Layer Loading ====================
+
+async function loadLayers() {
+  try {
+    const layers = await api.getLayers();
+    
+    // Group layers by project_name
+    const groupedLayers = layers.reduce((acc, layer) => {
+      const group = layer.project_name || 'Ungrouped';
+      if (!acc[group]) {
+        acc[group] = [];
+      }
+      acc[group].push(layer);
+      return acc;
+    }, {});
+
+    // Create layer groups in UI
+    const layerGroupsContainer = document.getElementById('layer-groups');
+    layerGroupsContainer.innerHTML = '';
+
+    // Add base maps group first
+    addBaseMapsGroup(layerGroupsContainer);
+
+    // Add data layer groups
+    for (const [groupName, groupLayers] of Object.entries(groupedLayers)) {
+      addLayerGroup(layerGroupsContainer, groupName, groupLayers);
+    }
+
+  } catch (error) {
+    console.error('Failed to load layers:', error);
+    showError('Failed to load layers from API');
+  }
+}
+
+function addBaseMapsGroup(container) {
+  const groupDiv = document.createElement('div');
+  groupDiv.className = 'layer-group';
+  groupDiv.innerHTML = `
+    <div class="layer-group-header">Base Maps</div>
+    <div class="layer-group-content">
+      <div class="layer-item">
+        <input type="radio" name="basemap" id="basemap-esri" value="esri-imagery" 
+               ${appConfig.BASE_MAP_DEFAULT === 'esri-imagery' ? 'checked' : ''}>
+        <label for="basemap-esri">ESRI Imagery</label>
+      </div>
+      <div class="layer-item">
+        <input type="radio" name="basemap" id="basemap-osm" value="osm"
+               ${appConfig.BASE_MAP_DEFAULT === 'osm' ? 'checked' : ''}>
+        <label for="basemap-osm">OpenStreetMap</label>
+      </div>
+      <div class="layer-item">
+        <input type="radio" name="basemap" id="basemap-terrain" value="terrain"
+               ${appConfig.BASE_MAP_DEFAULT === 'terrain' ? 'checked' : ''}>
+        <label for="basemap-terrain">Terrain</label>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(groupDiv);
+
+  // Add event listeners for basemap switching
+  groupDiv.querySelectorAll('input[name="basemap"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      switchBasemap(e.target.value);
+    });
+  });
+
+  // Make group collapsible
+  groupDiv.querySelector('.layer-group-header').addEventListener('click', () => {
+    groupDiv.classList.toggle('collapsed');
+  });
+}
+
+function addLayerGroup(container, groupName, layers) {
+  const groupDiv = document.createElement('div');
+  groupDiv.className = 'layer-group';
+  
+  const headerDiv = document.createElement('div');
+  headerDiv.className = 'layer-group-header';
+  headerDiv.textContent = groupName;
+  groupDiv.appendChild(headerDiv);
+
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'layer-group-content';
+
+  layers.forEach(layer => {
+    const layerItem = createLayerItem(layer);
+    contentDiv.appendChild(layerItem);
+  });
+
+  groupDiv.appendChild(contentDiv);
+  container.appendChild(groupDiv);
+
+  // Make group collapsible
+  headerDiv.addEventListener('click', () => {
+    groupDiv.classList.toggle('collapsed');
+  });
+}
+
+function createLayerItem(layer) {
+  const itemDiv = document.createElement('div');
+  itemDiv.className = 'layer-item';
+  
+  const layerName = layer.dimension 
+    ? `${layer.property_name} (${layer.dimension})`
+    : layer.property_name;
+
+  itemDiv.innerHTML = `
+    <input type="radio" name="data-layer" id="layer-${layer.layer_id}" value="${layer.layer_id}">
+    <label for="layer-${layer.layer_id}" title="${layerName}">${layerName}</label>
+    <div class="layer-icons">
+      ${layer.metadata_url ? `<a href="${layer.metadata_url}" target="_blank" title="Metadata"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z'/%3E%3C/svg%3E" alt="Info"></a>` : ''}
+      ${layer.download_url ? `<a href="${layer.download_url}" title="Download"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z'/%3E%3C/svg%3E" alt="Download"></a>` : ''}
+    </div>
+  `;
+
+  const radio = itemDiv.querySelector('input[type="radio"]');
+  radio.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      switchLayer(layer);
+    }
+  });
+
+  return itemDiv;
+}
+
+function switchBasemap(basemapId) {
+  const baseLayers = map.get('baseLayers');
+  Object.entries(baseLayers).forEach(([id, layer]) => {
+    layer.setVisible(id === basemapId);
+  });
+}
+
+function switchLayer(layerConfig) {
+  // Remove currently active layer
+  if (activeLayer) {
+    map.removeLayer(activeLayer);
+    document.getElementById('legend').style.display = 'none';
+  }
+
+  // Create and add new layer
+  const layer = createWMSLayer(layerConfig);
+  map.addLayer(layer);
+  activeLayer = layer;
+
+  // Show legend if available
+  if (layerConfig.get_legend_url) {
+    showLegend(layerConfig.get_legend_url);
+  }
+
+  // Store current layer config
+  currentLayers[layerConfig.layer_id] = layerConfig;
+}
+
+function createWMSLayer(layerConfig) {
+  // Parse WMS URL to extract base URL and layer name
+  const mapServerUrl = 'http://localhost:8082/';
+  
+  const layer = new ImageLayer({
+    source: new ImageWMS({
+      url: mapServerUrl,
+      params: {
+        'LAYERS': layerConfig.layer_id,
+        'FORMAT': 'image/png',
+        'TRANSPARENT': true
+      },
+      ratio: 1,
+      serverType: 'mapserver'
+    })
+  });
+
+  layer.set('layerId', layerConfig.layer_id);
+  layer.set('featureInfoUrl', layerConfig.get_feature_info_url);
+  
+  return layer;
+}
+
+// ==================== Profile Layer ====================
+
+async function loadProfiles() {
+  try {
+    const profiles = await api.getProfiles();
+    
+    // Create features from profiles
+    const features = profiles.map(profile => {
+      const geometry = JSON.parse(profile.geometry);
+      const feature = new GeoJSON().readFeature({
+        type: 'Feature',
+        geometry: geometry,
+        properties: {
+          profile_code: profile.profile_code,
+          project_name: profile.project_name,
+          altitude: profile.altitude,
+          date: profile.date
+        }
+      }, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857'
+      });
+      return feature;
+    });
+
+    // Create vector source with clustering
+    const vectorSource = new VectorSource({ features });
+    
+    const clusterSource = new Cluster({
+      distance: 40,
+      source: vectorSource
+    });
+
+    // Create profile layer
+    profileLayer = new VectorLayer({
+      source: clusterSource,
+      style: getProfileStyle,
+      zIndex: 1000
+    });
+
+    profileLayer.set('name', 'Soil Profiles');
+    map.addLayer(profileLayer);
+
+    // Add checkbox for profile layer
+    addProfileLayerControl();
+
+  } catch (error) {
+    console.error('Failed to load profiles:', error);
+    showError('Failed to load soil profiles');
+  }
+}
+
+function getProfileStyle(feature) {
+  const size = feature.get('features').length;
+  
+  if (size > 1) {
+    // Clustered style
+    return new Style({
+      image: new CircleStyle({
+        radius: 15 + Math.min(size / 2, 10),
+        fill: new Fill({ color: 'rgba(255, 153, 0, 0.8)' }),
+        stroke: new Stroke({ color: 'rgba(255, 153, 0, 1)', width: 2 })
+      }),
+      text: new Text({
+        text: size.toString(),
+        fill: new Fill({ color: '#fff' }),
+        font: 'bold 12px sans-serif'
+      })
+    });
+  } else {
+    // Single point style
+    return new Style({
+      image: new CircleStyle({
+        radius: 8,
+        fill: new Fill({ color: 'rgba(0, 123, 255, 0.8)' }),
+        stroke: new Stroke({ color: '#fff', width: 2 })
+      })
+    });
+  }
+}
+
+function addProfileLayerControl() {
+  const profileGroup = document.createElement('div');
+  profileGroup.className = 'layer-group';
+  profileGroup.innerHTML = `
+    <div class="layer-group-header">Soil Profiles</div>
+    <div class="layer-group-content">
+      <div class="layer-item">
+        <input type="checkbox" id="layer-profiles" checked>
+        <label for="layer-profiles">Profile Locations</label>
+      </div>
+    </div>
+  `;
+
+  // Insert at the beginning of layer groups
+  const layerGroupsContainer = document.getElementById('layer-groups');
+  layerGroupsContainer.insertBefore(profileGroup, layerGroupsContainer.firstChild);
+
+  // Add event listener
+  document.getElementById('layer-profiles').addEventListener('change', (e) => {
+    profileLayer.setVisible(e.target.checked);
+  });
+
+  // Make collapsible
+  profileGroup.querySelector('.layer-group-header').addEventListener('click', () => {
+    profileGroup.classList.toggle('collapsed');
+  });
+}
+
+// ==================== Popup ====================
+
+function setupPopup() {
+  const popup = new Overlay({
+    element: document.getElementById('popup'),
+    autoPan: true,
+    autoPanAnimation: { duration: 250 }
+  });
+  map.addOverlay(popup);
+
+  // Close popup
+  document.getElementById('popup-closer').addEventListener('click', () => {
     popup.setPosition(undefined);
-};
+  });
 
-// Add click handler for feature information
-map.on('singleclick', async (evt) => {
-    // Get the visible WMS layers
-    const visibleLayers = map.getLayers().getArray().filter(layer => {
-        return layer instanceof ImageLayer && 
-               layer.getVisible() && 
-               layer.getSource() instanceof ImageWMS;
-    });
-
-    if (visibleLayers.length === 0) {
-        popup.setPosition(undefined);
-        return;
-    }
-
-    // Get the view resolution and projection
-    const viewResolution = map.getView().getResolution();
-    const viewProjection = map.getView().getProjection();
-    const coordinate = evt.coordinate;
-
-    // Transform coordinates to EPSG:4326 (lat/lon)
-    const coordinate4326 = transform(coordinate, viewProjection, 'EPSG:4326');
-    // Format coordinates to 3 decimal places
-    const lon = coordinate4326[0].toFixed(2);
-    const lat = coordinate4326[1].toFixed(2);
-
-    const mapSize = map.getSize();
-    const extent = map.getView().calculateExtent(mapSize);
-    const bbox4326 = transformExtent(extent, viewProjection, 'EPSG:4326');
-
-    // Create a promise for each layer's feature info request
-    const featureInfoPromises = visibleLayers.map(async (layer) => {
-        const source = layer.getSource();
-        const layerName = layer.get('name');
-        
-        if (!layerName) {
-            console.warn('Layer name not found for layer:', layer);
-            return null;
-        }
-
-        // Get the layer ID from the source params
-        const layerId = source.getParams().LAYERS;
-        
-        // Log layer information for debugging
-        console.log('Layer info:', {
-            layerName: layerName,
-            layerId: layerId,
-            sourceParams: source.getParams()
-        });
-
-        // Use OpenLayers' built-in getGetFeatureInfoUrl method
-        const url = source.getFeatureInfoUrl(
-            evt.coordinate,
-            viewResolution,
-            viewProjection,
-            {
-                'INFO_FORMAT': 'text/html',
-                'FEATURE_COUNT': 1,
-                'QUERY_LAYERS': layerId,
-                'VERSION': '1.3.0'
-            }
-        );
-
-        if (!url) {
-            console.warn('Could not generate GetFeatureInfo URL for layer:', layerName);
-            return null;
-        }
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Network response was not ok');
-            
-            // Get the content type from the response
-            const contentType = response.headers.get('content-type');
-            
-            let data;
-            if (contentType && contentType.includes('application/json')) {
-                data = await response.json();
-            } else if (contentType && contentType.includes('text/html')) {
-                const text = await response.text();
-                data = {
-                    type: 'FeatureCollection',
-                    features: [{
-                        type: 'Feature',
-                        properties: {
-                            'Content': text
-                        }
-                    }]
-                };
-            } else if (contentType && contentType.includes('text/plain')) {
-                const text = await response.text();
-                // Parse the plain text response into a structured format
-                const properties = {};
-                text.split('\n').forEach(line => {
-                    const [key, value] = line.split(':').map(s => s.trim());
-                    if (key && value) {
-                        properties[key] = value;
-                    }
-                });
-                data = {
-                    type: 'FeatureCollection',
-                    features: [{
-                        type: 'Feature',
-                        properties: properties
-                    }]
-                };
-            } else {
-                // For other formats, get the text content
-                const text = await response.text();
-                data = {
-                    type: 'FeatureCollection',
-                    features: [{
-                        type: 'Feature',
-                        properties: {
-                            'Content': text
-                        }
-                    }]
-                };
-            }
-            
-            return {
-                layer: layer,
-                data: data
-            };
-        } catch (error) {
-            console.error('Error fetching feature info:', error);
-            return null;
-        }
-    });
-
-    // Wait for all feature info requests to complete
-    const featureInfoResults = await Promise.all(featureInfoPromises);
+  // Handle map clicks
+  map.on('singleclick', async (evt) => {
+    const features = map.getFeaturesAtPixel(evt.pixel);
     
-    // Filter out failed requests and empty results
-    const validResults = featureInfoResults.filter(result => 
-        result && result.data && 
-        ((result.data.features && result.data.features.length > 0) || 
-         (result.data.properties && Object.keys(result.data.properties).length > 0))
-    );
+    if (features && features.length > 0) {
+      const feature = features[0];
+      const clusterFeatures = feature.get('features');
+      
+      if (clusterFeatures && clusterFeatures.length === 1) {
+        // Single profile - show observations
+        await showProfileObservations(clusterFeatures[0], popup, evt.coordinate);
+      } else if (clusterFeatures && clusterFeatures.length > 1) {
+        // Cluster - zoom in
+        const extent = clusterFeatures[0].getGeometry().getExtent();
+        map.getView().fit(extent, { duration: 500, maxZoom: map.getView().getZoom() + 2 });
+      }
+    } else {
+      popup.setPosition(undefined);
+    }
+  });
+}
 
-    if (validResults.length === 0) {
-        popup.setPosition(undefined);
-        return;
+async function showProfileObservations(feature, popup, coordinate) {
+  const profileCode = feature.get('profile_code');
+  const projectName = feature.get('project_name');
+  const altitude = feature.get('altitude');
+  const date = feature.get('date');
+
+  try {
+    const observations = await api.getObservations(profileCode);
+    
+    let html = `
+      <div class="feature-info-layer">
+        <h3>Profile: ${profileCode}</h3>
+        <div class="feature-info-item">
+          <div class="feature-info-property"><strong>Project:</strong> ${projectName || 'N/A'}</div>
+          <div class="feature-info-property"><strong>Altitude:</strong> ${altitude || 'N/A'} m</div>
+          <div class="feature-info-property"><strong>Date:</strong> ${date ? new Date(date).toLocaleDateString() : 'N/A'}</div>
+          <div class="feature-info-property"><strong>Observations:</strong> ${observations.length}</div>
+        </div>
+      </div>
+    `;
+
+    if (observations.length > 0) {
+      html += '<div class="feature-info-layer"><h3>Sample Data (first 5):</h3>';
+      observations.slice(0, 5).forEach(obs => {
+        html += `
+          <div class="feature-info-item">
+            <div class="feature-info-property"><strong>Property:</strong> ${obs.property_phys_chem_id}</div>
+            <div class="feature-info-property"><strong>Depth:</strong> ${obs.upper_depth}-${obs.lower_depth} cm</div>
+            <div class="feature-info-property"><strong>Value:</strong> ${obs.value} ${obs.unit_of_measure_id || ''}</div>
+          </div>
+        `;
+      });
+      html += '</div>';
     }
 
-    // Create popup content
-    const popupContent = document.getElementById('popup-content');
-    popupContent.innerHTML = '';
-
-    validResults.forEach(result => {
-        const layerName = result.layer.get('name') || 'Unknown Layer';
-        const features = result.data.features || [result.data];
-
-        const layerDiv = document.createElement('div');
-        layerDiv.className = 'feature-info-layer';
-        
-        const layerHeader = document.createElement('h3');
-        layerHeader.textContent = layerName;
-        layerDiv.appendChild(layerHeader);
-
-        features.forEach(feature => {
-            const featureDiv = document.createElement('div');
-            featureDiv.className = 'feature-info-item';
-            
-            if (feature.properties) {
-                if (feature.properties.Content) {
-                    // Parse the content string
-                    const content = feature.properties.Content;
-                    const valueMatch = content.match(/Value:\s*([\d.]+)/);
-                    
-                    // Get unit from layer source parameters
-                    const unit = result.layer.get('unit');
-                    
-                    if (valueMatch) {
-                        const valueDiv = document.createElement('div');
-                        valueDiv.className = 'feature-info-property';
-                        const roundedValue = parseFloat(valueMatch[1]).toFixed(2);
-                        valueDiv.innerHTML = `<strong>Value:</strong> ${roundedValue}${unit ? ' ' + unit : ''}`;
-                        featureDiv.appendChild(valueDiv);
-                    }
-                    
-                    // Add coordinates in EPSG:4326
-                    const coordsDiv = document.createElement('div');
-                    coordsDiv.className = 'feature-info-property';
-                    coordsDiv.innerHTML = `<strong>Coords (lon, lat):</strong> ${lon}, ${lat}`;
-                    featureDiv.appendChild(coordsDiv);
-                } else {
-                    Object.entries(feature.properties).forEach(([key, value]) => {
-                        if (value !== null && value !== undefined) {
-                            const propertyDiv = document.createElement('div');
-                            propertyDiv.className = 'feature-info-property';
-                            propertyDiv.innerHTML = `<strong>${key}:</strong> ${value}`;
-                            featureDiv.appendChild(propertyDiv);
-                        }
-                    });
-                }
-            }
-            
-            layerDiv.appendChild(featureDiv);
-        });
-
-        popupContent.appendChild(layerDiv);
-    });
-
-    // Show popup
+    document.getElementById('popup-content').innerHTML = html;
     popup.setPosition(coordinate);
-});
-
-// Function to create layer group UI
-function createLayerGroupUI(groupName, layers) {
-    const groupDiv = document.createElement('div');
-    groupDiv.className = 'layer-group';
-    
-    // Add collapsed class for specific groups
-    if (['Base Maps', 'Soil Profiles', 'Global Soil Nutrients Map', 'Global Soil Organic Carbon Sequestration potential map'].includes(groupName)) {
-        groupDiv.classList.add('collapsed');
-    }
-    
-    const header = document.createElement('div');
-    header.className = 'layer-group-header';
-    header.textContent = groupName;
-    header.onclick = () => groupDiv.classList.toggle('collapsed');
-    
-    const content = document.createElement('div');
-    content.className = 'layer-group-content';
-    
-    layers.forEach(layer => {
-        const layerDiv = document.createElement('div');
-        layerDiv.className = 'layer-item';
-        
-        const input = document.createElement('input');
-        input.type = groupName === 'Base Maps' ? 'radio' : 'checkbox';
-        input.name = groupName === 'Base Maps' ? 'baseMap' : 'overlayLayer';
-        input.id = layer.id;
-        
-        const label = document.createElement('label');
-        label.htmlFor = layer.id;
-        label.textContent = layer.name;
-        label.title = layer.name; // Add tooltip
-        
-        if (layer.metadata_url || layer.download_url) {
-            const icons = document.createElement('div');
-            icons.className = 'layer-icons';
-            
-            if (layer.metadata_url) {
-                const metadataIcon = document.createElement('img');
-                metadataIcon.src = '../public/img/metadata-icon.svg';
-                metadataIcon.title = 'View Metadata';
-                metadataIcon.onclick = () => window.open(layer.metadata_url);
-                icons.appendChild(metadataIcon);
-            }
-            
-            if (layer.download_url) {
-                const downloadIcon = document.createElement('img');
-                downloadIcon.src = '../public/img/download-icon.svg';
-                downloadIcon.title = 'Download Layer';
-                downloadIcon.onclick = () => window.open(layer.download_url);
-                icons.appendChild(downloadIcon);
-            }
-            
-            layerDiv.appendChild(icons);
-        }
-        
-        layerDiv.appendChild(input);
-        layerDiv.appendChild(label);
-        content.appendChild(layerDiv);
-        
-        // Handle layer visibility
-        input.onchange = () => {
-            // Close any open popup
-            popup.setPosition(undefined);
-            
-            if (groupName === 'Base Maps') {
-                baseMaps['Base Maps'].forEach(baseLayer => {
-                    baseLayer.layer.setVisible(baseLayer.id === layer.id);
-                });
-                // Hide legend for base maps
-                updateLegend(null);
-            } else {
-                // For non-profile layers, uncheck all other non-profile layers
-                if (groupName !== 'Soil Profiles') {
-                    document.querySelectorAll('input[name="overlayLayer"]').forEach(checkbox => {
-                        if (checkbox.id !== layer.id && !checkbox.closest('.layer-group').querySelector('.layer-group-header').textContent.includes('Soil Profiles')) {
-                            checkbox.checked = false;
-                            const layerToHide = findLayerById(checkbox.id);
-                            if (layerToHide) {
-                                layerToHide.setVisible(false);
-                            }
-                        }
-                    });
-                }
-                layer.layer.setVisible(input.checked);
-                // Update legend
-                updateLegend(input.checked ? layer.layer : null);
-
-                // Collapse other group layers when a new layer is selected
-                if (input.checked) {
-                    document.querySelectorAll('.layer-group').forEach(otherGroup => {
-                        const otherGroupHeader = otherGroup.querySelector('.layer-group-header');
-                        if (otherGroupHeader && otherGroupHeader.textContent !== groupName) {
-                            otherGroup.classList.add('collapsed');
-                        }
-                    });
-                }
-            }
-        };
-    });
-    
-    groupDiv.appendChild(header);
-    groupDiv.appendChild(content);
-    return groupDiv;
+  } catch (error) {
+    console.error('Failed to load observations:', error);
+    document.getElementById('popup-content').innerHTML = `
+      <div class="feature-info-layer">
+        <h3>Profile: ${profileCode}</h3>
+        <p>Failed to load observations</p>
+      </div>
+    `;
+    popup.setPosition(coordinate);
+  }
 }
 
-// Helper function to find layer by ID
-function findLayerById(id) {
-    for (const group of Object.values(layerGroups)) {
-        for (const layer of group) {
-            if (layer.id === id) {
-                return layer.layer;
-            }
-        }
-    }
-    return null;
+function showLegend(legendUrl) {
+  const legendContainer = document.getElementById('legend');
+  const legendContent = legendContainer.querySelector('.legend-content');
+  legendContent.innerHTML = `<img src="${legendUrl}" alt="Legend">`;
+  legendContainer.style.display = 'block';
 }
 
-// Initialize layer groups
-let layerGroups = { ...baseMaps };
+// ==================== UI Controls ====================
 
-// Load and initialize WMS layers
-async function initializeLayers() {
-    try {
-        const layerInfo = await fetchLayerInfo();
-        const wmsLayers = createLayerConfig(layerInfo);
-        layerGroups = { ...layerGroups, ...wmsLayers };
-        
-        const layerGroupsContainer = document.getElementById('layer-groups');
-        layerGroupsContainer.innerHTML = ''; // Clear existing content
-        
-        // Add all layer groups to the UI and map
-        Object.entries(layerGroups).forEach(([groupName, layers]) => {
-            const groupUI = createLayerGroupUI(groupName, layers);
-            layerGroupsContainer.appendChild(groupUI);
-            
-            // Add all layers to map, including Soil Profiles
-            layers.forEach(layer => {
-                map.addLayer(layer.layer);
-                layer.layer.setVisible(false);
-                // Set default opacity for non-base map layers
-                if (!baseMaps['Base Maps'].some(baseLayer => baseLayer.layer === layer.layer)) {
-                    layer.layer.setOpacity(0.8);
-                }
-            });
-        });
-        
-        // Select default base map
-        const defaultBaseMap = document.getElementById('esri-imagery');
-        if (defaultBaseMap) {
-            defaultBaseMap.checked = true;
-            defaultBaseMap.dispatchEvent(new Event('change'));
-        }
-
-        // Set default opacity in the opacity control
-        const opacityControl = document.getElementById('opacity');
-        opacityControl.value = 0.8;
-
-        // Activate Bulk density (0-30) by default
-        const bulkDensityLayer = document.querySelector('input[id="BT-GSNM-BKD-2024-0-30"]');
-        if (bulkDensityLayer) {
-            bulkDensityLayer.checked = true;
-            bulkDensityLayer.dispatchEvent(new Event('change'));
-        }
-    } catch (error) {
-        console.error('Error initializing layers:', error);
-    }
-}
-
-// Initialize layers
-initializeLayers();
-
-// Layer switcher collapse functionality
-const collapseBtn = document.getElementById('collapse-btn');
-const layerSwitcher = document.getElementById('layer-switcher');
-
-// Change button text to an arrow
-collapseBtn.innerHTML = '◀';
-
-collapseBtn.onclick = () => {
+function setupControls() {
+  // Layer switcher collapse
+  const collapseBtn = document.getElementById('collapse-btn');
+  const layerSwitcher = document.getElementById('layer-switcher');
+  
+  collapseBtn.addEventListener('click', () => {
     layerSwitcher.classList.toggle('collapsed');
-    // Update button text based on state
-    collapseBtn.innerHTML = layerSwitcher.classList.contains('collapsed') ? '▶' : '◀';
-};
+  });
 
-// Opacity control
-const opacityControl = document.getElementById('opacity');
-opacityControl.oninput = (e) => {
-    const opacity = parseFloat(e.target.value);
-    const visibleLayers = map.getLayers().getArray().filter(layer => {
-        // Only apply opacity to non-base map layers
-        return layer.getVisible() && !baseMaps['Base Maps'].some(baseLayer => baseLayer.layer === layer);
-    });
-    visibleLayers.forEach(layer => layer.setOpacity(opacity));
-};
+  // Opacity control
+  const opacitySlider = document.getElementById('opacity');
+  opacitySlider.addEventListener('input', (e) => {
+    if (activeLayer) {
+      activeLayer.setOpacity(parseFloat(e.target.value));
+    }
+  });
 
-// Zoom controls
-document.getElementById('zoom-in').onclick = () => {
+  // Zoom controls
+  document.getElementById('zoom-in').addEventListener('click', () => {
     const view = map.getView();
-    view.animate({
-        zoom: view.getZoom() + 1,
-        duration: 250
-    });
-};
+    view.setZoom(view.getZoom() + 1);
+  });
 
-document.getElementById('zoom-out').onclick = () => {
+  document.getElementById('zoom-out').addEventListener('click', () => {
     const view = map.getView();
-    view.animate({
-        zoom: view.getZoom() - 1,
-        duration: 250
-    });
-}; 
+    view.setZoom(view.getZoom() - 1);
+  });
+
+  // Add login button
+  addLoginButton();
+}
+
+function addLoginButton() {
+  const loginBtn = document.createElement('button');
+  loginBtn.id = 'login-btn';
+  loginBtn.textContent = 'Admin Login';
+  loginBtn.style.cssText = 'position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: rgba(255,255,255,0.9); border: none; border-radius: 4px; cursor: pointer; z-index: 1001;';
+  
+  loginBtn.addEventListener('click', () => {
+    if (api.isAuthenticated()) {
+      showAdminPanel();
+    } else {
+      showLoginModal();
+    }
+  });
+
+  document.body.appendChild(loginBtn);
+}
+
+// ==================== Admin Functions ====================
+
+function showLoginModal() {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+  
+  modal.innerHTML = `
+    <div style="background: white; padding: 30px; border-radius: 8px; min-width: 300px;">
+      <h2 style="margin-top: 0;">Admin Login</h2>
+      <input type="email" id="login-email" placeholder="Email" style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
+      <input type="password" id="login-password" placeholder="Password" style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box;">
+      <button id="login-submit" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
+      <button id="login-cancel" style="width: 100%; padding: 10px; margin-top: 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+      <div id="login-error" style="color: red; margin-top: 10px; display: none;"></div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById('login-submit').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    try {
+      await api.login(email, password);
+      document.body.removeChild(modal);
+      showAdminPanel();
+      document.getElementById('login-btn').textContent = 'Admin Panel';
+    } catch (error) {
+      document.getElementById('login-error').textContent = error.message;
+      document.getElementById('login-error').style.display = 'block';
+    }
+  });
+
+  document.getElementById('login-cancel').addEventListener('click', () => {
+    document.body.removeChild(modal);
+  });
+}
+
+function showAdminPanel() {
+  // This would open a full admin interface
+  // For now, just show an alert that you're logged in
+  alert('Admin panel functionality coming soon! You can now manage layers and settings via API calls.');
+  document.getElementById('login-btn').textContent = 'Logout';
+  document.getElementById('login-btn').onclick = () => {
+    api.logout();
+    document.getElementById('login-btn').textContent = 'Admin Login';
+    alert('Logged out successfully');
+  };
+}
+
+// ==================== Utility Functions ====================
+
+function showLoading(show) {
+  let loader = document.getElementById('loading-overlay');
+  if (show) {
+    if (!loader) {
+      loader = document.createElement('div');
+      loader.id = 'loading-overlay';
+      loader.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; font-size: 24px;';
+      loader.textContent = 'Loading...';
+      document.body.appendChild(loader);
+    }
+  } else {
+    if (loader) {
+      document.body.removeChild(loader);
+    }
+  }
+}
+
+function showError(message) {
+  alert(message);
+}
+
+// ==================== Start App ====================
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}

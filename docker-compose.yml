@@ -86,14 +86,13 @@ services:
     build: 
       context: ./sis-web-mapping
       dockerfile: Dockerfile
+      args:
+        API_URL: http://sis-api:8000
+        API_KEY: ${WEB_MAPPING_API_KEY}
     ports:
       - "1234:1234"
-    volumes:
-      - ./sis-web-mapping/public/layer_info.csv:/usr/share/nginx/html/public/layer_info.csv:ro
     environment:
       - NODE_ENV=production
-      - API_KEY=${WEB_MAPPING_API_KEY}
-      - API_URL=http://sis-api:8000
     networks:
       - sis-net
     depends_on:

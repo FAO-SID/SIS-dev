@@ -1,35 +1,28 @@
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Copy package files
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy source files
-COPY . .
+# Copy source code
+COPY src ./src
+COPY public ./public
 
-# Create public directory if it doesn't exist
-RUN mkdir -p public
+# Build arguments for environment variables
+ARG API_URL
+ARG API_KEY
 
-# Build the application
-RUN npm run build
-
-# Production stage
-FROM nginx:alpine
-
-# Copy built files to nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY --from=builder /app/public /usr/share/nginx/html/public
-
-# Create public directory if it doesn't exist
-RUN mkdir -p /usr/share/nginx/html/public
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Set environment variables
+ENV API_URL=$API_URL
+ENV API_KEY=$API_KEY
+ENV NODE_ENV=production
 
 # Expose port
 EXPOSE 1234
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"] 
+# Start Parcel dev server
+CMD ["npm", "start"]
