@@ -398,7 +398,7 @@ async function loadProfiles() {
     const vectorSource = new VectorSource({ features });
     
     const clusterSource = new Cluster({
-      distance: 40,
+      distance: 100,
       source: vectorSource
     });
 
@@ -609,7 +609,7 @@ function setupControls() {
 function addLoginButton() {
   const loginBtn = document.createElement('button');
   loginBtn.id = 'login-btn';
-  loginBtn.textContent = 'Admin Login';
+  loginBtn.textContent = 'Login';
   loginBtn.style.cssText = 'position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: rgba(255,255,255,0.9); border: none; border-radius: 4px; cursor: pointer; z-index: 1001;';
   
   loginBtn.addEventListener('click', () => {
