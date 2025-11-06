@@ -71,12 +71,3 @@ psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.layer
          'http://localhost:8082/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.1.1&LAYER=Profiles&REQUEST=getlegendgraphic&FORMAT=image/png',
          'http://localhost:8082/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&BBOX=1.16625995882351496%2C116.25895549999999901%2C24.6476970411764853%2C127.10635850000001312&CRS=EPSG%3A4326&WIDTH=595&HEIGHT=1288&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS=Profiles&INFO_FORMAT=text%2Fhtml&I=282&J=429')"
 
-
-
-
-# reset api schema
-# psql -h localhost -p 5442 -U sis -d sis -c "DROP SCHEMA api CASCADE"
-# psql -h localhost -p 5442 -U sis -d sis -c "DROP SCHEMA soil_data_upload CASCADE"
-# psql -h localhost -p 5442 -U sis -d sis -f $PROJECT_DIR/sis-api/schema.sql
-
-
