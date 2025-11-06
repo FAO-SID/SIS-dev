@@ -242,6 +242,35 @@ curl -X POST http://localhost:8000/api/clients \
 #     sis-web-mapping    #
 ##########################
 
+
+docker-compose up -d --build --no-deps sis-api
+
+
+
+# Stop container
+docker-compose stop sis-web-mapping
+
+# Remove container
+docker-compose rm -f sis-web-mapping
+
+# Remove the image to force complete rebuild
+docker rmi sis-dev-sis-web-mapping
+
+# Also clear Parcel cache inside if needed
+docker-compose run --rm sis-web-mapping rm -rf .parcel-cache
+
+# Rebuild from scratch
+docker-compose build --no-cache sis-web-mapping
+
+# Start
+docker-compose up --no-deps -d sis-web-mapping
+
+# Watch logs
+docker logs sis-web-mapping -f
+
+
+
+
 # Build and start container
 docker compose up --build sis-web-mapping -d
 

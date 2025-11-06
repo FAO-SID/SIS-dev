@@ -21,22 +21,28 @@ let activeLayer = null;
 
 async function initializeApp() {
   try {
+    console.log('Starting application initialization...');
     showLoading(true);
 
     // Load settings from API
+    console.log('Fetching settings...');
     const settings = await api.getSettings();
+    console.log('Settings loaded:', settings);
     appConfig = settingsArrayToObject(settings);
 
     // Apply settings to UI
     applySettings();
 
     // Initialize map
+    console.log('Initializing map...');
     initializeMap();
 
     // Load layers from API
+    console.log('Loading layers...');
     await loadLayers();
 
     // Load profiles
+    console.log('Loading profiles...');
     await loadProfiles();
 
     // Setup UI controls
@@ -47,10 +53,12 @@ async function initializeApp() {
       showAdminPanel();
     }
 
+    console.log('Application initialized successfully!');
     showLoading(false);
   } catch (error) {
     console.error('Failed to initialize app:', error);
-    showError('Failed to load application. Please check your connection and refresh.');
+    console.error('Error details:', error.message, error.stack);
+    showError(`Failed to load application: ${error.message}`);
     showLoading(false);
   }
 }

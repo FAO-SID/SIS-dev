@@ -4,8 +4,9 @@
  */
 
 // Read API configuration from environment or fallback to defaults
-const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
-const API_KEY = process.env.API_KEY || '';
+// Parcel will replace process.env at build time
+const API_BASE_URL = 'http://sis-api:8000';  // Internal Docker network URL
+const API_KEY = process.env.API_KEY || 'tqgCPggHmxqRW6v-c3gwxOeRsWCnhgdgFqY1RQycvFM';  // Your actual API key
 
 class SISApiClient {
   constructor() {

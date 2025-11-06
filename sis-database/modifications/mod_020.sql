@@ -14,3 +14,7 @@ UPDATE core.observation_phys_chem SET value_min = 0, value_max = 100 WHERE prope
 UPDATE core.observation_phys_chem SET value_min = 0, value_max = 100 WHERE property_phys_chem_id = 'effectiveCecProperty';
 UPDATE core.observation_phys_chem SET value_min = 0.01, value_max = 2.65 WHERE property_phys_chem_id = 'bulkDensityFineEarthProperty';
 UPDATE core.observation_phys_chem SET value_min = 0.01, value_max = 3.60 WHERE property_phys_chem_id = 'bulkDensityWholeSoilProperty';
+
+-- exceptions
+UPDATE core.observation_phys_chem SET value_max = 200 WHERE property_phys_chem_id = 'effectiveCecProperty';
+

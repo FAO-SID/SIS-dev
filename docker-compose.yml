@@ -80,19 +80,17 @@ services:
       - sis-net
     restart: unless-stopped
 
-  # SIS web mapping (Openlayers)
+# SIS web mapping (OpenLayers)
   sis-web-mapping:
     container_name: sis-web-mapping
     build: 
       context: ./sis-web-mapping
       dockerfile: Dockerfile
       args:
-        API_URL: http://sis-api:8000
+        API_URL: http://localhost:8000
         API_KEY: ${WEB_MAPPING_API_KEY}
     ports:
       - "1234:1234"
-    environment:
-      - NODE_ENV=production
     networks:
       - sis-net
     depends_on:

@@ -39,7 +39,12 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=[
+        "http://localhost:1234",  # sis-web-mapping in development
+        "http://localhost",       # nginx on port 80
+        "http://localhost:80",    # explicit port 80
+        "*"                        # Allow all for development (remove in production)
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
