@@ -85,9 +85,9 @@ function applySettings() {
 // ==================== Map Initialization ====================
 
 function initializeMap() {
-  const latitude = parseFloat(appConfig.LATITUDE || 0);
-  const longitude = parseFloat(appConfig.LONGITUDE || 0);
-  const zoom = parseInt(appConfig.ZOOM || 12);
+  const latitude = parseFloat(appConfig.LATITUDE || 27.5);
+  const longitude = parseFloat(appConfig.LONGITUDE || 89.7);
+  const zoom = parseInt(appConfig.ZOOM || 9);
 
   // Base layers
   const baseLayers = {
@@ -156,6 +156,20 @@ async function loadLayers() {
     // Add data layer groups
     for (const [groupName, groupLayers] of Object.entries(groupedLayers)) {
       addLayerGroup(layerGroupsContainer, groupName, groupLayers);
+    }
+
+    // Load default layer if specified in settings
+    if (appConfig.LAYER_DEFAULT) {
+      const defaultLayer = layers.find(l => l.layer_id === appConfig.LAYER_DEFAULT);
+      if (defaultLayer) {
+        // Check the radio button
+        const radio = document.getElementById(`layer-${defaultLayer.layer_id}`);
+        if (radio) {
+          radio.checked = true;
+          // Load the layer
+          switchLayer(defaultLayer);
+        }
+      }
     }
 
   } catch (error) {
@@ -285,17 +299,36 @@ function switchLayer(layerConfig) {
 }
 
 function createWMSLayer(layerConfig) {
-  // Parse WMS URL to extract base URL and layer name
+  // Parse the get_map_url to extract the map parameter
+  let mapParam = null;
+  
+  if (layerConfig.get_map_url) {
+    try {
+      const url = new URL(layerConfig.get_map_url);
+      mapParam = url.searchParams.get('map');
+    } catch (e) {
+      console.warn('Could not parse get_map_url:', layerConfig.get_map_url);
+    }
+  }
+
+  // MapServer base URL
   const mapServerUrl = 'http://localhost:8082/';
   
+  const params = {
+    'LAYERS': layerConfig.layer_id,
+    'FORMAT': 'image/png',
+    'TRANSPARENT': true
+  };
+
+  // Add map parameter if found
+  if (mapParam) {
+    params['map'] = mapParam;
+  }
+
   const layer = new ImageLayer({
     source: new ImageWMS({
       url: mapServerUrl,
-      params: {
-        'LAYERS': layerConfig.layer_id,
-        'FORMAT': 'image/png',
-        'TRANSPARENT': true
-      },
+      params: params,
       ratio: 1,
       serverType: 'mapserver'
     })
@@ -313,24 +346,53 @@ async function loadProfiles() {
   try {
     const profiles = await api.getProfiles();
     
+    if (!profiles || profiles.length === 0) {
+      console.log('No profiles found in database');
+      return;
+    }
+
+    console.log('Loading profiles:', profiles.length);
+    console.log('First profile sample:', profiles[0]);
+    
+    // Create GeoJSON format parser
+    const geoJsonFormat = new GeoJSON();
+    
     // Create features from profiles
     const features = profiles.map(profile => {
-      const geometry = JSON.parse(profile.geometry);
-      const feature = new GeoJSON().readFeature({
-        type: 'Feature',
-        geometry: geometry,
-        properties: {
+      try {
+        // The geometry column now contains GeoJSON as a JSON object
+        if (!profile.geometry) {
+          console.warn('Profile missing geometry:', profile.profile_code);
+          return null;
+        }
+
+        const feature = geoJsonFormat.readFeature(profile.geometry, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+        
+        // Set properties
+        feature.setProperties({
           profile_code: profile.profile_code,
           project_name: profile.project_name,
           altitude: profile.altitude,
           date: profile.date
-        }
-      }, {
-        dataProjection: 'EPSG:4326',
-        featureProjection: 'EPSG:3857'
-      });
-      return feature;
-    });
+        });
+        
+        return feature;
+      } catch (e) {
+        console.error('Failed to create feature for profile:', profile.profile_code, e);
+        console.error('Geometry value:', profile.geometry);
+        return null;
+      }
+    }).filter(f => f !== null);
+
+    if (features.length === 0) {
+      console.warn('No valid profile features could be created');
+      return;
+    }
+
+    console.log(`Created ${features.length} profile features`);
 
     // Create vector source with clustering
     const vectorSource = new VectorSource({ features });
@@ -355,7 +417,8 @@ async function loadProfiles() {
 
   } catch (error) {
     console.error('Failed to load profiles:', error);
-    showError('Failed to load soil profiles');
+    console.error('Error details:', error.message, error.stack);
+    // Don't show error to user - profiles are optional
   }
 }
 
@@ -396,7 +459,7 @@ function addProfileLayerControl() {
     <div class="layer-group-content">
       <div class="layer-item">
         <input type="checkbox" id="layer-profiles" checked>
-        <label for="layer-profiles">Profile Locations</label>
+        <label for="layer-profiles">Profiles</label>
       </div>
     </div>
   `;

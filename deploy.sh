@@ -153,10 +153,10 @@ psql -h localhost -p 5442 -U sis -d sis -f $PROJECT_DIR/sis-api/scripts/db_inser
 psql -h localhost -p 5442 -U sis -d sis -c "SELECT api.insert_dummy_data(
                                                     p_num_plots := 200,
                                                     p_observation_ids := ARRAY[514,635,587,683,69,30, 497,742,970,54],
-                                                    p_xmin := 88,
-                                                    p_xmax := 92,
-                                                    p_ymin := 26,
-                                                    p_ymax := 28
+                                                    p_xmin := 89.11,
+                                                    p_xmax := 92.12,
+                                                    p_ymin := 26.71,
+                                                    p_ymax := 28.28
                                                 )"
 
 # Export overall layer info to build web-mapping interface
@@ -189,27 +189,27 @@ cat $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv | psql -h localhost -
 rm $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv
 
 # Add Profiles layers
-psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.layer 
-    (project_id,
-     project_name,
-     layer_id,
-     publish,
-     property_name,
-     metadata_url,
-     download_url,
-     get_map_url,
-     get_legend_url,
-     get_feature_info_url)
- VALUES ('Profiles',
-         'Profiles',
-         'Profiles',
-         'TRUE',
-         'Soil profiles',
-         'http://localhost:8001/collections/metadata:main/items/00aaaa0a-ebeb-11ef-bc12-6b4a6fcd8b5e',
-         NULL,
-         'http://localhost:8082?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=26.69988199999999878%2C88.74999900000000252%2C28.24941499999999905%2C92.12528600000000267&CRS=EPSG%3A4326&WIDTH=661&HEIGHT=304&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE',
-         'http://localhost:8082/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.1.1&LAYER=Profiles&REQUEST=getlegendgraphic&FORMAT=image/png',
-         'http://localhost:8082/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&BBOX=1.16625995882351496%2C116.25895549999999901%2C24.6476970411764853%2C127.10635850000001312&CRS=EPSG%3A4326&WIDTH=595&HEIGHT=1288&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS=Profiles&INFO_FORMAT=text%2Fhtml&I=282&J=429')"
+# psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.layer 
+#     (project_id,
+#      project_name,
+#      layer_id,
+#      publish,
+#      property_name,
+#      metadata_url,
+#      download_url,
+#      get_map_url,
+#      get_legend_url,
+#      get_feature_info_url)
+#  VALUES ('Profiles',
+#          'Profiles',
+#          'Profiles',
+#          'TRUE',
+#          'Soil profiles',
+#          'http://localhost:8001/collections/metadata:main/items/00aaaa0a-ebeb-11ef-bc12-6b4a6fcd8b5e',
+#          NULL,
+#          'http://localhost:8082?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=26.69988199999999878%2C88.74999900000000252%2C28.24941499999999905%2C92.12528600000000267&CRS=EPSG%3A4326&WIDTH=661&HEIGHT=304&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE',
+#          'http://localhost:8082/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.1.1&LAYER=Profiles&REQUEST=getlegendgraphic&FORMAT=image/png',
+#          'http://localhost:8082/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&BBOX=1.16625995882351496%2C116.25895549999999901%2C24.6476970411764853%2C127.10635850000001312&CRS=EPSG%3A4326&WIDTH=595&HEIGHT=1288&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS=Profiles&INFO_FORMAT=text%2Fhtml&I=282&J=429')"
 
 # Add Profiles layers
 psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.setting(key, value) VALUES
@@ -218,7 +218,8 @@ psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.setting(key, value) 
  ('LATITUDE','27.5'),
  ('LONGITUDE','89.7'),
  ('ZOOM','9'),
- ('BASE_MAP_DEFAULT','esri-imagery')"
+ ('BASE_MAP_DEFAULT','esri-imagery'),
+ ('LAYER_DEFAULT','BT-GSNM-BASAT-2024-0-30-MEAN')"
 
 # Test with API key
 curl http://localhost:8000/api/manifest -H "X-API-Key: 5P3_cUmQ_jsVacn8WSOWd112gwNF9QfsRfx3t5T8SKk"
@@ -250,7 +251,6 @@ docker rmi sis-dev-sis-web-mapping
 docker-compose build sis-web-mapping
 docker-compose up --no-deps -d sis-web-mapping
 # docker logs sis-web-mapping -f
-
 
 
 

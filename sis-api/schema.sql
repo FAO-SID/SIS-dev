@@ -127,7 +127,8 @@ SELECT
     proj.name AS project_name,
     plt.altitude,
     plt.time_stamp AS date,
-    plt."position" AS geom
+    plt."position" AS geom,
+    ST_AsGeoJSON(plt."position")::json AS geometry
 FROM soil_data.profile p
     INNER JOIN soil_data.plot plt ON p.plot_id = plt.plot_id
     INNER JOIN soil_data.site s ON plt.site_id = s.site_id
