@@ -4,6 +4,7 @@ import View from 'ol/View';
 import { Tile as TileLayer, Image as ImageLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, XYZ, ImageWMS, Vector as VectorSource, Cluster } from 'ol/source';
 import { fromLonLat } from 'ol/proj';
+import { fromLonLat, toLonLat } from 'ol/proj';
 import { ScaleLine, defaults as defaultControls } from 'ol/control';
 import Overlay from 'ol/Overlay';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text } from 'ol/style';
@@ -118,7 +119,10 @@ function initializeMap() {
       center: fromLonLat([longitude, latitude]),
       zoom: zoom
     }),
-    controls: defaultControls({ attribution: false }).extend([
+    controls: defaultControls({ 
+      attribution: false,
+      zoom: false  // Add this to remove default zoom controls
+    }).extend([
       new ScaleLine({ target: 'scale-line' })
     ])
   });
@@ -212,6 +216,7 @@ function addBaseMapsGroup(container) {
   });
 
   // Make group collapsible
+  groupDiv.classList.add('collapsed');
   groupDiv.querySelector('.layer-group-header').addEventListener('click', () => {
     groupDiv.classList.toggle('collapsed');
   });
@@ -238,6 +243,7 @@ function addLayerGroup(container, groupName, layers) {
   container.appendChild(groupDiv);
 
   // Make group collapsible
+  groupDiv.classList.add('collapsed');
   headerDiv.addEventListener('click', () => {
     groupDiv.classList.toggle('collapsed');
   });
@@ -474,10 +480,70 @@ function addProfileLayerControl() {
   });
 
   // Make collapsible
+  profileGroup.classList.add('collapsed');
   profileGroup.querySelector('.layer-group-header').addEventListener('click', () => {
     profileGroup.classList.toggle('collapsed');
   });
 }
+
+
+// ==================== GetFeatureInfo ====================
+
+async function showRasterInfo(evt, popup) {
+  const viewResolution = map.getView().getResolution();
+  const source = activeLayer.getSource();
+  const url = source.getFeatureInfoUrl(
+    evt.coordinate,
+    viewResolution,
+    'EPSG:3857',
+    { 'INFO_FORMAT': 'text/html' }
+  );
+
+  if (url) {
+    try {
+      const response = await fetch(url);
+      const htmlText = await response.text();
+      
+      if (htmlText && htmlText.trim() && !htmlText.includes('no features')) {
+        // Transform coordinates to WGS84
+        const lonLat = toLonLat(evt.coordinate);
+        const longitude = lonLat[0].toFixed(6);
+        const latitude = lonLat[1].toFixed(6);
+        
+        // Extract value from HTML (adjust regex based on your MapServer output)
+        const valueMatch = htmlText.match(/Value:\s*([0-9.-]+)/);
+        const value = valueMatch ? valueMatch[1] : 'N/A';
+        
+        // Get current layer info
+        const layerId = activeLayer.get('layerId');
+        const layerConfig = currentLayers[layerId];
+        const layerName = layerConfig ? layerConfig.property_name : 'Unknown';
+        const unit = layerConfig ? layerConfig.unit_of_measure_id || '' : '';
+        
+        // Format like profile popup
+        const html = `
+          <div class="feature-info-layer">
+            <h3>${layerName}</h3>
+            <div class="feature-info-item">
+              <div class="feature-info-property"><strong>Value:</strong> ${value} ${unit}</div>
+              <div class="feature-info-property"><strong>Latitude:</strong> ${latitude}°</div>
+              <div class="feature-info-property"><strong>Longitude:</strong> ${longitude}°</div>
+            </div>
+          </div>
+        `;
+        
+        document.getElementById('popup-content').innerHTML = html;
+        popup.setPosition(evt.coordinate);
+      } else {
+        popup.setPosition(undefined);
+      }
+    } catch (error) {
+      console.error('Failed to get feature info:', error);
+      popup.setPosition(undefined);
+    }
+  }
+}
+
 
 // ==================== Popup ====================
 
@@ -498,6 +564,7 @@ function setupPopup() {
   map.on('singleclick', async (evt) => {
     const features = map.getFeaturesAtPixel(evt.pixel);
     
+    // Check for profile points first (priority)
     if (features && features.length > 0) {
       const feature = features[0];
       const clusterFeatures = feature.get('features');
@@ -505,11 +572,18 @@ function setupPopup() {
       if (clusterFeatures && clusterFeatures.length === 1) {
         // Single profile - show observations
         await showProfileObservations(clusterFeatures[0], popup, evt.coordinate);
+        return; // Stop here, don't check raster
       } else if (clusterFeatures && clusterFeatures.length > 1) {
         // Cluster - zoom in
         const extent = clusterFeatures[0].getGeometry().getExtent();
         map.getView().fit(extent, { duration: 500, maxZoom: map.getView().getZoom() + 2 });
+        return; // Stop here
       }
+    }
+    
+    // No profile clicked, check for active raster layer
+    if (activeLayer) {
+      await showRasterInfo(evt, popup);
     } else {
       popup.setPosition(undefined);
     }
@@ -521,38 +595,130 @@ async function showProfileObservations(feature, popup, coordinate) {
   const projectName = feature.get('project_name');
   const altitude = feature.get('altitude');
   const date = feature.get('date');
+  
+  // Get coordinates from feature geometry
+  const geometry = feature.getGeometry();
+  const coords = geometry.getCoordinates();
+  // Transform from map projection (EPSG:3857) to WGS84 (EPSG:4326)
+  const lonLat = toLonLat(coords);
+  const longitude = lonLat[0].toFixed(6);
+  const latitude = lonLat[1].toFixed(6);
 
   try {
     const observations = await api.getObservations(profileCode);
     
     let html = `
-      <div class="feature-info-layer">
+      <div class="popup-tabs">
+        <button class="tab-button active" data-tab="profile">Profile</button>
+        <button class="tab-button" data-tab="observations">Observations (${observations.length})</button>
+      </div>
+      
+      <div class="tab-content active" id="tab-profile">
         <h3>Profile: ${profileCode}</h3>
         <div class="feature-info-item">
           <div class="feature-info-property"><strong>Project:</strong> ${projectName || 'N/A'}</div>
+          <div class="feature-info-property"><strong>Latitude:</strong> ${latitude}°</div>
+          <div class="feature-info-property"><strong>Longitude:</strong> ${longitude}°</div>
           <div class="feature-info-property"><strong>Altitude:</strong> ${altitude || 'N/A'} m</div>
-          <div class="feature-info-property"><strong>Date:</strong> ${date ? new Date(date).toLocaleDateString() : 'N/A'}</div>
-          <div class="feature-info-property"><strong>Observations:</strong> ${observations.length}</div>
+          <div class="feature-info-property"><strong>Date:</strong> ${date || 'N/A'}</div>
+          <div class="feature-info-property"><strong>Total Observations:</strong> ${observations.length}</div>
         </div>
       </div>
+      
+      <div class="tab-content" id="tab-observations">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="margin: 0;">Observations</h3>
+          <button id="download-csv-btn" style="padding: 5px 10px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; display: flex; align-items: center; gap: 5px; margin-right: 20px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
+            </svg>
+            Download CSV
+          </button>
+        </div>
     `;
-
+    
     if (observations.length > 0) {
-      html += '<div class="feature-info-layer"><h3>Sample Data (first 5):</h3>';
-      observations.slice(0, 5).forEach(obs => {
+      html += `
+        <div>
+          <table class="observations-table">
+            <thead style="position: sticky; top: 0; background: white;">
+              <tr>
+                <th>Top</th>
+                <th>Bottom</th>
+                <th>Property</th>
+                <th>Procedure</th>
+                <th>Value</th>
+                <th>Unit</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      observations.forEach(obs => {
         html += `
-          <div class="feature-info-item">
-            <div class="feature-info-property"><strong>Property:</strong> ${obs.property_phys_chem_id}</div>
-            <div class="feature-info-property"><strong>Depth:</strong> ${obs.upper_depth}-${obs.lower_depth} cm</div>
-            <div class="feature-info-property"><strong>Value:</strong> ${obs.value} ${obs.unit_of_measure_id || ''}</div>
-          </div>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 5px;">${obs.upper_depth}</td>
+            <td style="padding: 5px;">${obs.lower_depth}</td>
+            <td style="padding: 5px;">${obs.property_phys_chem_id}</td>
+            <td style="padding: 5px;">${obs.procedure_phys_chem_id || 'N/A'}</td>
+            <td style="padding: 5px; text-align: right;">${obs.value}</td>
+            <td style="padding: 5px;">${obs.unit_of_measure_id || ''}</td>
+          </tr>
         `;
       });
-      html += '</div>';
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    } else {
+      html += '<p>No observations available</p>';
     }
+    
+    html += '</div>';
 
     document.getElementById('popup-content').innerHTML = html;
     popup.setPosition(coordinate);
+    
+    // Add tab switching functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const tabName = e.target.dataset.tab;
+        
+        // Update button states
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        // Update content visibility
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+      });
+    });
+    
+    // Add tab switching functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const tabName = e.target.dataset.tab;
+        
+        // Update button states
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        // Update content visibility
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+      });
+    });
+    
+    // Add CSV download functionality
+    const downloadBtn = document.getElementById('download-csv-btn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        downloadObservationsCSV(profileCode, projectName, altitude, date, latitude, longitude, observations);
+      });
+    }
+
   } catch (error) {
     console.error('Failed to load observations:', error);
     document.getElementById('popup-content').innerHTML = `
@@ -571,6 +737,55 @@ function showLegend(legendUrl) {
   legendContent.innerHTML = `<img src="${legendUrl}" alt="Legend">`;
   legendContainer.style.display = 'block';
 }
+
+
+function downloadObservationsCSV(profileCode, projectName, altitude, date, latitude, longitude, observations) {
+  // Create CSV header
+  let csv = 'Profile Code,Project,Latitude,Longitude,Altitude (m),Date,Top (cm),Bottom (cm),Property,Procedure,Value,Unit\n';
+  
+  // Add data rows
+  observations.forEach(obs => {
+    const row = [
+      profileCode,
+      projectName || '',
+      latitude,
+      longitude,
+      altitude || '',
+      date || '',
+      obs.upper_depth,
+      obs.lower_depth,
+      obs.property_phys_chem_id,
+      obs.procedure_phys_chem_id || '',
+      obs.value,
+      obs.unit_of_measure_id || ''
+    ];
+    
+    // Escape values that contain commas or quotes
+    const escapedRow = row.map(value => {
+      const stringValue = String(value);
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    });
+    
+    csv += escapedRow.join(',') + '\n';
+  });
+  
+  // Create blob and download
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${profileCode}_observations.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 
 // ==================== UI Controls ====================
 

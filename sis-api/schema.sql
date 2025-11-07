@@ -148,8 +148,8 @@ SELECT p3.profile_code,
     e.lower_depth,
     o.property_phys_chem_id,
     o.procedure_phys_chem_id,
-    o.unit_of_measure_id,
-    r.value
+    r.value,
+    o.unit_of_measure_id
    FROM soil_data.project p
      LEFT JOIN soil_data.project_site sp ON sp.project_id = p.project_id
      LEFT JOIN soil_data.site s ON s.site_id = sp.site_id

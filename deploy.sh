@@ -188,6 +188,13 @@ TO $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv WITH CSV HEADER"
 cat $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv | psql -h localhost -p 5442 -d sis -U sis -c "COPY api.layer FROM STDIN WITH (FORMAT CSV, HEADER, NULL '')"
 rm $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv
 
+psql -h localhost -p 5442 -d sis -U sis -c "
+  UPDATE api.layer SET project_name ='Soil Organic Carbon Sequestration Potential'
+  WHERE project_name ='Global Soil Organic Carbon Sequestration potential map';
+
+  UPDATE api.layer SET project_name ='Soil Nutrients'
+  WHERE project_name ='Global Soil Nutrients Map'"
+
 # Add Profiles layers
 # psql -h localhost -p 5442 -d sis -U sis -c "INSERT INTO api.layer 
 #     (project_id,
@@ -251,6 +258,31 @@ docker rmi sis-dev-sis-web-mapping
 docker-compose build sis-web-mapping
 docker-compose up --no-deps -d sis-web-mapping
 # docker logs sis-web-mapping -f
+
+
+
+
+
+Profile: PROFILE_175
+Project: dummy data
+Altitude: 261 m
+Date: 2025-07-26
+Observations: 30
+
+Observations:
+Top 	Bottom 	Property 	Procedure 	Value 	Unit
+0 	30 	bulkDensityWholeSoilProperty 	BlkDensW_we-unkn 	0.2761075 	kg/dm³
+0 	30 	Carbon (C) - organic 	OrgC_wc-cro3-nrcs6a1c 	352.5447 	g/kg
+0 	30 	Clay texture fraction 	SaSiCl_2-50-2000u-adj100 	83.28865 	%
+
+
+
+
+
+
+
+
+
 
 
 
