@@ -263,30 +263,6 @@ docker-compose up --no-deps -d sis-web-mapping
 
 
 
-Profile: PROFILE_175
-Project: dummy data
-Altitude: 261 m
-Date: 2025-07-26
-Observations: 30
-
-Observations:
-Top 	Bottom 	Property 	Procedure 	Value 	Unit
-0 	30 	bulkDensityWholeSoilProperty 	BlkDensW_we-unkn 	0.2761075 	kg/dm³
-0 	30 	Carbon (C) - organic 	OrgC_wc-cro3-nrcs6a1c 	352.5447 	g/kg
-0 	30 	Clay texture fraction 	SaSiCl_2-50-2000u-adj100 	83.28865 	%
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Build and start container
 docker compose up --build sis-web-mapping -d
 
