@@ -261,7 +261,7 @@ function createLayerItem(layer) {
     <input type="radio" name="data-layer" id="layer-${layer.layer_id}" value="${layer.layer_id}">
     <label for="layer-${layer.layer_id}" title="${layerName}">${layerName}</label>
     <div class="layer-icons">
-      ${layer.metadata_url ? `<a href="${layer.metadata_url}" target="_blank" title="Metadata"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z'/%3E%3C/svg%3E" alt="Info"></a>` : ''}
+      ${layer.metadata_url ? `<a href="#" class="metadata-link" data-url="${layer.metadata_url}" title="Metadata"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z'/%3E%3C/svg%3E" alt="Info"></a>` : ''}
       ${layer.download_url ? `<a href="${layer.download_url}" title="Download"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z'/%3E%3C/svg%3E" alt="Download"></a>` : ''}
     </div>
   `;
@@ -272,6 +272,16 @@ function createLayerItem(layer) {
       switchLayer(layer);
     }
   });
+
+  // Add metadata link handler
+  const metadataLink = itemDiv.querySelector('.metadata-link');
+  if (metadataLink) {
+    metadataLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const metadataUrl = e.currentTarget.dataset.url;
+      await showMetadataPopup(metadataUrl);
+    });
+  }
 
   return itemDiv;
 }
@@ -344,6 +354,82 @@ function createWMSLayer(layerConfig) {
   layer.set('featureInfoUrl', layerConfig.get_feature_info_url);
   
   return layer;
+}
+
+
+// ==================== Metadata ====================
+
+async function showMetadataPopup(metadataUrl) {
+  // Create modal overlay
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;';
+  
+  modal.innerHTML = `
+    <div style="background: white; padding: 20px; border-radius: 8px; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; width: 100%;">
+      <button id="metadata-close" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+      <h2 style="margin-top: 0;">Layer Metadata</h2>
+      <div id="metadata-content" style="margin-top: 20px;">Loading...</div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Close button handler
+  document.getElementById('metadata-close').addEventListener('click', () => {
+    document.body.removeChild(modal);
+  });
+  
+  // Close on background click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      document.body.removeChild(modal);
+    }
+  });
+  
+  // Fetch metadata
+  try {
+    // Parse the URL and reconstruct without port
+    const url = new URL(metadataUrl);
+    // Remove port and reconstruct the URL to go through nginx proxy
+    const jsonUrl = `http://${url.hostname}${url.pathname}?f=json`;
+    
+    console.log('Original URL:', metadataUrl);
+    console.log('Fetching metadata from:', jsonUrl);
+    
+    const response = await fetch(jsonUrl);
+    const contentType = response.headers.get('content-type');
+    
+    console.log('Response content-type:', contentType);
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`); // Fixed syntax error here
+    }
+    
+    // Check if response is JSON
+    if (contentType && contentType.includes('application/json')) {
+      const metadata = await response.json();
+      console.log('Metadata received:', metadata); // Debug
+      const content = formatMetadata(metadata);
+      document.getElementById('metadata-content').innerHTML = content;
+    } else {
+      // If not JSON, display as HTML or text
+      const text = await response.text();
+      console.log('Response text:', text.substring(0, 200));
+      document.getElementById('metadata-content').innerHTML = `
+        <div style="background: #f8f8f8; padding: 15px; border-radius: 4px; overflow-x: auto;">
+          <pre style="white-space: pre-wrap; word-wrap: break-word;">${text}</pre>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Failed to load metadata:', error);
+    document.getElementById('metadata-content').innerHTML = `
+      <p style="color: red;">Failed to load metadata: ${error.message}</p>
+      <p>URL attempted: ${metadataUrl}?f=json</p>
+      <p><a href="${metadataUrl}" target="_blank">Open metadata in new tab</a></p>
+    `;
+  }
 }
 
 // ==================== Profile Layer ====================

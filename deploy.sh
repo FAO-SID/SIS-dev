@@ -251,6 +251,13 @@ curl -X POST http://localhost:8000/api/clients \
 ##########################
 
 
+docker-compose stop sis-nginx
+docker-compose rm -f sis-nginx
+docker rmi sis-dev-sis-nginx
+docker-compose build sis-nginx
+docker-compose up --no-deps -d sis-nginx
+
+
 docker-compose stop sis-web-mapping
 docker-compose rm -f sis-web-mapping
 docker rmi sis-dev-sis-web-mapping
@@ -258,7 +265,6 @@ docker rmi sis-dev-sis-web-mapping
 docker-compose build sis-web-mapping
 docker-compose up --no-deps -d sis-web-mapping
 # docker logs sis-web-mapping -f
-
 
 
 
