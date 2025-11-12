@@ -190,7 +190,7 @@ psql -h localhost -p 5432 -U sis -d iso19139 -c "\copy (
                 l.dimension_depth || '-' || l.dimension_stats AS dimension,
                 m.creation_date::text AS version,
                 p2.unit_of_measure_id,
-                'http://$HOST_SIS_METADATA/collections/metadata:main/items/'||m.file_identifier metadata_url,
+                '/collections/metadata:main/items/'||m.file_identifier metadata_url,
                 u.url AS download_url,
                 'http://$HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=4.584249999999999936%2C116.5172270000000054%2C21.22970700000000122%2C126.8480870000000067&CRS=EPSG%3A4326&WIDTH=567&HEIGHT=914&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE' AS get_map_url,
                 'http://$HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.1.1&LAYER='||l.layer_id||'&REQUEST=getlegendgraphic&FORMAT=image/png' AS get_legend_url,
@@ -234,7 +234,7 @@ docker exec sis-database psql -d sis -U sis -c "
 #          'Profiles',
 #          'TRUE',
 #          'Soil profiles',
-#          'http://$HOST_SIS_METADATA/collections/metadata:main/items/00aaaa0a-ebeb-11ef-bc12-6b4a6fcd8b5e',
+#          '/collections/metadata:main/items/00aaaa0a-ebeb-11ef-bc12-6b4a6fcd8b5e',
 #          NULL,
 #          'http://HOST_SIS_WEB_SERVICES?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=26.69988199999999878%2C88.74999900000000252%2C28.24941499999999905%2C92.12528600000000267&CRS=EPSG%3A4326&WIDTH=661&HEIGHT=304&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE',
 #          'http://HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.1.1&LAYER=Profiles&REQUEST=getlegendgraphic&FORMAT=image/png',
@@ -342,9 +342,5 @@ docker compose up --no-deps -d sis-web-mapping
 
 # Build and start container
 docker compose up --build sis-web-mapping -d
-
-
-
-
 
 

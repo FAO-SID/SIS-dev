@@ -518,6 +518,14 @@ function formatMetadata(metadata) {
   return html;
 }
 
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+
 async function showMetadataPopup(metadataUrl) {
   // Create modal overlay
   const modal = document.createElement('div');
@@ -547,10 +555,16 @@ async function showMetadataPopup(metadataUrl) {
   
   // Fetch metadata
   try {
-    // Parse the URL and reconstruct without port
-    const url = new URL(metadataUrl);
-    // Remove port and reconstruct the URL to go through nginx proxy
-    const jsonUrl = `http://${url.hostname}${url.pathname}?f=json`;
+    // Handle both relative and absolute URLs
+    let jsonUrl;
+    if (metadataUrl.startsWith('http://') || metadataUrl.startsWith('https://')) {
+      // Absolute URL - parse and remove port to go through nginx
+      const url = new URL(metadataUrl);
+      jsonUrl = `http://${url.hostname}${url.pathname}?f=json`;
+    } else {
+      // Relative URL - just append ?f=json
+      jsonUrl = `${metadataUrl}?f=json`;
+    }
     
     console.log('Original URL:', metadataUrl);
     console.log('Fetching metadata from:', jsonUrl);
@@ -562,25 +576,33 @@ async function showMetadataPopup(metadataUrl) {
     console.log('Response status:', response.status);
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`); // Fixed syntax error here
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    // Check if response is JSON
-    if (contentType && contentType.includes('application/json')) {
-      const metadata = await response.json();
-      console.log('Metadata received:', metadata); // Debug
+    // Always try to parse as JSON first, regardless of content-type
+    const text = await response.text();
+    
+    try {
+      // Try to parse as JSON
+      const metadata = JSON.parse(text);
+      console.log('Metadata received:', metadata);
+      
+      // Format and display
       const content = formatMetadata(metadata);
       document.getElementById('metadata-content').innerHTML = content;
-    } else {
-      // If not JSON, display as HTML or text
-      const text = await response.text();
+      
+    } catch (jsonError) {
+      // Not valid JSON - display as text
+      console.log('Response is not valid JSON, displaying as text');
       console.log('Response text:', text.substring(0, 200));
+      
       document.getElementById('metadata-content').innerHTML = `
         <div style="background: #f8f8f8; padding: 15px; border-radius: 4px; overflow-x: auto;">
-          <pre style="white-space: pre-wrap; word-wrap: break-word;">${text}</pre>
+          <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 12px;">${escapeHtml(text)}</pre>
         </div>
       `;
     }
+    
   } catch (error) {
     console.error('Failed to load metadata:', error);
     document.getElementById('metadata-content').innerHTML = `
@@ -590,6 +612,7 @@ async function showMetadataPopup(metadataUrl) {
     `;
   }
 }
+
 
 // ==================== Profile Layer ====================
 
