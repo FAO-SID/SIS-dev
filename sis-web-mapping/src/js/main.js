@@ -631,6 +631,7 @@ function generateProjectColors(projectNames) {
   return projectColors;
 }
 
+
 async function loadProfiles() {
   try {
     const profiles = await api.getProfiles();
@@ -643,113 +644,127 @@ async function loadProfiles() {
     console.log('Loading profiles:', profiles.length);
     console.log('First profile sample:', profiles[0]);
     
-    // Group profiles by project_name
-    const profilesByProject = {};
-    profiles.forEach(profile => {
-      const projectName = profile.project_name || 'Unknown Project';
-      if (!profilesByProject[projectName]) {
-        profilesByProject[projectName] = [];
-      }
-      profilesByProject[projectName].push(profile);
-    });
-
-    console.log('Projects found:', Object.keys(profilesByProject));
+    // Get unique project names
+    const projectNames = [...new Set(profiles.map(p => p.project_name || 'Unknown Project'))];
+    console.log('Projects found:', projectNames);
     
     // Generate colors for each project
-    profileColors = generateProjectColors(Object.keys(profilesByProject));
+    profileColors = generateProjectColors(projectNames);
     
     // Create GeoJSON format parser
     const geoJsonFormat = new GeoJSON();
     
-    // Create a layer for each project
-    Object.entries(profilesByProject).forEach(([projectName, projectProfiles]) => {
-      // Create features for this project
-      const features = projectProfiles.map(profile => {
-        try {
-          if (!profile.geometry) {
-            console.warn('Profile missing geometry:', profile.profile_code);
-            return null;
-          }
-
-          const feature = geoJsonFormat.readFeature(profile.geometry, {
-            dataProjection: 'EPSG:4326',
-            featureProjection: 'EPSG:3857'
-          });
-          
-          // Set properties including project name for styling
-          feature.setProperties({
-            profile_code: profile.profile_code,
-            project_name: profile.project_name,
-            altitude: profile.altitude,
-            date: profile.date
-          });
-          
-          return feature;
-        } catch (e) {
-          console.error('Failed to create feature for profile:', profile.profile_code, e);
-          console.error('Geometry value:', profile.geometry);
+    // Create ALL features in one array (not separated by project)
+    const allFeatures = profiles.map(profile => {
+      try {
+        if (!profile.geometry) {
+          console.warn('Profile missing geometry:', profile.profile_code);
           return null;
         }
-      }).filter(f => f !== null);
 
-      if (features.length === 0) {
-        console.warn(`No valid features for project: ${projectName}`);
-        return;
+        const feature = geoJsonFormat.readFeature(profile.geometry, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+        
+        // Set properties including project name for styling
+        feature.setProperties({
+          profile_code: profile.profile_code,
+          project_name: profile.project_name || 'Unknown Project',
+          altitude: profile.altitude,
+          date: profile.date
+        });
+        
+        return feature;
+      } catch (e) {
+        console.error('Failed to create feature for profile:', profile.profile_code, e);
+        return null;
       }
+    }).filter(f => f !== null);
 
-      console.log(`Created ${features.length} features for project: ${projectName}`);
+    if (allFeatures.length === 0) {
+      console.warn('No valid profile features could be created');
+      return;
+    }
 
-      // Create vector source with clustering
-      const vectorSource = new VectorSource({ features });
-      
-      const clusterSource = new Cluster({
-        distance: 100,
-        source: vectorSource
-      });
+    console.log(`Created ${allFeatures.length} total features`);
 
-      // Create profile layer for this project with project-specific styling
-      const layer = new VectorLayer({
-        source: clusterSource,
-        style: (feature) => getProfileStyle(feature, projectName),
-        zIndex: 1000,
-        visible: true
-      });
-
-      layer.set('name', projectName);
-      layer.set('project', projectName);
-      
-      // Store layer by project name
-      profileLayers[projectName] = layer;
-      
-      // Add to map
-      map.addLayer(layer);
+    // Create ONE vector source with ALL profiles
+    const vectorSource = new VectorSource({ features: allFeatures });
+    
+    // Create ONE cluster source for all profiles
+    const clusterSource = new Cluster({
+      distance: 100,
+      source: vectorSource
     });
 
-    // Add checkbox controls for all project layers
+    // Create ONE profile layer with unified clustering
+    const profileLayer = new VectorLayer({
+      source: clusterSource,
+      style: getUnifiedClusterStyle,
+      zIndex: 1000,
+      visible: true
+    });
+
+    profileLayer.set('name', 'Soil Profiles');
+    
+    // IMPORTANT: Store ALL original features for filtering
+    profileLayer.set('allFeatures', allFeatures);
+    
+    // Store the single layer
+    profileLayers['all'] = profileLayer;
+    
+    // Store individual project visibility states
+    projectNames.forEach(name => {
+      profileLayers[name] = { visible: true };
+    });
+    
+    // Add to map
+    map.addLayer(profileLayer);
+
+    // Add checkbox controls
     addProfileLayerControl();
 
   } catch (error) {
     console.error('Failed to load profiles:', error);
     console.error('Error details:', error.message, error.stack);
-    // Don't show error to user - profiles are optional
   }
 }
 
 
-function getProfileStyle(feature, projectName) {
-  const size = feature.get('features').length;
-  const color = profileColors[projectName] || '#007BFF';
-  
-  // Convert hex to rgba
-  const hexToRgba = (hex, alpha) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
+
+function getUnifiedClusterStyle(feature) {
+  const features = feature.get('features');
+  const size = features.length;
   
   if (size > 1) {
-    // Clustered style
+    // Clustered style - count projects in cluster
+    const projectCounts = {};
+    features.forEach(f => {
+      const projectName = f.get('project_name');
+      projectCounts[projectName] = (projectCounts[projectName] || 0) + 1;
+    });
+    
+    // Get dominant project color (project with most profiles in cluster)
+    let dominantProject = Object.keys(projectCounts)[0];
+    let maxCount = 0;
+    Object.entries(projectCounts).forEach(([project, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        dominantProject = project;
+      }
+    });
+    
+    const color = profileColors[dominantProject] || '#007BFF';
+    
+    // Convert hex to rgba
+    const hexToRgba = (hex, alpha) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+    
     return new Style({
       image: new CircleStyle({
         radius: 15 + Math.min(size / 2, 10),
@@ -763,7 +778,17 @@ function getProfileStyle(feature, projectName) {
       })
     });
   } else {
-    // Single point style
+    // Single point style - use project color
+    const projectName = features[0].get('project_name');
+    const color = profileColors[projectName] || '#007BFF';
+    
+    const hexToRgba = (hex, alpha) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+    
     return new Style({
       image: new CircleStyle({
         radius: 8,
@@ -789,8 +814,25 @@ function addProfileLayerControl() {
   const content = document.createElement('div');
   content.className = 'layer-group-content';
   
-  // Add a checkbox and color picker for each project layer
-  Object.entries(profileLayers).forEach(([projectName, layer]) => {
+  // Get the unified layer
+  const unifiedLayer = profileLayers['all'];
+  const vectorSource = unifiedLayer.getSource().getSource(); // Get the non-clustered source
+  const allFeatures = unifiedLayer.get('allFeatures'); // Get ALL original features
+  
+  // Function to update visible features based on checkbox states
+  const updateVisibleFeatures = () => {
+    const visibleFeatures = allFeatures.filter(feature => {
+      const featureProject = feature.get('project_name');
+      return profileLayers[featureProject] && profileLayers[featureProject].visible;
+    });
+    
+    // Clear and re-add filtered features
+    vectorSource.clear();
+    vectorSource.addFeatures(visibleFeatures);
+  };
+  
+  // Add a checkbox and color picker for each project
+  Object.entries(profileColors).forEach(([projectName, color]) => {
     const layerItem = document.createElement('div');
     layerItem.className = 'layer-item';
     layerItem.style.display = 'flex';
@@ -812,8 +854,8 @@ function addProfileLayerControl() {
     // Create circular color picker wrapper
     const colorWrapper = document.createElement('div');
     colorWrapper.style.position = 'relative';
-    colorWrapper.style.width = '12px';
-    colorWrapper.style.height = '12px';
+    colorWrapper.style.width = '24px';
+    colorWrapper.style.height = '24px';
     colorWrapper.style.borderRadius = '50%';
     colorWrapper.style.overflow = 'hidden';
     colorWrapper.style.border = '2px solid #fff';
@@ -821,10 +863,9 @@ function addProfileLayerControl() {
     colorWrapper.style.cursor = 'pointer';
     colorWrapper.title = 'Change color';
     
-    // Add color picker (hidden but functional)
     const colorPicker = document.createElement('input');
     colorPicker.type = 'color';
-    colorPicker.value = profileColors[projectName];
+    colorPicker.value = color;
     colorPicker.style.position = 'absolute';
     colorPicker.style.top = '0';
     colorPicker.style.left = '0';
@@ -834,11 +875,10 @@ function addProfileLayerControl() {
     colorPicker.style.cursor = 'pointer';
     colorPicker.style.opacity = '0';
     
-    // Add visible color circle
     const colorCircle = document.createElement('div');
     colorCircle.style.width = '100%';
     colorCircle.style.height = '100%';
-    colorCircle.style.backgroundColor = profileColors[projectName];
+    colorCircle.style.backgroundColor = color;
     colorCircle.style.borderRadius = '50%';
     colorCircle.style.pointerEvents = 'none';
     
@@ -850,22 +890,21 @@ function addProfileLayerControl() {
     layerItem.appendChild(colorWrapper);
     content.appendChild(layerItem);
     
-    // Add event listener for checkbox
+    // Toggle visibility by filtering features
     checkbox.addEventListener('change', (e) => {
-      layer.setVisible(e.target.checked);
+      profileLayers[projectName].visible = e.target.checked;
+      updateVisibleFeatures(); // Use the function that always works from allFeatures
     });
     
-    // Add event listener for color picker
+    // Update color
     colorPicker.addEventListener('input', (e) => {
-      // Update the visible circle immediately as user picks
       colorCircle.style.backgroundColor = e.target.value;
     });
     
     colorPicker.addEventListener('change', (e) => {
-      // Update the stored color and re-render layer
       profileColors[projectName] = e.target.value;
       colorCircle.style.backgroundColor = e.target.value;
-      layer.changed();
+      unifiedLayer.changed();
     });
   });
   
