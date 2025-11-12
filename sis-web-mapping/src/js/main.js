@@ -15,7 +15,8 @@ import api from './api-client.js';
 let map;
 let appConfig = {};
 let currentLayers = {};
-let profileLayer;
+let profileLayers = {};
+let profileColors = {};
 let activeLayer = null;
 
 // ==================== Initialization ====================
@@ -328,7 +329,7 @@ function createWMSLayer(layerConfig) {
   }
 
   // MapServer base URL
-  const mapServerUrl = 'http://localhost:8082/';
+  const mapServerUrl = 'http://localhost:8004/';
   
   const params = {
     'LAYERS': layerConfig.layer_id,
@@ -358,6 +359,164 @@ function createWMSLayer(layerConfig) {
 
 
 // ==================== Metadata ====================
+
+function formatMetadata(metadata) {
+  let html = '';
+  
+  // Title
+  if (metadata.properties?.title) {
+    html += `<h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">${metadata.properties.title}</h3>`;
+  }
+  
+  // Description
+  if (metadata.properties?.description) {
+    html += `<div style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-left: 3px solid #3498db; border-radius: 3px;">
+      <strong>Description:</strong><br/>
+      <p style="margin: 8px 0 0 0; line-height: 1.6;">${metadata.properties.description}</p>
+    </div>`;
+  }
+  
+  // Basic Information
+  html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Basic Information</h4>';
+  html += '<table style="width: 100%; border-collapse: collapse;">';
+  
+  const basicInfo = [
+    { label: 'Type', value: metadata.properties?.type },
+    { label: 'Language', value: metadata.properties?.language },
+    { label: 'Created', value: metadata.properties?.created },
+    { label: 'Updated', value: metadata.properties?.updated },
+    { label: 'ID', value: metadata.id }
+  ];
+  
+  basicInfo.forEach(item => {
+    if (item.value) {
+      html += `<tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px; font-weight: bold; width: 30%; color: #555;">${item.label}:</td>
+        <td style="padding: 8px;">${item.value}</td>
+      </tr>`;
+    }
+  });
+  html += '</table></div>';
+  
+  // Keywords
+  if (metadata.properties?.keywords && metadata.properties.keywords.length > 0) {
+    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Keywords</h4>';
+    html += '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
+    metadata.properties.keywords.forEach(keyword => {
+      html += `<span style="background: #e8f4f8; color: #2980b9; padding: 5px 12px; border-radius: 15px; font-size: 13px;">${keyword}</span>`;
+    });
+    html += '</div></div>';
+  }
+  
+  // Themes
+  if (metadata.properties?.themes && metadata.properties.themes.length > 0) {
+    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Themes</h4>';
+    metadata.properties.themes.forEach(theme => {
+      if (theme.concepts && theme.concepts.length > 0) {
+        html += `<div style="margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 3px;">`;
+        if (theme.scheme) {
+          html += `<div style="font-size: 12px; color: #666; margin-bottom: 5px;">${theme.scheme}</div>`;
+        }
+        theme.concepts.forEach(concept => {
+          html += `<span style="background: #fff; border: 1px solid #ddd; padding: 4px 10px; border-radius: 3px; margin-right: 8px; display: inline-block; margin-bottom: 5px;">${concept.id}</span>`;
+        });
+        html += '</div>';
+      }
+    });
+    html += '</div>';
+  }
+  
+  // Contacts
+  if (metadata.properties?.contacts && metadata.properties.contacts.length > 0) {
+    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Contacts</h4>';
+    metadata.properties.contacts.forEach((contact, index) => {
+      html += `<div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 5px; border-left: 3px solid #27ae60;">`;
+      if (contact.name) html += `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">${contact.name}</div>`;
+      if (contact.organization) html += `<div style="margin-bottom: 3px;"><strong>Organization:</strong> ${contact.organization}</div>`;
+      if (contact.position) html += `<div style="margin-bottom: 3px;"><strong>Position:</strong> ${contact.position}</div>`;
+      if (contact.roles && contact.roles.length > 0) html += `<div style="margin-bottom: 3px;"><strong>Role:</strong> ${contact.roles.join(', ')}</div>`;
+      if (contact.emails && contact.emails.length > 0 && contact.emails[0].value) {
+        html += `<div style="margin-bottom: 3px;"><strong>Email:</strong> <a href="mailto:${contact.emails[0].value}" style="color: #3498db;">${contact.emails[0].value}</a></div>`;
+      }
+      if (contact.addresses && contact.addresses.length > 0) {
+        const addr = contact.addresses[0];
+        let addressParts = [];
+        if (addr.deliveryPoint && addr.deliveryPoint.length > 0) addressParts.push(addr.deliveryPoint.join(', '));
+        if (addr.city) addressParts.push(addr.city);
+        if (addr.postalCode) addressParts.push(addr.postalCode);
+        if (addr.country) addressParts.push(addr.country);
+        if (addressParts.length > 0) {
+          html += `<div style="margin-top: 5px; font-size: 13px; color: #555;">${addressParts.join(', ')}</div>`;
+        }
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  
+  // Geometry/Extent
+  if (metadata.geometry) {
+    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Spatial Extent</h4>';
+    if (metadata.geometry.type === 'Polygon' && metadata.geometry.coordinates) {
+      const coords = metadata.geometry.coordinates[0];
+      const [minLon, minLat] = coords[0];
+      const [maxLon, maxLat] = coords[2];
+      html += `<div style="padding: 10px; background: #f8f9fa; border-radius: 3px; font-family: monospace; font-size: 13px;">
+        West: ${minLon}° | East: ${maxLon}°<br/>
+        South: ${minLat}° | North: ${maxLat}°
+      </div>`;
+    }
+    html += '</div>';
+  }
+  
+  // Time Period
+  if (metadata.time?.interval) {
+    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Temporal Extent</h4>';
+    html += `<div style="padding: 10px; background: #f8f9fa; border-radius: 3px;">
+      From: <strong>${metadata.time.interval[0]}</strong> to <strong>${metadata.time.interval[1]}</strong>
+    </div></div>`;
+  }
+  
+  // Formats
+  if (metadata.properties?.formats && metadata.properties.formats.length > 0) {
+    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Available Formats</h4>';
+    html += '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
+    metadata.properties.formats.forEach(format => {
+      html += `<span style="background: #e8f4f8; padding: 5px 12px; border-radius: 3px; font-size: 13px; border: 1px solid #3498db;">${format.name}</span>`;
+    });
+    html += '</div></div>';
+  }
+  
+  // Links
+  if (metadata.links && metadata.links.length > 0) {
+    const dataLinks = metadata.links.filter(link => 
+      link.rel === 'information' || link.rel === 'download' || link.rel === 'preview'
+    );
+    
+    if (dataLinks.length > 0) {
+      html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Data Access Links</h4>';
+      html += '<div style="display: flex; flex-direction: column; gap: 8px;">';
+      
+      dataLinks.forEach(link => {
+        const linkType = link.rel === 'download' ? '📥' : link.rel === 'preview' ? '👁️' : '🔗';
+        const linkName = link.name || link.title || link.rel;
+        html += `<a href="${link.href}" target="_blank" style="padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; color: #2c3e50; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" 
+          onmouseover="this.style.background='#f0f0f0'; this.style.borderColor='#3498db';"
+          onmouseout="this.style.background='#fff'; this.style.borderColor='#ddd';">
+          <span style="font-size: 20px;">${linkType}</span>
+          <div style="flex: 1;">
+            <div style="font-weight: bold;">${linkName}</div>
+            ${link.protocol ? `<div style="font-size: 12px; color: #666;">${link.protocol}</div>` : ''}
+          </div>
+        </a>`;
+      });
+      
+      html += '</div></div>';
+    }
+  }
+  
+  return html;
+}
 
 async function showMetadataPopup(metadataUrl) {
   // Create modal overlay
@@ -434,6 +593,21 @@ async function showMetadataPopup(metadataUrl) {
 
 // ==================== Profile Layer ====================
 
+function generateProjectColors(projectNames) {
+  const colors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+    '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2',
+    '#F8B739', '#52B788', '#E63946', '#457B9D'
+  ];
+  
+  const projectColors = {};
+  projectNames.forEach((name, index) => {
+    projectColors[name] = colors[index % colors.length];
+  });
+  
+  return projectColors;
+}
+
 async function loadProfiles() {
   try {
     const profiles = await api.getProfiles();
@@ -446,65 +620,89 @@ async function loadProfiles() {
     console.log('Loading profiles:', profiles.length);
     console.log('First profile sample:', profiles[0]);
     
+    // Group profiles by project_name
+    const profilesByProject = {};
+    profiles.forEach(profile => {
+      const projectName = profile.project_name || 'Unknown Project';
+      if (!profilesByProject[projectName]) {
+        profilesByProject[projectName] = [];
+      }
+      profilesByProject[projectName].push(profile);
+    });
+
+    console.log('Projects found:', Object.keys(profilesByProject));
+    
+    // Generate colors for each project
+    profileColors = generateProjectColors(Object.keys(profilesByProject));
+    
     // Create GeoJSON format parser
     const geoJsonFormat = new GeoJSON();
     
-    // Create features from profiles
-    const features = profiles.map(profile => {
-      try {
-        // The geometry column now contains GeoJSON as a JSON object
-        if (!profile.geometry) {
-          console.warn('Profile missing geometry:', profile.profile_code);
+    // Create a layer for each project
+    Object.entries(profilesByProject).forEach(([projectName, projectProfiles]) => {
+      // Create features for this project
+      const features = projectProfiles.map(profile => {
+        try {
+          if (!profile.geometry) {
+            console.warn('Profile missing geometry:', profile.profile_code);
+            return null;
+          }
+
+          const feature = geoJsonFormat.readFeature(profile.geometry, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857'
+          });
+          
+          // Set properties including project name for styling
+          feature.setProperties({
+            profile_code: profile.profile_code,
+            project_name: profile.project_name,
+            altitude: profile.altitude,
+            date: profile.date
+          });
+          
+          return feature;
+        } catch (e) {
+          console.error('Failed to create feature for profile:', profile.profile_code, e);
+          console.error('Geometry value:', profile.geometry);
           return null;
         }
+      }).filter(f => f !== null);
 
-        const feature = geoJsonFormat.readFeature(profile.geometry, {
-          dataProjection: 'EPSG:4326',
-          featureProjection: 'EPSG:3857'
-        });
-        
-        // Set properties
-        feature.setProperties({
-          profile_code: profile.profile_code,
-          project_name: profile.project_name,
-          altitude: profile.altitude,
-          date: profile.date
-        });
-        
-        return feature;
-      } catch (e) {
-        console.error('Failed to create feature for profile:', profile.profile_code, e);
-        console.error('Geometry value:', profile.geometry);
-        return null;
+      if (features.length === 0) {
+        console.warn(`No valid features for project: ${projectName}`);
+        return;
       }
-    }).filter(f => f !== null);
 
-    if (features.length === 0) {
-      console.warn('No valid profile features could be created');
-      return;
-    }
+      console.log(`Created ${features.length} features for project: ${projectName}`);
 
-    console.log(`Created ${features.length} profile features`);
+      // Create vector source with clustering
+      const vectorSource = new VectorSource({ features });
+      
+      const clusterSource = new Cluster({
+        distance: 100,
+        source: vectorSource
+      });
 
-    // Create vector source with clustering
-    const vectorSource = new VectorSource({ features });
-    
-    const clusterSource = new Cluster({
-      distance: 100,
-      source: vectorSource
+      // Create profile layer for this project with project-specific styling
+      const layer = new VectorLayer({
+        source: clusterSource,
+        style: (feature) => getProfileStyle(feature, projectName),
+        zIndex: 1000,
+        visible: true
+      });
+
+      layer.set('name', projectName);
+      layer.set('project', projectName);
+      
+      // Store layer by project name
+      profileLayers[projectName] = layer;
+      
+      // Add to map
+      map.addLayer(layer);
     });
 
-    // Create profile layer
-    profileLayer = new VectorLayer({
-      source: clusterSource,
-      style: getProfileStyle,
-      zIndex: 1000
-    });
-
-    profileLayer.set('name', 'Soil Profiles');
-    map.addLayer(profileLayer);
-
-    // Add checkbox for profile layer
+    // Add checkbox controls for all project layers
     addProfileLayerControl();
 
   } catch (error) {
@@ -514,16 +712,26 @@ async function loadProfiles() {
   }
 }
 
-function getProfileStyle(feature) {
+
+function getProfileStyle(feature, projectName) {
   const size = feature.get('features').length;
+  const color = profileColors[projectName] || '#007BFF';
+  
+  // Convert hex to rgba
+  const hexToRgba = (hex, alpha) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
   
   if (size > 1) {
     // Clustered style
     return new Style({
       image: new CircleStyle({
         radius: 15 + Math.min(size / 2, 10),
-        fill: new Fill({ color: 'rgba(255, 153, 0, 0.8)' }),
-        stroke: new Stroke({ color: 'rgba(255, 153, 0, 1)', width: 2 })
+        fill: new Fill({ color: hexToRgba(color, 0.8) }),
+        stroke: new Stroke({ color: color, width: 2 })
       }),
       text: new Text({
         text: size.toString(),
@@ -536,38 +744,117 @@ function getProfileStyle(feature) {
     return new Style({
       image: new CircleStyle({
         radius: 8,
-        fill: new Fill({ color: 'rgba(0, 123, 255, 0.8)' }),
+        fill: new Fill({ color: hexToRgba(color, 0.8) }),
         stroke: new Stroke({ color: '#fff', width: 2 })
       })
     });
   }
 }
 
+
 function addProfileLayerControl() {
   const profileGroup = document.createElement('div');
   profileGroup.className = 'layer-group';
-  profileGroup.innerHTML = `
-    <div class="layer-group-header">Soil Profiles</div>
-    <div class="layer-group-content">
-      <div class="layer-item">
-        <input type="checkbox" id="layer-profiles" checked>
-        <label for="layer-profiles">Profiles</label>
-      </div>
-    </div>
-  `;
+  
+  // Create header
+  const header = document.createElement('div');
+  header.className = 'layer-group-header';
+  header.textContent = 'Soil Profiles';
+  profileGroup.appendChild(header);
+  
+  // Create content container
+  const content = document.createElement('div');
+  content.className = 'layer-group-content';
+  
+  // Add a checkbox and color picker for each project layer
+  Object.entries(profileLayers).forEach(([projectName, layer]) => {
+    const layerItem = document.createElement('div');
+    layerItem.className = 'layer-item';
+    layerItem.style.display = 'flex';
+    layerItem.style.alignItems = 'center';
+    layerItem.style.gap = '8px';
+    
+    const checkboxId = `layer-profile-${projectName.replace(/\s+/g, '-').toLowerCase()}`;
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = checkboxId;
+    checkbox.checked = true;
+    
+    const label = document.createElement('label');
+    label.htmlFor = checkboxId;
+    label.textContent = projectName;
+    label.style.flex = '1';
+    
+    // Create circular color picker wrapper
+    const colorWrapper = document.createElement('div');
+    colorWrapper.style.position = 'relative';
+    colorWrapper.style.width = '12px';
+    colorWrapper.style.height = '12px';
+    colorWrapper.style.borderRadius = '50%';
+    colorWrapper.style.overflow = 'hidden';
+    colorWrapper.style.border = '2px solid #fff';
+    colorWrapper.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+    colorWrapper.style.cursor = 'pointer';
+    colorWrapper.title = 'Change color';
+    
+    // Add color picker (hidden but functional)
+    const colorPicker = document.createElement('input');
+    colorPicker.type = 'color';
+    colorPicker.value = profileColors[projectName];
+    colorPicker.style.position = 'absolute';
+    colorPicker.style.top = '0';
+    colorPicker.style.left = '0';
+    colorPicker.style.width = '100%';
+    colorPicker.style.height = '100%';
+    colorPicker.style.border = 'none';
+    colorPicker.style.cursor = 'pointer';
+    colorPicker.style.opacity = '0';
+    
+    // Add visible color circle
+    const colorCircle = document.createElement('div');
+    colorCircle.style.width = '100%';
+    colorCircle.style.height = '100%';
+    colorCircle.style.backgroundColor = profileColors[projectName];
+    colorCircle.style.borderRadius = '50%';
+    colorCircle.style.pointerEvents = 'none';
+    
+    colorWrapper.appendChild(colorCircle);
+    colorWrapper.appendChild(colorPicker);
+    
+    layerItem.appendChild(checkbox);
+    layerItem.appendChild(label);
+    layerItem.appendChild(colorWrapper);
+    content.appendChild(layerItem);
+    
+    // Add event listener for checkbox
+    checkbox.addEventListener('change', (e) => {
+      layer.setVisible(e.target.checked);
+    });
+    
+    // Add event listener for color picker
+    colorPicker.addEventListener('input', (e) => {
+      // Update the visible circle immediately as user picks
+      colorCircle.style.backgroundColor = e.target.value;
+    });
+    
+    colorPicker.addEventListener('change', (e) => {
+      // Update the stored color and re-render layer
+      profileColors[projectName] = e.target.value;
+      colorCircle.style.backgroundColor = e.target.value;
+      layer.changed();
+    });
+  });
+  
+  profileGroup.appendChild(content);
 
   // Insert at the beginning of layer groups
   const layerGroupsContainer = document.getElementById('layer-groups');
   layerGroupsContainer.insertBefore(profileGroup, layerGroupsContainer.firstChild);
 
-  // Add event listener
-  document.getElementById('layer-profiles').addEventListener('change', (e) => {
-    profileLayer.setVisible(e.target.checked);
-  });
-
   // Make collapsible
   profileGroup.classList.add('collapsed');
-  profileGroup.querySelector('.layer-group-header').addEventListener('click', () => {
+  header.addEventListener('click', () => {
     profileGroup.classList.toggle('collapsed');
   });
 }

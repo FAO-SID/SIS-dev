@@ -24,7 +24,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", os.getenv("POSTGRES_HOST", "sis-database")),
-    "port": os.getenv("DB_PORT", "5432"),  # Internal port is always 5432
+    "port": os.getenv("DB_PORT", "5432"),
     "database": os.getenv("DB_NAME", os.getenv("POSTGRES_DB", "sis")),
     "user": os.getenv("DB_USER", os.getenv("POSTGRES_USER", "sis")),
     "password": os.getenv("DB_PASSWORD", os.getenv("POSTGRES_PASSWORD", "sis"))
@@ -36,14 +36,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS middleware
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:1234",  # sis-web-mapping in development
-        "http://localhost",       # nginx on port 80
-        "http://localhost:80",    # explicit port 80
-        "*"                        # Allow all for development (remove in production)
+        "http://localhost",
+        "http://localhost:80",
+        "http://localhost:8001",
+        "*"  # For development - remove in production!
     ],
     allow_credentials=True,
     allow_methods=["*"],

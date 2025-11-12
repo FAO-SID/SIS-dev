@@ -1,6 +1,23 @@
 services:
 
-  # SIS database (PostgreSQL)
+# # DEVELOPMENT
+# sis-nginx:        80:80, 443:443
+# sis-web-mapping:  8001:8000
+# sis-api:          8002:8000
+# sis-metadata:     8003:8000
+# sis-web-services: 8004:80
+# sis-database:     8005:5432
+
+# # PRODUCTION (only nginx exposed)
+# sis-nginx:        80:80, 443:443  # Only this exposed!
+# sis-web-mapping:  expose: 8000    # Internal only
+# sis-api:          expose: 8000
+# sis-metadata:     expose: 8000
+# sis-web-services: expose: 80
+# sis-database:     expose: 5432
+
+
+  # sis-database (PostgreSQL)
   sis-database:
     container_name: sis-database
     image: postgis/postgis:17-3.5
@@ -9,14 +26,14 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5442:5432"
+      - "8005:5432"
     volumes:
       - ./sis-database/volume:/var/lib/postgresql/data
     networks:
       - sis-net
     restart: unless-stopped
 
-  # SIS REST API (FastAPI)
+  # sis-api REST API (FastAPI)
   sis-api:
     container_name: sis-api
     build:
@@ -31,7 +48,7 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
     ports:
-      - "8000:8000"
+      - "8002:8000"
     depends_on:
       - sis-database
     networks:
@@ -44,62 +61,7 @@ services:
       retries: 3
       start_period: 10s
 
-  # SIS metadata (pyCSW)
-  sis-metadata:
-    container_name: sis-metadata
-    image: geopython/pycsw:3.0.0-beta1
-    environment:
-      PYCSW_SERVER_URL: http://localhost:8001
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - 8001:8000
-    volumes:
-      - ./sis-metadata/pycsw.yml:/etc/pycsw/pycsw.yml
-      - ./sis-metadata/volume:/records
-    networks:
-      - sis-net
-    depends_on:
-      - sis-database
-    restart: unless-stopped
-
-  # SIS web services (MapServer)
-  sis-web-services:
-    container_name: sis-web-services
-    image: camptocamp/mapserver:8.4
-    ports:
-      - "8082:80"
-    volumes:
-      - ./sis-web-services/volume:/etc/mapserver:ro
-    depends_on:
-      - sis-database
-    networks:
-      - sis-net
-    restart: unless-stopped
-
-# SIS web mapping (OpenLayers)
-  sis-web-mapping:
-    container_name: sis-web-mapping
-    build: 
-      context: ./sis-web-mapping
-      dockerfile: Dockerfile
-      args:
-        API_URL: http://localhost:8000
-        API_KEY: ${WEB_MAPPING_API_KEY}
-    ports:
-      - "1234:1234"
-    networks:
-      - sis-net
-    depends_on:
-      - sis-api
-      - sis-web-services
-      - sis-metadata
-    restart: unless-stopped
-
-  # SIS web-server (Nginx reverse proxy)
+  # sis-nginx (Nginx reverse proxy)
   sis-nginx:
     image: nginx:alpine
     container_name: sis-nginx
@@ -116,6 +78,61 @@ services:
         condition: service_started
     networks:
       - sis-net
+    restart: unless-stopped
+
+  # sis-metadata (pyCSW)
+  sis-metadata:
+    container_name: sis-metadata
+    image: geopython/pycsw:3.0.0-beta1
+    environment:
+      PYCSW_SERVER_URL: http://localhost:8003
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - 8003:8000
+    volumes:
+      - ./sis-metadata/pycsw.yml:/etc/pycsw/pycsw.yml
+      - ./sis-metadata/volume:/records
+    networks:
+      - sis-net
+    depends_on:
+      - sis-database
+    restart: unless-stopped
+
+  # sis-web-services (MapServer)
+  sis-web-services:
+    container_name: sis-web-services
+    image: camptocamp/mapserver:8.4
+    ports:
+      - "8004:80"
+    volumes:
+      - ./sis-web-services/volume:/etc/mapserver:ro
+    depends_on:
+      - sis-database
+    networks:
+      - sis-net
+    restart: unless-stopped
+
+# sis-web-mapping (OpenLayers)
+  sis-web-mapping:
+    container_name: sis-web-mapping
+    build: 
+      context: ./sis-web-mapping
+      dockerfile: Dockerfile
+      args:
+        API_URL: http://localhost
+        API_KEY: ${WEB_MAPPING_API_KEY}
+    ports:
+      - "8001:8000"
+    networks:
+      - sis-net
+    depends_on:
+      - sis-api
+      - sis-web-services
+      - sis-metadata
     restart: unless-stopped
 
 networks:

@@ -1,11 +1,12 @@
 -- OBJECT: api.insert_dummy_data()
--- ISSUE: add dummy data to he database
+-- ISSUE: add dummy data to the database
+-- UPDATED: Parametrized project_id and project_name
 
 
 -- PL/pgSQL function that inserts dummy data.
 -- Key features:
 
--- Single project and site named "dummy data"
+-- Single project and site with configurable project_id and name
 -- x plots (parameter p_num_plots, default 100) with unique codes (PLOT_000001 to PLOT_000100) with geometry within (p_xmin, p_xmax, p_ymin, p_ymax)
 -- 3 elements (layers) per plot with depth ranges:
 --     Element 1: 0-30 cm
@@ -15,6 +16,8 @@
 -- Physical/chemical results for all, or for the array of observation_phys_chem_id specified in the parameter (p_observation_ids), and with random values that respect the value_min and value_max bounds of the property
 
 CREATE OR REPLACE FUNCTION api.insert_dummy_data(
+    p_project_id text DEFAULT 'dummy data',
+    p_project_name text DEFAULT 'dummy data',
     p_num_plots integer DEFAULT 100,
     p_observation_ids integer[] DEFAULT NULL,
     p_xmin float DEFAULT -1.0,
@@ -49,20 +52,23 @@ BEGIN
     END IF;
     
     RAISE NOTICE 'Starting dummy data insertion with parameters:';
+    RAISE NOTICE '  - Project ID: %', p_project_id;
+    RAISE NOTICE '  - Project Name: %', p_project_name;
     RAISE NOTICE '  - Number of plots: %', p_num_plots;
     RAISE NOTICE '  - Observations: %', array_length(v_observation_filter, 1);
     RAISE NOTICE '  - X range: [%, %]', p_xmin, p_xmax;
     RAISE NOTICE '  - Y range: [%, %]', p_ymin, p_ymax;
+    
     -- Insert project
     INSERT INTO soil_data.project (project_id, name)
-    VALUES ('dummy data', 'dummy data')
+    VALUES (p_project_id, p_project_name)
     RETURNING project_id INTO v_project_id;
     
     RAISE NOTICE 'Created project with ID: %', v_project_id;
     
     -- Insert site
     INSERT INTO soil_data.site (site_code, "position")
-    VALUES ('dummy data', ST_SetSRID(ST_MakePoint(0, 0), 4326))
+    VALUES (p_project_id || '_site', ST_SetSRID(ST_MakePoint(0, 0), 4326))
     RETURNING site_id INTO v_site_id;
     
     RAISE NOTICE 'Created site with ID: %', v_site_id;
@@ -80,7 +86,7 @@ BEGIN
         INSERT INTO soil_data.plot (site_id, plot_code, altitude, time_stamp, "position", type)
         VALUES (
             v_site_id,
-            'PLOT_' || LPAD(v_plot_num::text, 6, '0'),
+            p_project_id || '_PLOT_' || LPAD(v_plot_num::text, 6, '0'),
             100 + (random() * 500)::integer,  -- Random altitude between 100 and 600
             CURRENT_DATE - (random() * 365)::integer,
             ST_SetSRID(ST_MakePoint(v_random_x, v_random_y), 4326),
@@ -90,7 +96,7 @@ BEGIN
         
         -- Insert profile for this plot
         INSERT INTO soil_data.profile (plot_id, profile_code)
-        VALUES (v_plot_id, 'PROFILE_' || LPAD(v_plot_num::text, 3, '0'))
+        VALUES (v_plot_id, p_project_id || '_PROFILE_' || LPAD(v_plot_num::text, 3, '0'))
         RETURNING profile_id INTO v_profile_id;
         
         -- Insert 3 elements (layers) per plot
@@ -101,7 +107,7 @@ BEGIN
         
         -- Insert specimen for element 1
         INSERT INTO soil_data.specimen (element_id, code)
-        VALUES (v_element_id, 'SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E1')
+        VALUES (v_element_id, p_project_id || '_SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E1')
         RETURNING specimen_id INTO v_specimen_id;
         
         -- Insert result_phys_chem for specified observations for this specimen
@@ -125,7 +131,7 @@ BEGIN
         
         -- Insert specimen for element 2
         INSERT INTO soil_data.specimen (element_id, code)
-        VALUES (v_element_id, 'SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E2')
+        VALUES (v_element_id, p_project_id || '_SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E2')
         RETURNING specimen_id INTO v_specimen_id;
         
         -- Insert result_phys_chem for specified observations for this specimen
@@ -148,7 +154,7 @@ BEGIN
         
         -- Insert specimen for element 3
         INSERT INTO soil_data.specimen (element_id, code)
-        VALUES (v_element_id, 'SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E3')
+        VALUES (v_element_id, p_project_id || '_SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E3')
         RETURNING specimen_id INTO v_specimen_id;
         
         -- Insert result_phys_chem for specified observations for this specimen
@@ -186,20 +192,32 @@ $$;
 
 -- Usage examples:
 
--- 1. Default usage (100 plots, all observations, default coordinate range):
+-- 1. Default usage (100 plots, all observations, default coordinate range, default project):
 -- SELECT api.insert_dummy_data();
 
--- 2. Custom number of plots:
--- SELECT api.insert_dummy_data(50);
+-- 2. Custom project ID and name:
+-- SELECT api.insert_dummy_data('PROJECT_001', 'Soil Survey 2024');
 
--- 3. Specific observations only (e.g., pH and Clay):
--- SELECT api.insert_dummy_data(100, ARRAY[514, 635]);
+-- 3. Custom project with specific number of plots:
+-- SELECT api.insert_dummy_data('PROJECT_002', 'Portugal Study', 50);
 
--- 4. Custom geographic bounds (e.g., Portugal area):
--- SELECT api.insert_dummy_data(100, NULL, -9.5, -6.2, 36.9, 42.2);
+-- 4. Custom project with specific observations (e.g., pH and Clay):
+-- SELECT api.insert_dummy_data('PROJECT_003', 'Chemical Analysis', 100, ARRAY[514, 635]);
+
+-- 5. Full custom parameters (Portugal area):
+-- SELECT api.insert_dummy_data(
+--     p_project_id := 'PORTUGAL_2024',
+--     p_project_name := 'Portugal Soil Survey 2024',
+--     p_num_plots := 100,
+--     p_observation_ids := NULL,
+--     p_xmin := -9.5,
+--     p_xmax := -6.2,
+--     p_ymin := 36.9,
+--     p_ymax := 42.2
+-- );
 
 
--- To clean up dummy data, you can use:
+-- To clean up dummy data for a specific project:
 -- DELETE FROM soil_data.result_phys_chem;
 -- DELETE FROM soil_data.specimen;
 -- DELETE FROM soil_data.element;
@@ -210,7 +228,7 @@ $$;
 -- DELETE FROM soil_data.project;
 
 
--- Example for 500 plots in Portugal and soil properties:
+-- Example for 500 plots in Portugal with custom project and soil properties:
 -- 514	pH - Hydrogen potential	pHH2O	pH	1.5	13
 -- 635	Clay texture fraction	SaSiCl_2-50-2000u-adj100	%	0	100
 -- 587	Sand texture fraction	SaSiCl_2-50-2000u-adj100	%	0	100
@@ -223,16 +241,18 @@ $$;
 -- 54	Carbon (C) - organic	OrgC_wc-cro3-nrcs6a1c	g/kg	0	1000
 
 -- SELECT api.insert_dummy_data(
+--     p_project_id := 'PT_SOIL_2024',
+--     p_project_name := 'Portugal Soil Analysis 2024',
 --     p_num_plots := 500,
---     p_observation_ids := ARRAY[514,635,587,683,69,30, 497,742,970,54],
+--     p_observation_ids := ARRAY[514,635,587,683,69,30,497,742,970,54],
 --     p_xmin := -8.7,
 --     p_xmax := -6.6,
 --     p_ymin := 37,
 --     p_ymax := 41.9
 -- );
 
--- -- Look to the results for specific plot
--- SELECT st.site_code, p.plot_code, pf.profile_code, e.upper_depth, e.lower_depth, opc.property_phys_chem_id, opc.unit_of_measure_id , opc.procedure_phys_chem_id , rpc.value 
+-- Look at the results for specific plot
+-- SELECT st.site_code, p.plot_code, pf.profile_code, e.upper_depth, e.lower_depth, opc.property_phys_chem_id, opc.unit_of_measure_id, opc.procedure_phys_chem_id, rpc.value 
 -- FROM soil_data.result_phys_chem rpc 
 -- LEFT JOIN soil_data.observation_phys_chem opc ON opc.observation_phys_chem_id = rpc.observation_phys_chem_id 
 -- LEFT JOIN soil_data.specimen s ON s.specimen_id = rpc.specimen_id 
@@ -240,5 +260,5 @@ $$;
 -- LEFT JOIN soil_data.profile pf ON pf.profile_id = e.profile_id 
 -- LEFT JOIN soil_data.plot p ON p.plot_id = pf.plot_id
 -- LEFT JOIN soil_data.site st ON st.site_id = p.site_id 
--- WHERE p.plot_code ='PLOT_000001'
+-- WHERE p.plot_code = 'DUMMY_DATA_2_PLOT_000001'  -- Format: {project_id}_PLOT_000001
 -- ORDER BY p.plot_code, pf.profile_code, opc.property_phys_chem_id, e.upper_depth, e.lower_depth;

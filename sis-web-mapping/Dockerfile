@@ -29,4 +29,4 @@ RUN echo "API_URL=${API_URL}" > .env && \
 EXPOSE 1234
 
 # Start Parcel dev server
-CMD ["npm", "start"]
+CMD ["npm", "start", "--", "--port", "8000", "--host", "0.0.0.0"]

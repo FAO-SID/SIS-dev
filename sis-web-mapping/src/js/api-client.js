@@ -5,8 +5,8 @@
 
 // Read API configuration from environment or fallback to defaults
 // Parcel will replace process.env at build time
-const API_BASE_URL = 'http://localhost:8000';  // Internal Docker network URL
-const API_KEY = process.env.API_KEY || '5P3_cUmQ_jsVacn8WSOWd112gwNF9QfsRfx3t5T8SKk';
+const API_BASE_URL = process.env.API_URL;
+const API_KEY = process.env.API_KEY;
 
 // Debug: Log configuration on load
 console.log('API Client Configuration:', {
