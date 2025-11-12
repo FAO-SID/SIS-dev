@@ -534,7 +534,7 @@ async function showMetadataPopup(metadataUrl) {
   modal.innerHTML = `
     <div style="background: white; padding: 20px; border-radius: 8px; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; width: 100%;">
       <button id="metadata-close" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
-      <h2 style="margin-top: 0;">Layer Metadata</h2>
+      <h2 style="margin-top: 0;">Metadata</h2>
       <div id="metadata-content" style="margin-top: 20px;">Loading...</div>
     </div>
   `;
