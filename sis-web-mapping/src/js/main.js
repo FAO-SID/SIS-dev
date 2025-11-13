@@ -489,8 +489,9 @@ function formatMetadata(metadata) {
   
   // Links
   if (metadata.links && metadata.links.length > 0) {
+    // Filter out 'preview' - only keep 'information' and 'download'
     const dataLinks = metadata.links.filter(link => 
-      link.rel === 'information' || link.rel === 'download' || link.rel === 'preview'
+      link.rel === 'information' || link.rel === 'download'
     );
     
     if (dataLinks.length > 0) {
@@ -498,7 +499,8 @@ function formatMetadata(metadata) {
       html += '<div style="display: flex; flex-direction: column; gap: 8px;">';
       
       dataLinks.forEach(link => {
-        const linkType = link.rel === 'download' ? '📥' : link.rel === 'preview' ? '👁️' : '🔗';
+        // Removed preview emoji - only download and information
+        const linkType = link.rel === 'download' ? '📥' : '🔗';
         const linkName = link.name || link.title || link.rel;
         html += `<a href="${link.href}" target="_blank" style="padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; color: #2c3e50; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" 
           onmouseover="this.style.background='#f0f0f0'; this.style.borderColor='#3498db';"
@@ -512,8 +514,9 @@ function formatMetadata(metadata) {
       });
       
       html += '</div></div>';
-    }
   }
+}
+
   
   return html;
 }
