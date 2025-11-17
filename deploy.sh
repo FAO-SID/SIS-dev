@@ -313,6 +313,14 @@ docker exec sis-database psql -U sis -d sis -c "SELECT identifier, title FROM sp
 #     sis-web-mapping    #
 ##########################
 
+# Build and start container
+docker compose up --build sis-web-mapping -d
+
+
+
+
+
+# development
 
 docker compose stop sis-nginx
 docker compose rm -f sis-nginx
@@ -328,7 +336,6 @@ docker compose build sis-api
 docker compose up --no-deps -d sis-api
 
 
-
 docker compose stop sis-web-mapping
 docker compose rm -f sis-web-mapping
 docker rmi sis-dev-sis-web-mapping
@@ -336,11 +343,3 @@ docker compose run --rm sis-web-mapping rm -rf .parcel-cache
 docker compose build sis-web-mapping
 docker compose up --no-deps -d sis-web-mapping
 # docker logs sis-web-mapping -f
-
-
-
-
-# Build and start container
-docker compose up --build sis-web-mapping -d
-
-
