@@ -9,7 +9,7 @@ import { ScaleLine, defaults as defaultControls } from 'ol/control';
 import Overlay from 'ol/Overlay';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text } from 'ol/style';
 import { GeoJSON } from 'ol/format';
-import api from './api-client.js';
+import api, { MAPSERVER_URL } from './api-client.js';
 
 // Global variables
 let map;
@@ -329,7 +329,7 @@ function createWMSLayer(layerConfig) {
   }
 
   // MapServer base URL
-  const mapServerUrl = 'http://localhost:8004/';
+  const mapServerUrl = MAPSERVER_URL;
   
   const params = {
     'LAYERS': layerConfig.layer_id,

@@ -125,6 +125,7 @@ services:
       args:
         API_URL: http://localhost
         API_KEY: ${WEB_MAPPING_API_KEY}
+        MAPSERVER_URL: http://localhost/mapserver
     ports:
       - "8001:8000"
     networks:

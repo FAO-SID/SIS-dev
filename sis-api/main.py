@@ -18,16 +18,16 @@ import os
 from contextlib import contextmanager
 
 # Configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", os.getenv("POSTGRES_HOST", "sis-database")),
-    "port": os.getenv("DB_PORT", "5432"),
-    "database": os.getenv("DB_NAME", os.getenv("POSTGRES_DB", "sis")),
-    "user": os.getenv("DB_USER", os.getenv("POSTGRES_USER", "sis")),
-    "password": os.getenv("DB_PASSWORD", os.getenv("POSTGRES_PASSWORD", "sis"))
+    "host": os.getenv("POSTGRES_HOST"),
+    "port": os.getenv("POSTGRES_PORT"),
+    "database": os.getenv("POSTGRES_DB"),
+    "user": os.getenv("POSTGRES_USER"),
+    "password": os.getenv("POSTGRES_PASSWORD")
 }
 
 app = FastAPI(
