@@ -43,7 +43,7 @@ clear
 ####################
 
 # Clean up Docker 
-# THE BELOW COMMANDS WILL DELETE ANY EXISTING CONTAINERS YOU HAVE ON YOU MACHINE!!!
+# THE COMMANDS BELOW WILL DELETE ALL EXISTING CONTAINERS ON YOUR MACHINE!!!
 docker stop $(docker ps -q)
 docker rm $(docker ps -aq)
 docker rmi $(docker images -q) --force
