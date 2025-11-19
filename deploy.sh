@@ -42,7 +42,8 @@ clear
 #      Docker      #
 ####################
 
-# Clean up Docker
+# Clean up Docker 
+# THE BELOW COMMANDS WILL DELETE ANY EXISTING CONTAINERS YOU HAVE ON YOU MACHINE!!!
 docker stop $(docker ps -q)
 docker rm $(docker ps -aq)
 docker rmi $(docker images -q) --force
@@ -321,7 +322,6 @@ docker compose up --build sis-web-mapping -d
 
 
 # development
-
 docker compose stop sis-nginx
 docker compose rm -f sis-nginx
 docker rmi sis-dev-sis-nginx
@@ -343,3 +343,4 @@ docker compose run --rm sis-web-mapping rm -rf .parcel-cache
 docker compose build sis-web-mapping
 docker compose up --no-deps -d sis-web-mapping
 # docker logs sis-web-mapping -f
+

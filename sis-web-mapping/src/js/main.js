@@ -10,6 +10,7 @@ import Overlay from 'ol/Overlay';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text } from 'ol/style';
 import { GeoJSON } from 'ol/format';
 import api, { MAPSERVER_URL } from './api-client.js';
+import adminDashboard from './admin-dashboard.js';
 
 // Global variables
 let map;
@@ -51,9 +52,10 @@ async function initializeApp() {
     setupControls();
 
     // Check if user is logged in
-    if (api.restoreSession()) {
-      showAdminPanel();
-    }
+    // if (api.restoreSession()) {
+    //   showAdminPanel();
+    // }
+    api.restoreSession();
 
     console.log('Application initialized successfully!');
     showLoading(false);
@@ -1262,16 +1264,16 @@ function setupControls() {
 function addLoginButton() {
   const loginBtn = document.createElement('button');
   loginBtn.id = 'login-btn';
-  loginBtn.textContent = 'Login';
-  loginBtn.style.cssText = 'position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: rgba(255,255,255,0.9); border: none; border-radius: 4px; cursor: pointer; z-index: 1001;';
+  loginBtn.style.cssText = 'position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: rgba(255,255,255,0.9); border: none; border-radius: 4px; cursor: pointer; z-index: 1001; font-weight: 500;';
   
-  loginBtn.addEventListener('click', () => {
-    if (api.isAuthenticated()) {
-      showAdminPanel();
-    } else {
-      showLoginModal();
-    }
-  });
+  // Check if user is already logged in (restore session)
+  if (api.restoreSession()) {
+    loginBtn.textContent = 'Admin Panel';
+    loginBtn.onclick = showAdminPanel;  // CHANGED: Use .onclick instead of addEventListener
+  } else {
+    loginBtn.textContent = 'Login';
+    loginBtn.onclick = showLoginModal;  // CHANGED: Use .onclick instead of addEventListener
+  }
 
   document.body.appendChild(loginBtn);
 }
@@ -1279,23 +1281,41 @@ function addLoginButton() {
 // ==================== Admin Functions ====================
 
 function showLoginModal() {
+  // If already authenticated, show admin panel instead
+  if (api.isAuthenticated()) {
+    showAdminPanel();
+    return;
+  }
+
+  // Create modal HTML
   const modal = document.createElement('div');
-  modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;';
-  
+  modal.className = 'login-modal active';
   modal.innerHTML = `
-    <div style="background: white; padding: 30px; border-radius: 8px; min-width: 300px;">
-      <h2 style="margin-top: 0;">Admin Login</h2>
-      <input type="email" id="login-email" placeholder="Email" style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
-      <input type="password" id="login-password" placeholder="Password" style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box;">
-      <button id="login-submit" style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
-      <button id="login-cancel" style="width: 100%; padding: 10px; margin-top: 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
-      <div id="login-error" style="color: red; margin-top: 10px; display: none;"></div>
+    <div class="login-content">
+      <h2>Admin Login</h2>
+      <div id="login-error" class="login-error"></div>
+      <form class="login-form" id="login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required>
+        </div>
+        <div class="login-actions">
+          <button type="submit" class="btn btn-primary">Login</button>
+          <button type="button" id="login-cancel" class="btn btn-secondary">Cancel</button>
+        </div>
+      </form>
     </div>
   `;
 
   document.body.appendChild(modal);
 
-  document.getElementById('login-submit').addEventListener('click', async () => {
+  // Handle form submission
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     
@@ -1303,10 +1323,9 @@ function showLoginModal() {
       await api.login(email, password);
       document.body.removeChild(modal);
       showAdminPanel();
-      document.getElementById('login-btn').textContent = 'Admin Panel';
     } catch (error) {
       document.getElementById('login-error').textContent = error.message;
-      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('login-error').classList.add('active');
     }
   });
 
@@ -1315,17 +1334,31 @@ function showLoginModal() {
   });
 }
 
+// Make it globally accessible:
+window.showLoginModal = showLoginModal;
+
 function showAdminPanel() {
-  // This would open a full admin interface
-  // For now, just show an alert that you're logged in
-  alert('Admin panel functionality coming soon! You can now manage layers and settings via API calls.');
-  document.getElementById('login-btn').textContent = 'Logout';
-  document.getElementById('login-btn').onclick = () => {
-    api.logout();
-    document.getElementById('login-btn').textContent = 'Admin Login';
-    alert('Logged out successfully');
+  // Show the admin dashboard
+  adminDashboard.show();
+  
+  // Update login button to "Back to Map"
+  const loginBtn = document.getElementById('login-btn');
+  if (!loginBtn) return;
+  
+  loginBtn.textContent = 'Back to Map';
+  
+  // Set click handler for closing dashboard
+  loginBtn.onclick = () => {
+    // Close dashboard and return to map
+    adminDashboard.hide();
+    
+    // Reset button to reopen dashboard
+    loginBtn.textContent = 'Admin Panel';
+    loginBtn.onclick = showAdminPanel; // This line is critical!
   };
 }
+
+window.showAdminPanel = showAdminPanel;
 
 // ==================== Utility Functions ====================
 
@@ -1358,3 +1391,13 @@ if (document.readyState === 'loading') {
 } else {
   initializeApp();
 }
+
+// ==================== Map Data Refresh ====================
+
+function refreshMapData() {
+  console.log('Refreshing map after admin changes...');
+  window.location.reload();
+}
+
+window.refreshMapData = refreshMapData;
+
