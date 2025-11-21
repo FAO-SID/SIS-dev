@@ -28,10 +28,6 @@ sis/
 ├── sis-metadata/                   # pyCSW metadata catalog
 │   ├── records/                    # Metadata records in XML
 |   └── pycsw.yml                   # Configuration file
-|
-├── sis-shiny/                      # Shiny app to help with ingest soil profile data into PostgreSQL
-│   ├── init-scripts/               # Init scripts
-│   └── test_data/                  # Test data
 │
 ├── sis-wweb-mapping/               # Web mapping
 |   ├── dist                        # Node distro
@@ -74,8 +70,6 @@ Create a `.env` file in your project root:
 4. **Web-mapping - Openlayers**:
    - Build your OpenLayers application in `wm/src/`
    - Configure it to connect to your API and MapServer services
-
-5. **Soil data upload tool - Shiny server**:
 
 
 ## Deployment Instructions
