@@ -21,19 +21,19 @@ sis/
 │       ├── data_cube_4_epsg.sh     # Set the same EPSG for all rasters
 │       └── data_cube_5_cog.sh      # Set the same BBox for all rasters and converts them into Cloud Optmized GeoTIFFs
 │
-├── sis-database/                   # Database (DONE)
+├── sis-database/                   # Database
 │   ├── Changes/                    # All changes made since fork
 │   └── pgdata/                     # Persistent data (added to .gitignore)
 │
-├── sis-metadata/                   # GeoNetwork metadata catalog (DONE)
+├── sis-metadata/                   # pyCSW metadata catalog
 │   ├── records/                    # Metadata records in XML
 |   └── pycsw.yml                   # Configuration file
 |
-├── sis-shiny/                      # Shiny app to help with ingest soil profile data into PostgreSQL (DONE)
+├── sis-shiny/                      # Shiny app to help with ingest soil profile data into PostgreSQL
 │   ├── init-scripts/               # Init scripts
 │   └── test_data/                  # Test data
 │
-├── sis-wweb-mapping/               # Web mapping (DONE)
+├── sis-wweb-mapping/               # Web mapping
 |   ├── dist                        # Node distro
 |   ├── node_modules                # Mode modules
 |   ├── .parcel-cache               # Cache
@@ -45,7 +45,7 @@ sis/
 |   ├── package.json                # Dependencies
 |   └── .gitignore                  # gitignore
 │
-└── sis-web-services/               # MapServer (DONE)
+└── sis-web-services/               # MapServer
     └── data/                       # GeoTIFFs and mapfiles
 ```
 
