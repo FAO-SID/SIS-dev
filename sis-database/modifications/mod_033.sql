@@ -31,7 +31,8 @@ ALTER TABLE IF EXISTS soil_data.result_phys_chem RENAME CONSTRAINT result_phys_c
 ALTER TABLE IF EXISTS soil_data.result_phys_chem RENAME CONSTRAINT result_phys_chem_specimen_observation_phys_chem_id_fkey TO result_num_observation_num_id_fkey;
 ALTER TABLE IF EXISTS soil_data.result_phys_chem RENAME TO result_num;
 
-ALTER TABLE IF EXISTS soil_data.result_num DROP COLUMN individual_id;
+ALTER TABLE IF EXISTS soil_data.specimen DROP COLUMN individual_id;
+ALTER TABLE IF EXISTS soil_data.specimen DROP COLUMN organisation_id;
 
 DROP VIEW api.vw_api_observation;
 CREATE OR REPLACE VIEW api.vw_api_observation
