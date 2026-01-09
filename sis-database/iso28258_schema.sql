@@ -45,14 +45,14 @@ COMMENT ON ROLE sis_r IS 'Soil Information System Reader - read-only access (SEL
 -- SCHEMA
 -- ============================================================================
 
-DROP SCHEMA IF EXISTS soil_data CASCADE;
-CREATE SCHEMA soil_data AUTHORIZATION sis_a;
-COMMENT ON SCHEMA soil_data IS 'ISO 28258:2013 Soil quality — Digital exchange of soil-related data';
+DROP SCHEMA IF EXISTS iso28258 CASCADE;
+CREATE SCHEMA iso28258 AUTHORIZATION sis_a;
+COMMENT ON SCHEMA iso28258 IS 'ISO 28258:2013 Soil quality — Digital exchange of soil-related data';
 
 -- Enable extensions
 CREATE EXTENSION IF NOT EXISTS postgis;
 
-SET search_path TO soil_data, public;
+SET search_path TO iso28258, public;
 
 -- ============================================================================
 -- CORE FEATURE TYPES
@@ -277,14 +277,14 @@ CREATE INDEX idx_specimen_element ON specimen (element_id);
 COMMENT ON INDEX idx_specimen_element IS 'Index on element code for joining with profile_element table';
 
 -- ============================================================================
--- SOIL MAPPING FEATURES
+-- SOIL MAPPING FEATURES (ISO 28258:2013/Amd 1:2019)
 -- ============================================================================
 
 -- ----------------------------------------------------------------------------
 -- SoilMap: A soil map (collection of mapping units)
 -- ----------------------------------------------------------------------------
 CREATE TABLE soil_map (
-    soil_map_id       TEXT PRIMARY KEY,
+    soil_map_id         TEXT PRIMARY KEY,
     name                TEXT NOT NULL,
     description         TEXT,
     geom                GEOMETRY(Polygon, 4326),
@@ -322,39 +322,29 @@ CREATE INDEX idx_soil_map_geom ON soil_map USING GIST (geom);
 COMMENT ON INDEX idx_soil_map_geom IS 'Spatial index on soil map extent geometry';
 
 -- ----------------------------------------------------------------------------
--- SoilMappingUnitCategory: Legend category describing soil types
+-- SoilMappingUnitCategory: Legend category with hierarchical subcategories
+-- Links to SoilMap via rootCategory relationship (0..1)
+-- Self-referencing for subcategory hierarchy
 -- ----------------------------------------------------------------------------
 CREATE TABLE soil_mapping_unit_category (
-    category_id       TEXT PRIMARY KEY,
-    soil_map_id       TEXT NOT NULL REFERENCES soil_map(soil_map_id) ON DELETE CASCADE,
+    category_id         TEXT PRIMARY KEY,
+    soil_map_id         TEXT REFERENCES soil_map(soil_map_id) ON DELETE CASCADE,
+    parent_category_id  TEXT REFERENCES soil_mapping_unit_category(category_id) ON DELETE CASCADE,
     name                TEXT NOT NULL,
     description         TEXT,
-    wrb_classification  TEXT,
-    local_classification TEXT,
-    dominant_soil_type  TEXT,
-    parent_material     TEXT,
-    landform            TEXT,
-    is_compound         BOOLEAN DEFAULT FALSE,
     legend_order        INTEGER,
     symbol              TEXT,
     colour_rgb          TEXT,
     created_at          TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    remarks             TEXT,
-    
-    UNIQUE (soil_map_id, category_id)
+    remarks             TEXT
 );
 
-COMMENT ON TABLE soil_mapping_unit_category IS 'Legend category describing soil types in a map (ISO 28258 SoilMappingUnitCategory feature)';
+COMMENT ON TABLE soil_mapping_unit_category IS 'Legend category describing soil types in a map with hierarchical subcategories (ISO 28258 SoilMappingUnitCategory)';
 COMMENT ON COLUMN soil_mapping_unit_category.category_id IS 'Unique identifier for the category (natural key)';
-COMMENT ON COLUMN soil_mapping_unit_category.soil_map_id IS 'Reference to the parent soil map';
+COMMENT ON COLUMN soil_mapping_unit_category.soil_map_id IS 'Reference to soil map - only set for root categories (rootCategory relationship)';
+COMMENT ON COLUMN soil_mapping_unit_category.parent_category_id IS 'Reference to parent category for subcategory hierarchy';
 COMMENT ON COLUMN soil_mapping_unit_category.name IS 'Name of the mapping unit category';
 COMMENT ON COLUMN soil_mapping_unit_category.description IS 'Detailed description of the category';
-COMMENT ON COLUMN soil_mapping_unit_category.wrb_classification IS 'World Reference Base classification';
-COMMENT ON COLUMN soil_mapping_unit_category.local_classification IS 'Local or national classification';
-COMMENT ON COLUMN soil_mapping_unit_category.dominant_soil_type IS 'Dominant soil type in this category';
-COMMENT ON COLUMN soil_mapping_unit_category.parent_material IS 'Parent material description';
-COMMENT ON COLUMN soil_mapping_unit_category.landform IS 'Associated landform';
-COMMENT ON COLUMN soil_mapping_unit_category.is_compound IS 'Whether this is a compound unit with multiple soil types';
 COMMENT ON COLUMN soil_mapping_unit_category.legend_order IS 'Order in the map legend';
 COMMENT ON COLUMN soil_mapping_unit_category.symbol IS 'Symbol used in the map legend';
 COMMENT ON COLUMN soil_mapping_unit_category.colour_rgb IS 'RGB colour code for map display (e.g., #A52A2A)';
@@ -362,84 +352,113 @@ COMMENT ON COLUMN soil_mapping_unit_category.created_at IS 'Timestamp when the r
 COMMENT ON COLUMN soil_mapping_unit_category.remarks IS 'Additional remarks or notes';
 
 CREATE INDEX idx_category_map ON soil_mapping_unit_category (soil_map_id);
-COMMENT ON INDEX idx_category_map IS 'Index on soil map code for joining with soil_map table';
+COMMENT ON INDEX idx_category_map IS 'Index on soil map for root categories';
 
--- ----------------------------------------------------------------------------
--- SoilMappingUnitCategoryComponent: Components of compound categories
--- ----------------------------------------------------------------------------
-CREATE TABLE soil_mapping_unit_category_component (
-    component_id      TEXT PRIMARY KEY,
-    category_id       TEXT NOT NULL REFERENCES soil_mapping_unit_category(category_id) ON DELETE CASCADE,
-    component_name      TEXT NOT NULL,
-    component_classification TEXT,
-    proportion_pct      NUMERIC(5,2),
-    sequence_order      INTEGER,
-    remarks             TEXT
-);
-
-COMMENT ON TABLE soil_mapping_unit_category_component IS 'Components of compound mapping unit categories';
-COMMENT ON COLUMN soil_mapping_unit_category_component.component_id IS 'Unique identifier for the component (natural key)';
-COMMENT ON COLUMN soil_mapping_unit_category_component.category_id IS 'Reference to the parent category';
-COMMENT ON COLUMN soil_mapping_unit_category_component.component_name IS 'Name of the soil component';
-COMMENT ON COLUMN soil_mapping_unit_category_component.component_classification IS 'Classification of the component';
-COMMENT ON COLUMN soil_mapping_unit_category_component.proportion_pct IS 'Percentage of the compound unit occupied by this component';
-COMMENT ON COLUMN soil_mapping_unit_category_component.sequence_order IS 'Order of components within the category';
-COMMENT ON COLUMN soil_mapping_unit_category_component.remarks IS 'Additional remarks or notes';
-
-CREATE INDEX idx_component_category ON soil_mapping_unit_category_component (category_id);
-COMMENT ON INDEX idx_component_category IS 'Index on category code for joining with category table';
+CREATE INDEX idx_category_parent ON soil_mapping_unit_category (parent_category_id);
+COMMENT ON INDEX idx_category_parent IS 'Index on parent category for hierarchy traversal';
 
 -- ----------------------------------------------------------------------------
 -- SoilMappingUnit: Delineated polygon on a soil map
+-- Links to exactly one SoilMappingUnitCategory (mappingUnit 0..* to 1)
 -- ----------------------------------------------------------------------------
 CREATE TABLE soil_mapping_unit (
-    mapping_unit_id   TEXT PRIMARY KEY,
-    category_id       TEXT NOT NULL REFERENCES soil_mapping_unit_category(category_id) ON DELETE CASCADE,
+    mapping_unit_id     TEXT PRIMARY KEY,
+    category_id         TEXT NOT NULL REFERENCES soil_mapping_unit_category(category_id) ON DELETE CASCADE,
+    explanation         TEXT,
     geom                GEOMETRY(MultiPolygon, 4326) NOT NULL,
-    name                TEXT,
-    area_ha             NUMERIC(12,2),
-    perimeter_m         NUMERIC(12,2),
-    slope_class         TEXT,
-    drainage_class      TEXT,
-    erosion_class       TEXT,
     created_at          TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     remarks             TEXT
 );
 
 COMMENT ON TABLE soil_mapping_unit IS 'Delineated polygon on a soil map (ISO 28258 SoilMappingUnit feature)';
 COMMENT ON COLUMN soil_mapping_unit.mapping_unit_id IS 'Unique identifier for the mapping unit (natural key)';
-COMMENT ON COLUMN soil_mapping_unit.category_id IS 'Reference to the mapping unit category';
+COMMENT ON COLUMN soil_mapping_unit.category_id IS 'Reference to the mapping unit category (required, many-to-one)';
+COMMENT ON COLUMN soil_mapping_unit.explanation IS 'Explanation or description of the mapping unit';
 COMMENT ON COLUMN soil_mapping_unit.geom IS 'MultiPolygon geometry of the mapping unit (EPSG:4326)';
-COMMENT ON COLUMN soil_mapping_unit.name IS 'Name of the mapping unit';
-COMMENT ON COLUMN soil_mapping_unit.area_ha IS 'Area of the mapping unit in hectares';
-COMMENT ON COLUMN soil_mapping_unit.perimeter_m IS 'Perimeter of the mapping unit in meters';
-COMMENT ON COLUMN soil_mapping_unit.slope_class IS 'Slope class within this unit';
-COMMENT ON COLUMN soil_mapping_unit.drainage_class IS 'Drainage class within this unit';
-COMMENT ON COLUMN soil_mapping_unit.erosion_class IS 'Erosion class within this unit';
 COMMENT ON COLUMN soil_mapping_unit.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN soil_mapping_unit.remarks IS 'Additional remarks or notes';
 
 CREATE INDEX idx_mapping_unit_category ON soil_mapping_unit (category_id);
-COMMENT ON INDEX idx_mapping_unit_category IS 'Index on category code for joining with category table';
+COMMENT ON INDEX idx_mapping_unit_category IS 'Index on category for joining with category table';
 
 CREATE INDEX idx_mapping_unit_geom ON soil_mapping_unit USING GIST (geom);
 COMMENT ON INDEX idx_mapping_unit_geom IS 'Spatial index on mapping unit geometry';
 
 -- ----------------------------------------------------------------------------
--- Link profiles to mapping units (representative profiles)
+-- SoilTypologicalUnit: Soil type classification
+-- Links to SoilProfile via typicalProfile (0..1 to 0..*)
+-- ----------------------------------------------------------------------------
+CREATE TABLE soil_typological_unit (
+    typological_unit_id TEXT PRIMARY KEY,
+    name                TEXT NOT NULL,
+    classification_scheme TEXT,
+    description         TEXT,
+    created_at          TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    remarks             TEXT
+);
+
+COMMENT ON TABLE soil_typological_unit IS 'Soil type classification unit (ISO 28258 SoilTypologicalUnit feature)';
+COMMENT ON COLUMN soil_typological_unit.typological_unit_id IS 'Unique identifier for the typological unit (natural key)';
+COMMENT ON COLUMN soil_typological_unit.name IS 'Name of the soil typological unit';
+COMMENT ON COLUMN soil_typological_unit.classification_scheme IS 'Classification scheme used (e.g., WRB, Soil Taxonomy)';
+COMMENT ON COLUMN soil_typological_unit.description IS 'Detailed description of the typological unit';
+COMMENT ON COLUMN soil_typological_unit.created_at IS 'Timestamp when the record was created';
+COMMENT ON COLUMN soil_typological_unit.remarks IS 'Additional remarks or notes';
+
+-- ----------------------------------------------------------------------------
+-- SoilTypologicalUnit <-> SoilMappingUnit: Many-to-many relationship
+-- representedUnit (0..*) <-> mapRepresentation (0..*)
+-- Each SMU should have STU percentages summing to 100%
+-- Reference: ESDB SGDBE purity concept
+-- ----------------------------------------------------------------------------
+CREATE TABLE soil_typological_unit_mapping_unit (
+    typological_unit_id TEXT REFERENCES soil_typological_unit(typological_unit_id) ON DELETE CASCADE,
+    mapping_unit_id     TEXT REFERENCES soil_mapping_unit(mapping_unit_id) ON DELETE CASCADE,
+    percentage          SMALLINT NOT NULL,
+    remarks             TEXT,
+    PRIMARY KEY (typological_unit_id, mapping_unit_id),
+    CONSTRAINT chk_percentage_range CHECK (percentage > 0 AND percentage <= 100)
+);
+
+COMMENT ON TABLE soil_typological_unit_mapping_unit IS 'Links typological units to mapping units with percentage composition (representedUnit/mapRepresentation). Percentages per SMU should sum to 100%.';
+COMMENT ON COLUMN soil_typological_unit_mapping_unit.typological_unit_id IS 'Reference to the soil typological unit (STU)';
+COMMENT ON COLUMN soil_typological_unit_mapping_unit.mapping_unit_id IS 'Reference to the soil mapping unit (SMU)';
+COMMENT ON COLUMN soil_typological_unit_mapping_unit.percentage IS 'Percentage of the STU within the SMU (sum per SMU should equal 100)';
+COMMENT ON COLUMN soil_typological_unit_mapping_unit.remarks IS 'Additional remarks or notes';
+
+-- ----------------------------------------------------------------------------
+-- SoilProfile -> SoilTypologicalUnit: typicalProfile relationship (0..* to 0..1)
+-- ----------------------------------------------------------------------------
+CREATE TABLE soil_typological_unit_profile (
+    typological_unit_id TEXT REFERENCES soil_typological_unit(typological_unit_id) ON DELETE CASCADE,
+    profile_id          TEXT REFERENCES profile(profile_id) ON DELETE CASCADE,
+    is_typical          BOOLEAN DEFAULT TRUE,
+    remarks             TEXT,
+    PRIMARY KEY (typological_unit_id, profile_id)
+);
+
+COMMENT ON TABLE soil_typological_unit_profile IS 'Links profiles to typological units as typical profiles (typicalProfile relationship)';
+COMMENT ON COLUMN soil_typological_unit_profile.typological_unit_id IS 'Reference to the typological unit';
+COMMENT ON COLUMN soil_typological_unit_profile.profile_id IS 'Reference to the profile (typicalProfile)';
+COMMENT ON COLUMN soil_typological_unit_profile.is_typical IS 'Whether this is a typical profile for the typological unit';
+COMMENT ON COLUMN soil_typological_unit_profile.remarks IS 'Additional remarks or notes';
+
+-- ----------------------------------------------------------------------------
+-- SoilProfile -> SoilMappingUnit: profile relationship (0..*)
+-- Links observed profiles to mapping units where they are located
 -- ----------------------------------------------------------------------------
 CREATE TABLE soil_mapping_unit_profile (
-    mapping_unit_id   TEXT REFERENCES soil_mapping_unit(mapping_unit_id) ON DELETE CASCADE,
-    profile_id        TEXT REFERENCES profile(profile_id) ON DELETE CASCADE,
+    mapping_unit_id     TEXT REFERENCES soil_mapping_unit(mapping_unit_id) ON DELETE CASCADE,
+    profile_id          TEXT REFERENCES profile(profile_id) ON DELETE CASCADE,
     is_representative   BOOLEAN DEFAULT FALSE,
     remarks             TEXT,
     PRIMARY KEY (mapping_unit_id, profile_id)
 );
 
-COMMENT ON TABLE soil_mapping_unit_profile IS 'Links profiles to mapping units as representative or supporting profiles';
-COMMENT ON COLUMN soil_mapping_unit_profile.mapping_unit_id IS 'Reference to the mapping unit';
-COMMENT ON COLUMN soil_mapping_unit_profile.profile_id IS 'Reference to the profile';
-COMMENT ON COLUMN soil_mapping_unit_profile.is_representative IS 'Whether this is the representative (type) profile for the unit';
+COMMENT ON TABLE soil_mapping_unit_profile IS 'Links profiles to mapping units (profile relationship 0..*)';
+COMMENT ON COLUMN soil_mapping_unit_profile.mapping_unit_id IS 'Reference to the soil mapping unit (SMU)';
+COMMENT ON COLUMN soil_mapping_unit_profile.profile_id IS 'Reference to the soil profile';
+COMMENT ON COLUMN soil_mapping_unit_profile.is_representative IS 'Whether this profile is representative for the mapping unit';
 COMMENT ON COLUMN soil_mapping_unit_profile.remarks IS 'Additional remarks or notes';
 
 -- ============================================================================
@@ -805,9 +824,10 @@ COMMENT ON COLUMN element_document.document_id IS 'Reference to the document';
 
 -- ----------------------------------------------------------------------------
 -- Project: Grouping of sites/data collection campaigns
+-- Self-referencing for relatedProject (0..*)
 -- ----------------------------------------------------------------------------
 CREATE TABLE project (
-    project_id        TEXT PRIMARY KEY,
+    project_id          TEXT PRIMARY KEY,
     name                TEXT NOT NULL,
     description         TEXT,
     start_date          DATE,
@@ -819,7 +839,7 @@ CREATE TABLE project (
     remarks             TEXT
 );
 
-COMMENT ON TABLE project IS 'Projects or data collection campaigns that group sites';
+COMMENT ON TABLE project IS 'Projects or data collection campaigns (ISO 28258 Project feature)';
 COMMENT ON COLUMN project.project_id IS 'Unique identifier for the project (natural key)';
 COMMENT ON COLUMN project.name IS 'Name of the project';
 COMMENT ON COLUMN project.description IS 'Description of the project';
@@ -831,14 +851,35 @@ COMMENT ON COLUMN project.contact_email IS 'Contact email address';
 COMMENT ON COLUMN project.created_at IS 'Timestamp when the record was created';
 COMMENT ON COLUMN project.remarks IS 'Additional remarks or notes';
 
+-- ----------------------------------------------------------------------------
+-- Project <-> Site: siteOfInterest/concernedProject (0..* to 0..*)
+-- ----------------------------------------------------------------------------
 CREATE TABLE project_site (
-    project_id        TEXT REFERENCES project(project_id) ON DELETE CASCADE,
-    site_id           TEXT REFERENCES site(site_id) ON DELETE CASCADE,
+    project_id          TEXT REFERENCES project(project_id) ON DELETE CASCADE,
+    site_id             TEXT REFERENCES site(site_id) ON DELETE CASCADE,
+    remarks             TEXT,
     PRIMARY KEY (project_id, site_id)
 );
-COMMENT ON TABLE project_site IS 'Links sites to projects (many-to-many relationship)';
-COMMENT ON COLUMN project_site.project_id IS 'Reference to the project';
-COMMENT ON COLUMN project_site.site_id IS 'Reference to the site';
+
+COMMENT ON TABLE project_site IS 'Links sites to projects (siteOfInterest/concernedProject many-to-many)';
+COMMENT ON COLUMN project_site.project_id IS 'Reference to the project (concernedProject)';
+COMMENT ON COLUMN project_site.site_id IS 'Reference to the site (siteOfInterest)';
+COMMENT ON COLUMN project_site.remarks IS 'Additional remarks or notes';
+
+-- ----------------------------------------------------------------------------
+-- Project <-> SoilMap: relatedMap (0..* to 0..*)
+-- ----------------------------------------------------------------------------
+CREATE TABLE project_soil_map (
+    project_id          TEXT REFERENCES project(project_id) ON DELETE CASCADE,
+    soil_map_id         TEXT REFERENCES soil_map(soil_map_id) ON DELETE CASCADE,
+    remarks             TEXT,
+    PRIMARY KEY (project_id, soil_map_id)
+);
+
+COMMENT ON TABLE project_soil_map IS 'Links soil maps to projects (relatedMap many-to-many)';
+COMMENT ON COLUMN project_soil_map.project_id IS 'Reference to the project';
+COMMENT ON COLUMN project_soil_map.soil_map_id IS 'Reference to the soil map (relatedMap)';
+COMMENT ON COLUMN project_soil_map.remarks IS 'Additional remarks or notes';
 
 -- ============================================================================
 -- VIEWS
@@ -892,7 +933,7 @@ JOIN site s ON s.site_id = pl.site_id;
 
 COMMENT ON VIEW v_specimen_context IS 'Specimens with full hierarchical context from site to profile element';
 
--- Soil map with mapping units
+-- Soil map with mapping units and typological units
 CREATE VIEW v_soil_map_units AS
 SELECT 
     sm.soil_map_id,
@@ -901,15 +942,36 @@ SELECT
     sm.classification_system,
     smc.category_id,
     smc.name AS category_name,
-    smc.wrb_classification,
+    smc.parent_category_id,
     smu.mapping_unit_id,
-    smu.geom,
-    smu.area_ha
+    smu.explanation,
+    smu.geom
 FROM soil_map sm
 JOIN soil_mapping_unit_category smc ON smc.soil_map_id = sm.soil_map_id
 JOIN soil_mapping_unit smu ON smu.category_id = smc.category_id;
 
 COMMENT ON VIEW v_soil_map_units IS 'Soil mapping units with their map and category context';
+
+-- Typological units with their map representations
+CREATE VIEW v_typological_unit_maps AS
+SELECT 
+    stu.typological_unit_id,
+    stu.name AS typological_unit_name,
+    stu.classification_scheme,
+    smu.mapping_unit_id,
+    smu.explanation,
+    smu.geom,
+    smc.category_id,
+    smc.name AS category_name,
+    sm.soil_map_id,
+    sm.name AS map_name
+FROM soil_typological_unit stu
+JOIN soil_typological_unit_mapping_unit stum ON stum.typological_unit_id = stu.typological_unit_id
+JOIN soil_mapping_unit smu ON smu.mapping_unit_id = stum.mapping_unit_id
+JOIN soil_mapping_unit_category smc ON smc.category_id = smu.category_id
+LEFT JOIN soil_map sm ON sm.soil_map_id = smc.soil_map_id;
+
+COMMENT ON VIEW v_typological_unit_maps IS 'Typological units with their mapping representations';
 
 -- ============================================================================
 -- FUNCTIONS
@@ -1000,27 +1062,27 @@ INSERT INTO property (property_id, name, property_group, uom_symbol, value_type,
 -- ============================================================================
 
 -- Grant usage on schema
-GRANT USAGE ON SCHEMA soil_data TO sis_e, sis_r;
+GRANT USAGE ON SCHEMA iso28258 TO sis_e, sis_r;
 
 -- Grant permissions on all tables
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA soil_data TO sis_e;
-GRANT SELECT ON ALL TABLES IN SCHEMA soil_data TO sis_r;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA iso28258 TO sis_e;
+GRANT SELECT ON ALL TABLES IN SCHEMA iso28258 TO sis_r;
 
 -- Grant permissions on sequences (if any are created)
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA soil_data TO sis_e;
-GRANT SELECT ON ALL SEQUENCES IN SCHEMA soil_data TO sis_r;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA iso28258 TO sis_e;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA iso28258 TO sis_r;
 
 -- Set default privileges for future objects
-ALTER DEFAULT PRIVILEGES IN SCHEMA soil_data
+ALTER DEFAULT PRIVILEGES IN SCHEMA iso28258
     GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO sis_e;
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA soil_data
+ALTER DEFAULT PRIVILEGES IN SCHEMA iso28258
     GRANT SELECT ON TABLES TO sis_r;
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA soil_data
+ALTER DEFAULT PRIVILEGES IN SCHEMA iso28258
     GRANT USAGE, SELECT ON SEQUENCES TO sis_e;
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA soil_data
+ALTER DEFAULT PRIVILEGES IN SCHEMA iso28258
     GRANT SELECT ON SEQUENCES TO sis_r;
 
 -- ============================================================================
