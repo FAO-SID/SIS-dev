@@ -2,7 +2,6 @@
 -- ISSUE: rename phys_chem to num (numerical)
 
 
-ALTER TABLE IF EXISTS soil_data.property_num RENAME TO property_phys_chem;
 ALTER TABLE IF EXISTS soil_data.property_phys_chem RENAME COLUMN property_phys_chem_id TO property_num_id;
 ALTER TABLE IF EXISTS soil_data.property_phys_chem RENAME CONSTRAINT property_phys_chem_pkey TO property_num_pkey;
 ALTER TABLE IF EXISTS soil_data.property_phys_chem RENAME CONSTRAINT unq_property_phys_chem_uri TO unq_property_num_uri;
@@ -31,29 +30,29 @@ ALTER TABLE IF EXISTS soil_data.result_phys_chem RENAME CONSTRAINT result_phys_c
 ALTER TABLE IF EXISTS soil_data.result_phys_chem RENAME CONSTRAINT result_phys_chem_specimen_observation_phys_chem_id_fkey TO result_num_observation_num_id_fkey;
 ALTER TABLE IF EXISTS soil_data.result_phys_chem RENAME TO result_num;
 
-ALTER TABLE IF EXISTS soil_data.specimen DROP COLUMN individual_id;
+-- ALTER TABLE IF EXISTS soil_data.specimen DROP COLUMN individual_id;
 ALTER TABLE IF EXISTS soil_data.specimen DROP COLUMN organisation_id;
 
-DROP VIEW api.vw_api_observation;
-CREATE OR REPLACE VIEW api.vw_api_observation
- AS
- SELECT p2.profile_code,
-    e.upper_depth,
-    e.lower_depth,
-    o.property_num_id,
-    o.procedure_num_id,
-    o.unit_of_measure_id,
-    r.value
-   FROM soil_data.project p
-     LEFT JOIN soil_data.project_site ps ON ps.project_id = p.project_id
-     LEFT JOIN soil_data.site s ON s.site_id = ps.site_id
-     LEFT JOIN soil_data.profile p2 ON p2.site_id = ps.site_id
-     LEFT JOIN soil_data.element e ON e.profile_id = p2.profile_id
-     LEFT JOIN soil_data.specimen s2 ON s2.element_id = e.element_id
-     LEFT JOIN soil_data.result_num r ON r.specimen_id = s2.specimen_id
-     LEFT JOIN soil_data.observation_num o ON o.observation_num_id = r.observation_num_id
-  ORDER BY p2.profile_code, e.upper_depth, o.property_num_id;
-ALTER TABLE api.vw_api_observation OWNER TO sis;
-COMMENT ON VIEW api.vw_api_observation IS 'View to expose the observational data';
-GRANT ALL ON TABLE api.vw_api_observation TO sis;
-GRANT SELECT ON TABLE api.vw_api_observation TO sis_r;
+-- DROP VIEW IF EXISTS api.vw_api_observation;
+-- CREATE OR REPLACE VIEW api.vw_api_observation
+--  AS
+--  SELECT p2.profile_code,
+--     e.upper_depth,
+--     e.lower_depth,
+--     o.property_num_id,
+--     o.procedure_num_id,
+--     o.unit_of_measure_id,
+--     r.value
+--    FROM soil_data.project p
+--      LEFT JOIN soil_data.project_site ps ON ps.project_id = p.project_id
+--      LEFT JOIN soil_data.site s ON s.site_id = ps.site_id
+--      LEFT JOIN soil_data.profile p2 ON p2.site_id = ps.site_id
+--      LEFT JOIN soil_data.element e ON e.profile_id = p2.profile_id
+--      LEFT JOIN soil_data.specimen s2 ON s2.element_id = e.element_id
+--      LEFT JOIN soil_data.result_num r ON r.specimen_id = s2.specimen_id
+--      LEFT JOIN soil_data.observation_num o ON o.observation_num_id = r.observation_num_id
+--   ORDER BY p2.profile_code, e.upper_depth, o.property_num_id;
+-- ALTER TABLE api.vw_api_observation OWNER TO sis;
+-- COMMENT ON VIEW api.vw_api_observation IS 'View to expose the observational data';
+-- GRANT ALL ON TABLE api.vw_api_observation TO sis;
+-- GRANT SELECT ON TABLE api.vw_api_observation TO sis_r;

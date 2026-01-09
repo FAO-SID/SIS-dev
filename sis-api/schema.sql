@@ -102,18 +102,18 @@ GRANT SELECT ON TABLE api.layer TO sis_r;
 -- view to expose the list of soil properties and geographical extent
 CREATE OR REPLACE VIEW api.vw_api_manifest AS
 SELECT 
-    opc.property_phys_chem_id AS property,
+    opc.property_num_id AS property,
     COUNT(DISTINCT p.profile_id) AS profiles,
-    COUNT(rpc.result_phys_chem_id) AS observations,
-    ST_Envelope(ST_Collect(plt."position")) AS geom
-FROM soil_data.observation_phys_chem opc
-    INNER JOIN soil_data.result_phys_chem rpc ON opc.observation_phys_chem_id = rpc.observation_phys_chem_id
+    COUNT(rpc.result_num_id) AS observations,
+    ST_Envelope(ST_Collect(p.geom)) AS geom
+FROM soil_data.observation_num opc
+    INNER JOIN soil_data.result_num rpc ON opc.observation_num_id = rpc.observation_num_id
     INNER JOIN soil_data.specimen s ON rpc.specimen_id = s.specimen_id
     INNER JOIN soil_data.element e ON s.element_id = e.element_id
     INNER JOIN soil_data.profile p ON e.profile_id = p.profile_id
     INNER JOIN soil_data.plot plt ON p.plot_id = plt.plot_id
-GROUP BY opc.property_phys_chem_id
-ORDER BY opc.property_phys_chem_id;
+GROUP BY opc.property_num_id
+ORDER BY opc.property_num_id;
 COMMENT ON VIEW api.vw_api_manifest IS 'View to expose the list of soil properties and geographical extent';
 ALTER TABLE IF EXISTS api.vw_api_manifest OWNER to sis;
 GRANT SELECT ON TABLE api.vw_api_manifest TO sis_r;
@@ -125,16 +125,16 @@ SELECT
     p.profile_id AS gid,
     p.profile_code,
     proj.name AS project_name,
-    plt.altitude,
-    plt.time_stamp AS date,
-    plt."position" AS geom,
-    ST_AsGeoJSON(plt."position")::json AS geometry
+    p.altitude,
+    p.time_stamp AS date,
+    p.geom AS geom,
+    ST_AsGeoJSON(plt.geom)::json AS geometry
 FROM soil_data.profile p
     INNER JOIN soil_data.plot plt ON p.plot_id = plt.plot_id
     INNER JOIN soil_data.site s ON plt.site_id = s.site_id
     LEFT JOIN soil_data.project_site ps ON s.site_id = ps.site_id
     LEFT JOIN soil_data.project proj ON ps.project_id = proj.project_id
-WHERE plt."position" IS NOT NULL
+WHERE p.geom IS NOT NULL
 ORDER BY p.profile_id;
 COMMENT ON VIEW api.vw_api_profile IS 'View to expose the list of profiles';
 ALTER TABLE IF EXISTS api.vw_api_profile OWNER to sis;
@@ -146,8 +146,8 @@ CREATE OR REPLACE VIEW api.vw_api_observation AS
 SELECT p3.profile_code,
     e.upper_depth,
     e.lower_depth,
-    o.property_phys_chem_id,
-    o.procedure_phys_chem_id,
+    o.property_num_id,
+    o.procedure_num_id,
     r.value,
     o.unit_of_measure_id
    FROM soil_data.project p
@@ -157,9 +157,9 @@ SELECT p3.profile_code,
      LEFT JOIN soil_data.profile p3 ON p3.plot_id = p2.plot_id
      LEFT JOIN soil_data.element e ON e.profile_id = p3.profile_id
      LEFT JOIN soil_data.specimen s2 ON s2.element_id = e.element_id
-     LEFT JOIN soil_data.result_phys_chem r ON r.specimen_id = s2.specimen_id
-     LEFT JOIN soil_data.observation_phys_chem o ON o.observation_phys_chem_id = r.observation_phys_chem_id
-  ORDER BY p3.profile_code, e.upper_depth, o.property_phys_chem_id;
+     LEFT JOIN soil_data.result_num r ON r.specimen_id = s2.specimen_id
+     LEFT JOIN soil_data.observation_num o ON o.observation_num_id = r.observation_num_id
+  ORDER BY p3.profile_code, e.upper_depth, o.property_num_id;
 COMMENT ON VIEW api.vw_api_observation IS 'View to expose the observational data';
 ALTER TABLE IF EXISTS api.vw_api_observation OWNER to sis;
 GRANT SELECT ON TABLE api.vw_api_observation TO sis_r;
@@ -208,8 +208,8 @@ CREATE TABLE IF NOT EXISTS api.uploaded_dataset_column
 (
     table_name text NOT NULL,
     column_name text NOT NULL,
-    property_phys_chem_id text,
-    procedure_phys_chem_id text,
+    property_num_id text,
+    procedure_num_id text,
     unit_of_measure_id text,
     ignore_column boolean DEFAULT false,
     note text,
@@ -218,12 +218,12 @@ CREATE TABLE IF NOT EXISTS api.uploaded_dataset_column
         REFERENCES api.uploaded_dataset (table_name) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    CONSTRAINT uploaded_dataset_column_property_phys_chem_id_fkey FOREIGN KEY (property_phys_chem_id)
-        REFERENCES soil_data.property_phys_chem (property_phys_chem_id) MATCH SIMPLE
+    CONSTRAINT uploaded_dataset_column_property_num_id_fkey FOREIGN KEY (property_num_id)
+        REFERENCES soil_data.property_num (property_num_id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE NO ACTION,
-    CONSTRAINT uploaded_dataset_column_procedure_phys_chem_id_fkey FOREIGN KEY (procedure_phys_chem_id)
-        REFERENCES soil_data.procedure_phys_chem (procedure_phys_chem_id) MATCH SIMPLE
+    CONSTRAINT uploaded_dataset_column_procedure_num_id_fkey FOREIGN KEY (procedure_num_id)
+        REFERENCES soil_data.procedure_num (procedure_num_id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE SET NULL,
     CONSTRAINT uploaded_dataset_column_unit_of_measure_id_fkey FOREIGN KEY (unit_of_measure_id)

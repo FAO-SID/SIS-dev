@@ -125,8 +125,8 @@ pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT
 
 # Export table with codelists of properties, procedures, units and alowed value range
 psql -h localhost -p 5432 -d sis -U sis -c "\COPY (
-        SELECT o.property_phys_chem_id, o.procedure_phys_chem_id, o.unit_of_measure_id, o.value_min, o.value_max, p.definition, p.citation, p.reference 
-        FROM soil_data.observation_phys_chem o
-        LEFT JOIN soil_data.procedure_phys_chem p ON p.procedure_phys_chem_id = o.procedure_phys_chem_id
+        SELECT o.property_num_id, o.procedure_num_id, o.unit_of_measure_id, o.value_min, o.value_max, p.definition, p.citation, p.reference 
+        FROM soil_data.observation_num o
+        LEFT JOIN soil_data.procedure_num p ON p.procedure_num_id = o.procedure_num_id
         ORDER BY 1, 2) 
-        TO '$PROJECT_DIR/sis-database/versions/sis-database_observation_phys_chem_code_list.csv' WITH CSV HEADER"
+        TO '$PROJECT_DIR/sis-database/versions/sis-database_observation_num_code_list.csv' WITH CSV HEADER"
