@@ -12,12 +12,6 @@ CREATE TABLE soil_data.soil_map (
     scale_denominator   INTEGER,
     spatial_resolution_m NUMERIC(10,2),
     publication_date    DATE,
-    survey_start_date   DATE,
-    survey_end_date     DATE,
-    classification_system TEXT,
-    classification_version TEXT,
-    source_organization TEXT,
-    source_citation     TEXT,
     remarks             TEXT,
     geom                GEOMETRY(Polygon, 4326)
 );
@@ -30,17 +24,11 @@ COMMENT ON TABLE soil_data.soil_map IS 'A soil map containing delineated mapping
 COMMENT ON COLUMN soil_data.soil_map.soil_map_id IS 'Unique identifier for the soil map';
 COMMENT ON COLUMN soil_data.soil_map.name IS 'Name of the soil map';
 COMMENT ON COLUMN soil_data.soil_map.description IS 'Detailed description of the soil map';
-COMMENT ON COLUMN soil_data.soil_map.geom IS 'Polygon geometry representing the map extent (EPSG:4326)';
 COMMENT ON COLUMN soil_data.soil_map.scale_denominator IS 'Map scale denominator (e.g., 50000 for 1:50,000)';
 COMMENT ON COLUMN soil_data.soil_map.spatial_resolution_m IS 'Spatial resolution in meters';
 COMMENT ON COLUMN soil_data.soil_map.publication_date IS 'Date when the map was published';
-COMMENT ON COLUMN soil_data.soil_map.survey_start_date IS 'Start date of the soil survey';
-COMMENT ON COLUMN soil_data.soil_map.survey_end_date IS 'End date of the soil survey';
-COMMENT ON COLUMN soil_data.soil_map.classification_system IS 'Soil classification system used (e.g., WRB 2022, Soil Taxonomy)';
-COMMENT ON COLUMN soil_data.soil_map.classification_version IS 'Version of the Soil classification system used';
-COMMENT ON COLUMN soil_data.soil_map.source_organization IS 'Organization that produced the map';
-COMMENT ON COLUMN soil_data.soil_map.source_citation IS 'Full citation for the map source';
 COMMENT ON COLUMN soil_data.soil_map.remarks IS 'Additional remarks or notes';
+COMMENT ON COLUMN soil_data.soil_map.geom IS 'Polygon geometry representing the map extent (EPSG:4326)';
 
 CREATE INDEX idx_soil_map_geom ON soil_data.soil_map USING GIST (geom);
 COMMENT ON INDEX soil_data.idx_soil_map_geom IS 'Spatial index on soil map extent geometry';

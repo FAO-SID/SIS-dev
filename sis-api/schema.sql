@@ -23,6 +23,15 @@ COMMENT ON TABLE api.user IS 'For human users who log in through the web applica
 ALTER TABLE IF EXISTS api.user OWNER to sis;
 GRANT SELECT ON TABLE api.user TO sis_r;
 
+COMMENT ON COLUMN api."user".user_id IS 'Unique identifier for the user (typically email or username)';
+COMMENT ON COLUMN api."user".password_hash IS 'Bcrypt hash of the user password';
+COMMENT ON COLUMN api."user".is_active IS 'Flag indicating whether the user account is active';
+COMMENT ON COLUMN api."user".is_admin IS 'Flag indicating whether the user has administrator privileges';
+COMMENT ON COLUMN api."user".created_at IS 'Timestamp when the user was created';
+COMMENT ON COLUMN api."user".updated_at IS 'Timestamp of the last update to the user record';
+COMMENT ON COLUMN api."user".last_login IS 'Timestamp of the last successful login';
+
+
 -- API_client - For server-to-server authentication
 CREATE TABLE IF NOT EXISTS api.api_client (
     api_client_id text,
@@ -38,6 +47,15 @@ CREATE TABLE IF NOT EXISTS api.api_client (
 COMMENT ON TABLE api.api_client IS 'For server-to-server authentication';
 ALTER TABLE IF EXISTS api.api_client OWNER to sis;
 GRANT SELECT ON TABLE api.api_client TO sis_r;
+
+COMMENT ON COLUMN api.api_client.api_client_id IS 'Unique identifier for the API client';
+COMMENT ON COLUMN api.api_client.api_key IS 'Secret API key for authentication';
+COMMENT ON COLUMN api.api_client.is_active IS 'Flag indicating whether the client is active';
+COMMENT ON COLUMN api.api_client.created_at IS 'Date when the client was created';
+COMMENT ON COLUMN api.api_client.expires_at IS 'Date when the API key expires';
+COMMENT ON COLUMN api.api_client.last_login IS 'Timestamp of the last successful authentication';
+COMMENT ON COLUMN api.api_client.description IS 'Description of the API client purpose';
+
 
 -- Audit - Track authentication attempts and API usage
 CREATE TABLE IF NOT EXISTS api.audit (
@@ -62,6 +80,14 @@ COMMENT ON TABLE api.audit IS 'Track authentication attempts and API usage';
 ALTER TABLE IF EXISTS api.audit OWNER to sis;
 GRANT SELECT ON TABLE api.audit TO sis_r;
 
+COMMENT ON COLUMN api.audit.audit_id IS 'Synthetic primary key for the audit record';
+COMMENT ON COLUMN api.audit.user_id IS 'Reference to the user who performed the action';
+COMMENT ON COLUMN api.audit.api_client_id IS 'Reference to the API client that performed the action';
+COMMENT ON COLUMN api.audit.action IS 'Type of action performed';
+COMMENT ON COLUMN api.audit.details IS 'JSON object with action details';
+COMMENT ON COLUMN api.audit.ip_address IS 'IP address from which the action was performed';
+COMMENT ON COLUMN api.audit.created_at IS 'Timestamp when the action occurred';
+
 
 -------------------------------
 -- Application costumization --
@@ -74,6 +100,11 @@ CREATE TABLE IF NOT EXISTS api.setting (
 );
 ALTER TABLE IF EXISTS api.setting OWNER to sis;
 GRANT SELECT ON TABLE api.setting TO sis_r;
+
+COMMENT ON TABLE api.setting IS 'Key-value store for API configuration settings';
+COMMENT ON COLUMN api.setting.key IS 'Setting identifier key';
+COMMENT ON COLUMN api.setting.value IS 'Setting value';
+
 
 -- Layer management
 CREATE TABLE IF NOT EXISTS api.layer (
@@ -93,6 +124,21 @@ CREATE TABLE IF NOT EXISTS api.layer (
 );
 ALTER TABLE IF EXISTS api.layer OWNER to sis;
 GRANT SELECT ON TABLE api.layer TO sis_r;
+
+COMMENT ON TABLE api.layer IS 'API layer for exposing spatial data layers through the REST API';
+COMMENT ON COLUMN api.layer.project_id IS 'Reference to the project this layer belongs to';
+COMMENT ON COLUMN api.layer.project_name IS 'Human-readable name of the project';
+COMMENT ON COLUMN api.layer.layer_id IS 'Unique identifier for the layer';
+COMMENT ON COLUMN api.layer.publish IS 'Flag indicating whether the layer is published and accessible via API';
+COMMENT ON COLUMN api.layer.property_name IS 'Name of the soil property this layer represents';
+COMMENT ON COLUMN api.layer.dimension IS 'Dimension type (e.g., depth, time)';
+COMMENT ON COLUMN api.layer.version IS 'Version identifier of the layer';
+COMMENT ON COLUMN api.layer.unit_of_measure_id IS 'Reference to the unit of measure for layer values';
+COMMENT ON COLUMN api.layer.metadata_url IS 'URL to the layer metadata document';
+COMMENT ON COLUMN api.layer.download_url IS 'URL for downloading the layer data';
+COMMENT ON COLUMN api.layer.get_map_url IS 'WMS GetMap URL for the layer';
+COMMENT ON COLUMN api.layer.get_legend_url IS 'WMS GetLegendGraphic URL for the layer';
+COMMENT ON COLUMN api.layer.get_feature_info_url IS 'WMS GetFeatureInfo URL for the layer';
 
 
 ------------------------------------
@@ -203,6 +249,22 @@ CREATE TABLE IF NOT EXISTS api.uploaded_dataset (
 ALTER TABLE IF EXISTS api.uploaded_dataset OWNER to sis;
 GRANT SELECT ON TABLE api.uploaded_dataset TO sis_r;
 
+COMMENT ON TABLE api.uploaded_dataset IS 'Tracks datasets uploaded by users for ingestion into the soil data schema';
+COMMENT ON COLUMN api.uploaded_dataset.user_id IS 'Reference to the user who uploaded the dataset';
+COMMENT ON COLUMN api.uploaded_dataset.project_id IS 'Reference to the project this dataset belongs to';
+COMMENT ON COLUMN api.uploaded_dataset.table_name IS 'Name of the staging table containing the uploaded data';
+COMMENT ON COLUMN api.uploaded_dataset.file_name IS 'Original filename of the uploaded file';
+COMMENT ON COLUMN api.uploaded_dataset.upload_date IS 'Date when the file was uploaded';
+COMMENT ON COLUMN api.uploaded_dataset.ingestion_date IS 'Date when the data was ingested into the main schema';
+COMMENT ON COLUMN api.uploaded_dataset.status IS 'Current status: Uploaded, Ingested, or Removed';
+COMMENT ON COLUMN api.uploaded_dataset.depth_if_topsoil IS 'Depth in cm if this is topsoil data';
+COMMENT ON COLUMN api.uploaded_dataset.n_rows IS 'Number of rows in the uploaded dataset';
+COMMENT ON COLUMN api.uploaded_dataset.n_col IS 'Number of columns in the uploaded dataset';
+COMMENT ON COLUMN api.uploaded_dataset.has_cords IS 'Flag indicating whether the dataset contains coordinates';
+COMMENT ON COLUMN api.uploaded_dataset.cords_epsg IS 'EPSG code of the coordinate reference system';
+COMMENT ON COLUMN api.uploaded_dataset.cords_check IS 'Flag indicating whether coordinates have been validated';
+COMMENT ON COLUMN api.uploaded_dataset.note IS 'Additional notes about the dataset';
+
 
 CREATE TABLE IF NOT EXISTS api.uploaded_dataset_column
 (
@@ -233,3 +295,12 @@ CREATE TABLE IF NOT EXISTS api.uploaded_dataset_column
 );
 ALTER TABLE IF EXISTS api.uploaded_dataset_column OWNER to sis;
 GRANT SELECT ON TABLE api.uploaded_dataset_column TO sis_r;
+
+COMMENT ON TABLE api.uploaded_dataset_column IS 'Column mapping configuration for uploaded datasets';
+COMMENT ON COLUMN api.uploaded_dataset_column.table_name IS 'Reference to the uploaded dataset table';
+COMMENT ON COLUMN api.uploaded_dataset_column.column_name IS 'Name of the column in the uploaded dataset';
+COMMENT ON COLUMN api.uploaded_dataset_column.property_num_id IS 'Mapped soil property identifier';
+COMMENT ON COLUMN api.uploaded_dataset_column.procedure_num_id IS 'Mapped analytical procedure identifier';
+COMMENT ON COLUMN api.uploaded_dataset_column.unit_of_measure_id IS 'Mapped unit of measure identifier';
+COMMENT ON COLUMN api.uploaded_dataset_column.ignore_column IS 'Flag to ignore this column during ingestion';
+COMMENT ON COLUMN api.uploaded_dataset_column.note IS 'Additional notes about the column mapping';
