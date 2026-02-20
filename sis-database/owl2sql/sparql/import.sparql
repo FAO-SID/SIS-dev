@@ -1,0 +1,25 @@
+
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/codelists/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/common/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/ext/property#>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/layerhorizon/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/main/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/observation/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/procedure/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/profile/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/siteplot/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/surface/>;	
+SPARQL CLEAR GRAPH  <http://w3id.org/glosis/model/unit/>;
+
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_cl.ttl'), '', 'http://w3id.org/glosis/model/codelists#');
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_common.ttl'), '', 'http://w3id.org/glosis/model/common#');	
+# DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_ext_property.ttl'), '', 'http://w3id.org/glosis/model/ext/property#');	
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_layer_horizon.ttl'), '', 'http://w3id.org/glosis/model/layerhorizon#');	
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_main.ttl'), '', 'http://w3id.org/glosis/model/main#');	
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_observation.ttl'), '', 'http://w3id.org/glosis/model/observation#');	
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_procedure.ttl'), '', 'http://w3id.org/glosis/model/procedure#');	
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_profile.ttl'), '', 'http://w3id.org/glosis/model/profile#');	
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_siteplot.ttl'), '', 'http://w3id.org/glosis/model/siteplot#');	
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_surface.ttl'), '', 'http://w3id.org/glosis/model/surface#');	
+DB.DBA.TTLP_MT (file_to_string_output ('/database/glosis_unit.ttl'), '', 'http://w3id.org/glosis/model/unit#');
+

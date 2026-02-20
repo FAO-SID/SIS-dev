@@ -132,3 +132,12 @@ psql -h localhost -p 5432 -d sis -U sis -c "\COPY (
         LEFT JOIN soil_data.procedure_num p ON p.procedure_num_id = o.procedure_num_id
         ORDER BY 1, 2) 
         TO '$PROJECT_DIR/sis-database/versions/sis-database_observation_num_code_list.csv' WITH CSV HEADER"
+
+
+
+
+# psql -h localhost -p 5432 -d postgres -U postgres -c "DROP DATABASE IF EXISTS sis_test"
+# psql -h localhost -p 5432 -d postgres -U sis -c "CREATE DATABASE sis_test"
+# psql -h localhost -p 5432 -d sis_test -U sis -c "CREATE EXTENSION IF NOT EXISTS postgis SCHEMA public"
+# psql -h localhost -p 5432 -d sis_test -U sis -f /home/carva014/Work/Code/FAO/SIS-dev/sis-database/iso28258_v1.9.sql
+

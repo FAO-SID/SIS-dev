@@ -1,0 +1,95 @@
+object,num,title,page
+table,1,Soil profile description status,6
+table,2,Codes for weather conditions,9
+table,3,Soil temperature and moisture regime codes,10
+table,4,Hierarchy of major landforms,11
+table,5,Subdivisions for complex landforms,11
+table,6,Classification of slope forms,12
+table,7,Slope gradient classes,12
+table,8,Land-use classification,14
+table,9,Crop codes,15
+table,10,Recommended codes for human influence,15
+table,11,Vegetation classification,16
+table,12,Hierarchy of lithology,18
+table,13,Provisional coding for age of land surface,19
+table,14,Recommended classification of rock outcrops,21
+table,15,Classification of coarse surface fragments,22
+table,16,"Classification of erosion, by category",22
+table,17,Classification of total area affected by erosion and deposition,22
+table,18,"Classification of erosion, by degree",22
+table,19,"Classification of erosion, by activity",23
+table,20,Classification of attributes of surface sealing,23
+table,21,Classification of surface cracks,24
+table,22,Classification of salt characteristics,24
+table,23,Classification of bleached sand characteristics,24
+table,24,"Classification of horizon boundaries, by distinctness and topography",25
+table,25,Key to the soil textural classes,28
+table,26,"Abundance of rock fragments and artefacts, by volume",29
+table,27,Classification of rock fragments and artefacts,30
+table,28,Classification of shape of rock fragments,31
+table,29,Classification of weathering of coarse fragments,31
+table,30,Codes for primary mineral fragments,31
+table,31,Field estimation and coding of the degree of decomposition and humification of peat,32
+table,32,Classification of the abundance of mottles,35
+table,33,Classification of the size of mottles,35
+table,34,Classification of the contrast of mottles,36
+table,35,Classification of boundary between mottle and matrix,36
+table,36,Redoximorphic soil characteristics and their relation to rH values and soil processes,36
+table,37,Reductimorphic colour pattern and occurrence of Fe compounds,37
+table,38,Classification of carbonate reaction in the soil matrix,38
+table,39,Classification of forms of secondary carbonates,38
+table,40,Classification of gypsum content,39
+table,41,Classification of forms of secondary gypsum,39
+table,42,Classification of salt content of soil,40
+table,43,Dependency of water content of saturation extract on texture and content of humus for mineral soils and on decomposition for peat soils,41
+table,44,Classification of pH value,41
+table,45,Classification of soil odour,42
+table,46,Estimation of organic matter content based on Munsell soil colour,43
+table,47,Classification of structure of pedal soil materials,45
+table,48,Classification of types of soil structure,46
+table,49,Codes for types of soil structure,46
+table,50,Size classes for soil structure types,47
+table,51,Combined size classes for soil structure types,47
+table,52,Combinations of soil structures,47
+table,53,Consistence of soil mass when dry,48
+table,54,Consistence of soil mass when moist,49
+table,55,Classification of soil stickiness,49
+table,56,Classification of soil plasticity,49
+table,57,Classification of moisture status of soil,50
+table,58,Field estimation of bulk density for mineral soils,51
+table,59,Field estimation of volume of solids and bulk density of peat soils,52
+table,60,Classification of porosity,52
+table,61,Classification of voids,53
+table,62,Classification of diameter of voids,53
+table,63,Classification of abundance of pores,53
+table,64,Classification of abundance of coatings,55
+table,65,Classification of the contrast of coatings,55
+table,66,Classification of the nature of coatings,55
+table,67,Classification of the form of coatings,56
+table,68,Classification of the location of coatings and clay accumulation,56
+table,69,Classification of the continuity of cementation/compaction,56
+table,70,Classification of the fabric of the cemented/compacted layer,56
+table,71,Classification of the nature of cementation/compaction,57
+table,72,Classification of the degree of cementation/compaction,57
+table,73,"Classification of the abundance of mineral concentrations, by volume",58
+table,74,Classification of the kinds of mineral concentrations,58
+table,75,Classification of the size and shape of mineral concentrations,58
+table,76,Classification of the hardness of mineral concentrations,58
+table,77,Examples of the nature of mineral concentrations,59
+table,78,Colour names of mineral concentrations,59
+table,79,Classification of the diameter of roots,60
+table,80,Classification of the abundance of roots,60
+table,81,Classification of the abundance of biological activity,60
+table,82,Examples of biological features,60
+table,83,Classification of kinds of artefacts,63
+table,84,Determination table and codes for human-made deposits,64
+table,85,Subordinate characteristics within master horizons,72
+table,86,"Checklist of WRB diagnostic horizons, properties and materials",81
+figure,1,"The process of soil description, classification, site quality and suitability evaluation",1
+figure,2,Slope positions in undulating and mountainous terrain,11
+figure,3,Slope forms and surface pathways,12
+figure,4,"Relation of constituents of fine earth by size, defining textural classes and sand subclasses",27
+figure,5,Charts for estimating proportions of coarse fragments and mottles,30
+figure,6,Soil structure types and their formation,45
+figure,7,Qualification of bulk density,51
+figure,8,Charts for estimating size and abundance of pores,54
