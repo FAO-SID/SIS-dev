@@ -47,7 +47,7 @@ for FILE in *.tif; do
 done
 
 
-# Resample the mask to match the target raster's grid
+# Resample the mask to match the target raster's grid. Computing extent to 100.0835516 13.9126580 107.7080026 22.5050437 ...
 gdalwarp -overwrite -srcnodata nan -dstnodata -9999 -tr 0.0083333 0.0083333 -te 100.0835516 13.9134114 107.7085211 22.5050437 -r near LA-GSNM-BKD-2026-0-30-MEAN.tif mask.tif
 
 # Transfer the -9999 pixels from Geotiff A to Geotiff B (mask country shape)

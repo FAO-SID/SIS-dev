@@ -7,7 +7,7 @@
 echo
 
 # Input and output directories
-COUNTRY=BD
+COUNTRY=KH
 INPUT_DIR="/home/carva014/Downloads/FAO/AFACI/$COUNTRY/tmp"                          # << EDIT THIS LINE!
 OUTPUT_DIR="/home/carva014/Downloads/FAO/AFACI/$COUNTRY/output"                      # << EDIT THIS LINE!
 cd $INPUT_DIR
@@ -100,9 +100,9 @@ cd $OUTPUT_DIR
 ls *GSOCSEQ*.tif > filelist.txt
 gdalbuildvrt -q -separate -input_file_list filelist.txt $COUNTRY-GSOCSEQ.vrt
 rm filelist.txt
-ls *GSNM*.tif > filelist.txt
-gdalbuildvrt -q -separate -input_file_list filelist.txt $COUNTRY-GSNM.vrt
-rm filelist.txt
+# ls *GSNM*.tif > filelist.txt
+# gdalbuildvrt -q -separate -input_file_list filelist.txt $COUNTRY-GSNM.vrt
+# rm filelist.txt
 ls *GSAS*.tif > filelist.txt
 gdalbuildvrt -q -separate -input_file_list filelist.txt $COUNTRY-GSAS.vrt
 rm filelist.txt

@@ -14,40 +14,40 @@ OUTPUT_DIR="/home/carva014/Downloads/FAO/AFACI/$COUNTRY/tmp"                    
 
 mkdir -p "$OUTPUT_DIR"
 
-# # Non existing NoData parameter, add now or fail after.
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ECseMap030-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ECseMap30100-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ECuncertaintyMap030-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ECuncertaintyMap30100-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ESPMap030-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ESPMap30100-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ESPuncertaintyMap030-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ESPuncertaintyMap30100-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_pHMap030-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_pHMap30100-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_pHuncertaintyMap030-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_pHuncertaintyMap30100-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_SaltMap030-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_SaltMap30100-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_UncertaintySaltMap030-Arifunnahar_akhi.tif
-# gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_UncertaintySaltMap30100-Arifunnahar_akhi.tif
+# Non existing NoData parameter, add now or fail after.
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ECseMap030-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ECseMap30100-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ECuncertaintyMap030-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ECuncertaintyMap30100-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ESPMap030-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ESPMap30100-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ESPuncertaintyMap030-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_ESPuncertaintyMap30100-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_pHMap030-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_pHMap30100-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_pHuncertaintyMap030-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_pHuncertaintyMap30100-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_SaltMap030-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_SaltMap30100-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_UncertaintySaltMap030-Arifunnahar_akhi.tif
+gdal_edit.py -a_nodata nan $INPUT_DIR/BGD_UncertaintySaltMap30100-Arifunnahar_akhi.tif
 
-# cp $INPUT_DIR/BGD_ECseMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-ECX-$YEAR-0-30-MEAN.tif
-# cp $INPUT_DIR/BGD_ECseMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-ECX-$YEAR-30-100-MEAN.tif
-# cp $INPUT_DIR/BGD_ECuncertaintyMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-ECX-$YEAR-0-30-UNCT.tif
-# cp $INPUT_DIR/BGD_ECuncertaintyMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-ECX-$YEAR-30-100-UNCT.tif
-# cp $INPUT_DIR/BGD_ESPMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-NAEXC-$YEAR-0-30-MEAN.tif
-# cp $INPUT_DIR/BGD_ESPMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-NAEXC-$YEAR-30-100-MEAN.tif
-# cp $INPUT_DIR/BGD_ESPuncertaintyMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-NAEXC-$YEAR-0-30-UNCT.tif
-# cp $INPUT_DIR/BGD_ESPuncertaintyMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-NAEXC-$YEAR-30-100-UNCT.tif
-# cp $INPUT_DIR/BGD_pHMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-PHX-$YEAR-0-30-MEAN.tif
-# cp $INPUT_DIR/BGD_pHMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-PHX-$YEAR-30-100-MEAN.tif
-# cp $INPUT_DIR/BGD_pHuncertaintyMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-PHX-$YEAR-0-30-UNCT.tif
-# cp $INPUT_DIR/BGD_pHuncertaintyMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-PHX-$YEAR-30-100-UNCT.tif
-# cp $INPUT_DIR/BGD_SaltMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-SALT-$YEAR-0-30-MEAN.tif
-# cp $INPUT_DIR/BGD_SaltMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-SALT-$YEAR-30-100-MEAN.tif
-# cp $INPUT_DIR/BGD_UncertaintySaltMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-SALT-$YEAR-0-30-UNCT.tif
-# cp $INPUT_DIR/BGD_UncertaintySaltMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-SALT-$YEAR-30-100-UNCT.tif
+cp $INPUT_DIR/BGD_ECseMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-ECX-$YEAR-0-30-MEAN.tif
+cp $INPUT_DIR/BGD_ECseMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-ECX-$YEAR-30-100-MEAN.tif
+cp $INPUT_DIR/BGD_ECuncertaintyMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-ECX-$YEAR-0-30-UNCT.tif
+cp $INPUT_DIR/BGD_ECuncertaintyMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-ECX-$YEAR-30-100-UNCT.tif
+cp $INPUT_DIR/BGD_ESPMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-NAEXC-$YEAR-0-30-MEAN.tif
+cp $INPUT_DIR/BGD_ESPMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-NAEXC-$YEAR-30-100-MEAN.tif
+cp $INPUT_DIR/BGD_ESPuncertaintyMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-NAEXC-$YEAR-0-30-UNCT.tif
+cp $INPUT_DIR/BGD_ESPuncertaintyMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-NAEXC-$YEAR-30-100-UNCT.tif
+cp $INPUT_DIR/BGD_pHMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-PHX-$YEAR-0-30-MEAN.tif
+cp $INPUT_DIR/BGD_pHMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-PHX-$YEAR-30-100-MEAN.tif
+cp $INPUT_DIR/BGD_pHuncertaintyMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-PHX-$YEAR-0-30-UNCT.tif
+cp $INPUT_DIR/BGD_pHuncertaintyMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-PHX-$YEAR-30-100-UNCT.tif
+cp $INPUT_DIR/BGD_SaltMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-SALT-$YEAR-0-30-MEAN.tif
+cp $INPUT_DIR/BGD_SaltMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-SALT-$YEAR-30-100-MEAN.tif
+cp $INPUT_DIR/BGD_UncertaintySaltMap030-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-SALT-$YEAR-0-30-UNCT.tif
+cp $INPUT_DIR/BGD_UncertaintySaltMap30100-Arifunnahar_akhi.tif $OUTPUT_DIR/$COUNTRY-$PROJ-SALT-$YEAR-30-100-UNCT.tif
 
 
 PROJ=GSNM
