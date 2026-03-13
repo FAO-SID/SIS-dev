@@ -11,8 +11,7 @@ WHERE {
     ?obs rdfs:subClassOf ?rest .
     ?rest owl:onProperty sosa:hasFeatureOfInterest .
     ?rest owl:allValuesFrom glosis_su:GL_Surface .
-}
-;
+};
 
 # Get all Code-lists for Surface
 SPARQL
@@ -29,8 +28,7 @@ WHERE {
     ?rest_f owl:allValuesFrom glosis_su:GL_Surface .
     ?rest_r owl:onProperty sosa:hasResult .
     ?rest_r owl:someValuesFrom ?code_list .
-}
-;
+};
 
 
 # Get all Code-lists for Profile
@@ -48,8 +46,7 @@ WHERE {
     ?rest_f owl:allValuesFrom glosis_pr:GL_Profile .
     ?rest_r owl:onProperty sosa:hasResult .
     ?rest_r owl:someValuesFrom ?code_list .
-}
-;
+};
 
 # Code-list values for descriptive observations for Surface
 SPARQL
@@ -69,10 +66,9 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
     ?value a ?code_list .
     ?value skos:prefLabel ?l .
-    BIND (CONCAT('INSERT INTO core.thesaurus_desc_surface (label, uri) VALUES (\'', ?l,
+    BIND (CONCAT('INSERT INTO soil_data.category_desc (category_desc_id, uri) VALUES (\'', ?l,
           '\', \'', ?value, '\');') AS ?query)
-}
-;
+};
 
 # Code-list values for descriptive observations Plot
 SPARQL
@@ -95,10 +91,9 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
     ?value a ?code_list .
     ?value skos:prefLabel ?l .
-    BIND (CONCAT('INSERT INTO core.thesaurus_desc_plot (label, uri) VALUES (\'', ?l,
+    BIND (CONCAT('INSERT INTO soil_data.category_desc (category_desc_id, uri) VALUES (\'', ?l,
           '\', \'', ?value, '\');') AS ?query)
-}
-;
+};
 
 # Code-list values for descriptive observations for Profile
 SPARQL
@@ -118,7 +113,7 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
     ?value a ?code_list .
     ?value skos:prefLabel ?l .
-    BIND (CONCAT('INSERT INTO core.thesaurus_desc_profile (label, uri) VALUES (\'', ?l,
+    BIND (CONCAT('INSERT INTO soil_data.category_desc (category_desc_id, uri) VALUES (\'', ?l,
           '\', \'', ?value, '\');') AS ?query)
 };
 
@@ -144,9 +139,6 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
     ?value a ?code_list .
     ?value skos:prefLabel ?l .
-    BIND (CONCAT('INSERT INTO core.thesaurus_desc_element (label, uri) VALUES (\'', ?l,
+    BIND (CONCAT('INSERT INTO soil_data.category_desc (category_desc_id, uri) VALUES (\'', ?l,
           '\', \'', ?value, '\');') AS ?query)
-}
-;
-
-
+};

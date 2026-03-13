@@ -7,7 +7,7 @@ WHERE {
         ?uri skos:prefLabel ?label .    
         OPTIONAL {?uri skos:broader ?broader} .
     }
-    BIND (CONCAT('INSERT INTO core.procedure_phys_chem (uri, label, broader_id) VALUES (\'', STR(?uri),
-         '\', \'', ?label, '\', (SELECT procedure_phys_chem_id FROM core.procedure_phys_chem WHERE uri LIKE \'', 
+    BIND (CONCAT('INSERT INTO soil_data.procedure_num (uri, procedure_num_id, broader_id) VALUES (\'', STR(?uri),
+         '\', \'', ?label, '\', (SELECT procedure_num_id FROM soil_data.procedure_num WHERE uri LIKE \'', 
          COALESCE(STR(?broader), ''), '\'));') AS ?query)
 };

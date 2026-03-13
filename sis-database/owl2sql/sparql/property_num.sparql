@@ -12,7 +12,7 @@ WHERE {
     ?rest_p owl:onProperty sosa:observedProperty .
     ?rest_p owl:hasValue ?prop .
     ?prop skos:prefLabel ?label
-    BIND (CONCAT('INSERT INTO core.property_phys_chem (label, uri) VALUES (\'', ?label,
+    BIND (CONCAT('INSERT INTO soil_data.property_num (property_num_id, uri) VALUES (\'', ?label,
           '\', \'', ?prop, '\');') AS ?query)
 };
 
@@ -30,7 +30,7 @@ WHERE {
     ?rest_p owl:onProperty sosa:observedProperty .
     ?rest_p owl:hasValue ?prop .
     ?prop rdfs:label ?label .
-    BIND (CONCAT('INSERT INTO core.property_phys_chem (label, uri) VALUES (\'', ?label,
+    BIND (CONCAT('INSERT INTO soil_data.property_num (property_num_id, uri) VALUES (\'', ?label,
           '\', \'', ?prop, '\');') AS ?query)
 };
 
@@ -52,7 +52,7 @@ WHERE {
     ?rest_u owl:hasValue ?unit .
     ?unit rdfs:label ?label .
     FILTER(lang(?label) = 'en') .
-    BIND (CONCAT('INSERT INTO core.unit_of_measure (label, uri) VALUES (\'', ?label,
+    BIND (CONCAT('INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, uri) VALUES (\'', ?label,
          '\', \'', ?unit, '\');') AS ?query)
 };
 
@@ -69,8 +69,8 @@ WHERE {
     ?uri a ?parent .
     ?uri skos:prefLabel ?label .    
     OPTIONAL {?uri skos:broader ?broader} .
-    BIND (CONCAT('INSERT INTO core.procedure_phys_chem (uri, label, broader_id) VALUES (\'', ?uri,
-         '\', \'', ?label, '\', (SELECT procedure_phys_chem_id FROM core.procedure_phys_chem WHERE uri LIKE \'', 
+    BIND (CONCAT('INSERT INTO soil_data.procedure_num (uri, procedure_num_id, broader_id) VALUES (\'', ?uri,
+         '\', \'', ?label, '\', (SELECT procedure_num_id FROM soil_data.procedure_num WHERE uri LIKE \'', 
          ?broader ,'\')  );') AS ?query)
 };
 
@@ -100,18 +100,18 @@ WHERE {
     ?rest_m owl:onProperty sosa:usedProcedure .
     ?rest_m owl:someValuesFrom ?meta_proc .
     ?procedure a ?meta_proc .
-    BIND (CONCAT('INSERT INTO core.observation_phys_chem\n',
-                 '       (property_phys_chem_id,\n',
+    BIND (CONCAT('INSERT INTO soil_data.observation_num\n',
+                 '       (property_num_id,\n',
                  '        unit_of_measure_id,\n',
-                 '        procedure_phys_chem_id) \n',
-                 'VALUES ((SELECT property_phys_chem_id\n',
-                 '           FROM core.property_phys_chem\n',
+                 '        procedure_num_id) \n',
+                 'VALUES ((SELECT property_num_id\n',
+                 '           FROM soil_data.property_num\n',
                  '          WHERE uri LIKE \'', ?prop, '\'),\n',
                  '        (SELECT unit_of_measure_id\n',
-                 '           FROM core.unit_of_measure\n',
+                 '           FROM soil_data.unit_of_measure\n',
                  '          WHERE uri LIKE \'', ?unit, '\'),\n',
-                 '        (SELECT procedure_phys_chem_id\n',
-                 '           FROM core.procedure_phys_chem\n',
+                 '        (SELECT procedure_num_id\n',
+                 '           FROM soil_data.procedure_num\n',
                  '          WHERE uri LIKE \'', ?procedure, '\'));\n') AS ?query)
 };" > current.sql
 
@@ -155,5 +155,3 @@ WHERE {
 #    FILTER (langMatches(lang(?label),"en-us"))
     FILTER(lang(?label) = 'en') .
 };
-
-

@@ -18,10 +18,9 @@ WHERE {
     ?rest_c owl:onProperty sosa:observedProperty .
     ?rest_c owl:hasValue ?p .
     ?p rdfs:label ?l .
-    BIND (CONCAT('INSERT INTO core.property_desc_surface (label, uri) VALUES (\'', ?l,
+    BIND (CONCAT('INSERT INTO soil_data.property_desc (surface, property_desc_id, uri) VALUES (TRUE, \'', ?l,
           '\', \'', ?p, '\');') AS ?query)
-}
-;
+};
 
 # Observable properties for Plot
 SPARQL
@@ -42,10 +41,9 @@ WHERE {
     ?rest_c owl:onProperty sosa:observedProperty .
     ?rest_c owl:hasValue ?p .
     ?p rdfs:label ?l .
-    BIND (CONCAT('INSERT INTO core.property_desc_plot (label, uri) VALUES (\'', ?l,
+    BIND (CONCAT('INSERT INTO soil_data.property_desc (plot, property_desc_id, uri) VALUES (TRUE, \'', ?l,
           '\', \'', ?p, '\');') AS ?query)
-}
-;
+};
 
 # Observable properties for Profile
 SPARQL
@@ -63,10 +61,9 @@ WHERE {
     ?rest_c owl:onProperty sosa:observedProperty .
     ?rest_c owl:hasValue ?p .
     ?p rdfs:label ?l .
-    BIND (CONCAT('INSERT INTO core.property_desc_profile (label, uri) VALUES (\'', ?l,
+    BIND (CONCAT('INSERT INTO soil_data.property_desc (profile, property_desc_id, uri) VALUES (TRUE, \'', ?l,
           '\', \'', ?p, '\');') AS ?query)
-}
-;
+};
 
 # Observable properties for Profile Element
 SPARQL
@@ -87,8 +84,6 @@ WHERE {
     ?rest_c owl:onProperty sosa:observedProperty .
     ?rest_c owl:hasValue ?p .
     ?p rdfs:label ?l .
-    BIND (CONCAT('INSERT INTO core.property_desc_element (label, uri) VALUES (\'', ?l,
+    BIND (CONCAT('INSERT INTO soil_data.property_desc (element, property_desc_id, uri) VALUES (TRUE, \'', ?l,
           '\', \'', ?p, '\');') AS ?query)
-}
-;
-
+};

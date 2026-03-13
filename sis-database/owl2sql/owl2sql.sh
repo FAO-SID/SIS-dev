@@ -72,10 +72,10 @@ docker exec virtuoso isql 1111 dba dba exec="DB.DBA.TTLP_MT (file_to_string_outp
 
 # Generate SQL files, extracting only INSERT statements
 docker exec -i virtuoso isql 1111 dba dba < sparql/properties_desc.sparql 2>/dev/null | grep "^INSERT" > output/properties_desc.sql
-docker exec -i virtuoso isql 1111 dba dba < sparql/thesaurus_desc.sparql 2>/dev/null | grep "^INSERT" > output/thesaurus_desc.sql
+docker exec -i virtuoso isql 1111 dba dba < sparql/category_desc.sparql 2>/dev/null | grep "^INSERT" > output/category_desc.sql
 docker exec -i virtuoso isql 1111 dba dba < sparql/observations_desc.sparql 2>/dev/null | grep "^INSERT" > output/observations_desc.sql
-docker exec -i virtuoso isql 1111 dba dba < sparql/phys_chem.sparql 2>/dev/null | grep "^INSERT" > output/phys_chem.sql
-docker exec -i virtuoso isql 1111 dba dba < sparql/procedures_phys_chem.sparql 2>/dev/null | grep "^INSERT" > output/procedures_phys_chem.sql
+docker exec -i virtuoso isql 1111 dba dba < sparql/property_num.sparql 2>/dev/null | grep "^INSERT" > output/property_num.sql
+docker exec -i virtuoso isql 1111 dba dba < sparql/procedures_num.sparql 2>/dev/null | grep "^INSERT" > output/procedures_num.sql
 
 # Check counts
 # wc -l output/*.sql
