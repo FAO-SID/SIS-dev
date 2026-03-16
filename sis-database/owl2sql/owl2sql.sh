@@ -127,6 +127,6 @@ docker exec -i virtuoso isql 1111 dba dba < sparql/procedures_num.sparql 2>/dev/
 
 
 # Clean up
-docker stop virtuoso
-docker rm virtuoso
-rm -Rf $PROJECT_DIR/ontology
+# docker stop virtuoso
+# docker rm virtuoso
+# rm -Rf $PROJECT_DIR/ontology

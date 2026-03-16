@@ -66,7 +66,7 @@ WHERE {
 };
 
 
-# Descriptive observations for Plot !!!! INSERT IS FOR ELEMENT BUT LOOKS LIKE IT SHOULD BE FRO PLOT!!!!
+# Descriptive observations for Plot !!!! INSERT IS FOR ELEMENT LOOKS LIKE IT SHOULD BE FRO PLOT!!!!
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
@@ -89,9 +89,12 @@ WHERE {
     ?value skos:prefLabel ?l .
     BIND (CONCAT("""
     INSERT INTO soil_data.observation_desc (plot, property_desc_id, category_desc_id) 
-    VALUES ((SELECT property_desc_id FROM soil_data.property_desc WHERE uri LIKE \'""", ?prop, """\'),
-            (SELECT category_desc_id FROM soil_data.category_desc WHERE uri LIKE \'""", ?value, "\')
-            );") AS ?query)
+    VALUES ((SELECT property_desc_id
+               FROM soil_data.property_desc
+              WHERE uri LIKE \'""", ?prop, """\'),
+            (SELECT category_desc_id
+               FROM soil_data.category_desc
+              WHERE uri LIKE \'""", ?value, "\'));") AS ?query)
 };
 
 
@@ -122,7 +125,10 @@ WHERE {
     ?value skos:prefLabel ?l .
     BIND (CONCAT("""
     INSERT INTO soil_data.observation_desc (element, property_desc_id, category_desc_id)
-    VALUES ((SELECT property_desc_id FROM soil_data.property_desc WHERE uri LIKE \'""", ?prop, """\'),
-            (SELECT category_desc_id FROM soil_data.category_desc WHERE uri LIKE \'""", ?value, "\')
-            );") AS ?query)
+    VALUES ((SELECT property_desc_id
+               FROM soil_data.property_desc
+              WHERE uri LIKE \'""", ?prop, """\'),
+            (SELECT category_desc_id
+               FROM soil_data.category_desc
+              WHERE uri LIKE \'""", ?value, "\'));") AS ?query)
 };
