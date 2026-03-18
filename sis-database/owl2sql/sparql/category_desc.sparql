@@ -1,5 +1,4 @@
 # Get all Observations for Surface
-
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
@@ -30,7 +29,6 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
 };
 
-
 # Get all Code-lists for Profile
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
@@ -48,7 +46,7 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
 };
 
-# Code-list values for descriptive observations for Surface
+# Code-list values for descriptive observations for Surface (84 rows)
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
@@ -66,11 +64,14 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
     ?value a ?code_list .
     ?value skos:prefLabel ?l .
-    BIND (CONCAT('INSERT INTO soil_data.category_desc (category_desc_id, uri) VALUES (\'', ?l,
-          '\', \'', ?value, '\');') AS ?query)
+    BIND(STRAFTER(STR(?value), 'http://w3id.org/glosis/model/codelists/') AS ?code_id)
+    BIND(CONCAT(
+        'INSERT INTO soil_data.category_desc (category_name, category_desc_id, uri) VALUES (\'',
+        ?l, '\', \'', ?code_id, '\', \'', STR(?value), '\') ON CONFLICT DO NOTHING;'
+    ) AS ?query)
 };
 
-# Code-list values for descriptive observations Plot
+# Code-list values for descriptive observations Plot (395 rows)
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
@@ -91,11 +92,14 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
     ?value a ?code_list .
     ?value skos:prefLabel ?l .
-    BIND (CONCAT('INSERT INTO soil_data.category_desc (category_desc_id, uri) VALUES (\'', ?l,
-          '\', \'', ?value, '\');') AS ?query)
+    BIND(STRAFTER(STR(?value), 'http://w3id.org/glosis/model/codelists/') AS ?code_id)
+    BIND(CONCAT(
+        'INSERT INTO soil_data.category_desc (category_name, category_desc_id, uri) VALUES (\'',
+        ?l, '\', \'', ?code_id, '\', \'', STR(?value), '\') ON CONFLICT DO NOTHING;'
+    ) AS ?query)
 };
 
-# Code-list values for descriptive observations for Profile
+# Code-list values for descriptive observations for Profile (9 rows)
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
@@ -113,12 +117,14 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
     ?value a ?code_list .
     ?value skos:prefLabel ?l .
-    BIND (CONCAT('INSERT INTO soil_data.category_desc (category_desc_id, uri) VALUES (\'', ?l,
-          '\', \'', ?value, '\');') AS ?query)
+    BIND(STRAFTER(STR(?value), 'http://w3id.org/glosis/model/codelists/') AS ?code_id)
+    BIND(CONCAT(
+        'INSERT INTO soil_data.category_desc (category_name, category_desc_id, uri) VALUES (\'',
+        ?l, '\', \'', ?code_id, '\', \'', STR(?value), '\') ON CONFLICT DO NOTHING;'
+    ) AS ?query)
 };
 
-
-# Code-list values for descriptive observations Element
+# Code-list values for descriptive observations Element (373 rows)
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
@@ -139,6 +145,9 @@ WHERE {
     ?rest_r owl:someValuesFrom ?code_list .
     ?value a ?code_list .
     ?value skos:prefLabel ?l .
-    BIND (CONCAT('INSERT INTO soil_data.category_desc (category_desc_id, uri) VALUES (\'', ?l,
-          '\', \'', ?value, '\');') AS ?query)
+    BIND(STRAFTER(STR(?value), 'http://w3id.org/glosis/model/codelists/') AS ?code_id)
+    BIND(CONCAT(
+        'INSERT INTO soil_data.category_desc (category_name, category_desc_id, uri) VALUES (\'',
+        ?l, '\', \'', ?code_id, '\', \'', STR(?value), '\') ON CONFLICT DO NOTHING;'
+    ) AS ?query)
 };

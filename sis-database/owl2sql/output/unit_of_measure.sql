@@ -1,0 +1,11 @@
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('CentiMOL-PER-KiloGM', 'CentiMOL-PER-KiloGM', 'http://qudt.org/vocab/unit/CentiMOL-PER-KiloGM') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('CentiM-PER-HR', 'CentiM-PER-HR', 'http://qudt.org/vocab/unit/CentiM-PER-HR') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('DeciS-PER-M', 'DeciS-PER-M', 'http://qudt.org/vocab/unit/DeciS-PER-M') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('GM-PER-KiloGM', 'GM-PER-KiloGM', 'http://qudt.org/vocab/unit/GM-PER-KiloGM') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('KiloGM-PER-DeciM3', 'KiloGM-PER-DeciM3', 'http://qudt.org/vocab/unit/KiloGM-PER-DeciM3') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('MilliGM-PER-KiloGM', 'MilliGM-PER-KiloGM', 'http://qudt.org/vocab/unit/MilliGM-PER-KiloGM') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('PERCENT', 'PERCENT', 'http://qudt.org/vocab/unit/PERCENT') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('PH', 'PH', 'http://qudt.org/vocab/unit/PH') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('centimolePerLitre', 'centimolePerLitre', 'https://raw.githubusercontent.com/HajoRijgersberg/OM/refs/heads/master/om-2.0.rdf/centimolePerLitre') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('gramPerHectogram', 'gramPerHectogram', 'https://raw.githubusercontent.com/HajoRijgersberg/OM/refs/heads/master/om-2.0.rdf/gramPerHectogram') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES ('M3-PER-HundredM3', 'M3-PER-HundredM3', 'http://w3id.org/glosis/model/unit/M3-PER-HundredM3') ON CONFLICT DO NOTHING;

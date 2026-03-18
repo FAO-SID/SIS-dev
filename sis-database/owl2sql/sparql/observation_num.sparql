@@ -1,0 +1,35 @@
+# Observations (853 rows)
+SPARQL
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sosa:  <http://www.w3.org/ns/sosa/>
+PREFIX qudt: <http://qudt.org/schema/qudt/>
+PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
+PREFIX glosis_lh: <http://w3id.org/glosis/model/layerhorizon/>
+SELECT DISTINCT ?query
+WHERE {
+    ?obs rdfs:subClassOf glosis_lh:PhysioChemical .
+    ?obs rdfs:subClassOf ?rest_p .
+    ?rest_p owl:onProperty sosa:observedProperty .
+    ?rest_p owl:hasValue ?prop .
+    ?obs rdfs:subClassOf ?rest_v .
+    ?rest_v owl:onProperty sosa:hasResult .
+    ?rest_v owl:allValuesFrom ?value .
+    ?value rdfs:subClassOf ?rest_u .
+    ?rest_u owl:onProperty qudt:unit .
+    ?rest_u owl:hasValue ?unit .
+    ?obs rdfs:subClassOf ?rest_m .
+    ?rest_m owl:onProperty sosa:usedProcedure .
+    ?rest_m owl:someValuesFrom ?meta_proc .
+    GRAPH <http://w3id.org/glosis/model/procedure> {
+        ?procedure a skos:Concept .
+        ?procedure a ?meta_proc .
+    }
+    BIND (CONCAT(
+            "INSERT INTO soil_data.observation_num (property_num_id, unit_of_measure_id, procedure_num_id) VALUES (",
+                "(SELECT property_num_id FROM soil_data.property_num WHERE uri LIKE '", STR(?prop), "'), ",
+                "(SELECT unit_of_measure_id FROM soil_data.unit_of_measure WHERE uri LIKE '", STR(?unit), "'), ",
+                "(SELECT procedure_num_id FROM soil_data.procedure_num WHERE uri LIKE '", STR(?procedure), "')",
+            ");"
+        ) AS ?query)
+};

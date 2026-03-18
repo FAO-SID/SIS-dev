@@ -1,0 +1,27 @@
+# Units of measure for PhysioChemical observations ( rows)
+SPARQL
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX qudt: <http://qudt.org/schema/qudt/>
+PREFIX glosis_lh: <http://w3id.org/glosis/model/layerhorizon/>
+SELECT DISTINCT ?query
+WHERE {
+    ?obs rdfs:subClassOf glosis_lh:PhysioChemical .
+    ?obs rdfs:subClassOf ?rest_v .
+    ?rest_v owl:onProperty sosa:hasResult .
+    ?rest_v owl:allValuesFrom ?value_class .
+    ?value_class rdfs:subClassOf ?rest_u .
+    ?rest_u owl:onProperty qudt:unit .
+    ?rest_u owl:hasValue ?unit .
+    ?unit rdfs:label ?label .
+    FILTER(lang(?label) = 'en')
+    BIND(STRAFTER(STR(?unit), '/') AS ?unit_id)
+    BIND(CONCAT(
+        "INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri) VALUES (",
+            "'", STRAFTER(STR(?unit), 'unit/'), "', ",
+            "'", ?label, "', ",
+            "'", STR(?unit), "'",
+        ") ON CONFLICT DO NOTHING;"
+    ) AS ?query)
+};

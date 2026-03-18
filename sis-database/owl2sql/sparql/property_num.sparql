@@ -1,4 +1,23 @@
-# Physio-chemical properties
+# # Physio-chemical properties (50 rows)
+# SPARQL
+# PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+# PREFIX owl:   <http://www.w3.org/2002/07/owl#>
+# PREFIX sosa:  <http://www.w3.org/ns/sosa/>
+# PREFIX skos:  <http://www.w3.org/2004/02/skos/core#> 
+# PREFIX glosis_lh:  <http://w3id.org/glosis/model/layerhorizon/>
+# SELECT DISTINCT ?query
+# WHERE {
+#     ?obs rdfs:subClassOf  glosis_lh:PhysioChemical .
+#     ?obs rdfs:subClassOf ?rest_p .
+#     ?rest_p owl:onProperty sosa:observedProperty .
+#     ?rest_p owl:hasValue ?prop .
+#     ?prop skos:prefLabel ?label
+#     BIND (CONCAT('INSERT INTO soil_data.property_num (property_num_id, uri) VALUES (\'', ?label, '\', \'', ?prop, '\');') AS ?query)
+# };
+
+# TphysioChemicalPropertyCode-CoaFra is referenced in the layerhorizon ontology but never actually defined in the codelists graph.
+# No triples at all means no prefLabel, no rdfs:label, nothing. It's a GloSIS ontology bug, issue open: https://github.com/glosis-ld/glosis/issues/215
+# Physio-chemical properties (51 rows, CoaFra included)
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
@@ -6,152 +25,12 @@ PREFIX sosa:  <http://www.w3.org/ns/sosa/>
 PREFIX skos:  <http://www.w3.org/2004/02/skos/core#> 
 PREFIX glosis_lh:  <http://w3id.org/glosis/model/layerhorizon/>
 SELECT DISTINCT ?query
-WHERE {
-    ?obs rdfs:subClassOf  glosis_lh:PhysioChemical .
-    ?obs rdfs:subClassOf ?rest_p .
-    ?rest_p owl:onProperty sosa:observedProperty .
-    ?rest_p owl:hasValue ?prop .
-    ?prop skos:prefLabel ?label
-    BIND (CONCAT('INSERT INTO soil_data.property_num (property_num_id, uri) VALUES (\'', ?label,
-          '\', \'', ?prop, '\');') AS ?query)
-};
-
-# Missing properties - caused by GloSIS issue #
-SPARQL
-PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl:   <http://www.w3.org/2002/07/owl#>
-PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX skos:  <http://www.w3.org/2004/02/skos/core#> 
-PREFIX glosis_lh:  <http://w3id.org/glosis/model/layerhorizon/>
-SELECT DISTINCT ?query
-WHERE {
-    ?obs rdfs:subClassOf  glosis_lh:PhysioChemical .
-    ?obs rdfs:subClassOf ?rest_p .
-    ?rest_p owl:onProperty sosa:observedProperty .
-    ?rest_p owl:hasValue ?prop .
-    ?prop rdfs:label ?label .
-    BIND (CONCAT('INSERT INTO soil_data.property_num (property_num_id, uri) VALUES (\'', ?label,
-          '\', \'', ?prop, '\');') AS ?query)
-};
-
-# Units of measure
-SPARQL
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX qudt: <http://qudt.org/schema/qudt/>
-PREFIX glosis_lh: <http://w3id.org/glosis/model/layerhorizon/>
-SELECT DISTINCT ?query
-WHERE {
-    ?obs rdfs:subClassOf glosis_lh:PhysioChemical .
-    ?obs rdfs:subClassOf ?rest_v .
-    ?rest_v owl:onProperty sosa:hasResult .
-    ?rest_v owl:allValuesFrom ?value .
-    ?value rdfs:subClassOf ?rest_u .
-    ?rest_u owl:onProperty qudt:unit .
-    ?rest_u owl:hasValue ?unit .
-    ?unit rdfs:label ?label .
-    FILTER(lang(?label) = 'en') .
-    BIND (CONCAT('INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, uri) VALUES (\'', ?label,
-         '\', \'', ?unit, '\');') AS ?query)
-};
-
-
-# Procedures
-SPARQL
-PREFIX owl:   <http://www.w3.org/2002/07/owl#>
-PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
-PREFIX glosis_proc: <http://w3id.org/glosis/model/procedure/>
-SELECT ?query
-WHERE {
-    ?parent a sosa:Procedure .
-    ?uri a ?parent .
-    ?uri skos:prefLabel ?label .    
-    OPTIONAL {?uri skos:broader ?broader} .
-    BIND (CONCAT('INSERT INTO soil_data.procedure_num (uri, procedure_num_id, broader_id) VALUES (\'', ?uri,
-         '\', \'', ?label, '\', (SELECT procedure_num_id FROM soil_data.procedure_num WHERE uri LIKE \'', 
-         ?broader ,'\')  );') AS ?query)
-};
-
-
-# Observations
-docker exec -i virt-db isql 1111 dba secret exec="
-SPARQL
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX qudt: <http://qudt.org/schema/qudt/>
-PREFIX glosis_lh: <http://w3id.org/glosis/model/layerhorizon/>
-#SELECT DISTINCT(?obs) ?prop ?unit ?procedure
-SELECT DISTINCT(?query)
 WHERE {
     ?obs rdfs:subClassOf glosis_lh:PhysioChemical .
     ?obs rdfs:subClassOf ?rest_p .
     ?rest_p owl:onProperty sosa:observedProperty .
     ?rest_p owl:hasValue ?prop .
-    ?obs rdfs:subClassOf ?rest_v .
-    ?rest_v owl:onProperty sosa:hasResult .
-    ?rest_v owl:allValuesFrom ?value .
-    ?value rdfs:subClassOf ?rest_u .
-    ?rest_u owl:onProperty qudt:unit .
-    ?rest_u owl:hasValue ?unit .
-    ?obs rdfs:subClassOf ?rest_m .
-    ?rest_m owl:onProperty sosa:usedProcedure .
-    ?rest_m owl:someValuesFrom ?meta_proc .
-    ?procedure a ?meta_proc .
-    BIND (CONCAT('INSERT INTO soil_data.observation_num\n',
-                 '       (property_num_id,\n',
-                 '        unit_of_measure_id,\n',
-                 '        procedure_num_id) \n',
-                 'VALUES ((SELECT property_num_id\n',
-                 '           FROM soil_data.property_num\n',
-                 '          WHERE uri LIKE \'', ?prop, '\'),\n',
-                 '        (SELECT unit_of_measure_id\n',
-                 '           FROM soil_data.unit_of_measure\n',
-                 '          WHERE uri LIKE \'', ?unit, '\'),\n',
-                 '        (SELECT procedure_num_id\n',
-                 '           FROM soil_data.procedure_num\n',
-                 '          WHERE uri LIKE \'', ?procedure, '\'));\n') AS ?query)
-};" > current.sql
-
-
-
-
-
-## Aid queries
-
-SPARQL
-PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl:   <http://www.w3.org/2002/07/owl#>
-PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX skos:  <http://www.w3.org/2004/02/skos/core#> 
-PREFIX glosis_lh:  <http://w3id.org/glosis/model/layerhorizon/>
-SELECT ?obs ?prop ?proc
-WHERE {
-    ?obs rdfs:subClassOf  glosis_lh:PhysioChemical .
-    ?obs rdfs:subClassOf ?rest_p .
-    ?obs rdfs:subClassOf ?rest_m .
-    ?rest_p owl:onProperty sosa:observedProperty .
-    ?rest_p owl:hasValue ?prop .
-    ?rest_m owl:onProperty sosa:usedProcedure .
-    ?rest_m owl:someValuesFrom ?proc .
-};
-
-SPARQL
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX qudt: <http://qudt.org/schema/qudt/>
-PREFIX glosis_lh: <http://w3id.org/glosis/model/layerhorizon/>
-SELECT DISTINCT ?value ?label lang(?label)
-#SELECT ?p ?o
-#SELECT ?value
-WHERE {
-    glosis_lh:SiltValue rdfs:subClassOf ?rest .
-    ?rest owl:onProperty qudt:unit .
-    ?rest owl:hasValue ?value .
-#    ?value ?p ?o .
-    ?value rdfs:label ?label . 
-#    FILTER (langMatches(lang(?label),"en-us"))
-    FILTER(lang(?label) = 'en') .
+    OPTIONAL { ?prop skos:prefLabel ?label }
+    BIND(COALESCE(?label, STRAFTER(STR(?prop), 'physioChemicalPropertyCode-')) AS ?name)
+    BIND(CONCAT('INSERT INTO soil_data.property_num (property_num_id, uri) VALUES (\'', ?name, '\', \'', ?prop, '\') ON CONFLICT DO NOTHING;') AS ?query)
 };
