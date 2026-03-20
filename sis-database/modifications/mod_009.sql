@@ -1,8 +1,0 @@
--- OBJECT: core.observation_desc_element, observation_desc_plot, observation_desc_profile, observation_desc_surface
--- ISSUE: UNIQUE is irelevant
-
-
-ALTER TABLE IF EXISTS core.observation_desc_element DROP CONSTRAINT IF EXISTS observation_desc_element_property_desc_element_id_thesaurus_key;
-ALTER TABLE IF EXISTS core.observation_desc_plot DROP CONSTRAINT IF EXISTS observation_desc_plot_property_desc_plot_id_thesaurus_desc__key;
-ALTER TABLE IF EXISTS core.observation_desc_profile DROP CONSTRAINT IF EXISTS observation_desc_profile_property_desc_profile_id_thesaurus_key;
-ALTER TABLE IF EXISTS core.observation_desc_surface DROP CONSTRAINT IF EXISTS observation_desc_surface_property_desc_surface_id_thesaurus_key;

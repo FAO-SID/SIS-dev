@@ -29,7 +29,7 @@ WHERE {
         ) AS ?query)
 };
 
-# Descriptive observations for Plot (601 rows, it would expect 395)
+# Descriptive observations for Plot (601 rows)
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
@@ -94,7 +94,7 @@ WHERE {
         ) AS ?query)
 };
 
-# Descriptive observations for Element (381 rows, I would expect 373)
+# Descriptive observations for Element (381 rows)
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
