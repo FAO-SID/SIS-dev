@@ -7,7 +7,7 @@
 # PREFIX glosis_lh:  <http://w3id.org/glosis/model/layerhorizon/>
 # SELECT DISTINCT ?query
 # WHERE {
-#     ?obs rdfs:subClassOf  glosis_lh:PhysioChemical .
+#     ?obs rdfs:subClassOf glosis_lh:PhysioChemical .
 #     ?obs rdfs:subClassOf ?rest_p .
 #     ?rest_p owl:onProperty sosa:observedProperty .
 #     ?rest_p owl:hasValue ?prop .
@@ -19,11 +19,11 @@
 # No triples at all means no prefLabel, no rdfs:label, nothing. It's a GloSIS ontology bug, issue open: https://github.com/glosis-ld/glosis/issues/215
 # Physio-chemical properties (51 rows, CoaFra included)
 SPARQL
-PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl:   <http://www.w3.org/2002/07/owl#>
-PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX skos:  <http://www.w3.org/2004/02/skos/core#> 
-PREFIX glosis_lh:  <http://w3id.org/glosis/model/layerhorizon/>
+PREFIX rdfs:      <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:       <http://www.w3.org/2002/07/owl#>
+PREFIX sosa:      <http://www.w3.org/ns/sosa/>
+PREFIX skos:      <http://www.w3.org/2004/02/skos/core#>
+PREFIX glosis_lh: <http://w3id.org/glosis/model/layerhorizon/>
 SELECT DISTINCT ?query
 WHERE {
     ?obs rdfs:subClassOf glosis_lh:PhysioChemical .
@@ -31,6 +31,7 @@ WHERE {
     ?rest_p owl:onProperty sosa:observedProperty .
     ?rest_p owl:hasValue ?prop .
     OPTIONAL { ?prop skos:prefLabel ?label }
-    BIND(COALESCE(?label, STRAFTER(STR(?prop), 'physioChemicalPropertyCode-')) AS ?name)
-    BIND(CONCAT('INSERT INTO soil_data.property_num (property_num_id, uri) VALUES (\'', ?name, '\', \'', ?prop, '\') ON CONFLICT DO NOTHING;') AS ?query)
+    BIND(COALESCE(?label, STRAFTER(STR(?prop), 'http://w3id.org/glosis/model/codelists/physioChemicalPropertyCode-')) AS ?name)
+    BIND(STRAFTER(STR(?prop), 'http://w3id.org/glosis/model/codelists/physioChemicalPropertyCode-') AS ?code_id)  # was ?value
+    BIND(CONCAT('INSERT INTO soil_data.property_num (property_num_id, property_name, uri) VALUES (\'', ?code_id, '\', \'', ?name, '\', \'', ?prop, '\') ON CONFLICT DO NOTHING;') AS ?query)
 };

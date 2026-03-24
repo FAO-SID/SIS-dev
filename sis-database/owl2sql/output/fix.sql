@@ -1,7 +1,7 @@
 -- Issue https://github.com/glosis-ld/glosis/issues/200
-INSERT INTO soil_data.property_num (property_num_id, uri) VALUES ('Clay texture fraction', 'http://w3id.org/glosis/model/codelists/physioChemicalPropertyCode-Textclay') ON CONFLICT DO NOTHING;
-INSERT INTO soil_data.property_num (property_num_id, uri) VALUES ('Sand texture fraction', 'http://w3id.org/glosis/model/codelists/physioChemicalPropertyCode-Textsand') ON CONFLICT DO NOTHING;
-INSERT INTO soil_data.property_num (property_num_id, uri) VALUES ('Silt texture fraction', 'http://w3id.org/glosis/model/codelists/physioChemicalPropertyCode-Textsilt') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.property_num (property_num_id, property_name, uri) VALUES ('Textclay','Clay texture fraction', 'http://w3id.org/glosis/model/codelists/physioChemicalPropertyCode-Textclay') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.property_num (property_num_id, property_name, uri) VALUES ('Textsand','Sand texture fraction', 'http://w3id.org/glosis/model/codelists/physioChemicalPropertyCode-Textsand') ON CONFLICT DO NOTHING;
+INSERT INTO soil_data.property_num (property_num_id, property_name, uri) VALUES ('Textsilt','Silt texture fraction', 'http://w3id.org/glosis/model/codelists/physioChemicalPropertyCode-Textsilt') ON CONFLICT DO NOTHING;
 INSERT INTO soil_data.observation_num (property_num_id, unit_of_measure_id, procedure_num_id)
     SELECT pn.property_num_id, um.unit_of_measure_id, proc.procedure_num_id
         FROM soil_data.property_num pn
@@ -12,11 +12,11 @@ INSERT INTO soil_data.observation_num (property_num_id, unit_of_measure_id, proc
            ON CONFLICT DO NOTHING;
 
 -- Issue https://github.com/glosis-ld/glosis/issues/216
-INSERT INTO soil_data.property_num (property_num_id, uri) VALUES ('Bulk Density whole soil', 'http://w3id.org/glosis/model/layerhorizon/bulkDensityWholeSoilProperty') ON CONFLICT DO NOTHING;
-UPDATE soil_data.observation_num SET property_num_id = 'Bulk Density whole soil' WHERE procedure_num_id ILIKE 'BlkDensW%';
+INSERT INTO soil_data.property_num (property_num_id, property_name, uri) VALUES ('BulDwhole','Bulk Density whole soil', 'http://w3id.org/glosis/model/layerhorizon/bulkDensityWholeSoilProperty') ON CONFLICT DO NOTHING;
+UPDATE soil_data.observation_num SET property_num_id = 'BulDwhole' WHERE procedure_num_id ILIKE 'BlkDensW%';
 
 -- Issue https://github.com/glosis-ld/glosis/issues/215
-UPDATE soil_data.property_num SET property_num_id = 'Coarse Fragments' WHERE property_num_id = 'CoaFra';
+UPDATE soil_data.property_num SET property_name = 'Coarse Fragments' WHERE property_num_id = 'CoaFra';
 
 -- Pretifying property names
 UPDATE soil_data.property_desc SET property_name = regexp_replace(property_name, '([a-z])([A-Z])', '\1 \2', 'g');
@@ -41,3 +41,6 @@ INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, uri)
 VALUES  ('t/(ha·a)', 'Tonne per hectare per year', 'https://qudt.org/vocab/unit/TONNE-PER-HA-YR'),
         ('class', 'Categorical', 'https://qudt.org/vocab/unit/class'),
         ('dimensionless', 'No dimension', 'https://qudt.org/vocab/unit/dimensionless');
+
+-- Upper case property_num_id
+UPDATE soil_data.property_num SET property_num_id = UPPER(property_num_id);

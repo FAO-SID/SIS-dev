@@ -9,6 +9,8 @@ DATE=`date +%Y-%m-%d`
 #   Database    #
 #################
 
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/sis-database_v$DATE.sql
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/sis-database_latest.sql
 psql -h localhost -p 5432 -d postgres -U postgres -c "DROP DATABASE IF EXISTS sis"
 psql -h localhost -p 5432 -d postgres -U sis -c "CREATE DATABASE sis"
 
