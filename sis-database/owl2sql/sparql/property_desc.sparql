@@ -1,22 +1,30 @@
+# Total rows: 105
 # Observable properties for Surface (19 rows)
 SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
 PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX glosis_su:  <http://w3id.org/glosis/model/surface/>
+PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
+PREFIX glosis_su: <http://w3id.org/glosis/model/surface/>
 SELECT ?query
 WHERE {
     ?obs rdfs:subClassOf sosa:Observation .
     ?obs rdfs:subClassOf ?rest .
     ?obs rdfs:subClassOf ?rest_c .
+    ?obs rdfs:subClassOf ?rest_r .
     ?obs rdfs:label ?obs_label .
     ?rest owl:onProperty sosa:hasFeatureOfInterest .
     ?rest owl:allValuesFrom glosis_su:GL_Surface .
     ?rest_c owl:onProperty sosa:observedProperty .
     ?rest_c owl:hasValue ?p .
     ?p rdfs:label ?l .
-    BIND (CONCAT('INSERT INTO soil_data.property_desc (property_desc_id, property_name, uri) VALUES (\'', ?l,
-          '\', \'', ?obs_label, '\', \'', ?p, '\') ON CONFLICT DO NOTHING;') AS ?query)
+    ?rest_r owl:onProperty sosa:hasResult .
+    ?rest_r owl:someValuesFrom ?code_list .
+    OPTIONAL { ?code_list skos:definition ?definition }
+    BIND(REPLACE(COALESCE(STR(?definition), ''), "'", "''") AS ?def)
+    BIND(REPLACE(STR(?l), "'", "''") AS ?label)
+    BIND(CONCAT('INSERT INTO soil_data.property_desc (property_desc_id, property_name, uri, definition) VALUES (\'', ?label,
+    '\', \'', ?obs_label, '\', \'', ?p, '\', \'', ?def, '\') ON CONFLICT DO NOTHING;') AS ?query)
 };
 
 # Observable properties for Plot (44 rows)
@@ -24,23 +32,30 @@ SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
 PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX glosis_sp:  <http://w3id.org/glosis/model/siteplot/>
+PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
+PREFIX glosis_sp: <http://w3id.org/glosis/model/siteplot/>
 SELECT ?query
 WHERE {
     ?obs rdfs:subClassOf sosa:Observation .
     ?obs rdfs:subClassOf ?rest .
     ?obs rdfs:subClassOf ?rest_c .
+    ?obs rdfs:subClassOf ?rest_r .
     ?obs rdfs:label ?obs_label .
     ?rest owl:onProperty sosa:hasFeatureOfInterest .
     ?rest owl:allValuesFrom ?u .
-    ?u owl:unionOf ?set . 
+    ?u owl:unionOf ?set .
     ?set rdf:rest*/rdf:first ?elements .
     FILTER (glosis_sp:GL_Plot IN (?elements)) .
     ?rest_c owl:onProperty sosa:observedProperty .
     ?rest_c owl:hasValue ?p .
     ?p rdfs:label ?l .
-    BIND (CONCAT('INSERT INTO soil_data.property_desc (property_desc_id, property_name, uri) VALUES (\'', ?l,
-          '\', \'', ?obs_label, '\', \'', ?p, '\') ON CONFLICT DO NOTHING;') AS ?query)
+    ?rest_r owl:onProperty sosa:hasResult .
+    ?rest_r owl:someValuesFrom ?code_list .
+    OPTIONAL { ?code_list skos:definition ?definition }
+    BIND(REPLACE(COALESCE(STR(?definition), ''), "'", "''") AS ?def)
+    BIND(REPLACE(STR(?l), "'", "''") AS ?label)
+    BIND(CONCAT('INSERT INTO soil_data.property_desc (property_desc_id, property_name, uri, definition) VALUES (\'', ?label,
+    '\', \'', ?obs_label, '\', \'', ?p, '\', \'', ?def, '\') ON CONFLICT DO NOTHING;') AS ?query)
 };
 
 # Observable properties for Profile (9 rows)
@@ -48,20 +63,27 @@ SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
 PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX glosis_pr:  <http://w3id.org/glosis/model/profile/>
+PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
+PREFIX glosis_pr: <http://w3id.org/glosis/model/profile/>
 SELECT ?query
 WHERE {
     ?obs rdfs:subClassOf sosa:Observation .
     ?obs rdfs:subClassOf ?rest .
     ?obs rdfs:subClassOf ?rest_c .
+    ?obs rdfs:subClassOf ?rest_r .
     ?obs rdfs:label ?obs_label .
     ?rest owl:onProperty sosa:hasFeatureOfInterest .
     ?rest owl:allValuesFrom glosis_pr:GL_Profile .
     ?rest_c owl:onProperty sosa:observedProperty .
     ?rest_c owl:hasValue ?p .
     ?p rdfs:label ?l .
-    BIND (CONCAT('INSERT INTO soil_data.property_desc (property_desc_id, property_name, uri) VALUES (\'', ?l,
-          '\', \'', ?obs_label, '\', \'', ?p, '\') ON CONFLICT DO NOTHING;') AS ?query)
+    ?rest_r owl:onProperty sosa:hasResult .
+    ?rest_r owl:someValuesFrom ?code_list .
+    OPTIONAL { ?code_list skos:definition ?definition }
+    BIND(REPLACE(COALESCE(STR(?definition), ''), "'", "''") AS ?def)
+    BIND(REPLACE(STR(?l), "'", "''") AS ?label)
+    BIND(CONCAT('INSERT INTO soil_data.property_desc (property_desc_id, property_name, uri, definition) VALUES (\'', ?label,
+    '\', \'', ?obs_label, '\', \'', ?p, '\', \'', ?def, '\') ON CONFLICT DO NOTHING;') AS ?query)
 };
 
 # Observable properties for Element (85 rows)
@@ -69,21 +91,28 @@ SPARQL
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl:   <http://www.w3.org/2002/07/owl#>
 PREFIX sosa:  <http://www.w3.org/ns/sosa/>
-PREFIX glosis_lh:  <http://w3id.org/glosis/model/layerhorizon/>
+PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
+PREFIX glosis_lh: <http://w3id.org/glosis/model/layerhorizon/>
 SELECT ?query
 WHERE {
     ?obs rdfs:subClassOf sosa:Observation .
     ?obs rdfs:subClassOf ?rest .
     ?obs rdfs:subClassOf ?rest_c .
+    ?obs rdfs:subClassOf ?rest_r .
     ?obs rdfs:label ?obs_label .
     ?rest owl:onProperty sosa:hasFeatureOfInterest .
     ?rest owl:allValuesFrom ?u .
-    ?u owl:unionOf ?set . 
+    ?u owl:unionOf ?set .
     ?set rdf:rest*/rdf:first ?elements .
     FILTER (glosis_lh:GL_Layer IN (?elements)) .
     ?rest_c owl:onProperty sosa:observedProperty .
     ?rest_c owl:hasValue ?p .
     ?p rdfs:label ?l .
-    BIND (CONCAT('INSERT INTO soil_data.property_desc (property_desc_id, property_name, uri) VALUES (\'', ?l,
-          '\', \'', ?obs_label, '\', \'', ?p, '\') ON CONFLICT DO NOTHING;') AS ?query)
+    ?rest_r owl:onProperty sosa:hasResult .
+    ?rest_r owl:someValuesFrom ?code_list .
+    OPTIONAL { ?code_list skos:definition ?definition }
+    BIND(REPLACE(COALESCE(STR(?definition), ''), "'", "''") AS ?def)
+    BIND(REPLACE(STR(?l), "'", "''") AS ?label)
+    BIND(CONCAT('INSERT INTO soil_data.property_desc (property_desc_id, property_name, uri, definition) VALUES (\'', ?label,
+    '\', \'', ?obs_label, '\', \'', ?p, '\', \'', ?def, '\') ON CONFLICT DO NOTHING;') AS ?query)
 };
