@@ -97,9 +97,9 @@ done
 
 # Create VRTs
 cd $OUTPUT_DIR
-ls *GSOCSEQ*.tif > filelist.txt
-gdalbuildvrt -q -separate -input_file_list filelist.txt $COUNTRY-GSOCSEQ.vrt
-rm filelist.txt
+# ls *GSOCSEQ*.tif > filelist.txt
+# gdalbuildvrt -q -separate -input_file_list filelist.txt $COUNTRY-GSOCSEQ.vrt
+# rm filelist.txt
 ls *GSNM*.tif > filelist.txt
 gdalbuildvrt -q -separate -input_file_list filelist.txt $COUNTRY-GSNM.vrt
 rm filelist.txt
