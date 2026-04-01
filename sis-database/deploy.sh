@@ -62,3 +62,4 @@ psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-p
 
 pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/sis-database_v$DATE.sql
 pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/sis-database_latest.sql
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v -f $PROJECT_DIR/sis-database/sis-database_latest_with_codelist.sql
