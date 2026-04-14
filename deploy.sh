@@ -245,7 +245,7 @@ docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.setting(key, val
  ('LONGITUDE','89.7'),
  ('ZOOM','9'),
  ('BASE_MAP_DEFAULT','esri-imagery'),
- ('LAYER_DEFAULT','BT-GSNM-BASAT-2024-0-30-MEAN')"
+ ('LAYER_DEFAULT','BT-GSNM-BASCAL-2024-0-30-MEAN')"
 
 # Test with API key
 curl http://$HOST_SIS_API/api/manifest -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
