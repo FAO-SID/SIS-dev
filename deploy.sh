@@ -78,17 +78,40 @@ sleep 10
 docker exec sis-database psql -d sis -U sis -f /tmp/init.sql
 docker exec sis-database psql -d sis -U sis -f /tmp/sis-database_latest_with_codelist.sql
 
+# insert dummy data for test
+docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
+                                                    p_project_id := 'DUMMY_DATA_1',
+                                                    p_project_name := 'Dummy data 1',
+                                                    p_num_plots := 200,
+                                                    p_observation_ids := ARRAY[911,912,913],
+                                                    p_xmin := 89.11,
+                                                    p_xmax := 92.12,
+                                                    p_ymin := 26.71,
+                                                    p_ymax := 28.28
+                                                )"
+
+docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
+                                                    p_project_id := 'DUMMY_DATA_2',
+                                                    p_project_name := 'Dummy data 2',
+                                                    p_num_plots := 100,
+                                                    p_observation_ids := ARRAY[911,912,913],
+                                                    p_xmin := 89.11,
+                                                    p_xmax := 92.12,
+                                                    p_ymin := 26.71,
+                                                    p_ymax := 28.28
+                                                )"
+
 
 ##################
 #     sis-api    #
 ##################
 
-# Build and start container
-docker compose up --build sis-api -d
-
-# Two types of authentication:
+# Authentication:
 # 🔑 JWT tokens (for humans): Login with email/password to manage users, layers, API clients
 # 🎫 API keys (for applications): Long-lived keys for sis and external servers to access data
+
+# Build and start container
+docker compose up --build sis-api -d
 
 # Create admin user (admin/admin123). This user can manage other users (humans) and API clients (servers)
 docker exec sis-database psql -U sis -d sis -c "
@@ -144,39 +167,6 @@ curl -X POST http://$HOST_SIS_API/api/clients \
     "description": "GloSIS Discovery Hub access"
   }'
 
-# insert dummy data for test
-docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
-                                                    p_project_id := 'DUMMY_DATA_1',
-                                                    p_project_name := 'Dummy data 1',
-                                                    p_num_plots := 200,
-                                                    p_observation_ids := ARRAY[911,912,913],
-                                                    p_xmin := 89.11,
-                                                    p_xmax := 92.12,
-                                                    p_ymin := 26.71,
-                                                    p_ymax := 28.28
-                                                )"
-
-docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
-                                                    p_project_id := 'DUMMY_DATA_2',
-                                                    p_project_name := 'Dummy data 2',
-                                                    p_num_plots := 100,
-                                                    p_observation_ids := ARRAY[911,912,913],
-                                                    p_xmin := 89.11,
-                                                    p_xmax := 92.12,
-                                                    p_ymin := 26.71,
-                                                    p_ymax := 28.28
-                                                )"
-
-docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
-                                                    p_project_id := 'DUMMY_DATA_3',
-                                                    p_project_name := 'Dummy data 3',
-                                                    p_num_plots := 50,
-                                                    p_observation_ids := ARRAY[911,912,913],
-                                                    p_xmin := 89.11,
-                                                    p_xmax := 92.12,
-                                                    p_ymin := 26.71,
-                                                    p_ymax := 28.28
-                                                )"
 
 # Export overall layer info to build web-mapping interface
 psql -h localhost -p 5432 -U sis -d iso19139 -c "\copy (
@@ -247,13 +237,27 @@ docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.setting(key, val
  ('BASE_MAP_DEFAULT','esri-imagery'),
  ('LAYER_DEFAULT','BT-GSNM-BASCAL-2024-0-30-MEAN')"
 
-# Test with API key
-curl http://$HOST_SIS_API/api/manifest -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
-curl http://$HOST_SIS_API/api/profile -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
-curl http://$HOST_SIS_API/api/observation -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
-curl http://$HOST_SIS_API/api/layer -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+
+# Test SIS API
 curl http://$HOST_SIS_API/api/setting -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
-curl http://localhost:8002/health
+curl -s http://localhost:8002/health
+
+
+##################
+# sis-api-glosis #
+##################
+
+# Authentication:
+# 🎫 API keys (for applications): Long-lived keys for sis and external servers to access data
+
+# Build and start container
+docker compose up --build sis-api-glosis -d
+
+# Test GloSIS API
+curl http://$HOST_SIS_API/glosis/manifest -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+curl http://$HOST_SIS_API/glosis/profile -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+curl http://$HOST_SIS_API/glosis/observation -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+curl http://$HOST_SIS_API/glosis/layer -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
 
 
 ####################

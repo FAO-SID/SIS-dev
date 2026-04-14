@@ -9,12 +9,6 @@ const API_BASE_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 const MAPSERVER_URL = process.env.MAPSERVER_URL;
 
-// Debug: Log configuration on load
-console.log('API Client Configuration:', {
-  baseURL: API_BASE_URL,
-  hasApiKey: !!API_KEY,
-  apiKeyLength: API_KEY ? API_KEY.length : 0
-});
 
 class SISApiClient {
   constructor() {

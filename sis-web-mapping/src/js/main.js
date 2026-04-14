@@ -3,7 +3,6 @@ import Map from 'ol/Map';
 import View from 'ol/View';
 import { Tile as TileLayer, Image as ImageLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, XYZ, ImageWMS, Vector as VectorSource, Cluster } from 'ol/source';
-import { fromLonLat } from 'ol/proj';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { ScaleLine, defaults as defaultControls } from 'ol/control';
 import Overlay from 'ol/Overlay';
@@ -431,7 +430,7 @@ function formatMetadata(metadata) {
   // Contacts
   if (metadata.properties?.contacts && metadata.properties.contacts.length > 0) {
     html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Contacts</h4>';
-    metadata.properties.contacts.forEach((contact, index) => {
+    metadata.properties.contacts.forEach((contact) => {
       html += `<div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 5px; border-left: 3px solid #27ae60;">`;
       if (contact.name) html += `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">${contact.name}</div>`;
       if (contact.organization) html += `<div style="margin-bottom: 3px;"><strong>Organization:</strong> ${contact.organization}</div>`;
@@ -1125,27 +1124,8 @@ async function showProfileObservations(feature, popup, coordinate) {
     document.querySelectorAll('.tab-button').forEach(button => {
       button.addEventListener('click', (e) => {
         const tabName = e.target.dataset.tab;
-        
-        // Update button states
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
         e.target.classList.add('active');
-        
-        // Update content visibility
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        document.getElementById(`tab-${tabName}`).classList.add('active');
-      });
-    });
-    
-    // Add tab switching functionality
-    document.querySelectorAll('.tab-button').forEach(button => {
-      button.addEventListener('click', (e) => {
-        const tabName = e.target.dataset.tab;
-        
-        // Update button states
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-        
-        // Update content visibility
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         document.getElementById(`tab-${tabName}`).classList.add('active');
       });
@@ -1363,19 +1343,9 @@ window.showAdminPanel = showAdminPanel;
 // ==================== Utility Functions ====================
 
 function showLoading(show) {
-  let loader = document.getElementById('loading-overlay');
-  if (show) {
-    if (!loader) {
-      loader = document.createElement('div');
-      loader.id = 'loading-overlay';
-      loader.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; font-size: 24px;';
-      loader.textContent = 'Loading...';
-      document.body.appendChild(loader);
-    }
-  } else {
-    if (loader) {
-      document.body.removeChild(loader);
-    }
+  const loader = document.getElementById('loading-overlay');
+  if (loader) {
+    loader.style.display = show ? 'flex' : 'none';
   }
 }
 

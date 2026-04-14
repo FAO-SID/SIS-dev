@@ -116,6 +116,36 @@ services:
       - sis-net
     restart: unless-stopped
 
+# sis-api-glosis (GloSIS federation data API — optional)
+  sis-api-glosis:
+    container_name: sis-api-glosis
+    build:
+      context: .
+      dockerfile: sis-api-glosis/Dockerfile
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+    ports:
+      - "8006:8000"
+    depends_on:
+      - sis-database
+    networks:
+      - sis-net
+    restart: unless-stopped
+    profiles:
+      - glosis
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
 # sis-web-mapping (OpenLayers)
   sis-web-mapping:
     container_name: sis-web-mapping

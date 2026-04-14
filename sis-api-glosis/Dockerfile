@@ -1,11 +1,12 @@
-# Dockerfile for SIS Admin API (JWT authentication)
+# Dockerfile for SIS GloSIS API (API key-protected federation endpoint)
+# Build context: project root (to share sis-api/shared.py)
 
 # --- Build stage: install Python dependencies ---
 FROM python:3.12-slim AS builder
 
 WORKDIR /build
 
-COPY requirements.txt .
+COPY sis-api-glosis/requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 
@@ -19,8 +20,10 @@ WORKDIR /app
 
 # Copy installed Python packages from build stage (no gcc/build tools in runtime)
 COPY --from=builder /install /usr/local
-COPY shared.py .
-COPY main.py .
+
+# shared.py lives in sis-api/ and is used by both APIs
+COPY sis-api/shared.py .
+COPY sis-api-glosis/main.py .
 
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
