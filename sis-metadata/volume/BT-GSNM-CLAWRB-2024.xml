@@ -10,7 +10,7 @@
                  xmlns:xlink="http://www.w3.org/1999/xlink"
                  xmlns:gmi="http://www.isotc211.org/2005/gmi">
   <gmd:fileIdentifier>
-    <gco:CharacterString>feb7f9d6-9557-11f0-bd5f-770c6be09b44</gco:CharacterString>
+    <gco:CharacterString>401060b6-374e-11f1-82e6-0d95180fc8cc</gco:CharacterString>
   </gmd:fileIdentifier>
   <gmd:language>
     <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="eng" />
@@ -101,7 +101,7 @@
       <gmd:citation>
         <gmd:CI_Citation>
           <gmd:title>
-            <gco:CharacterString>GSNmap - World reference base (Bhutan - 250 m - 2024)</gco:CharacterString>
+            <gco:CharacterString>GSNMap - World reference base (Bhutan - 250 m - 2024) - SOIL+</gco:CharacterString>
           </gmd:title>
           <gmd:date>
             <gmd:CI_Date>
@@ -126,9 +126,9 @@
         </gmd:CI_Citation>
       </gmd:citation>
       <gmd:abstract>
-        <gco:CharacterString>This dataset was developed under the AFACI project - Development of the Soil Atlas of Asia and National Soil Information Systems (2019-2023). The project supported AFACI member countries in collecting, harmonizing, and managing national soil data to strengthen evidence-based decision making for sustainable soil management. Activities included rescuing legacy soil data, harmonizing national soil maps for the Soil Atlas of Asia, building national soil profile databases and soil property maps, and establishing web-based soil information systems. The project fostered regional and international collaboration, promoted soil data sharing, and contributed to the Global Soil Information System (GLOSIS) under the Global Soil Partnership.
+        <gco:CharacterString>The Global Soil Nutrient and Nutrient Budget Maps (GSNmap) is an initiative under the Global Soil Partnership that provides national maps of soil nutrients and associated properties at 250 m resolution. Following the Country Guidelines (https://doi.org/10.4060/cc1717en ), it uses standardized digital soil mapping procedures to ensure consistency and comparability across countries and regions. Outputs include soil nutrient as well as key soil properties such as organic carbon, pH, texture, bulk density, and cation exchange capacity, supporting evidence-based agricultural planning and policy development.
 
-This dataset relates to the Country Guidelines for the GSNmap initiative (FAO, 2022), which provide technical specifications for generating national maps of soil nutrients and associated properties at 250 m resolution. The guidelines describe standardized digital soil mapping procedures to ensure consistency and comparability across countries and regions, with outputs including soil nutrient levels as well as key soil properties such as organic carbon, pH, texture, bulk density, and cation exchange capacity. These products support evidence-based agricultural planning and policy development. To cite or share: https://doi.org/10.4060/cc1717en</gco:CharacterString>
+This particular dataset was produced under the SOIL+ project, sponsored by the Asian Food and Agriculture Cooperation Initiative (AFACI, https://www.rda.go.kr/afaci/site/project/view?). The project supported AFACI member countries in collecting, harmonizing, and managing national soil data to strengthen evidence-based decision making for sustainable soil management. Activities included rescuing legacy soil data, harmonizing national soil maps for the Soil Atlas of Asia, building national soil profile databases and soil property maps, and establishing web-based soil information systems. The project fostered regional and international collaboration, promoted soil data sharing, and contributed to the Global Soil Information System (GloSIS) under the Global Soil Partnership.</gco:CharacterString>
       </gmd:abstract>
       <gmd:status>
         <gmd:MD_ProgressCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml#MD_ProgressCode" codeListValue="completed" />

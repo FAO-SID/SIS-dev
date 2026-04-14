@@ -13,7 +13,7 @@
 --     Element 2: 30-60 cm
 --     Element 3: 60-100 cm
 -- 1 specimen (sample) per element (layer)
--- Physical/chemical results for all, or for the array of observation_phys_chem_id specified in the parameter (p_observation_ids), and with random values that respect the value_min and value_max bounds of the property
+-- Physical/chemical results for all, or for the array of observation_num_id specified in the parameter (p_observation_ids), and with random values that respect the value_min and value_max bounds of the property
 
 CREATE OR REPLACE FUNCTION api.insert_dummy_data(
     p_project_id text DEFAULT 'dummy data',
@@ -30,7 +30,7 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
     v_project_id text;
-    v_site_id integer;
+    v_site_id text;
     v_plot_id integer;
     v_profile_id integer;
     v_element_id integer;
@@ -44,9 +44,9 @@ DECLARE
 BEGIN
     -- Use all observations if none specified
     IF p_observation_ids IS NULL THEN
-        SELECT array_agg(observation_phys_chem_id) 
+        SELECT array_agg(observation_num_id) 
         INTO v_observation_filter
-        FROM soil_data.observation_phys_chem;
+        FROM soil_data.observation_num;
     ELSE
         v_observation_filter := p_observation_ids;
     END IF;
@@ -67,8 +67,8 @@ BEGIN
     RAISE NOTICE 'Created project with ID: %', v_project_id;
     
     -- Insert site
-    INSERT INTO soil_data.site (site_code, "position")
-    VALUES (p_project_id || '_site', ST_SetSRID(ST_MakePoint(0, 0), 4326))
+    INSERT INTO soil_data.site (site_id)
+    VALUES (p_project_id || '_site')
     RETURNING site_id INTO v_site_id;
     
     RAISE NOTICE 'Created site with ID: %', v_site_id;
@@ -83,10 +83,9 @@ BEGIN
         v_random_x := p_xmin + (random() * (p_xmax - p_xmin));
         v_random_y := p_ymin + (random() * (p_ymax - p_ymin));
         
-        INSERT INTO soil_data.plot (site_id, plot_code, altitude, time_stamp, "position", type)
+        INSERT INTO soil_data.plot (site_id, altitude, sampling_date, geom, type)
         VALUES (
             v_site_id,
-            p_project_id || '_PLOT_' || LPAD(v_plot_num::text, 6, '0'),
             100 + (random() * 500)::integer,  -- Random altitude between 100 and 600
             CURRENT_DATE - (random() * 365)::integer,
             ST_SetSRID(ST_MakePoint(v_random_x, v_random_y), 4326),
@@ -110,18 +109,18 @@ BEGIN
         VALUES (v_element_id, p_project_id || '_SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E1')
         RETURNING specimen_id INTO v_specimen_id;
         
-        -- Insert result_phys_chem for specified observations for this specimen
+        -- Insert result_num for specified observations for this specimen
         FOR v_observation_rec IN 
-            SELECT observation_phys_chem_id, value_min, value_max 
-            FROM soil_data.observation_phys_chem
-            WHERE observation_phys_chem_id = ANY(v_observation_filter)
+            SELECT observation_num_id, COALESCE(value_min,0) AS value_min, COALESCE(value_max,100) AS value_max
+            FROM soil_data.observation_num
+            WHERE observation_num_id = ANY(v_observation_filter)
         LOOP
             -- Generate random value within bounds
             v_random_value := v_observation_rec.value_min + 
                 (random() * (v_observation_rec.value_max - v_observation_rec.value_min));
             
-            INSERT INTO soil_data.result_phys_chem (observation_phys_chem_id, specimen_id, value)
-            VALUES (v_observation_rec.observation_phys_chem_id, v_specimen_id, v_random_value);
+            INSERT INTO soil_data.result_num (observation_num_id, specimen_id, value)
+            VALUES (v_observation_rec.observation_num_id, v_specimen_id, v_random_value);
         END LOOP;
         
         -- Element 2: 30-60 cm
@@ -134,17 +133,17 @@ BEGIN
         VALUES (v_element_id, p_project_id || '_SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E2')
         RETURNING specimen_id INTO v_specimen_id;
         
-        -- Insert result_phys_chem for specified observations for this specimen
+        -- Insert result_num for specified observations for this specimen
         FOR v_observation_rec IN 
-            SELECT observation_phys_chem_id, value_min, value_max 
-            FROM soil_data.observation_phys_chem
-            WHERE observation_phys_chem_id = ANY(v_observation_filter)
+            SELECT observation_num_id, COALESCE(value_min,0) AS value_min, COALESCE(value_max,100) AS value_max
+            FROM soil_data.observation_num
+            WHERE observation_num_id = ANY(v_observation_filter)
         LOOP
             v_random_value := v_observation_rec.value_min + 
                 (random() * (v_observation_rec.value_max - v_observation_rec.value_min));
             
-            INSERT INTO soil_data.result_phys_chem (observation_phys_chem_id, specimen_id, value)
-            VALUES (v_observation_rec.observation_phys_chem_id, v_specimen_id, v_random_value);
+            INSERT INTO soil_data.result_num (observation_num_id, specimen_id, value)
+            VALUES (v_observation_rec.observation_num_id, v_specimen_id, v_random_value);
         END LOOP;
         
         -- Element 3: 60-100 cm
@@ -157,17 +156,17 @@ BEGIN
         VALUES (v_element_id, p_project_id || '_SPEC_P' || LPAD(v_plot_num::text, 3, '0') || '_E3')
         RETURNING specimen_id INTO v_specimen_id;
         
-        -- Insert result_phys_chem for specified observations for this specimen
+        -- Insert result_num for specified observations for this specimen
         FOR v_observation_rec IN 
-            SELECT observation_phys_chem_id, value_min, value_max 
-            FROM soil_data.observation_phys_chem
-            WHERE observation_phys_chem_id = ANY(v_observation_filter)
+            SELECT observation_num_id, COALESCE(value_min,0) AS value_min, COALESCE(value_max,100) AS value_max
+            FROM soil_data.observation_num
+            WHERE observation_num_id = ANY(v_observation_filter)
         LOOP
             v_random_value := v_observation_rec.value_min + 
                 (random() * (v_observation_rec.value_max - v_observation_rec.value_min));
             
-            INSERT INTO soil_data.result_phys_chem (observation_phys_chem_id, specimen_id, value)
-            VALUES (v_observation_rec.observation_phys_chem_id, v_specimen_id, v_random_value);
+            INSERT INTO soil_data.result_num (observation_num_id, specimen_id, value)
+            VALUES (v_observation_rec.observation_num_id, v_specimen_id, v_random_value);
         END LOOP;
         
         IF v_plot_num % GREATEST(1, p_num_plots / 10) = 0 THEN
@@ -218,7 +217,7 @@ $$;
 
 
 -- To clean up dummy data for a specific project:
--- DELETE FROM soil_data.result_phys_chem;
+-- DELETE FROM soil_data.result_num;
 -- DELETE FROM soil_data.specimen;
 -- DELETE FROM soil_data.element;
 -- DELETE FROM soil_data.profile;
@@ -252,13 +251,13 @@ $$;
 -- );
 
 -- Look at the results for specific plot
--- SELECT st.site_code, p.plot_code, pf.profile_code, e.upper_depth, e.lower_depth, opc.property_phys_chem_id, opc.unit_of_measure_id, opc.procedure_phys_chem_id, rpc.value 
--- FROM soil_data.result_phys_chem rpc 
--- LEFT JOIN soil_data.observation_phys_chem opc ON opc.observation_phys_chem_id = rpc.observation_phys_chem_id 
+-- SELECT st.site_id, p.plot_id, pf.profile_code, e.upper_depth, e.lower_depth, opc.property_num_id, opc.unit_of_measure_id, opc.procedure_num_id, rpc.value 
+-- FROM soil_data.result_num rpc 
+-- LEFT JOIN soil_data.observation_num opc ON opc.observation_num_id = rpc.observation_num_id 
 -- LEFT JOIN soil_data.specimen s ON s.specimen_id = rpc.specimen_id 
 -- LEFT JOIN soil_data.element e ON e.element_id = s.element_id 
 -- LEFT JOIN soil_data.profile pf ON pf.profile_id = e.profile_id 
 -- LEFT JOIN soil_data.plot p ON p.plot_id = pf.plot_id
 -- LEFT JOIN soil_data.site st ON st.site_id = p.site_id 
--- WHERE p.plot_code = 'DUMMY_DATA_2_PLOT_000001'  -- Format: {project_id}_PLOT_000001
--- ORDER BY p.plot_code, pf.profile_code, opc.property_phys_chem_id, e.upper_depth, e.lower_depth;
+-- WHERE p.plot_id = 'DUMMY_DATA_2_PLOT_000001'  -- Format: {project_id}_PLOT_000001
+-- ORDER BY p.plot_id, pf.profile_code, opc.property_num_id, e.upper_depth, e.lower_depth;

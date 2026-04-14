@@ -70,13 +70,13 @@ done
 echo "sis-database PostgreSQL is ready."
 
 # Copy SQL scripts to sis-database container
-docker cp $PROJECT_DIR/sis-database/initdb/init-01.sql sis-database:/tmp/init-01.sql
-docker cp $PROJECT_DIR/sis-database/versions/sis-database_latest.sql sis-database:/tmp/sis-database_latest.sql
+docker cp $PROJECT_DIR/sis-database/init.sql sis-database:/tmp/init.sql
+docker cp $PROJECT_DIR/sis-database/sis-database_latest_with_codelist.sql sis-database:/tmp/sis-database_latest_with_codelist.sql
 
 # Execute SQL scripts inside the container
 sleep 10
-docker exec sis-database psql -d sis -U sis -f /tmp/init-01.sql
-docker exec sis-database psql -d sis -U sis -f /tmp/sis-database_latest.sql
+docker exec sis-database psql -d sis -U sis -f /tmp/init.sql
+docker exec sis-database psql -d sis -U sis -f /tmp/sis-database_latest_with_codelist.sql
 
 
 ##################
@@ -97,8 +97,9 @@ docker exec sis-database psql -U sis -d sis -c "
   ON CONFLICT (user_id) DO NOTHING"
 
 # Login as admin to get admin token. This should return something like:
-# Hash: $2b$12$tAVK6pg/gBxjOfW2j058Ne2ybf26gUS0XSthfW3LtXH5lYAi/36xy
+# Hash: $2b$12$G4.okdhRYFtDAd8.kDLcD.xLZw6wuFzuBt8/ud.1dsW0HtA1qP7lC
 # Admin user created successfully!
+
 docker exec -i sis-api python << 'EOF'
 from main import hash_password, get_db
 
@@ -115,7 +116,7 @@ print("Admin user created successfully!")
 EOF
 
 # Login to get temporary token. This token is valid for 60 minutes.
-# {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyOTQ4MTE1fQ.UO0TsvAyzmGxbhaMUYzw0Fq1L6yosEvq-OBp6rPrbHw","token_type":"bearer"}
+# {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ","token_type":"bearer"}
 curl -X POST http://$HOST_SIS_API/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
@@ -123,36 +124,32 @@ curl -X POST http://$HOST_SIS_API/api/auth/login \
     "password": "admin123"
   }'
 
-# Create the API client for sis, also in env.
-# {"message":"API client created successfully","api_client_id":"sis","api_key":"ZCybtKbLSGfyTkFP8lLYQwjI_lFKNmVLKcAcnpWvLLw","warning":"Save this API key now. You won't be able to see it again!"}
+# Create the API client key for sis, also in env.
+# {"message":"API client created successfully","api_client_id":"sis","api_key":"ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4","warning":"Save this API key now. You won't be able to see it again!"}
 curl -X POST http://$HOST_SIS_API/api/clients \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyOTQ4MTE1fQ.UO0TsvAyzmGxbhaMUYzw0Fq1L6yosEvq-OBp6rPrbHw" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ" \
   -H "Content-Type: application/json" \
   -d '{
     "api_client_id": "sis",
     "description": "SIS OpenLayers web mapping application"
   }'
 
-# Create the API client for glosis
-# {"message":"API client created successfully","api_client_id":"glosis","api_key":"1noBirZS0SHHTsTRcK-IkjJ0rIGBd6XMlq2HxW38SmE","warning":"Save this API key now. You won't be able to see it again!"}
+# Create the API client key for glosis
+# {"message":"API client created successfully","api_client_id":"glosis","api_key":"82N_VVQ5Uo4QqaOCti6pOXDhvFZVGyE6qTLHkskV5WA","warning":"Save this API key now. You won't be able to see it again!"}
 curl -X POST http://$HOST_SIS_API/api/clients \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzYyOTQ4MTE1fQ.UO0TsvAyzmGxbhaMUYzw0Fq1L6yosEvq-OBp6rPrbHw" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ" \
   -H "Content-Type: application/json" \
   -d '{
     "api_client_id": "glosis",
     "description": "GloSIS Discovery Hub access"
   }'
 
-# create function to insert dummy data for test
-docker cp $PROJECT_DIR/sis-api/scripts/db_insert_dummy_data.sql sis-database:/tmp/db_insert_dummy_data.sql
-docker exec sis-database psql -U sis -d sis -f /tmp/db_insert_dummy_data.sql
-
-# run function
+# insert dummy data for test
 docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
                                                     p_project_id := 'DUMMY_DATA_1',
                                                     p_project_name := 'Dummy data 1',
                                                     p_num_plots := 200,
-                                                    p_observation_ids := ARRAY[514,635,587,683,69,30,497,742,970,54],
+                                                    p_observation_ids := ARRAY[911,912,913],
                                                     p_xmin := 89.11,
                                                     p_xmax := 92.12,
                                                     p_ymin := 26.71,
@@ -163,7 +160,7 @@ docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
                                                     p_project_id := 'DUMMY_DATA_2',
                                                     p_project_name := 'Dummy data 2',
                                                     p_num_plots := 100,
-                                                    p_observation_ids := ARRAY[514,635,587,683,69,30,497,742,970,54],
+                                                    p_observation_ids := ARRAY[911,912,913],
                                                     p_xmin := 89.11,
                                                     p_xmax := 92.12,
                                                     p_ymin := 26.71,
@@ -174,7 +171,7 @@ docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
                                                     p_project_id := 'DUMMY_DATA_3',
                                                     p_project_name := 'Dummy data 3',
                                                     p_num_plots := 50,
-                                                    p_observation_ids := ARRAY[514,635,587,683,69,30,497,742,970,54],
+                                                    p_observation_ids := ARRAY[911,912,913],
                                                     p_xmin := 89.11,
                                                     p_xmax := 92.12,
                                                     p_ymin := 26.71,
@@ -206,19 +203,17 @@ psql -h localhost -p 5432 -U sis -d iso19139 -c "\copy (
         ) 
 TO $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv WITH CSV HEADER"
 
+
 # Copy to sis database
 docker cp $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv sis-database:/tmp/layer_info_${COUNTRY}.csv
 docker exec -i sis-database cat /tmp/layer_info_${COUNTRY}.csv | docker exec -i sis-database psql -d sis -U sis -c "COPY api.layer FROM STDIN WITH (FORMAT CSV, HEADER, NULL '')"
 rm $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv
 
 docker exec sis-database psql -d sis -U sis -c "
-  UPDATE api.layer SET project_name ='Soil Organic Carbon Sequestration Potential'
-  WHERE project_name ='Global Soil Organic Carbon Sequestration potential map';
-
   UPDATE api.layer SET project_name ='Soil Nutrients'
-  WHERE project_name ='Global Soil Nutrients Map'"
+  WHERE project_name ='GSNMap'"
 
-# Add Profiles layers
+# Add Profiles layers (Not necessary, for point data it uses the API)
 # docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.layer 
 #     (project_id,
 #      project_name,
@@ -241,6 +236,7 @@ docker exec sis-database psql -d sis -U sis -c "
 #          'http://HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.1.1&LAYER=Profiles&REQUEST=getlegendgraphic&FORMAT=image/png',
 #          'http://HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/Profiles.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&BBOX=1.16625995882351496%2C116.25895549999999901%2C24.6476970411764853%2C127.10635850000001312&CRS=EPSG%3A4326&WIDTH=595&HEIGHT=1288&LAYERS=Profiles&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS=Profiles&INFO_FORMAT=text%2Fhtml&I=282&J=429')"
 
+
 # Add sis-Web-mapping applications settings
 docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.setting(key, value) VALUES
  ('ORG_LOGO_URL','https://tse4.mm.bing.net/th/id/OIP.hV37F63PxOkqMwTAlCNnvQAAAA?r=0&pid=Api'),
@@ -252,11 +248,11 @@ docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.setting(key, val
  ('LAYER_DEFAULT','BT-GSNM-BASAT-2024-0-30-MEAN')"
 
 # Test with API key
-curl http://$HOST_SIS_API/api/manifest -H "X-API-Key: ZCybtKbLSGfyTkFP8lLYQwjI_lFKNmVLKcAcnpWvLLw"
-curl http://$HOST_SIS_API/api/profile -H "X-API-Key: ZCybtKbLSGfyTkFP8lLYQwjI_lFKNmVLKcAcnpWvLLw"
-curl http://$HOST_SIS_API/api/observation -H "X-API-Key: ZCybtKbLSGfyTkFP8lLYQwjI_lFKNmVLKcAcnpWvLLw"
-curl http://$HOST_SIS_API/api/layer -H "X-API-Key: ZCybtKbLSGfyTkFP8lLYQwjI_lFKNmVLKcAcnpWvLLw"
-curl http://$HOST_SIS_API/api/setting -H "X-API-Key: ZCybtKbLSGfyTkFP8lLYQwjI_lFKNmVLKcAcnpWvLLw"
+curl http://$HOST_SIS_API/api/manifest -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+curl http://$HOST_SIS_API/api/profile -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+curl http://$HOST_SIS_API/api/observation -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+curl http://$HOST_SIS_API/api/layer -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+curl http://$HOST_SIS_API/api/setting -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
 curl http://localhost:8002/health
 
 
