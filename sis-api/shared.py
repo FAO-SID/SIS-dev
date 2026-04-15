@@ -64,6 +64,16 @@ class User(BaseModel):
     created_at: datetime
     last_login: Optional[datetime] = None
 
+class UserCreate(BaseModel):
+    user_id: EmailStr
+    password: str
+    is_admin: bool = False
+
+class UserSelfUpdate(BaseModel):
+    current_password: str
+    new_user_id: Optional[EmailStr] = None
+    new_password: Optional[str] = None
+
 class Layer(BaseModel):
     project_id: Optional[str] = None
     project_name: Optional[str] = None
@@ -78,6 +88,7 @@ class Layer(BaseModel):
     get_map_url: Optional[str] = None
     get_legend_url: Optional[str] = None
     get_feature_info_url: Optional[str] = None
+    is_default: Optional[bool] = False
 
 class LayerCreate(BaseModel):
     project_id: Optional[str] = None

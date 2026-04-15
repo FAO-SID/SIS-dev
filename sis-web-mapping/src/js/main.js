@@ -164,17 +164,13 @@ async function loadLayers() {
       addLayerGroup(layerGroupsContainer, groupName, groupLayers);
     }
 
-    // Load default layer if specified in settings
-    if (appConfig.LAYER_DEFAULT) {
-      const defaultLayer = layers.find(l => l.layer_id === appConfig.LAYER_DEFAULT);
-      if (defaultLayer) {
-        // Check the radio button
-        const radio = document.getElementById(`layer-${defaultLayer.layer_id}`);
-        if (radio) {
-          radio.checked = true;
-          // Load the layer
-          switchLayer(defaultLayer);
-        }
+    // Load default layer if one is flagged in the layer list
+    const defaultLayer = layers.find(l => l.is_default);
+    if (defaultLayer) {
+      const radio = document.getElementById(`layer-${defaultLayer.layer_id}`);
+      if (radio) {
+        radio.checked = true;
+        switchLayer(defaultLayer);
       }
     }
 
@@ -557,22 +553,17 @@ async function showMetadataPopup(metadataUrl) {
     }
   });
   
-  // Fetch metadata
+  // Fetch metadata — always route through nginx (api.baseURL) so it works
+  // whether the page is served via nginx or directly from the Parcel dev port.
   try {
-    // Handle both relative and absolute URLs
     let jsonUrl;
     if (metadataUrl.startsWith('http://') || metadataUrl.startsWith('https://')) {
-      // Absolute URL - parse and remove port to go through nginx
       const url = new URL(metadataUrl);
-      jsonUrl = `http://${url.hostname}${url.pathname}?f=json`;
+      jsonUrl = `${api.baseURL}${url.pathname}?f=json`;
     } else {
-      // Relative URL - just append ?f=json
-      jsonUrl = `${metadataUrl}?f=json`;
+      jsonUrl = `${api.baseURL}${metadataUrl}${metadataUrl.includes('?') ? '&' : '?'}f=json`;
     }
-    
-    console.log('Original URL:', metadataUrl);
-    console.log('Fetching metadata from:', jsonUrl);
-    
+
     const response = await fetch(jsonUrl);
     const contentType = response.headers.get('content-type');
     
@@ -693,38 +684,31 @@ async function loadProfiles() {
 
     console.log(`Created ${allFeatures.length} total features`);
 
-    // Create ONE vector source with ALL profiles
-    const vectorSource = new VectorSource({ features: allFeatures });
-    
-    // Create ONE cluster source for all profiles
-    const clusterSource = new Cluster({
-      distance: 100,
-      source: vectorSource
+    // Group features by project for per-dataset clustering
+    const featuresByProject = {};
+    projectNames.forEach(name => { featuresByProject[name] = []; });
+    allFeatures.forEach(f => {
+      const name = f.get('project_name');
+      (featuresByProject[name] = featuresByProject[name] || []).push(f);
     });
 
-    // Create ONE profile layer with unified clustering
-    const profileLayer = new VectorLayer({
-      source: clusterSource,
-      style: getUnifiedClusterStyle,
-      zIndex: 1000,
-      visible: true
-    });
-
-    profileLayer.set('name', 'Soil Profiles');
-    
-    // IMPORTANT: Store ALL original features for filtering
-    profileLayer.set('allFeatures', allFeatures);
-    
-    // Store the single layer
-    profileLayers['all'] = profileLayer;
-    
-    // Store individual project visibility states
+    // Build one clustered layer per project
     projectNames.forEach(name => {
-      profileLayers[name] = { visible: true };
+      const vectorSource = new VectorSource({ features: featuresByProject[name] });
+      const clusterSource = new Cluster({ distance: 100, source: vectorSource });
+      const layer = new VectorLayer({
+        source: clusterSource,
+        style: getUnifiedClusterStyle,
+        zIndex: 1000,
+        visible: true
+      });
+      layer.set('name', name);
+      profileLayers[name] = { visible: true, layer };
+      map.addLayer(layer);
     });
-    
-    // Add to map
-    map.addLayer(profileLayer);
+
+    // Keep a combined reference used by the data panel and highlight layer
+    profileLayers['all'] = { get: (key) => key === 'allFeatures' ? allFeatures : undefined };
 
     // Add checkbox controls
     addProfileLayerControl();
@@ -811,29 +795,41 @@ function addProfileLayerControl() {
   // Create header
   const header = document.createElement('div');
   header.className = 'layer-group-header';
-  header.textContent = 'Soil Profiles';
+  header.style.display = 'flex';
+  header.style.alignItems = 'center';
+  header.style.justifyContent = 'space-between';
+  header.style.gap = '8px';
+
+  const headerLabel = document.createElement('span');
+  headerLabel.textContent = 'Soil Profiles';
+  header.appendChild(headerLabel);
+
+  const showDataBtn = document.createElement('button');
+  showDataBtn.type = 'button';
+  showDataBtn.textContent = 'Show data';
+  showDataBtn.className = 'btn btn-primary';
+  showDataBtn.style.padding = '2px 8px';
+  showDataBtn.style.fontSize = '0.8em';
+  showDataBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const panel = document.getElementById('profiles-data-modal');
+    if (panel && panel.style.display !== 'none') {
+      panel.style.display = 'none';
+      selectedProfileCodes.clear();
+      refreshHighlight();
+      showDataBtn.textContent = 'Show data';
+    } else {
+      showVisibleProfilesData();
+      showDataBtn.textContent = 'Hide data';
+    }
+  });
+  header.appendChild(showDataBtn);
+
   profileGroup.appendChild(header);
   
   // Create content container
   const content = document.createElement('div');
   content.className = 'layer-group-content';
-  
-  // Get the unified layer
-  const unifiedLayer = profileLayers['all'];
-  const vectorSource = unifiedLayer.getSource().getSource(); // Get the non-clustered source
-  const allFeatures = unifiedLayer.get('allFeatures'); // Get ALL original features
-  
-  // Function to update visible features based on checkbox states
-  const updateVisibleFeatures = () => {
-    const visibleFeatures = allFeatures.filter(feature => {
-      const featureProject = feature.get('project_name');
-      return profileLayers[featureProject] && profileLayers[featureProject].visible;
-    });
-    
-    // Clear and re-add filtered features
-    vectorSource.clear();
-    vectorSource.addFeatures(visibleFeatures);
-  };
   
   // Add a checkbox and color picker for each project
   Object.entries(profileColors).forEach(([projectName, color]) => {
@@ -897,18 +893,24 @@ function addProfileLayerControl() {
     // Toggle visibility by filtering features
     checkbox.addEventListener('change', (e) => {
       profileLayers[projectName].visible = e.target.checked;
-      updateVisibleFeatures(); // Use the function that always works from allFeatures
+      const lyr = profileLayers[projectName].layer;
+      if (lyr) lyr.setVisible(e.target.checked);
+      const panel = document.getElementById('profiles-data-modal');
+      if (panel && panel.style.display !== 'none') {
+        refreshVisibleProfilesData();
+      }
     });
-    
+
     // Update color
     colorPicker.addEventListener('input', (e) => {
       colorCircle.style.backgroundColor = e.target.value;
     });
-    
+
     colorPicker.addEventListener('change', (e) => {
       profileColors[projectName] = e.target.value;
       colorCircle.style.backgroundColor = e.target.value;
-      unifiedLayer.changed();
+      const lyr = profileLayers[projectName].layer;
+      if (lyr) lyr.changed();
     });
   });
   
@@ -1001,7 +1003,9 @@ function setupPopup() {
 
   // Handle map clicks
   map.on('singleclick', async (evt) => {
-    const features = map.getFeaturesAtPixel(evt.pixel);
+    const features = map.getFeaturesAtPixel(evt.pixel, {
+      layerFilter: (lyr) => lyr !== highlightLayer
+    });
     
     // Check for profile points first (priority)
     if (features && features.length > 0) {
@@ -1009,6 +1013,12 @@ function setupPopup() {
       const clusterFeatures = feature.get('features');
       
       if (clusterFeatures && clusterFeatures.length === 1) {
+        const panel = document.getElementById('profiles-data-modal');
+        if (panel && panel.style.display !== 'none') {
+          const code = clusterFeatures[0].get('profile_code');
+          toggleProfileSelection(code);
+          return;
+        }
         // Single profile - show observations
         await showProfileObservations(clusterFeatures[0], popup, evt.coordinate);
         return; // Stop here, don't check raster
@@ -1043,112 +1053,19 @@ async function showProfileObservations(feature, popup, coordinate) {
   const longitude = lonLat[0].toFixed(6);
   const latitude = lonLat[1].toFixed(6);
 
-  try {
-    const observations = await api.getObservations(profileCode);
-    
-    let html = `
-      <div class="popup-tabs">
-        <button class="tab-button active" data-tab="profile">Profile</button>
-        <button class="tab-button" data-tab="observations">Observations (${observations.length})</button>
+  document.getElementById('popup-content').innerHTML = `
+    <div class="feature-info-layer">
+      <h3>Profile: ${profileCode}</h3>
+      <div class="feature-info-item">
+        <div class="feature-info-property"><strong>Project:</strong> ${projectName || 'N/A'}</div>
+        <div class="feature-info-property"><strong>Latitude:</strong> ${latitude}°</div>
+        <div class="feature-info-property"><strong>Longitude:</strong> ${longitude}°</div>
+        <div class="feature-info-property"><strong>Altitude:</strong> ${altitude || 'N/A'} m</div>
+        <div class="feature-info-property"><strong>Date:</strong> ${date || 'N/A'}</div>
       </div>
-      
-      <div class="tab-content active" id="tab-profile">
-        <h3>Profile: ${profileCode}</h3>
-        <div class="feature-info-item">
-          <div class="feature-info-property"><strong>Project:</strong> ${projectName || 'N/A'}</div>
-          <div class="feature-info-property"><strong>Latitude:</strong> ${latitude}°</div>
-          <div class="feature-info-property"><strong>Longitude:</strong> ${longitude}°</div>
-          <div class="feature-info-property"><strong>Altitude:</strong> ${altitude || 'N/A'} m</div>
-          <div class="feature-info-property"><strong>Date:</strong> ${date || 'N/A'}</div>
-          <div class="feature-info-property"><strong>Total Observations:</strong> ${observations.length}</div>
-        </div>
-      </div>
-      
-      <div class="tab-content" id="tab-observations">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h3 style="margin: 0;">Observations</h3>
-          <button id="download-csv-btn" style="padding: 5px 10px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; display: flex; align-items: center; gap: 5px; margin-right: 20px;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-              <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
-            </svg>
-            Download CSV
-          </button>
-        </div>
-    `;
-    
-    if (observations.length > 0) {
-      html += `
-        <div>
-          <table class="observations-table">
-            <thead style="position: sticky; top: 0; background: white;">
-              <tr>
-                <th>Top</th>
-                <th>Bottom</th>
-                <th>Property</th>
-                <th>Procedure</th>
-                <th>Value</th>
-                <th>Unit</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-      
-      observations.forEach(obs => {
-        html += `
-          <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 5px;">${obs.upper_depth}</td>
-            <td style="padding: 5px;">${obs.lower_depth}</td>
-            <td style="padding: 5px;">${obs.property_phys_chem_id}</td>
-            <td style="padding: 5px;">${obs.procedure_phys_chem_id || 'N/A'}</td>
-            <td style="padding: 5px; text-align: right;">${obs.value}</td>
-            <td style="padding: 5px;">${obs.unit_of_measure_id || ''}</td>
-          </tr>
-        `;
-      });
-      
-      html += `
-            </tbody>
-          </table>
-        </div>
-      `;
-    } else {
-      html += '<p>No observations available</p>';
-    }
-    
-    html += '</div>';
-
-    document.getElementById('popup-content').innerHTML = html;
-    popup.setPosition(coordinate);
-    
-    // Add tab switching functionality
-    document.querySelectorAll('.tab-button').forEach(button => {
-      button.addEventListener('click', (e) => {
-        const tabName = e.target.dataset.tab;
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        document.getElementById(`tab-${tabName}`).classList.add('active');
-      });
-    });
-    
-    // Add CSV download functionality
-    const downloadBtn = document.getElementById('download-csv-btn');
-    if (downloadBtn) {
-      downloadBtn.addEventListener('click', () => {
-        downloadObservationsCSV(profileCode, projectName, altitude, date, latitude, longitude, observations);
-      });
-    }
-
-  } catch (error) {
-    console.error('Failed to load observations:', error);
-    document.getElementById('popup-content').innerHTML = `
-      <div class="feature-info-layer">
-        <h3>Profile: ${profileCode}</h3>
-        <p>Failed to load observations</p>
-      </div>
-    `;
-    popup.setPosition(coordinate);
-  }
+    </div>
+  `;
+  popup.setPosition(coordinate);
 }
 
 function showLegend(legendUrl) {
@@ -1156,54 +1073,6 @@ function showLegend(legendUrl) {
   const legendContent = legendContainer.querySelector('.legend-content');
   legendContent.innerHTML = `<img src="${legendUrl}" alt="Legend">`;
   legendContainer.style.display = 'block';
-}
-
-
-function downloadObservationsCSV(profileCode, projectName, altitude, date, latitude, longitude, observations) {
-  // Create CSV header
-  let csv = 'Profile Code,Project,Latitude,Longitude,Altitude (m),Date,Top (cm),Bottom (cm),Property,Procedure,Value,Unit\n';
-  
-  // Add data rows
-  observations.forEach(obs => {
-    const row = [
-      profileCode,
-      projectName || '',
-      latitude,
-      longitude,
-      altitude || '',
-      date || '',
-      obs.upper_depth,
-      obs.lower_depth,
-      obs.property_phys_chem_id,
-      obs.procedure_phys_chem_id || '',
-      obs.value,
-      obs.unit_of_measure_id || ''
-    ];
-    
-    // Escape values that contain commas or quotes
-    const escapedRow = row.map(value => {
-      const stringValue = String(value);
-      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-        return `"${stringValue.replace(/"/g, '""')}"`;
-      }
-      return stringValue;
-    });
-    
-    csv += escapedRow.join(',') + '\n';
-  });
-  
-  // Create blob and download
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${profileCode}_observations.csv`);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
 }
 
 
@@ -1370,4 +1239,295 @@ function refreshMapData() {
 }
 
 window.refreshMapData = refreshMapData;
+
+let _allObservationsCache = null;
+let _profilesPanelMoveHooked = false;
+const selectedProfileCodes = new Set();
+let highlightLayer = null;
+
+function ensureHighlightLayer() {
+  if (highlightLayer) return;
+  highlightLayer = new VectorLayer({
+    source: new VectorSource(),
+    zIndex: 1500,
+    style: new Style({
+      image: new CircleStyle({
+        radius: 12,
+        stroke: new Stroke({ color: '#ffeb3b', width: 4 }),
+        fill: new Fill({ color: 'rgba(255,235,59,0.25)' })
+      })
+    })
+  });
+  map.addLayer(highlightLayer);
+}
+
+function refreshHighlight() {
+  ensureHighlightLayer();
+  const src = highlightLayer.getSource();
+  src.clear();
+  const allFeatures = (profileLayers['all'] && profileLayers['all'].get('allFeatures')) || [];
+  const feats = allFeatures
+    .filter(f => selectedProfileCodes.has(f.get('profile_code')))
+    .map(f => f.clone());
+  src.addFeatures(feats);
+
+  const tbody = document.getElementById('profiles-data-tbody');
+  if (tbody) {
+    tbody.querySelectorAll('tr[data-profile-code]').forEach(tr => {
+      const code = tr.getAttribute('data-profile-code');
+      if (selectedProfileCodes.has(code)) {
+        tr.style.background = '#fff8c4';
+      } else {
+        tr.style.background = '';
+      }
+    });
+  }
+}
+
+function toggleProfileSelection(profileCode) {
+  if (!profileCode) return;
+  if (selectedProfileCodes.has(profileCode)) selectedProfileCodes.delete(profileCode);
+  else selectedProfileCodes.add(profileCode);
+  refreshHighlight();
+}
+window.toggleProfileSelection = toggleProfileSelection;
+
+async function showVisibleProfilesData() {
+  if (!profileLayers['all']) {
+    alert('Profile layer not loaded yet.');
+    return;
+  }
+  ensureProfilesDataModal();
+  const modal = document.getElementById('profiles-data-modal');
+  modal.style.display = 'flex';
+
+  if (!_profilesPanelMoveHooked) {
+    map.on('moveend', () => {
+      const panel = document.getElementById('profiles-data-modal');
+      if (panel && panel.style.display !== 'none') {
+        refreshVisibleProfilesData();
+      }
+    });
+    _profilesPanelMoveHooked = true;
+  }
+
+  await refreshVisibleProfilesData();
+}
+
+async function refreshVisibleProfilesData() {
+  const unifiedLayer = profileLayers['all'];
+  if (!unifiedLayer) return;
+  const allFeatures = unifiedLayer.get('allFeatures') || [];
+  const extent = map.getView().calculateExtent(map.getSize());
+
+  const visibleCodes = new Set(
+    allFeatures
+      .filter(f => {
+        const proj = f.get('project_name');
+        if (profileLayers[proj] && profileLayers[proj].visible === false) return false;
+        const geom = f.getGeometry();
+        return geom && geom.intersectsExtent(extent);
+      })
+      .map(f => f.get('profile_code'))
+      .filter(Boolean)
+  );
+
+  const tbody = document.getElementById('profiles-data-tbody');
+  if (!_allObservationsCache) {
+    tbody.innerHTML = '<tr><td class="loading">Loading observations…</td></tr>';
+    document.getElementById('profiles-data-count').textContent = '';
+  }
+
+  try {
+    if (!_allObservationsCache) {
+      _allObservationsCache = await api.getObservations();
+    }
+    const projectByCode = new Map();
+    allFeatures.forEach(f => {
+      const code = f.get('profile_code');
+      if (code) projectByCode.set(code, f.get('project_name') || '');
+    });
+
+    const baseCols = ['project_name', 'profile_code', 'upper_depth', 'lower_depth'];
+    const groups = {};
+    const propColsSet = {};
+    _allObservationsCache
+      .filter(o => visibleCodes.has(o.profile_code))
+      .forEach(o => {
+        const key = o.profile_code + '|' +
+          (o.upper_depth == null ? '' : o.upper_depth) + '|' +
+          (o.lower_depth == null ? '' : o.lower_depth);
+        let row = groups[key];
+        if (!row) {
+          row = {
+            project_name: projectByCode.get(o.profile_code) || '',
+            profile_code: o.profile_code,
+            upper_depth: o.upper_depth,
+            lower_depth: o.lower_depth
+          };
+          groups[key] = row;
+        }
+        const prop = o.property_num_id || o.property_phys_chem_id || '';
+        const proc = o.procedure_num_id || o.procedure_phys_chem_id || '';
+        const unit = o.unit_of_measure_id || '';
+        const colName = [prop, proc, unit].filter(Boolean).join('.');
+        if (!colName) return;
+        propColsSet[colName] = true;
+        row[colName] = o.value;
+      });
+
+    const rows = Object.keys(groups).map(k => groups[k]).sort((a, b) => {
+      if (a.profile_code !== b.profile_code) return String(a.profile_code).localeCompare(String(b.profile_code));
+      return (a.upper_depth || 0) - (b.upper_depth || 0);
+    });
+    const columns = baseCols.concat(Object.keys(propColsSet).sort());
+
+    const thead = document.querySelector('#profiles-data-table thead tr');
+    thead.innerHTML = columns.map(c => `<th>${escapeHtml(c)}</th>`).join('');
+
+    const modal = document.getElementById('profiles-data-modal');
+    const prevPage = modal._state ? modal._state.page : 0;
+    modal._state = { rows, filtered: rows, page: prevPage, columns };
+    renderProfilesDataTable();
+  } catch (e) {
+    tbody.innerHTML = `<tr><td class="empty-state">Error: ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+function ensureProfilesDataModal() {
+  if (document.getElementById('profiles-data-modal')) return;
+  const modal = document.createElement('div');
+  modal.id = 'profiles-data-modal';
+  modal.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:33vh;z-index:10000;display:flex;box-shadow:0 -4px 12px rgba(0,0,0,0.2);';
+  modal.innerHTML = `
+    <div style="background:#fff;width:100%;height:100%;display:flex;flex-direction:column;border-top:1px solid #ccc;position:relative;">
+      <div id="profiles-data-resizer" title="Drag to resize" style="position:absolute;top:0;left:0;right:0;height:6px;cursor:ns-resize;background:#eee;"></div>
+      <style>
+        #profiles-data-table { border-collapse: separate; border-spacing: 0; }
+        #profiles-data-table th, #profiles-data-table td {
+          padding: 2px 6px !important;
+          line-height: 1.2 !important;
+          white-space: nowrap;
+        }
+        #profiles-data-table tr { height: auto !important; }
+        #profiles-data-table thead th {
+          position: sticky;
+          top: 0;
+          background: #f5f5f5;
+          z-index: 2;
+          box-shadow: inset 0 -1px 0 #ccc;
+        }
+      </style>
+      <div style="overflow:auto;flex:1;padding:6px 16px 0 16px;font-size:0.78em;">
+        <table class="admin-table" id="profiles-data-table" style="width:100%;font-size:inherit;">
+          <thead><tr></tr></thead>
+          <tbody id="profiles-data-tbody"></tbody>
+        </table>
+      </div>
+      <div style="padding:4px 16px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:0.85em;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button type="button" id="profiles-data-csv" title="Download CSV" style="padding:2px 8px;font-size:0.9em;cursor:pointer;">⬇ CSV</button>
+          <span id="profiles-data-count" style="color:#555;"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          Rows:
+          <select id="profiles-data-pagesize" style="padding:1px 2px;">
+            <option>25</option><option selected>50</option><option>100</option><option>250</option>
+          </select>
+          <button type="button" id="profiles-data-prev" style="padding:2px 6px;">◀</button>
+          <span id="profiles-data-pageinfo"></span>
+          <button type="button" id="profiles-data-next" style="padding:2px 6px;">▶</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const resizer = document.getElementById('profiles-data-resizer');
+  let resizing = false;
+  resizer.addEventListener('mousedown', (e) => {
+    resizing = true;
+    e.preventDefault();
+    document.body.style.userSelect = 'none';
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!resizing) return;
+    const newHeight = Math.max(80, Math.min(window.innerHeight - 60, window.innerHeight - e.clientY));
+    modal.style.height = newHeight + 'px';
+  });
+  window.addEventListener('mouseup', () => {
+    if (resizing) {
+      resizing = false;
+      document.body.style.userSelect = '';
+    }
+  });
+
+  document.getElementById('profiles-data-tbody').addEventListener('click', (e) => {
+    const tr = e.target.closest('tr[data-profile-code]');
+    if (!tr) return;
+    toggleProfileSelection(tr.getAttribute('data-profile-code'));
+  });
+  document.getElementById('profiles-data-pagesize').addEventListener('change', () => {
+    if (!modal._state) return;
+    modal._state.page = 0;
+    renderProfilesDataTable();
+  });
+  document.getElementById('profiles-data-prev').addEventListener('click', () => {
+    if (modal._state && modal._state.page > 0) { modal._state.page--; renderProfilesDataTable(); }
+  });
+  document.getElementById('profiles-data-next').addEventListener('click', () => {
+    if (!modal._state) return;
+    const pageSize = parseInt(document.getElementById('profiles-data-pagesize').value, 10);
+    const max = Math.ceil(modal._state.filtered.length / pageSize) - 1;
+    if (modal._state.page < max) { modal._state.page++; renderProfilesDataTable(); }
+  });
+  document.getElementById('profiles-data-csv').addEventListener('click', () => {
+    if (!modal._state) return;
+    const { filtered, columns } = modal._state;
+    const csv = [columns.join(',')].concat(
+      filtered.map(r => columns.map(c => {
+        const v = r[c] == null ? '' : String(r[c]);
+        return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
+      }).join(','))
+    ).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'visible_observations.csv'; a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+function renderProfilesDataTable() {
+  const modal = document.getElementById('profiles-data-modal');
+  if (!modal || !modal._state) return;
+  const { rows, columns } = modal._state;
+  const pageSize = parseInt(document.getElementById('profiles-data-pagesize').value, 10);
+  const filtered = rows;
+  modal._state.filtered = filtered;
+
+  const total = filtered.length;
+  const maxPage = Math.max(0, Math.ceil(total / pageSize) - 1);
+  if (modal._state.page > maxPage) modal._state.page = maxPage;
+  const start = modal._state.page * pageSize;
+  const pageRows = filtered.slice(start, start + pageSize);
+
+  const tbody = document.getElementById('profiles-data-tbody');
+  tbody.innerHTML = pageRows.length
+    ? pageRows.map(r => {
+        const code = r.profile_code || '';
+        const selected = selectedProfileCodes.has(code);
+        const bg = selected ? 'background:#fff8c4;' : '';
+        return `<tr data-profile-code="${escapeHtml(code)}" style="cursor:pointer;${bg}">` +
+          columns.map(c => `<td>${escapeHtml(r[c] == null ? '' : String(r[c]))}</td>`).join('') +
+          '</tr>';
+      }).join('')
+    : `<tr><td colspan="${columns.length}" class="empty-state">No observations for visible profiles</td></tr>`;
+
+  document.getElementById('profiles-data-count').textContent = `${total} observation${total === 1 ? '' : 's'}`;
+  document.getElementById('profiles-data-pageinfo').textContent =
+    total ? `Page ${modal._state.page + 1} / ${maxPage + 1}` : '—';
+  document.getElementById('profiles-data-prev').disabled = modal._state.page === 0;
+  document.getElementById('profiles-data-next').disabled = modal._state.page >= maxPage;
+}
 

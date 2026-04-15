@@ -9,6 +9,7 @@ from pydantic import EmailStr
 from typing import List, Optional
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
+import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import requests as http_requests
@@ -18,7 +19,7 @@ from shared import (
     get_db, log_audit,
     hash_password, verify_password, create_access_token,
     generate_api_key,
-    UserLogin, Token, User, Layer, LayerCreate, PublishUpdate,
+    UserLogin, Token, User, UserCreate, UserSelfUpdate, Layer, LayerCreate, PublishUpdate,
     Setting, SettingCreate, SettingUpdate, APIClient, APIClientCreate,
     get_current_user, get_current_admin_user, verify_api_key,
 )
@@ -76,6 +77,61 @@ async def login(user_credentials: UserLogin, request: Request):
             )
             return {"access_token": access_token, "token_type": "bearer"}
 
+@app.patch("/api/users/me")
+async def update_own_account(
+    payload: UserSelfUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update the logged-in user's own email and/or password. Requires current password."""
+    if payload.new_user_id is None and payload.new_password is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Nothing to update")
+
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                "SELECT password_hash FROM api.user WHERE user_id = %s",
+                (current_user['user_id'],))
+            row = cur.fetchone()
+            if not row or not verify_password(payload.current_password, row['password_hash']):
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                    detail="Current password is incorrect")
+
+            new_user_id = payload.new_user_id or current_user['user_id']
+
+            if payload.new_user_id and payload.new_user_id != current_user['user_id']:
+                cur.execute("SELECT 1 FROM api.user WHERE user_id = %s",
+                            (payload.new_user_id,))
+                if cur.fetchone():
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                        detail="Email already in use")
+
+            if payload.new_password and payload.new_user_id:
+                cur.execute(
+                    "UPDATE api.user SET user_id = %s, password_hash = %s WHERE user_id = %s",
+                    (payload.new_user_id, hash_password(payload.new_password), current_user['user_id']))
+            elif payload.new_password:
+                cur.execute(
+                    "UPDATE api.user SET password_hash = %s WHERE user_id = %s",
+                    (hash_password(payload.new_password), current_user['user_id']))
+            elif payload.new_user_id:
+                cur.execute(
+                    "UPDATE api.user SET user_id = %s WHERE user_id = %s",
+                    (payload.new_user_id, current_user['user_id']))
+
+            log_audit(current_user['user_id'], None, "user_self_updated",
+                     {"new_user_id": payload.new_user_id,
+                      "password_changed": payload.new_password is not None}, None)
+
+            result = {"message": "Account updated successfully"}
+            if payload.new_user_id and payload.new_user_id != current_user['user_id']:
+                new_token = create_access_token(
+                    data={"sub": new_user_id},
+                    expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+                result["access_token"] = new_token
+                result["token_type"] = "bearer"
+            return result
+
 @app.get("/api/auth/verify")
 async def verify_token(current_user: dict = Depends(get_current_user)):
     """Verify that a JWT token is valid."""
@@ -89,9 +145,7 @@ async def verify_token(current_user: dict = Depends(get_current_user)):
 
 @app.post("/api/users", status_code=status.HTTP_201_CREATED)
 async def create_user(
-    user_id: EmailStr,
-    password: str,
-    is_admin: bool = False,
+    user: UserCreate,
     current_user: dict = Depends(get_current_admin_user)
 ):
     """Create a new user (admin only)."""
@@ -100,10 +154,10 @@ async def create_user(
             try:
                 cur.execute(
                     "INSERT INTO api.user (user_id, password_hash, is_admin) VALUES (%s, %s, %s)",
-                    (user_id, hash_password(password), is_admin)
+                    (user.user_id, hash_password(user.password), user.is_admin)
                 )
-                log_audit(current_user['user_id'], None, "user_created", {"new_user": user_id}, None)
-                return {"message": "User created successfully", "user_id": user_id}
+                log_audit(current_user['user_id'], None, "user_created", {"new_user": user.user_id}, None)
+                return {"message": "User created successfully", "user_id": user.user_id}
             except psycopg2.IntegrityError:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
 
@@ -265,18 +319,53 @@ async def update_layer_publish(
     publish_data: PublishUpdate,
     current_user: dict = Depends(get_current_user)
 ):
-    """Publish or unpublish a layer."""
+    """Publish or unpublish a layer. Unpublishing clears is_default."""
     with get_db() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE api.layer SET publish = %s WHERE layer_id = %s",
-                (str(publish_data.publish).lower(), layer_id)
-            )
+            if publish_data.publish:
+                cur.execute(
+                    "UPDATE api.layer SET publish = 'true' WHERE layer_id = %s",
+                    (layer_id,))
+            else:
+                cur.execute(
+                    "UPDATE api.layer SET publish = 'false', is_default = FALSE WHERE layer_id = %s",
+                    (layer_id,))
             if cur.rowcount == 0:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Layer not found")
             log_audit(current_user['user_id'], None, "layer_publish_changed",
                      {"layer_id": layer_id, "publish": publish_data.publish}, None)
             return {"message": "Layer publish status updated successfully"}
+
+@app.patch("/api/layer/{layer_id}/default")
+async def set_default_layer(
+    layer_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Mark a layer as the default (clears previous default). Layer must be published."""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT publish FROM api.layer WHERE layer_id = %s", (layer_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Layer not found")
+            if str(row[0]).lower() != 'true':
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Only a published layer can be set as default")
+            cur.execute("UPDATE api.layer SET is_default = FALSE WHERE is_default = TRUE")
+            cur.execute("UPDATE api.layer SET is_default = TRUE WHERE layer_id = %s", (layer_id,))
+            log_audit(current_user['user_id'], None, "layer_default_set",
+                     {"layer_id": layer_id}, None)
+            return {"message": "Default layer updated successfully"}
+
+@app.post("/api/default-layer/clear")
+async def clear_default_layer(current_user: dict = Depends(get_current_user)):
+    """Clear the default layer (no layer will be default)."""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE api.layer SET is_default = FALSE WHERE is_default = TRUE")
+            log_audit(current_user['user_id'], None, "layer_default_cleared", None, None)
+            return {"message": "Default layer cleared"}
 
 @app.delete("/api/layer/{layer_id}")
 async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_user)):
@@ -429,6 +518,150 @@ async def get_observations(
                      {"profile_code": profile_code, "record_count": len(data)},
                      request.client.host)
             return [dict(row) for row in data]
+
+# ==================== Metadata Sync ====================
+
+PYCSW_URL = os.getenv("PYCSW_URL", "http://sis-metadata:8000")
+MAPSERVER_WMS_URL = os.getenv("MAPSERVER_WMS_URL", "http://localhost:8004")
+
+
+def _parse_layer_id(info_href: str):
+    params = parse_qs(urlparse(info_href).query)
+    map_path = params.get("map", [None])[0]
+    if not map_path:
+        return None, None
+    layer_id = map_path.split("/")[-1].replace(".map", "")
+    return layer_id, map_path
+
+
+def _build_wms_urls(map_path: str, layer_id: str):
+    base = MAPSERVER_WMS_URL
+    get_map = (f"{base}/?map={map_path}&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
+               f"&LAYERS={layer_id}&STYLES=&FORMAT=image%2Fpng&TRANSPARENT=TRUE")
+    get_legend = (f"{base}/?map={map_path}&SERVICE=WMS&VERSION=1.1.1"
+                  f"&LAYER={layer_id}&REQUEST=getlegendgraphic&FORMAT=image/png")
+    get_feature_info = (f"{base}/?map={map_path}&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo"
+                        f"&LAYERS={layer_id}&QUERY_LAYERS={layer_id}&INFO_FORMAT=text%2Fhtml")
+    return get_map, get_legend, get_feature_info
+
+
+def _to_relative_path(href: Optional[str]) -> Optional[str]:
+    """Strip scheme/host from a pyCSW link so it becomes same-origin."""
+    if not href:
+        return None
+    parsed = urlparse(href)
+    if not parsed.netloc:
+        return href
+    rel = parsed.path
+    if parsed.query:
+        rel += "?" + parsed.query
+    return rel
+
+
+def _parse_property_name(title: str) -> str:
+    try:
+        return title.split(" - ")[1].split(" (")[0].strip()
+    except (IndexError, AttributeError):
+        return title
+
+
+@app.post("/api/sync/layers")
+async def sync_layers_from_metadata(current_user: dict = Depends(get_current_admin_user)):
+    """Sync api.layer with records from the sis-metadata (pyCSW) server.
+
+    Preserves manually-curated fields (project_name, unit_of_measure_id) on existing rows.
+    """
+    try:
+        resp = http_requests.get(
+            f"{PYCSW_URL}/collections/metadata:main/items?f=json&limit=1000",
+            timeout=30)
+        resp.raise_for_status()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY,
+                            detail=f"Could not reach metadata server: {e}")
+
+    features = resp.json().get("features", [])
+    added, updated = 0, 0
+    seen_layer_ids = set()
+
+    for feature in features:
+        props = feature.get("properties", {})
+        links = feature.get("links", [])
+        title = props.get("title", "")
+        version = props.get("updated", "")
+        property_name = _parse_property_name(title)
+        metadata_url = _to_relative_path(
+            next((l["href"] for l in links if l.get("rel") == "self"), None))
+        download_links = [l for l in links if l.get("rel") == "download"]
+        info_links = [l for l in links
+                      if l.get("rel") == "information" and "map=" in l.get("href", "")]
+
+        for info_link in info_links:
+            layer_id, map_path = _parse_layer_id(info_link["href"])
+            if not layer_id or not map_path:
+                continue
+            parts = layer_id.split("-")
+            if len(parts) < 7:
+                continue
+            seen_layer_ids.add(layer_id)
+            project_id = parts[1]
+            stat = parts[-1]
+            dimension = f"{parts[-3]}-{parts[-2]}-{parts[-1]}"
+            download_url = _to_relative_path(next(
+                (l["href"] for l in download_links if f"D-{stat}" in l.get("href", "")),
+                None))
+            get_map_url, get_legend_url, get_feature_info_url = _build_wms_urls(map_path, layer_id)
+
+            with get_db() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT layer_id FROM api.layer WHERE layer_id = %s", (layer_id,))
+                    exists = cur.fetchone()
+                    if exists:
+                        cur.execute("""
+                            UPDATE api.layer SET
+                                project_id = %s, property_name = %s, dimension = %s,
+                                version = %s, metadata_url = %s, download_url = %s,
+                                get_map_url = %s, get_legend_url = %s, get_feature_info_url = %s
+                            WHERE layer_id = %s
+                            """,
+                            (project_id, property_name, dimension, version,
+                             metadata_url, download_url, get_map_url,
+                             get_legend_url, get_feature_info_url, layer_id))
+                        updated += 1
+                    else:
+                        cur.execute("""
+                            INSERT INTO api.layer
+                                (layer_id, project_id, property_name, dimension, version,
+                                 publish, metadata_url, download_url,
+                                 get_map_url, get_legend_url, get_feature_info_url)
+                            VALUES (%s, %s, %s, %s, %s, 'true', %s, %s, %s, %s, %s)
+                            """,
+                            (layer_id, project_id, property_name, dimension, version,
+                             metadata_url, download_url, get_map_url,
+                             get_legend_url, get_feature_info_url))
+                        added += 1
+
+    deleted = 0
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT layer_id FROM api.layer")
+            existing_ids = {row[0] for row in cur.fetchall()}
+            orphans = existing_ids - seen_layer_ids
+            if orphans:
+                cur.execute(
+                    "DELETE FROM api.layer WHERE layer_id = ANY(%s)",
+                    (list(orphans),))
+                deleted = cur.rowcount
+
+    log_audit(current_user['user_id'], None, "layers_synced_from_metadata",
+              {"added": added, "updated": updated, "deleted": deleted}, None)
+    return {
+        "message": "Sync complete",
+        "added": added,
+        "updated": updated,
+        "deleted": deleted,
+        "total_metadata_records": len(features)
+    }
 
 # ==================== Health Check & Root ====================
 

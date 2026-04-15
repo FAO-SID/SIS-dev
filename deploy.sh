@@ -94,7 +94,7 @@ docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
                                                     p_project_id := 'DUMMY_DATA_2',
                                                     p_project_name := 'Dummy data 2',
                                                     p_num_plots := 100,
-                                                    p_observation_ids := ARRAY[911,912,913],
+                                                    p_observation_ids := ARRAY[1,20,50,911,912,913],
                                                     p_xmin := 89.11,
                                                     p_xmax := 92.12,
                                                     p_ymin := 26.71,
@@ -234,8 +234,7 @@ docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.setting(key, val
  ('LATITUDE','27.5'),
  ('LONGITUDE','89.7'),
  ('ZOOM','9'),
- ('BASE_MAP_DEFAULT','esri-imagery'),
- ('LAYER_DEFAULT','BT-GSNM-BASCAL-2024-0-30-MEAN')"
+ ('BASE_MAP_DEFAULT','esri-imagery')"
 
 
 # Test SIS API
@@ -343,4 +342,5 @@ docker compose run --rm sis-web-mapping rm -rf .parcel-cache
 docker compose build sis-web-mapping
 docker compose up --no-deps -d sis-web-mapping
 # docker logs sis-web-mapping -f
+
 

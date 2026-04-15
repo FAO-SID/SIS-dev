@@ -193,6 +193,62 @@ class SISApiClient {
       method: 'DELETE'
     });
   }
+
+  async syncLayers() {
+    return this.authenticatedRequest('/api/sync/layers', {
+      method: 'POST'
+    });
+  }
+
+  async setDefaultLayer(layerId) {
+    return this.authenticatedRequest(`/api/layer/${layerId}/default`, {
+      method: 'PATCH'
+    });
+  }
+
+  async clearDefaultLayer() {
+    return this.authenticatedRequest('/api/default-layer/clear', {
+      method: 'POST'
+    });
+  }
+
+  // ==================== User Management (Admin JWT) ====================
+
+  async verifyAuth() {
+    return this.authenticatedRequest('/api/auth/verify');
+  }
+
+  async getUsers() {
+    return this.authenticatedRequest('/api/users');
+  }
+
+  async createUser(userId, password, isAdmin = false) {
+    return this.authenticatedRequest('/api/users', {
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId, password, is_admin: isAdmin })
+    });
+  }
+
+  async deleteUser(userId) {
+    return this.authenticatedRequest(`/api/users/${encodeURIComponent(userId)}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async updateOwnAccount(currentPassword, newUserId, newPassword) {
+    const body = { current_password: currentPassword };
+    if (newUserId) body.new_user_id = newUserId;
+    if (newPassword) body.new_password = newPassword;
+    const res = await this.authenticatedRequest('/api/users/me', {
+      method: 'PATCH',
+      body: JSON.stringify(body)
+    });
+    if (res.access_token) {
+      this.jwtToken = res.access_token;
+      localStorage.setItem('jwt_token', res.access_token);
+    }
+    return res;
+  }
 }
 
 // Export singleton instance

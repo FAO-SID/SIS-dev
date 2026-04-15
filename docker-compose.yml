@@ -47,6 +47,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       SECRET_KEY: ${SECRET_KEY}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+      PYCSW_URL: http://sis-metadata:8000
+      MAPSERVER_WMS_URL: http://localhost/mapserver
     ports:
       - "8002:8000"
     depends_on:
