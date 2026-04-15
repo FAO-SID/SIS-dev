@@ -590,6 +590,24 @@ async def sync_layers_from_metadata(current_user: dict = Depends(get_current_adm
         title = props.get("title", "")
         version = props.get("updated", "")
         property_name = _parse_property_name(title)
+        # pyCSW mixes all keywords in `properties.keywords` and groups the
+        # thesaurus-backed ones (discipline, place, topic category) under
+        # `themes[].concepts[].id`. The ones we want (ISO keyword type=theme)
+        # are the ones present in `keywords` but NOT in any theme concept.
+        all_keywords = [str(k).strip() for k in (props.get("keywords") or []) if str(k).strip()]
+        themed_ids = set()
+        for theme in props.get("themes") or []:
+            for concept in theme.get("concepts") or []:
+                cid = concept.get("id")
+                if cid:
+                    themed_ids.add(str(cid).strip())
+        seen_kw = set()
+        keywords = []
+        for k in all_keywords:
+            if k in themed_ids or k in seen_kw:
+                continue
+            seen_kw.add(k)
+            keywords.append(k)
         metadata_url = _to_relative_path(
             next((l["href"] for l in links if l.get("rel") == "self"), None))
         download_links = [l for l in links if l.get("rel") == "download"]
@@ -621,24 +639,25 @@ async def sync_layers_from_metadata(current_user: dict = Depends(get_current_adm
                             UPDATE api.layer SET
                                 project_id = %s, property_name = %s, dimension = %s,
                                 version = %s, metadata_url = %s, download_url = %s,
-                                get_map_url = %s, get_legend_url = %s, get_feature_info_url = %s
+                                get_map_url = %s, get_legend_url = %s, get_feature_info_url = %s,
+                                keywords = %s
                             WHERE layer_id = %s
                             """,
                             (project_id, property_name, dimension, version,
                              metadata_url, download_url, get_map_url,
-                             get_legend_url, get_feature_info_url, layer_id))
+                             get_legend_url, get_feature_info_url, keywords, layer_id))
                         updated += 1
                     else:
                         cur.execute("""
                             INSERT INTO api.layer
                                 (layer_id, project_id, property_name, dimension, version,
                                  publish, metadata_url, download_url,
-                                 get_map_url, get_legend_url, get_feature_info_url)
-                            VALUES (%s, %s, %s, %s, %s, 'true', %s, %s, %s, %s, %s)
+                                 get_map_url, get_legend_url, get_feature_info_url, keywords)
+                            VALUES (%s, %s, %s, %s, %s, 'true', %s, %s, %s, %s, %s, %s)
                             """,
                             (layer_id, project_id, property_name, dimension, version,
                              metadata_url, download_url, get_map_url,
-                             get_legend_url, get_feature_info_url))
+                             get_legend_url, get_feature_info_url, keywords))
                         added += 1
 
     deleted = 0
