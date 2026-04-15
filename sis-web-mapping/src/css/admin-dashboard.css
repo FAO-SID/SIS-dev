@@ -1,171 +1,202 @@
-/* Admin Dashboard Styles */
+/* =====================================================================
+   Admin Dashboard — uses tokens defined in main.css :root
+   ===================================================================== */
 
-/* Login Modal */
+/* ---------- Login Modal ---------- */
 .login-modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    inset: 0;
+    background: rgba(16, 24, 40, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     z-index: 10000;
     align-items: center;
     justify-content: center;
+    font-family: var(--font-sans);
 }
 
-.login-modal.active {
-    display: flex;
-}
+.login-modal.active { display: flex; }
 
 .login-content {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    width: 400px;
-    max-width: 90%;
+    background: var(--color-surface);
+    padding: var(--sp-8) var(--sp-8) var(--sp-6);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 420px;
+    max-width: 92%;
+    border: 1px solid var(--color-border);
 }
 
 .login-content h2 {
-    margin: 0 0 20px 0;
-    color: #2c5f2d;
-    font-size: 24px;
+    margin: 0 0 var(--sp-5) 0;
+    color: var(--color-primary);
+    font-size: var(--fs-2xl);
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
-.login-form .form-group {
-    margin-bottom: 15px;
-}
+.login-form .form-group { margin-bottom: var(--sp-4); }
 
 .login-form label {
     display: block;
-    margin-bottom: 5px;
-    color: #333;
-    font-weight: 500;
+    margin-bottom: var(--sp-2);
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: var(--fs-sm);
 }
 
 .login-form input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-md);
+    font-family: inherit;
+    background: var(--color-surface);
+    color: var(--color-text);
     box-sizing: border-box;
+    transition: all var(--transition);
 }
 
 .login-form input:focus {
     outline: none;
-    border-color: #2c5f2d;
+    border-color: var(--color-primary);
+    box-shadow: var(--focus-ring);
 }
 
 .login-actions {
     display: flex;
-    gap: 10px;
-    margin-top: 20px;
+    gap: var(--sp-3);
+    margin-top: var(--sp-5);
 }
 
+/* ---------- Buttons ---------- */
 .btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-5);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
+    font-weight: 600;
+    line-height: 1;
+    transition: all var(--transition);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .btn-primary {
-    background: #2c5f2d;
-    color: white;
+    background: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
     flex: 1;
 }
 
-.btn-primary:hover {
-    background: #234d24;
-}
-
-.btn-primary:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+.btn-primary:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
     flex: 1;
 }
 
-.btn-secondary:hover {
-    background: #5a6268;
+.btn-secondary:hover:not(:disabled) {
+    background: var(--color-surface-hover);
+    border-color: var(--color-text-muted);
 }
 
 .btn-danger {
-    background: #dc3545;
-    color: white;
+    background: var(--color-danger);
+    color: #ffffff;
+    border-color: var(--color-danger);
 }
 
-.btn-danger:hover {
-    background: #c82333;
+.btn-danger:hover:not(:disabled) {
+    background: var(--color-danger-hover);
+    border-color: var(--color-danger-hover);
 }
 
 .btn-success {
-    background: #28a745;
-    color: white;
+    background: var(--color-success);
+    color: #ffffff;
+    border-color: var(--color-success);
 }
 
-.btn-success:hover {
-    background: #218838;
+.btn-success:hover:not(:disabled) {
+    background: var(--color-success-hover);
+    border-color: var(--color-success-hover);
 }
 
 .login-error {
-    color: #dc3545;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #f8d7da;
+    color: var(--color-danger);
+    margin-bottom: var(--sp-4);
+    padding: var(--sp-3) var(--sp-4);
+    background: #fdecec;
     border: 1px solid #f5c6cb;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-sm);
     display: none;
 }
 
-.login-error.active {
-    display: block;
-}
+.login-error.active { display: block; }
 
-/* Login Button in Header */
+/* ---------- Header actions / user info ---------- */
 .header-actions {
     position: absolute;
-    right: 20px;
+    right: var(--sp-5);
     top: 50%;
     transform: translateY(-50%);
     display: flex;
-    gap: 10px;
+    gap: var(--sp-3);
     align-items: center;
 }
 
 .user-info {
-    color: white;
-    font-size: 14px;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    color: #ffffff;
+    font-size: var(--fs-sm);
+    padding: var(--sp-2) var(--sp-3);
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-sm);
 }
 
-/* Dashboard Full Page View */
+/* =====================================================================
+   Admin Dashboard full-page view
+   ===================================================================== */
 .admin-dashboard {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: white;
+    inset: 0;
+    background: var(--color-bg);
     z-index: 10000;
     overflow: auto;
+    font-family: var(--font-sans);
+    color: var(--color-text);
 }
 
-.admin-dashboard.active {
-    display: block;
-}
+.admin-dashboard.active { display: block; }
 
 .dashboard-content {
     width: 100%;
@@ -175,205 +206,239 @@
 }
 
 .dashboard-header {
-    padding: 20px 30px;
-    background: #2c5f2d;
-    color: white;
+    padding: var(--sp-5) var(--sp-8);
+    background: linear-gradient(135deg, var(--color-primary) 0%, #1e4a1f 100%);
+    color: #ffffff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .dashboard-header h2 {
     margin: 0;
-    color: white;
-    font-size: 24px;
+    color: #ffffff;
+    font-size: var(--fs-2xl);
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .dashboard-header-actions {
     display: flex;
-    gap: 10px;
+    gap: var(--sp-3);
 }
 
 .close-dashboard,
 .logout-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    font-size: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: var(--fs-sm);
+    font-weight: 600;
     cursor: pointer;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-weight: 500;
-    transition: background 0.2s;
+    color: #ffffff;
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+    font-family: inherit;
 }
 
-.close-dashboard:hover,
-.logout-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
+.close-dashboard:hover { background: rgba(255, 255, 255, 0.28); }
 
 .logout-btn {
-    background: rgba(220, 53, 69, 0.8);
+    background: rgba(220, 53, 69, 0.85);
+    border-color: rgba(220, 53, 69, 0.9);
 }
 
-.logout-btn:hover {
-    background: rgba(200, 35, 51, 0.9);
-}
+.logout-btn:hover { background: rgba(200, 35, 51, 0.95); }
 
-.close-dashboard::before {
-    content: '← ';
-}
+.close-dashboard::before { content: '← '; }
 
-/* Tabs */
+/* ---------- Tabs ---------- */
 .dashboard-tabs {
     display: flex;
-    padding: 0;
+    padding: 0 var(--sp-8);
     margin: 0;
     list-style: none;
-    border-bottom: 1px solid #ddd;
-    background: #f8f9fa;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
 }
 
-.dashboard-tabs li {
-    margin: 0;
-}
+.dashboard-tabs li { margin: 0; }
 
 .dashboard-tabs button {
-    padding: 15px 30px;
+    padding: var(--sp-4) var(--sp-6);
     border: none;
     background: none;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    color: #666;
-    transition: all 0.2s;
+    font-family: inherit;
+    font-size: var(--fs-md);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    transition: all var(--transition);
 }
 
 .dashboard-tabs button:hover {
-    background: rgba(44, 95, 45, 0.05);
+    color: var(--color-primary);
+    background: var(--color-primary-light);
 }
 
 .dashboard-tabs button.active {
-    color: #2c5f2d;
-    border-bottom: 3px solid #2c5f2d;
-    background: white;
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    background: var(--color-surface);
 }
 
-/* Tab Content */
+/* ---------- Tab content ---------- */
 .dashboard-body {
     flex: 1;
     overflow: auto;
-    padding: 30px;
+    padding: var(--sp-6) var(--sp-8);
+    background: var(--color-bg);
 }
 
-.tab-pane {
-    display: none;
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+.tab-pane h3 {
+    margin: 0 0 var(--sp-4) 0;
+    font-size: var(--fs-xl);
+    font-weight: 600;
+    color: var(--color-text);
 }
 
-.tab-pane.active {
-    display: block;
-}
-
-/* Table Styles */
+/* ---------- Admin table ---------- */
 .admin-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: var(--sp-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    font-size: var(--fs-sm);
 }
 
 .admin-table thead {
-    background: #f8f9fa;
+    background: var(--color-surface-alt);
 }
 
 .admin-table th {
-    padding: 12px;
+    padding: var(--sp-3) var(--sp-4);
     text-align: left;
     font-weight: 600;
-    color: #333;
-    border-bottom: 2px solid #dee2e6;
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border-strong);
+    white-space: nowrap;
 }
 
 .admin-table td {
-    padding: 12px;
-    border-bottom: 1px solid #dee2e6;
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    vertical-align: middle;
+}
+
+.admin-table tbody tr:nth-child(even) {
+    background: var(--color-surface-alt);
 }
 
 .admin-table tbody tr:hover {
-    background: #f8f9fa;
+    background: var(--color-primary-light);
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .admin-table .actions {
     display: flex;
-    gap: 8px;
+    gap: var(--sp-2);
 }
 
 .admin-table .btn {
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: var(--sp-2) var(--sp-3);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    flex: none;
 }
 
-/* Forms */
+/* ---------- Forms ---------- */
 .admin-form {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 4px;
-    margin-bottom: 30px;
+    background: var(--color-surface);
+    padding: var(--sp-5) var(--sp-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--sp-6);
 }
 
 .admin-form h3 {
-    margin: 0 0 20px 0;
-    color: #2c5f2d;
-    font-size: 18px;
+    margin: 0 0 var(--sp-5) 0;
+    color: var(--color-primary);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-    margin-bottom: 15px;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-4);
 }
 
-.form-group {
-    margin-bottom: 0;
-}
+.form-group { margin-bottom: 0; }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    color: #333;
-    font-weight: 500;
-    font-size: 14px;
+    margin-bottom: var(--sp-2);
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: var(--fs-sm);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-md);
+    font-family: inherit;
+    background: var(--color-surface);
+    color: var(--color-text);
     box-sizing: border-box;
+    transition: all var(--transition);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #2c5f2d;
+    border-color: var(--color-primary);
+    box-shadow: var(--focus-ring);
 }
 
 .form-group textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 90px;
+    line-height: 1.5;
 }
 
 .form-group input[type="checkbox"] {
     width: auto;
-    margin-right: 5px;
+    margin-right: var(--sp-2);
+    accent-color: var(--color-primary);
 }
 
 .checkbox-label {
@@ -383,15 +448,26 @@
 
 .form-actions {
     display: flex;
-    gap: 10px;
-    margin-top: 20px;
+    gap: var(--sp-3);
+    margin-top: var(--sp-5);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--color-border);
 }
 
-/* Toggle Switch */
+/* Sync bar helper */
+.sync-bar {
+    margin: var(--sp-3) 0 !important;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3) !important;
+    flex-wrap: wrap;
+}
+
+/* ---------- Toggle switch ---------- */
 .toggle-switch {
     position: relative;
     display: inline-block;
-    width: 50px;
+    width: 44px;
     height: 24px;
 }
 
@@ -404,12 +480,9 @@
 .toggle-slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.3s;
+    inset: 0;
+    background-color: var(--color-border-strong);
+    transition: var(--transition);
     border-radius: 24px;
 }
 
@@ -420,114 +493,121 @@
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
-    transition: 0.3s;
+    background-color: #ffffff;
+    transition: var(--transition);
     border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 input:checked + .toggle-slider {
-    background-color: #28a745;
+    background-color: var(--color-success);
 }
 
 input:checked + .toggle-slider:before {
-    transform: translateX(26px);
+    transform: translateX(20px);
 }
 
-/* Status Badge */
+/* ---------- Badges ---------- */
 .badge {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
 }
 
 .badge-success {
-    background: #d4edda;
-    color: #155724;
+    background: #e3f5ea;
+    color: #186a3b;
+    border: 1px solid #b8e1c7;
 }
 
 .badge-danger {
-    background: #f8d7da;
-    color: #721c24;
+    background: #fdecec;
+    color: #8a1c29;
+    border: 1px solid #f5c6cb;
 }
 
-/* Loading Spinner */
+/* ---------- Loading / Empty states ---------- */
 .loading {
     text-align: center;
-    padding: 40px;
-    color: #666;
+    padding: var(--sp-8);
+    color: var(--color-text-muted);
+    font-size: var(--fs-md);
 }
 
 .loading:after {
     content: "⏳";
     animation: spin 1s linear infinite;
     display: inline-block;
-    margin-left: 10px;
+    margin-left: var(--sp-2);
 }
 
 @keyframes spin {
     from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    to   { transform: rotate(360deg); }
 }
 
-/* Empty State */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
-    color: #666;
+    padding: var(--sp-8) var(--sp-5);
+    color: var(--color-text-muted);
+    font-size: var(--fs-sm);
 }
 
 .empty-state svg {
     width: 64px;
     height: 64px;
-    margin-bottom: 20px;
+    margin-bottom: var(--sp-5);
     opacity: 0.3;
 }
 
-/* Responsive */
+/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .dashboard-header {
-        padding: 15px 20px;
+        padding: var(--sp-4) var(--sp-5);
         flex-wrap: wrap;
-        gap: 10px;
+        gap: var(--sp-3);
     }
-    
+
     .dashboard-header h2 {
-        font-size: 18px;
+        font-size: var(--fs-lg);
         width: 100%;
     }
-    
+
     .dashboard-header-actions {
         width: 100%;
         justify-content: space-between;
     }
-    
+
     .close-dashboard,
     .logout-btn {
-        font-size: 14px;
-        padding: 6px 12px;
+        font-size: var(--fs-sm);
+        padding: var(--sp-2) var(--sp-3);
         flex: 1;
     }
 
+    .dashboard-tabs {
+        padding: 0 var(--sp-4);
+        overflow-x: auto;
+    }
+
     .dashboard-tabs button {
-        padding: 12px 20px;
-        font-size: 14px;
+        padding: var(--sp-3) var(--sp-4);
+        font-size: var(--fs-sm);
     }
 
-    .dashboard-body {
-        padding: 15px;
-    }
+    .dashboard-body { padding: var(--sp-4); }
 
-    .form-row {
-        grid-template-columns: 1fr;
-    }
+    .form-row { grid-template-columns: 1fr; }
 
-    .admin-table {
-        font-size: 12px;
-    }
+    .admin-table { font-size: var(--fs-xs); }
 
     .admin-table th,
     .admin-table td {
-        padding: 8px;
+        padding: var(--sp-2) var(--sp-3);
     }
 }
