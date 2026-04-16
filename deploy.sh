@@ -113,7 +113,7 @@ docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
 # Build and start container
 docker compose up --build sis-api -d
 
-# Create admin user (admin/admin123). This user can manage other users (humans) and API clients (servers)
+# Create admin user (admin@server.com/admin). This user can manage other users (humans) and API clients (servers)
 docker exec sis-database psql -U sis -d sis -c "
   INSERT INTO api.user (user_id, password_hash, is_admin, is_active) 
   VALUES ('admin@server.com', '\$2b\$12\$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5oi2W6H9j7K4G', true, true)
@@ -126,7 +126,7 @@ docker exec sis-database psql -U sis -d sis -c "
 docker exec -i sis-api python << 'EOF'
 from main import hash_password, get_db
 
-password_hash = hash_password("admin123")
+password_hash = hash_password("admin")
 print(f"Hash: {password_hash}")
 
 with get_db() as conn:
@@ -144,7 +144,7 @@ curl -X POST http://$HOST_SIS_API/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "admin@server.com",
-    "password": "admin123"
+    "password": "admin"
   }'
 
 # Create the API client key for sis, also in env.
