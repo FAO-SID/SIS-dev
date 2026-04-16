@@ -3,7 +3,7 @@ SIS Admin API — JWT authentication (for humans)
 Manages users, API clients, layers, and settings.
 """
 
-from fastapi import FastAPI, Depends, HTTPException, status, Request
+from fastapi import FastAPI, Depends, HTTPException, status, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import EmailStr
 from typing import List, Optional
@@ -11,7 +11,10 @@ from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 import os
 import re
+import csv
+import io
 import psycopg2
+from psycopg2 import sql as pgsql
 from psycopg2.extras import RealDictCursor
 import requests as http_requests
 
@@ -696,6 +699,745 @@ async def sync_layers_from_metadata(current_user: dict = Depends(get_current_adm
         "deleted": deleted,
         "total_metadata_records": len(features)
     }
+
+# ==================== Codelists (any authenticated user) ====================
+
+@app.get("/api/codelist/organisations")
+async def get_organisations(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT organisation_id, country, city FROM soil_data.organisation ORDER BY organisation_id")
+            return cur.fetchall()
+
+@app.get("/api/codelist/individuals")
+async def get_individuals(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT individual_id, email FROM soil_data.individual ORDER BY individual_id")
+            return cur.fetchall()
+
+@app.get("/api/codelist/projects")
+async def get_projects(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT project_id, name, abstract, license FROM soil_data.project ORDER BY project_id")
+            return cur.fetchall()
+
+@app.get("/api/codelist/properties")
+async def get_properties(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT property_num_id, property_name FROM soil_data.property_num ORDER BY property_name")
+            return cur.fetchall()
+
+@app.get("/api/codelist/procedures")
+async def get_procedures(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT procedure_num_id, procedure_name FROM soil_data.procedure_num ORDER BY procedure_name")
+            return cur.fetchall()
+
+@app.get("/api/codelist/units")
+async def get_units(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT unit_of_measure_id, unit_name FROM soil_data.unit_of_measure ORDER BY unit_name")
+            return cur.fetchall()
+
+@app.get("/api/codelist/procedures_for_property/{property_num_id}")
+async def get_procedures_for_property(property_num_id: str, current_user: dict = Depends(get_current_user)):
+    """Get procedure_num entries available for a given property, based on observation_num."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT DISTINCT o.procedure_num_id, p.procedure_name
+                FROM soil_data.observation_num o
+                JOIN soil_data.procedure_num p ON p.procedure_num_id = o.procedure_num_id
+                WHERE o.property_num_id = %s
+                ORDER BY p.procedure_name
+            """, (property_num_id,))
+            return cur.fetchall()
+
+@app.get("/api/codelist/units_for_property/{property_num_id}")
+async def get_units_for_property(property_num_id: str, current_user: dict = Depends(get_current_user)):
+    """Get unit_of_measure entries available for a given property, based on observation_num."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT DISTINCT o.unit_of_measure_id
+                FROM soil_data.observation_num o
+                WHERE o.property_num_id = %s
+                ORDER BY o.unit_of_measure_id
+            """, (property_num_id,))
+            return cur.fetchall()
+
+@app.post("/api/codelist/projects", status_code=status.HTTP_201_CREATED)
+async def create_project(payload: dict, current_user: dict = Depends(get_current_user)):
+    pid = payload.get("project_id", "").strip()
+    name = payload.get("name", "").strip()
+    if not pid or not name:
+        raise HTTPException(status_code=400, detail="project_id and name are required")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("INSERT INTO soil_data.project (project_id, name) VALUES (%s, %s)", (pid, name))
+                return {"project_id": pid, "name": name}
+            except psycopg2.IntegrityError:
+                raise HTTPException(status_code=400, detail="Project already exists")
+
+@app.patch("/api/codelist/projects/{project_id}")
+async def update_project(project_id: str, payload: dict, current_user: dict = Depends(get_current_user)):
+    abstract = payload.get("abstract")
+    license_val = payload.get("license")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE soil_data.project SET abstract = %s, license = %s
+                WHERE project_id = %s
+            """, (abstract, license_val, project_id))
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Project not found")
+            return {"message": "Project updated"}
+
+@app.post("/api/codelist/organisations", status_code=status.HTTP_201_CREATED)
+async def create_organisation(payload: dict, current_user: dict = Depends(get_current_user)):
+    oid = payload.get("organisation_id", "").strip()
+    if not oid:
+        raise HTTPException(status_code=400, detail="organisation_id is required")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    INSERT INTO soil_data.organisation (organisation_id, country, city)
+                    VALUES (%s, %s, %s)
+                """, (oid, payload.get("country"), payload.get("city")))
+                return {"organisation_id": oid, "country": payload.get("country"), "city": payload.get("city")}
+            except psycopg2.IntegrityError:
+                raise HTTPException(status_code=400, detail="Organisation already exists")
+
+@app.post("/api/codelist/individuals", status_code=status.HTTP_201_CREATED)
+async def create_individual(payload: dict, current_user: dict = Depends(get_current_user)):
+    iid = payload.get("individual_id", "").strip()
+    if not iid:
+        raise HTTPException(status_code=400, detail="individual_id is required")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("INSERT INTO soil_data.individual (individual_id, email) VALUES (%s, %s)",
+                           (iid, payload.get("email")))
+                return {"individual_id": iid, "email": payload.get("email")}
+            except psycopg2.IntegrityError:
+                raise HTTPException(status_code=400, detail="Individual already exists")
+
+# ==================== ETL (any authenticated user) ====================
+
+@app.put("/api/etl/metadata")
+async def save_etl_metadata(
+    payload: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Replace all authors for a project in soil_data.proj_x_org_x_ind."""
+    project_id = payload.get("project_id")
+    authors = payload.get("authors", [])
+    if not project_id:
+        raise HTTPException(status_code=400, detail="project_id is required")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            # Delete existing authors for this project
+            cur.execute("DELETE FROM soil_data.proj_x_org_x_ind WHERE project_id = %s", (project_id,))
+            # Insert the current set
+            for a in authors:
+                org = a.get("organisation_id")
+                ind = a.get("individual_id")
+                if not org or not ind:
+                    continue
+                cur.execute("""
+                    INSERT INTO soil_data.proj_x_org_x_ind
+                        (project_id, organisation_id, individual_id, position, tag, role)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT DO NOTHING
+                """, (project_id, org, ind, a.get("position"), a.get("tag"), a.get("role")))
+            log_audit(current_user['user_id'], None, "etl_metadata_saved",
+                     {"project_id": project_id, "count": len(authors)}, None)
+            return {"message": f"{len(authors)} author(s) saved"}
+
+@app.get("/api/etl/project/{project_id}/authors")
+async def get_project_authors(project_id: str, current_user: dict = Depends(get_current_user)):
+    """Get existing authors linked to a project from soil_data.proj_x_org_x_ind."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT organisation_id, individual_id, position, tag, role
+                FROM soil_data.proj_x_org_x_ind
+                WHERE project_id = %s
+                ORDER BY organisation_id, individual_id
+            """, (project_id,))
+            return cur.fetchall()
+
+@app.post("/api/etl/upload")
+async def upload_csv(
+    file: UploadFile = File(...),
+    project_id: str = Form(None),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload a CSV file: create staging table, register in api.uploaded_dataset."""
+    if not file.filename or not file.filename.lower().endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Only CSV files are accepted")
+
+    contents = await file.read()
+    text = contents.decode('utf-8-sig')
+    reader = csv.reader(io.StringIO(text))
+    rows = list(reader)
+    if len(rows) < 2:
+        raise HTTPException(status_code=400, detail="CSV must have a header row and at least one data row")
+
+    raw_headers = [h.strip() for h in rows[0]]
+    data_rows = rows[1:]
+
+    # Sanitize column names: replace chars that break psycopg2's parameter substitution
+    # Keep a map from sanitized → original for display
+    def sanitize_col(name):
+        return name.replace('%', 'pct')
+
+    headers = [sanitize_col(h) for h in raw_headers]
+
+    # Build a safe table name: sanitized filename + timestamp
+    base_name = re.sub(r'[^a-zA-Z0-9_]', '_', file.filename.rsplit('.', 1)[0]).lower()
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    table_name = f"{base_name}_{ts}"
+
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            # Create staging table with all TEXT columns
+            col_defs = pgsql.SQL(', ').join(
+                pgsql.SQL("{} TEXT").format(pgsql.Identifier(h)) for h in headers
+            )
+            cur.execute(pgsql.SQL("CREATE TABLE {}.{} ({})").format(
+                pgsql.Identifier('soil_data_upload'),
+                pgsql.Identifier(table_name),
+                col_defs
+            ))
+
+            # Insert data
+            if data_rows:
+                placeholders = pgsql.SQL(', ').join([pgsql.Placeholder()] * len(headers))
+                insert_sql = pgsql.SQL("INSERT INTO {}.{} ({}) VALUES ({})").format(
+                    pgsql.Identifier('soil_data_upload'),
+                    pgsql.Identifier(table_name),
+                    pgsql.SQL(', ').join(pgsql.Identifier(h) for h in headers),
+                    placeholders
+                )
+                for row in data_rows:
+                    # Pad or truncate row to match headers
+                    padded = (row + [''] * len(headers))[:len(headers)]
+                    cur.execute(insert_sql, padded)
+
+            # Register in api.uploaded_dataset
+            cur.execute("""
+                INSERT INTO api.uploaded_dataset (table_name, file_name, user_id, status, n_rows, n_col, project_id)
+                VALUES (%s, %s, %s, 'Uploaded', %s, %s, %s)
+            """, (table_name, file.filename, current_user['user_id'], len(data_rows), len(headers), project_id))
+
+            # Initialize column entries in api.uploaded_dataset_column
+            for i, h in enumerate(headers):
+                note = raw_headers[i] if raw_headers[i] != h else None
+                cur.execute("""
+                    INSERT INTO api.uploaded_dataset_column (table_name, column_name, ignore_column, note)
+                    VALUES (%s, %s, true, %s)
+                """, (table_name, h, note))
+
+            log_audit(current_user['user_id'], None, "etl_csv_uploaded",
+                     {"table_name": table_name, "rows": len(data_rows), "cols": len(headers)}, None)
+
+    # Return preview (first 20 rows)
+    preview = data_rows[:20]
+    return {
+        "table_name": table_name,
+        "columns": headers,
+        "n_rows": len(data_rows),
+        "n_col": len(headers),
+        "preview": preview
+    }
+
+@app.get("/api/etl/datasets")
+async def list_datasets(current_user: dict = Depends(get_current_user)):
+    """List all uploaded datasets."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT * FROM api.uploaded_dataset ORDER BY table_name DESC")
+            return cur.fetchall()
+
+@app.get("/api/etl/datasets/{table_name}/preview")
+async def get_dataset_preview(table_name: str, current_user: dict = Depends(get_current_user)):
+    """Get first 20 rows from a staging table."""
+    # Validate table exists in registry
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT 1 FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="Dataset not found")
+            cur.execute(pgsql.SQL("SELECT * FROM {}.{} LIMIT 20").format(
+                pgsql.Identifier('soil_data_upload'),
+                pgsql.Identifier(table_name)
+            ))
+            rows = cur.fetchall()
+            columns = [desc[0] for desc in cur.description] if cur.description else []
+            return {"columns": columns, "rows": [dict(r) for r in rows]}
+
+@app.get("/api/etl/datasets/{table_name}/columns")
+async def get_dataset_columns(table_name: str, current_user: dict = Depends(get_current_user)):
+    """Get column mappings for a dataset."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT column_name, property_num_id, procedure_num_id, unit_of_measure_id,
+                       ignore_column, note, destination_table, destination_column,
+                       conversion_operation, conversion_value
+                FROM api.uploaded_dataset_column
+                WHERE table_name = %s ORDER BY column_name
+            """, (table_name,))
+            return cur.fetchall()
+
+@app.put("/api/etl/datasets/{table_name}/columns")
+async def save_dataset_columns(
+    table_name: str,
+    payload: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save column mappings for a dataset. Payload: {columns: [...], epsg: "4326"}."""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1 FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="Dataset not found")
+
+            columns = payload.get("columns", [])
+            epsg = payload.get("epsg")
+
+            for col in columns:
+                cur.execute("""
+                    UPDATE api.uploaded_dataset_column
+                    SET destination_table = %s,
+                        destination_column = %s,
+                        property_num_id = %s,
+                        procedure_num_id = %s,
+                        unit_of_measure_id = %s,
+                        ignore_column = %s,
+                        note = %s,
+                        conversion_operation = %s,
+                        conversion_value = %s
+                    WHERE table_name = %s AND column_name = %s
+                """, (
+                    col.get("destination_table"),
+                    col.get("destination_column"),
+                    col.get("property_num_id"),
+                    col.get("procedure_num_id"),
+                    col.get("unit_of_measure_id"),
+                    col.get("ignore_column", True),
+                    col.get("note"),
+                    col.get("conversion_operation"),
+                    col.get("conversion_value"),
+                    table_name,
+                    col["column_name"]
+                ))
+
+            if epsg:
+                cur.execute("""
+                    UPDATE api.uploaded_dataset SET cords_epsg = %s WHERE table_name = %s
+                """, (epsg, table_name))
+
+            log_audit(current_user['user_id'], None, "etl_columns_saved",
+                     {"table_name": table_name, "columns": len(columns)}, None)
+            return {"message": "Column mappings saved successfully"}
+
+@app.post("/api/etl/datasets/{table_name}/ingest")
+async def ingest_dataset(
+    table_name: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Ingest staged CSV data into soil_data tables based on column mappings."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            # Get dataset metadata
+            cur.execute("SELECT * FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
+            dataset = cur.fetchone()
+            if not dataset:
+                raise HTTPException(status_code=404, detail="Dataset not found")
+
+            project_id = dataset.get("project_id")
+            epsg = dataset.get("cords_epsg") or "4326"
+
+            # Get column mappings (non-ignored)
+            cur.execute("""
+                SELECT column_name, destination_table, destination_column,
+                       property_num_id, procedure_num_id, unit_of_measure_id,
+                       conversion_operation, conversion_value
+                FROM api.uploaded_dataset_column
+                WHERE table_name = %s AND (ignore_column = false OR destination_table IS NOT NULL)
+            """, (table_name,))
+            mappings = cur.fetchall()
+
+            if not mappings:
+                raise HTTPException(status_code=400, detail="No column mappings defined")
+
+            # Build lookup: destination_table.destination_column → csv_column_name (and extras)
+            # For result_num, use csv column name as key since multiple columns map to "value"
+            col_map = {}  # {dest_table: {key: {csv_col, conversion_op, conversion_val, prop, proc, unit}}}
+            for m in mappings:
+                dt = m["destination_table"]
+                if not dt:
+                    continue
+                if dt not in col_map:
+                    col_map[dt] = {}
+                key = m["column_name"] if dt == "result_num" else (m["destination_column"] or "value")
+                col_map[dt][key] = {
+                    "csv_col": m["column_name"],
+                    "conv_op": m.get("conversion_operation"),
+                    "conv_val": m.get("conversion_value"),
+                    "property_num_id": m.get("property_num_id"),
+                    "procedure_num_id": m.get("procedure_num_id"),
+                    "unit_of_measure_id": m.get("unit_of_measure_id"),
+                }
+
+            # Read all rows from staging table
+            cur.execute(pgsql.SQL("SELECT * FROM {}.{}").format(
+                pgsql.Identifier("soil_data_upload"),
+                pgsql.Identifier(table_name)
+            ))
+            rows = cur.fetchall()
+
+            if not rows:
+                raise HTTPException(status_code=400, detail="No data rows in staging table")
+
+            # Helper to get a value from a row via mapping
+            def get_val(row, table, col):
+                info = col_map.get(table, {}).get(col)
+                if not info:
+                    return None
+                v = row.get(info["csv_col"])
+                if v is None or v == "":
+                    return None
+                return v
+
+            def get_val_converted(row, table, col):
+                info = col_map.get(table, {}).get(col)
+                if not info:
+                    return None
+                v = row.get(info["csv_col"])
+                if v is None or v == "":
+                    return None
+                try:
+                    v = float(v)
+                except (ValueError, TypeError):
+                    return None
+                op = info.get("conv_op")
+                cv = info.get("conv_val")
+                if op and cv:
+                    cv = float(cv)
+                    if op == "*":
+                        v = v * cv
+                    elif op == "/":
+                        v = v / cv
+                return v
+
+            # Caches to avoid duplicate inserts
+            sites_inserted = set()
+            project_sites_inserted = set()
+            plots_cache = {}       # (site_id, plot_code) → plot_id
+            profiles_cache = {}    # profile_code → profile_id
+            elements_cache = {}    # (profile_id, upper, lower) → element_id
+            specimens_cache = {}   # element_id → specimen_id
+            obs_num_cache = {}     # (prop, proc) → observation_num_id
+
+            ingested = 0
+            result_num_count = 0
+            errors = []
+
+            for i, row in enumerate(rows):
+                row_num = i + 2  # 1-based + header
+                try:
+                    # --- site ---
+                    site_id = get_val(row, "site", "site_id")
+                    if site_id and site_id not in sites_inserted:
+                        cur.execute("""
+                            INSERT INTO soil_data.site (site_id) VALUES (%s)
+                            ON CONFLICT (site_id) DO NOTHING
+                        """, (site_id,))
+                        sites_inserted.add(site_id)
+                        # link project ↔ site
+                        if project_id and (project_id, site_id) not in project_sites_inserted:
+                            cur.execute("""
+                                INSERT INTO soil_data.project_site (project_id, site_id)
+                                VALUES (%s, %s) ON CONFLICT DO NOTHING
+                            """, (project_id, site_id))
+                            project_sites_inserted.add((project_id, site_id))
+
+                    # --- plot ---
+                    plot_id = None
+                    if "plot" in col_map and site_id:
+                        plot_code = get_val(row, "plot", "plot_code")
+                        lon = get_val(row, "plot", "geom (longitude)")
+                        lat = get_val(row, "plot", "geom (latitude)")
+                        plot_type = get_val(row, "plot", "type")
+                        altitude = get_val(row, "plot", "altitude")
+                        sampling_date = get_val(row, "plot", "sampling_date")
+                        pos_accuracy = get_val(row, "plot", "positional_accuracy")
+
+                        cache_key = (site_id, plot_code or f"_row{i}")
+                        if cache_key in plots_cache:
+                            plot_id = plots_cache[cache_key]
+                        else:
+                            # Build geom if coordinates provided
+                            geom_expr = None
+                            geom_params = []
+                            if lon and lat:
+                                geom_expr = "ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), %s), 4326)"
+                                geom_params = [float(lon), float(lat), int(epsg)]
+
+                            if geom_expr:
+                                cur.execute(f"""
+                                    INSERT INTO soil_data.plot
+                                        (site_id, plot_code, geom, type, altitude, sampling_date, positional_accuracy)
+                                    VALUES (%s, %s, {geom_expr}, %s, %s, %s, %s)
+                                    RETURNING plot_id
+                                """, (site_id, plot_code, *geom_params, plot_type,
+                                      int(altitude) if altitude else None,
+                                      sampling_date or None,
+                                      int(pos_accuracy) if pos_accuracy else None))
+                            else:
+                                cur.execute("""
+                                    INSERT INTO soil_data.plot
+                                        (site_id, plot_code, type, altitude, sampling_date, positional_accuracy)
+                                    VALUES (%s, %s, %s, %s, %s, %s)
+                                    RETURNING plot_id
+                                """, (site_id, plot_code, plot_type,
+                                      int(altitude) if altitude else None,
+                                      sampling_date or None,
+                                      int(pos_accuracy) if pos_accuracy else None))
+                            plot_id = cur.fetchone()["plot_id"]
+                            plots_cache[cache_key] = plot_id
+
+                    # --- profile ---
+                    profile_id = None
+                    profile_code = get_val(row, "profile", "profile_code")
+                    if profile_code:
+                        if profile_code in profiles_cache:
+                            profile_id = profiles_cache[profile_code]
+                        else:
+                            cur.execute("""
+                                INSERT INTO soil_data.profile (plot_id, profile_code)
+                                VALUES (%s, %s)
+                                ON CONFLICT (profile_code) DO UPDATE SET plot_id = COALESCE(soil_data.profile.plot_id, EXCLUDED.plot_id)
+                                RETURNING profile_id
+                            """, (plot_id, profile_code))
+                            profile_id = cur.fetchone()["profile_id"]
+                            profiles_cache[profile_code] = profile_id
+
+                    # --- element ---
+                    element_id = None
+                    if "element" in col_map and profile_id:
+                        upper = get_val(row, "element", "upper_depth")
+                        lower = get_val(row, "element", "lower_depth")
+                        elem_type = get_val(row, "element", "type") or "Layer"
+                        if upper is not None and lower is not None:
+                            upper_i = int(float(upper))
+                            lower_i = int(float(lower))
+                            elem_key = (profile_id, upper_i, lower_i)
+                            if elem_key in elements_cache:
+                                element_id = elements_cache[elem_key]
+                            else:
+                                cur.execute("""
+                                    INSERT INTO soil_data.element (profile_id, upper_depth, lower_depth, type)
+                                    VALUES (%s, %s, %s, %s)
+                                    RETURNING element_id
+                                """, (profile_id, upper_i, lower_i, elem_type))
+                                element_id = cur.fetchone()["element_id"]
+                                elements_cache[elem_key] = element_id
+
+                    # --- specimen (auto-create per element) ---
+                    specimen_id = None
+                    if element_id:
+                        if element_id in specimens_cache:
+                            specimen_id = specimens_cache[element_id]
+                        else:
+                            cur.execute("""
+                                INSERT INTO soil_data.specimen (element_id)
+                                VALUES (%s) RETURNING specimen_id
+                            """, (element_id,))
+                            specimen_id = cur.fetchone()["specimen_id"]
+                            specimens_cache[element_id] = specimen_id
+
+                    # --- result_num (one per result_num-mapped column) ---
+                    if "result_num" in col_map and specimen_id:
+                        for dest_col, info in col_map["result_num"].items():
+                            prop_id = info.get("property_num_id")
+                            proc_id = info.get("procedure_num_id")
+                            unit_id = info.get("unit_of_measure_id")
+                            if not prop_id or not proc_id:
+                                continue
+
+                            # Get observation_num_id
+                            obs_key = (prop_id, proc_id)
+                            if obs_key in obs_num_cache:
+                                obs_num_id = obs_num_cache[obs_key]
+                            else:
+                                cur.execute("""
+                                    SELECT observation_num_id FROM soil_data.observation_num
+                                    WHERE property_num_id = %s AND procedure_num_id = %s
+                                """, (prop_id, proc_id))
+                                obs_row = cur.fetchone()
+                                if not obs_row:
+                                    # Create observation_num if not exists
+                                    cur.execute("""
+                                        INSERT INTO soil_data.observation_num
+                                            (property_num_id, procedure_num_id, unit_of_measure_id)
+                                        VALUES (%s, %s, %s) RETURNING observation_num_id
+                                    """, (prop_id, proc_id, unit_id or "Unknown"))
+                                    obs_row = cur.fetchone()
+                                obs_num_id = obs_row["observation_num_id"]
+                                obs_num_cache[obs_key] = obs_num_id
+
+                            # Get value with conversion
+                            raw_val = row.get(info["csv_col"])
+                            if raw_val is None or raw_val == "":
+                                continue
+                            try:
+                                val = float(raw_val)
+                            except (ValueError, TypeError):
+                                continue
+                            op = info.get("conv_op")
+                            cv = info.get("conv_val")
+                            if op and cv:
+                                cv = float(cv)
+                                if op == "*":
+                                    val = val * cv
+                                elif op == "/":
+                                    val = val / cv
+
+                            cur.execute("""
+                                INSERT INTO soil_data.result_num (observation_num_id, specimen_id, value)
+                                VALUES (%s, %s, %s)
+                                ON CONFLICT (observation_num_id, specimen_id)
+                                DO UPDATE SET value = EXCLUDED.value
+                            """, (obs_num_id, specimen_id, val))
+                            result_num_count += 1
+
+                    ingested += 1
+
+                except Exception as e:
+                    errors.append(f"Row {row_num}: {str(e)}")
+                    if len(errors) > 50:
+                        errors.append("... too many errors, stopping")
+                        break
+
+            # Update dataset status and note
+            status = "Ingested" if not errors else "Partial"
+            note = f"Ingested {ingested}/{len(rows)} rows, {result_num_count} results"
+            if errors:
+                note += f", {len(errors)} errors"
+            cur.execute("""
+                UPDATE api.uploaded_dataset SET status = %s, note = %s WHERE table_name = %s
+            """, (status, note, table_name))
+
+            log_audit(current_user['user_id'], None, "etl_ingested",
+                     {"table_name": table_name, "ingested": ingested, "errors": len(errors)}, None)
+
+            return {
+                "message": note,
+                "ingested": ingested,
+                "total": len(rows),
+                "result_num_count": result_num_count,
+                "errors": errors
+            }
+
+
+@app.post("/api/etl/datasets/{table_name}/prune")
+async def prune_dataset(
+    table_name: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete all soil_data rows associated with a dataset's project, reversing an ingest."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            # Get dataset metadata
+            cur.execute("SELECT * FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
+            dataset = cur.fetchone()
+            if not dataset:
+                raise HTTPException(status_code=404, detail="Dataset not found")
+
+            project_id = dataset.get("project_id")
+            if not project_id:
+                raise HTTPException(status_code=400, detail="No project associated with this dataset")
+
+            # Collect IDs top-down: project → sites → plots → profiles → elements → specimens
+            cur.execute("SELECT site_id FROM soil_data.project_site WHERE project_id = %s", (project_id,))
+            site_ids = [r["site_id"] for r in cur.fetchall()]
+
+            if not site_ids:
+                return {"message": "No data found for this project", "deleted": {}}
+
+            cur.execute("SELECT plot_id FROM soil_data.plot WHERE site_id = ANY(%s)", (site_ids,))
+            plot_ids = [r["plot_id"] for r in cur.fetchall()]
+
+            profile_ids = []
+            if plot_ids:
+                cur.execute("SELECT profile_id FROM soil_data.profile WHERE plot_id = ANY(%s)", (plot_ids,))
+                profile_ids = [r["profile_id"] for r in cur.fetchall()]
+
+            element_ids = []
+            if profile_ids:
+                cur.execute("SELECT element_id FROM soil_data.element WHERE profile_id = ANY(%s)", (profile_ids,))
+                element_ids = [r["element_id"] for r in cur.fetchall()]
+
+            specimen_ids = []
+            if element_ids:
+                cur.execute("SELECT specimen_id FROM soil_data.specimen WHERE element_id = ANY(%s)", (element_ids,))
+                specimen_ids = [r["specimen_id"] for r in cur.fetchall()]
+
+            # Delete bottom-up
+            deleted = {}
+
+            if specimen_ids:
+                cur.execute("DELETE FROM soil_data.result_num WHERE specimen_id = ANY(%s)", (specimen_ids,))
+                deleted["result_num"] = cur.rowcount
+                cur.execute("DELETE FROM soil_data.specimen WHERE specimen_id = ANY(%s)", (specimen_ids,))
+                deleted["specimen"] = cur.rowcount
+
+            if element_ids:
+                cur.execute("DELETE FROM soil_data.element WHERE element_id = ANY(%s)", (element_ids,))
+                deleted["element"] = cur.rowcount
+
+            if profile_ids:
+                cur.execute("DELETE FROM soil_data.profile WHERE profile_id = ANY(%s)", (profile_ids,))
+                deleted["profile"] = cur.rowcount
+
+            if plot_ids:
+                cur.execute("DELETE FROM soil_data.plot WHERE plot_id = ANY(%s)", (plot_ids,))
+                deleted["plot"] = cur.rowcount
+
+            # Remove project ↔ site links
+            cur.execute("DELETE FROM soil_data.project_site WHERE project_id = %s", (project_id,))
+            deleted["project_site"] = cur.rowcount
+
+            # Delete sites only if no other project references them
+            deleted["site"] = 0
+            for site_id in site_ids:
+                cur.execute("SELECT COUNT(*) AS cnt FROM soil_data.project_site WHERE site_id = %s", (site_id,))
+                if cur.fetchone()["cnt"] == 0:
+                    cur.execute("DELETE FROM soil_data.site WHERE site_id = %s", (site_id,))
+                    deleted["site"] += cur.rowcount
+
+            # Reset dataset status and save note
+            parts = [f"{k}: {v}" for k, v in deleted.items() if v > 0]
+            note = "Pruned" + (" (" + ", ".join(parts) + ")" if parts else "")
+            cur.execute("UPDATE api.uploaded_dataset SET status = %s, note = %s WHERE table_name = %s",
+                        ("Removed", note, table_name))
+
+            log_audit(current_user['user_id'], None, "etl_pruned",
+                     {"table_name": table_name, "project_id": project_id, "deleted": deleted}, None)
+
+            return {"message": note, "project_id": project_id, "deleted": deleted}
+
 
 # ==================== Health Check & Root ====================
 

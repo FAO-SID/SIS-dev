@@ -45,6 +45,10 @@ class AdminDashboard {
     this.users = [];
     this.isAdmin = false;
     this.editingItem = null;
+    // ETL state
+    this.etlCodelists = {};
+    this.etlUploadResult = null;
+    this.etlDatasets = [];
   }
 
   /**
@@ -176,6 +180,7 @@ class AdminDashboard {
           <ul class="dashboard-tabs">
             <li><button class="tab-btn active" data-tab="administration">Administration</button></li>
             <li><button class="tab-btn" data-tab="layers">Layers</button></li>
+            <li><button class="tab-btn" data-tab="etl">ETL</button></li>
             <li><button class="tab-btn" data-tab="account">My Account</button></li>
           </ul>
 
@@ -283,6 +288,144 @@ class AdminDashboard {
               </div>
             </div>
 
+            <!-- ETL Tab -->
+            <div id="etl-tab" class="tab-pane">
+              <div class="etl-steps">
+
+                <!-- List view (always visible unless detail panel open) -->
+                <div id="etl-list-view">
+                  <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+                    <input type="file" id="etl-file-input" accept=".csv">
+                    <button type="button" class="btn btn-primary btn-sm" id="etl-upload-btn">Upload CSV</button>
+                    <span id="etl-upload-status" style="font-size:var(--fs-sm);"></span>
+                  </div>
+                  <div id="etl-datasets-list"></div>
+                </div>
+
+                <!-- Detail panel (hidden until Open is clicked) -->
+                <div id="etl-detail-panel" style="display:none;">
+
+                  <div style="margin-bottom:var(--sp-4);">
+                    <button type="button" class="btn btn-secondary btn-sm" id="etl-back-btn">&larr; Back to list</button>
+                    <span id="etl-detail-title" style="font-weight:600;margin-left:var(--sp-3);"></span>
+                  </div>
+
+                  <!-- Preview -->
+                  <details id="etl-preview-section" class="etl-section" open>
+                    <summary class="etl-section-title" style="cursor:pointer;">Preview <span id="etl-preview-info" style="font-weight:normal;font-size:var(--fs-sm);color:#555;"></span></summary>
+                    <div class="etl-preview-scroll" style="margin-top:var(--sp-3);">
+                      <table class="admin-table" id="etl-preview-table">
+                        <thead id="etl-preview-thead"></thead>
+                        <tbody id="etl-preview-tbody"></tbody>
+                      </table>
+                    </div>
+                  </details>
+
+                  <!-- Attribution -->
+                  <div id="etl-section-metadata" class="etl-section">
+                    <h3 class="etl-section-title">Attribution</h3>
+                    <form id="etl-metadata-form">
+                      <div class="etl-metadata-grid" style="margin-bottom:var(--sp-4);">
+                        <label for="etl-project">Project</label>
+                        <div>
+                          <select id="etl-project" required><option value="">Loading...</option></select>
+                          <div id="etl-new-project" class="etl-new-entry" style="display:none;">
+                            <input type="text" id="etl-new-project-id" placeholder="Project ID" style="margin-top:4px;">
+                            <input type="text" id="etl-new-project-name" placeholder="Project Name" style="margin-top:4px;">
+                            <button type="button" class="btn btn-primary btn-sm" style="margin-top:4px;" onclick="adminDashboard.addNewProject()">Add</button>
+                            <button type="button" class="btn btn-secondary btn-sm" style="margin-top:4px;" onclick="adminDashboard.cancelNew('project')">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="etl-metadata-grid" style="margin-bottom:var(--sp-4);">
+                        <label for="etl-abstract">Abstract</label>
+                        <div><textarea id="etl-abstract" rows="3" style="width:100%;font-family:inherit;font-size:var(--fs-sm);padding:4px 8px;border:1px solid var(--color-border-strong);border-radius:var(--radius-sm);" placeholder="Project description..."></textarea></div>
+                        <label for="etl-license">License</label>
+                        <div>
+                          <select id="etl-license" style="width:100%;">
+                            <option value="">-- Select --</option>
+                            <option value="CC BY">CC BY</option>
+                            <option value="CC BY-SA">CC BY-SA</option>
+                            <option value="CC BY-NC">CC BY-NC</option>
+                            <option value="CC BY-NC-SA">CC BY-NC-SA</option>
+                            <option value="CC BY-ND">CC BY-ND</option>
+                            <option value="CC BY-NC-ND">CC BY-NC-ND</option>
+                            <option value="CC0">CC0</option>
+                            <option value="Public Domain Mark">Public Domain Mark</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="etl-author-row etl-author-header">
+                        <div class="etl-author-field"><label>Organisation</label></div>
+                        <div class="etl-author-field"><label>Author</label></div>
+                        <div class="etl-author-field etl-author-field-sm"><label>Position</label></div>
+                        <div class="etl-author-field etl-author-field-sm"><label>Tag</label></div>
+                        <div class="etl-author-field etl-author-field-sm"><label>Role</label></div>
+                      </div>
+                      <div id="etl-author-rows"></div>
+
+                      <div id="etl-new-org-block" class="etl-new-entry" style="display:none;margin-top:var(--sp-2);margin-bottom:var(--sp-2);">
+                        <strong style="font-size:var(--fs-xs);">New Organisation</strong>
+                        <div style="display:flex;gap:var(--sp-2);margin-top:4px;flex-wrap:wrap;">
+                          <input type="text" id="etl-new-org-id" placeholder="Organisation ID" style="flex:1;min-width:100px;">
+                          <input type="text" id="etl-new-org-country" placeholder="Country" style="flex:1;min-width:80px;">
+                          <input type="text" id="etl-new-org-city" placeholder="City" style="flex:1;min-width:80px;">
+                          <button type="button" class="btn btn-primary btn-sm" onclick="adminDashboard.addNewOrganisation()">Add</button>
+                          <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.cancelNew('organisation')">Cancel</button>
+                        </div>
+                      </div>
+                      <div id="etl-new-ind-block" class="etl-new-entry" style="display:none;margin-bottom:var(--sp-2);">
+                        <strong style="font-size:var(--fs-xs);">New Author</strong>
+                        <div style="display:flex;gap:var(--sp-2);margin-top:4px;flex-wrap:wrap;">
+                          <input type="text" id="etl-new-ind-id" placeholder="Name / ID" style="flex:1;min-width:100px;">
+                          <input type="email" id="etl-new-ind-email" placeholder="Email" style="flex:1;min-width:100px;">
+                          <button type="button" class="btn btn-primary btn-sm" onclick="adminDashboard.addNewIndividual()">Add</button>
+                          <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.cancelNew('individual')">Cancel</button>
+                        </div>
+                      </div>
+
+                      <div style="margin-top:var(--sp-3);">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.addAuthorRow()">+ Add Author</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <!-- Standardization -->
+                  <div id="etl-mapping-section" class="etl-section">
+                    <h3 class="etl-section-title">Standardization</h3>
+                    <div style="margin-bottom:var(--sp-3);display:flex;align-items:center;gap:var(--sp-3);">
+                      <label style="font-size:var(--fs-sm);font-weight:600;">EPSG Code:</label>
+                      <input type="text" id="etl-epsg" value="4326" style="width:80px;padding:2px 6px;font-size:var(--fs-sm);">
+                    </div>
+                    <table class="admin-table" id="etl-mapping-table">
+                      <thead>
+                        <tr>
+                          <th>CSV Column</th>
+                          <th>Destination Table</th>
+                          <th>Destination Column</th>
+                          <th>Property</th>
+                          <th>Procedure</th>
+                          <th>Unit</th>
+                          <th>Conversion</th>
+                        </tr>
+                      </thead>
+                      <tbody id="etl-mapping-tbody"></tbody>
+                    </table>
+                  </div>
+
+                  <!-- Save -->
+                  <div style="margin-top:var(--sp-5);display:flex;align-items:center;gap:var(--sp-3);">
+                    <button type="button" class="btn btn-primary" id="etl-save-btn">Save</button>
+                    <span id="etl-save-status" style="font-size:var(--fs-sm);"></span>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
             <!-- My Account Tab -->
             <div id="account-tab" class="tab-pane">
               <div class="admin-form" style="max-width:500px;">
@@ -369,6 +512,26 @@ class AdminDashboard {
     document.getElementById('account-form').addEventListener('submit', (e) => {
       e.preventDefault();
       this.handleAccountSubmit();
+    });
+
+    // ETL metadata form — prevent default submit, save handled by unified button
+    document.getElementById('etl-metadata-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+    });
+
+    // ETL upload
+    document.getElementById('etl-upload-btn').addEventListener('click', () => {
+      this.handleEtlUpload();
+    });
+
+    // ETL back to list
+    document.getElementById('etl-back-btn').addEventListener('click', () => {
+      this.closeDetailPanel();
+    });
+
+    // ETL unified save (attribution + standardization)
+    document.getElementById('etl-save-btn').addEventListener('click', () => {
+      this.handleEtlSave();
     });
 
     // Save view is now triggered automatically on map moveend
@@ -549,6 +712,11 @@ class AdminDashboard {
       pane.classList.remove('active');
     });
     document.getElementById(`${tab}-tab`).classList.add('active');
+
+    // Load ETL codelists when tab is first opened
+    if (tab === 'etl' && !this.etlCodelistsLoaded) {
+      this.loadEtlCodelists();
+    }
   }
 
   // ==================== Settings Management ====================
@@ -866,6 +1034,611 @@ class AdminDashboard {
       alert('Error toggling layer publish status: ' + error.message);
     }
   }
+
+  // ==================== ETL ====================
+
+  // Destination table → column options
+  get ETL_DEST_COLUMNS() {
+    return {
+      'site': ['site_id'],
+      'plot': ['plot_code', 'geom (longitude)', 'geom (latitude)', 'type', 'altitude', 'sampling_date', 'positional_accuracy'],
+      'profile': ['profile_code'],
+      'element': ['upper_depth', 'lower_depth', 'type'],
+      'result_num': ['value']
+    };
+  }
+
+  async loadEtlCodelists() {
+    try {
+      const [projects, organisations, individuals, properties, procedures, units] = await Promise.all([
+        api.getProjects(),
+        api.getOrganisations(),
+        api.getIndividuals(),
+        api.getProperties(),
+        api.getProcedures(),
+        api.getUnits()
+      ]);
+      this.etlCodelists = { projects, organisations, individuals, properties, procedures, units };
+      this.etlCodelistsLoaded = true;
+      this.populateEtlDropdowns();
+      this.loadEtlDatasets();
+    } catch (e) {
+      console.error('Error loading ETL codelists:', e);
+    }
+  }
+
+  populateEtlDropdowns() {
+    const cl = this.etlCodelists;
+
+    // Project dropdown (single)
+    const projEl = document.getElementById('etl-project');
+    if (projEl) {
+      projEl.innerHTML = '<option value="">-- Select --</option>' +
+        (cl.projects || []).map(i => `<option value="${this.escapeHtml(i.project_id)}">${this.escapeHtml(i.project_id + ' — ' + (i.name || ''))}</option>`).join('') +
+        '<option value="__new__">+ Add new...</option>';
+      projEl.onchange = () => {
+        document.getElementById('etl-new-project').style.display = projEl.value === '__new__' ? '' : 'none';
+        this.loadProjectAuthors(projEl.value);
+        this.loadProjectDetails(projEl.value);
+      };
+    }
+
+    // Fill all org selects and individual selects in author rows
+    this.refreshAuthorDropdowns();
+  }
+
+  refreshAuthorDropdowns() {
+    const cl = this.etlCodelists;
+    const orgOpts = '<option value="">-- Select --</option>' +
+      (cl.organisations || []).map(i => `<option value="${this.escapeHtml(i.organisation_id)}">${this.escapeHtml(i.organisation_id + ' — ' + (i.country || '') + ' ' + (i.city || ''))}</option>`).join('') +
+      '<option value="__new__">+ Add new...</option>';
+    const indOpts = '<option value="">-- Select --</option>' +
+      (cl.individuals || []).map(i => `<option value="${this.escapeHtml(i.individual_id)}">${this.escapeHtml(i.individual_id + ' — ' + (i.email || ''))}</option>`).join('') +
+      '<option value="__new__">+ Add new...</option>';
+
+    document.querySelectorAll('.etl-org-sel').forEach(sel => {
+      const prev = sel.value;
+      sel.innerHTML = orgOpts;
+      if (prev && prev !== '__new__') sel.value = prev;
+      sel.onchange = () => {
+        document.getElementById('etl-new-org-block').style.display = sel.value === '__new__' ? '' : 'none';
+      };
+    });
+    document.querySelectorAll('.etl-ind-sel').forEach(sel => {
+      const prev = sel.value;
+      sel.innerHTML = indOpts;
+      if (prev && prev !== '__new__') sel.value = prev;
+      sel.onchange = () => {
+        document.getElementById('etl-new-ind-block').style.display = sel.value === '__new__' ? '' : 'none';
+      };
+    });
+  }
+
+  async loadProjectAuthors(projectId) {
+    const container = document.getElementById('etl-author-rows');
+    // Clear rows if no valid project selected
+    if (!projectId || projectId === '__new__') {
+      container.innerHTML = '';
+      return;
+    }
+    try {
+      const authors = await api.getProjectAuthors(projectId);
+      if (!authors.length) {
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = '';
+      for (const a of authors) {
+        this.addAuthorRow();
+        const row = container.lastElementChild;
+        // Set values after dropdowns are populated by addAuthorRow → refreshAuthorDropdowns
+        row.querySelector('.etl-org-sel').value = a.organisation_id || '';
+        row.querySelector('.etl-ind-sel').value = a.individual_id || '';
+        row.querySelector('.etl-pos-input').value = a.position || '';
+        if (a.tag) row.querySelector('.etl-tag-sel').value = a.tag;
+        if (a.role) row.querySelector('.etl-role-sel').value = a.role;
+      }
+    } catch (e) {
+      console.error('Failed to load project authors:', e);
+    }
+  }
+
+  loadProjectDetails(projectId) {
+    const abstractEl = document.getElementById('etl-abstract');
+    const licenseEl = document.getElementById('etl-license');
+    if (!projectId || projectId === '__new__') {
+      abstractEl.value = '';
+      licenseEl.value = '';
+      return;
+    }
+    const proj = (this.etlCodelists.projects || []).find(p => p.project_id === projectId);
+    abstractEl.value = proj?.abstract || '';
+    licenseEl.value = proj?.license || '';
+  }
+
+  addAuthorRow() {
+    const container = document.getElementById('etl-author-rows');
+    const row = document.createElement('div');
+    row.className = 'etl-author-row';
+    row.innerHTML = `
+      <div class="etl-author-field">
+        <select class="etl-org-sel"><option value="">Loading...</option></select>
+      </div>
+      <div class="etl-author-field">
+        <select class="etl-ind-sel"><option value="">Loading...</option></select>
+      </div>
+      <div class="etl-author-field etl-author-field-sm">
+        <input type="text" class="etl-pos-input" placeholder="e.g. Researcher">
+      </div>
+      <div class="etl-author-field etl-author-field-sm">
+        <select class="etl-tag-sel">
+          <option value="contact">contact</option>
+          <option value="pointOfContact">pointOfContact</option>
+        </select>
+      </div>
+      <div class="etl-author-field etl-author-field-sm">
+        <select class="etl-role-sel">
+          <option value="author">author</option>
+          <option value="custodian">custodian</option>
+          <option value="distributor">distributor</option>
+          <option value="originator">originator</option>
+          <option value="owner">owner</option>
+          <option value="pointOfContact">pointOfContact</option>
+          <option value="principalInvestigator">principalInvestigator</option>
+          <option value="processor">processor</option>
+          <option value="publisher">publisher</option>
+          <option value="resourceProvider">resourceProvider</option>
+          <option value="user">user</option>
+        </select>
+      </div>
+      <button type="button" class="btn btn-danger btn-sm etl-remove-author" title="Remove" onclick="this.closest('.etl-author-row').remove()">×</button>
+    `;
+    container.appendChild(row);
+    this.refreshAuthorDropdowns();
+  }
+
+  cancelNew(type) {
+    if (type === 'project') {
+      document.getElementById('etl-new-project').style.display = 'none';
+      document.getElementById('etl-project').value = '';
+    } else if (type === 'organisation') {
+      document.getElementById('etl-new-org-block').style.display = 'none';
+      document.querySelectorAll('.etl-org-sel').forEach(s => { if (s.value === '__new__') s.value = ''; });
+    } else if (type === 'individual') {
+      document.getElementById('etl-new-ind-block').style.display = 'none';
+      document.querySelectorAll('.etl-ind-sel').forEach(s => { if (s.value === '__new__') s.value = ''; });
+    }
+  }
+
+  async addNewProject() {
+    const pid = document.getElementById('etl-new-project-id').value.trim();
+    const name = document.getElementById('etl-new-project-name').value.trim();
+    if (!pid || !name) { alert('Project ID and Name are required'); return; }
+    try {
+      await api.createProject({ project_id: pid, name });
+      this.etlCodelists.projects.push({ project_id: pid, name });
+      this.populateEtlDropdowns();
+      document.getElementById('etl-project').value = pid;
+      document.getElementById('etl-new-project').style.display = 'none';
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+
+  async addNewOrganisation() {
+    const oid = document.getElementById('etl-new-org-id').value.trim();
+    const country = document.getElementById('etl-new-org-country').value.trim();
+    const city = document.getElementById('etl-new-org-city').value.trim();
+    if (!oid) { alert('Organisation ID is required'); return; }
+    try {
+      await api.createOrganisation({ organisation_id: oid, country, city });
+      this.etlCodelists.organisations.push({ organisation_id: oid, country, city });
+      this.refreshAuthorDropdowns();
+      // Select the new org in any dropdown that had __new__
+      document.querySelectorAll('.etl-org-sel').forEach(s => { if (s.value === '__new__' || !s.value) s.value = oid; });
+      document.getElementById('etl-new-org-block').style.display = 'none';
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+
+  async addNewIndividual() {
+    const iid = document.getElementById('etl-new-ind-id').value.trim();
+    const email = document.getElementById('etl-new-ind-email').value.trim();
+    if (!iid) { alert('Name / ID is required'); return; }
+    try {
+      await api.createIndividual({ individual_id: iid, email });
+      this.etlCodelists.individuals.push({ individual_id: iid, email });
+      this.refreshAuthorDropdowns();
+      document.querySelectorAll('.etl-ind-sel').forEach(s => { if (s.value === '__new__' || !s.value) s.value = iid; });
+      document.getElementById('etl-new-ind-block').style.display = 'none';
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+
+  async handleEtlSave() {
+    const statusEl = document.getElementById('etl-save-status');
+    statusEl.textContent = 'Saving...';
+    statusEl.style.color = '#555';
+
+    try {
+      // Save attribution (metadata)
+      const projectId = document.getElementById('etl-project').value;
+      if (!projectId || projectId === '__new__') {
+        statusEl.textContent = 'Please select a project.';
+        statusEl.style.color = '#c33';
+        return;
+      }
+
+      const authorRows = document.querySelectorAll('#etl-author-rows .etl-author-row');
+      const authors = [];
+      for (const row of authorRows) {
+        const orgId = row.querySelector('.etl-org-sel')?.value;
+        const indId = row.querySelector('.etl-ind-sel')?.value;
+        const position = row.querySelector('.etl-pos-input')?.value.trim();
+        const tag = row.querySelector('.etl-tag-sel')?.value;
+        const role = row.querySelector('.etl-role-sel')?.value;
+        if (!orgId || orgId === '__new__' || !indId || indId === '__new__') {
+          statusEl.textContent = 'Please select organisation and author for every row.';
+          statusEl.style.color = '#c33';
+          return;
+        }
+        authors.push({ organisation_id: orgId, individual_id: indId, position, tag, role });
+      }
+
+      await api.saveEtlMetadata({ project_id: projectId, authors });
+
+      // Save project abstract and license
+      const abstract = document.getElementById('etl-abstract').value.trim();
+      const license = document.getElementById('etl-license').value;
+      await api.updateProject(projectId, { abstract: abstract || null, license: license || null });
+
+      // Update local cache
+      const proj = (this.etlCodelists.projects || []).find(p => p.project_id === projectId);
+      if (proj) { proj.abstract = abstract || null; proj.license = license || null; }
+
+      // Save standardization (column mapping)
+      const section = document.getElementById('etl-mapping-section');
+      const tableName = section.dataset.tableName;
+      if (tableName) {
+        const mappingRows = document.querySelectorAll('#etl-mapping-tbody tr');
+        const columns = [];
+        mappingRows.forEach(tr => {
+          const colName = tr.dataset.col;
+          const destTable = tr.querySelector('.etl-dest-table').value;
+          const destColSel = tr.querySelector('.etl-dest-col');
+          const destColHidden = tr.querySelector('.etl-dest-col-val');
+          const destCol = destColSel ? destColSel.value : (destColHidden ? destColHidden.value : '');
+          const convOp = tr.querySelector('.etl-conv-op').value || null;
+          const convVal = tr.querySelector('.etl-conv-val').value;
+          const entry = {
+            column_name: colName,
+            destination_table: destTable || null,
+            destination_column: destCol || null,
+            ignore_column: !destTable,
+            property_num_id: null,
+            procedure_num_id: null,
+            unit_of_measure_id: null,
+            conversion_operation: convOp,
+            conversion_value: convVal ? parseFloat(convVal) : null
+          };
+          if (destTable === 'result_num') {
+            entry.property_num_id = tr.querySelector('.etl-prop').value || null;
+            entry.procedure_num_id = tr.querySelector('.etl-proc').value || null;
+            entry.unit_of_measure_id = tr.querySelector('.etl-unit').value || null;
+          }
+          columns.push(entry);
+        });
+        const epsg = document.getElementById('etl-epsg').value.trim();
+        await api.saveDatasetColumns(tableName, columns, epsg);
+      }
+
+      this.closeDetailPanel();
+    } catch (e) {
+      statusEl.textContent = 'Error: ' + e.message;
+      statusEl.style.color = '#c33';
+    }
+  }
+
+  async handleEtlUpload() {
+    const fileInput = document.getElementById('etl-file-input');
+    const statusEl = document.getElementById('etl-upload-status');
+    if (!fileInput.files.length) {
+      statusEl.textContent = 'Please select a CSV file.';
+      statusEl.style.color = '#c33';
+      return;
+    }
+    const projectId = document.getElementById('etl-project').value;
+    const btn = document.getElementById('etl-upload-btn');
+    btn.disabled = true;
+    statusEl.textContent = 'Uploading...';
+    statusEl.style.color = '#555';
+    try {
+      const result = await api.uploadCsv(fileInput.files[0], projectId !== '__new__' ? projectId : null);
+      this.etlUploadResult = result;
+      statusEl.textContent = '';
+      fileInput.value = '';
+      await this.loadEtlDatasets();
+      this.openDataset(result.table_name);
+    } catch (e) {
+      statusEl.textContent = 'Error: ' + e.message;
+      statusEl.style.color = '#c33';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async loadEtlDatasets() {
+    try {
+      const datasets = await api.getDatasets();
+      this.etlDatasets = datasets;
+      this.renderEtlDatasets();
+    } catch (e) {
+      console.error('Error loading datasets:', e);
+    }
+  }
+
+  renderEtlDatasets() {
+    const container = document.getElementById('etl-datasets-list');
+    if (!container) return;
+    if (!this.etlDatasets.length) {
+      container.innerHTML = '<p style="font-size:var(--fs-sm);color:#555;">No datasets uploaded yet.</p>';
+      return;
+    }
+    container.innerHTML = `
+      <table class="admin-table">
+        <thead><tr><th>Table</th><th>Status</th><th>Rows</th><th>Cols</th><th>Actions</th><th>Result</th></tr></thead>
+        <tbody>${this.etlDatasets.map(d => {
+          const tn = this.escapeHtml(d.table_name);
+          const ingested = d.status === 'Ingested' || d.status === 'Partial';
+          const noPrune = d.status === 'Uploaded' || d.status === 'Removed' || !d.status;
+          return `<tr data-table="${tn}">
+            <td>${tn}</td>
+            <td>${this.escapeHtml(d.status || '-')}</td>
+            <td>${d.n_rows ?? '-'}</td>
+            <td>${d.n_col ?? '-'}</td>
+            <td>
+              <button class="btn btn-primary btn-sm" onclick="adminDashboard.openDataset('${tn}')">Open</button>
+              <button class="btn btn-sm" style="background:#28a745;color:#fff;margin-left:4px;${ingested ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.ingestDataset('${tn}')"${ingested ? ' disabled' : ''}>Ingest</button>
+              <button class="btn btn-sm" style="background:#dc3545;color:#fff;margin-left:4px;${noPrune ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.pruneDataset('${tn}')"${noPrune ? ' disabled' : ''}>Prune DB</button>
+            </td>
+            <td class="etl-result" style="font-size:var(--fs-xs);max-width:300px;white-space:pre-wrap;">${this.escapeHtml(d.note || '')}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  async openDataset(tableName) {
+    try {
+      const [preview, columns] = await Promise.all([
+        api.getDatasetPreview(tableName),
+        api.getDatasetColumns(tableName)
+      ]);
+      this.etlUploadResult = { table_name: tableName, columns: preview.columns };
+      this.showEtlPreview(preview.columns, preview.rows.map(r => preview.columns.map(c => r[c])));
+      this.showEtlMapping(tableName, preview.columns, columns);
+
+      // Restore project and authors from the dataset record
+      const dataset = (this.etlDatasets || []).find(d => d.table_name === tableName);
+      if (dataset && dataset.project_id) {
+        const projEl = document.getElementById('etl-project');
+        if (projEl) {
+          projEl.value = dataset.project_id;
+          document.getElementById('etl-new-project').style.display = 'none';
+        }
+        await this.loadProjectAuthors(dataset.project_id);
+        this.loadProjectDetails(dataset.project_id);
+      } else {
+        document.getElementById('etl-project').value = '';
+        document.getElementById('etl-abstract').value = '';
+        document.getElementById('etl-license').value = '';
+        document.getElementById('etl-author-rows').innerHTML = '';
+      }
+
+      // Switch to detail panel
+      document.getElementById('etl-list-view').style.display = 'none';
+      document.getElementById('etl-detail-panel').style.display = '';
+      document.getElementById('etl-detail-title').textContent = tableName;
+      document.getElementById('etl-save-status').textContent = '';
+    } catch (e) {
+      alert('Error opening dataset: ' + e.message);
+    }
+  }
+
+  closeDetailPanel() {
+    document.getElementById('etl-detail-panel').style.display = 'none';
+    document.getElementById('etl-list-view').style.display = '';
+    this.loadEtlDatasets();
+  }
+
+  setRowResult(tableName, html, isError) {
+    const row = document.querySelector(`tr[data-table="${tableName}"]`);
+    if (!row) return;
+    const cell = row.querySelector('.etl-result');
+    if (cell) {
+      cell.innerHTML = html;
+      cell.style.color = isError ? '#dc3545' : '#28a745';
+    }
+  }
+
+  async ingestDataset(tableName) {
+    this.setRowResult(tableName, 'Ingesting...', false);
+    try {
+      const result = await api.ingestDataset(tableName);
+      let msg = result.message || `Ingested ${result.ingested}/${result.total} rows`;
+      if (result.errors && result.errors.length) {
+        msg += `\nErrors: ${result.errors.length}`;
+      }
+      this.setRowResult(tableName, this.escapeHtml(msg), false);
+      this.loadEtlDatasets();
+    } catch (e) {
+      this.setRowResult(tableName, this.escapeHtml(e.message), true);
+    }
+  }
+
+  async pruneDataset(tableName) {
+    this.setRowResult(tableName, 'Pruning...', false);
+    try {
+      const result = await api.pruneDataset(tableName);
+      this.setRowResult(tableName, this.escapeHtml(result.message), false);
+      this.loadEtlDatasets();
+    } catch (e) {
+      this.setRowResult(tableName, this.escapeHtml(e.message), true);
+    }
+  }
+
+  showEtlPreview(columns, rows) {
+    const thead = document.getElementById('etl-preview-thead');
+    const tbody = document.getElementById('etl-preview-tbody');
+    const info = document.getElementById('etl-preview-info');
+    info.textContent = `(showing ${rows.length} rows)`;
+    thead.innerHTML = '<tr>' + columns.map(c => `<th>${this.escapeHtml(c)}</th>`).join('') + '</tr>';
+    tbody.innerHTML = rows.map(row =>
+      '<tr>' + (Array.isArray(row) ? row : columns.map(c => row[c])).map(v => `<td>${this.escapeHtml(String(v ?? ''))}</td>`).join('') + '</tr>'
+    ).join('');
+  }
+
+  showEtlMapping(tableName, columns, existingMappings) {
+    const section = document.getElementById('etl-mapping-section');
+    const tbody = document.getElementById('etl-mapping-tbody');
+    section.dataset.tableName = tableName;
+
+    const destTables = Object.keys(this.ETL_DEST_COLUMNS);
+    const cl = this.etlCodelists;
+    const ss = 'font-size:var(--fs-xs);padding:2px 4px;';
+
+    const existingMap = {};
+    if (existingMappings) {
+      existingMappings.forEach(m => { existingMap[m.column_name] = m; });
+    }
+
+    const convOps = ['', '*', '/'];
+    const convVals = ['', '10', '100', '1000', '10000'];
+
+    tbody.innerHTML = columns.map(col => {
+      const existing = existingMap[col] || {};
+      const selTable = existing.destination_table || '';
+      const selCol = existing.destination_column || '';
+      const isResult = selTable === 'result_num';
+      const exConvOp = existing.conversion_operation || '';
+      const exConvVal = existing.conversion_value != null ? String(existing.conversion_value) : '';
+
+      const tableOpts = '<option value="">(skip)</option>' +
+        destTables.map(t => `<option value="${t}"${selTable === t ? ' selected' : ''}>${t}</option>`).join('');
+
+      let colCell;
+      if (isResult) {
+        colCell = `<span style="${ss}color:var(--color-text-muted);">value</span><input type="hidden" class="etl-dest-col-val" value="value">`;
+      } else {
+        let colOpts = '<option value="">—</option>';
+        if (selTable && this.ETL_DEST_COLUMNS[selTable]) {
+          colOpts = '<option value="">—</option>' +
+            this.ETL_DEST_COLUMNS[selTable].map(c => `<option value="${c}"${selCol === c ? ' selected' : ''}>${c}</option>`).join('');
+        }
+        colCell = `<select class="etl-dest-col" style="${ss}">${colOpts}</select>`;
+      }
+
+      const propOpts = '<option value="">—</option>' + (cl.properties || []).map(p =>
+        `<option value="${p.property_num_id}"${existing.property_num_id == p.property_num_id ? ' selected' : ''}>${this.escapeHtml(p.property_name)}</option>`
+      ).join('');
+
+      const convOpOpts = convOps.map(o => `<option value="${o}"${exConvOp === o ? ' selected' : ''}>${o || '—'}</option>`).join('');
+      const convValOpts = convVals.map(v => `<option value="${v}"${exConvVal === v ? ' selected' : ''}>${v || '—'}</option>`).join('');
+
+      const hideResult = isResult ? '' : 'display:none;';
+
+      return `
+        <tr data-col="${this.escapeHtml(col)}">
+          <td><strong>${this.escapeHtml(col)}</strong></td>
+          <td><select class="etl-dest-table" style="${ss}">${tableOpts}</select></td>
+          <td class="etl-col-cell">${colCell}</td>
+          <td><select class="etl-prop" style="${ss}${hideResult}">${propOpts}</select></td>
+          <td><select class="etl-proc" style="${ss}${hideResult}"><option value="">—</option></select></td>
+          <td><select class="etl-unit" style="${ss}${hideResult}"><option value="">—</option></select></td>
+          <td class="etl-conv-cell" style="white-space:nowrap;${hideResult}">
+            <select class="etl-conv-op" style="${ss}width:50px;">${convOpOpts}</select>
+            <select class="etl-conv-val" style="${ss}width:70px;">${convValOpts}</select>
+          </td>
+        </tr>`;
+    }).join('');
+
+    // Cascade: dest table changes
+    tbody.querySelectorAll('.etl-dest-table').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const tr = sel.closest('tr');
+        const colCell = tr.querySelector('.etl-col-cell');
+        const table = sel.value;
+        const isResult = table === 'result_num';
+
+        if (isResult) {
+          colCell.innerHTML = `<span style="${ss}color:var(--color-text-muted);">value</span><input type="hidden" class="etl-dest-col-val" value="value">`;
+        } else {
+          const cols = this.ETL_DEST_COLUMNS[table] || [];
+          colCell.innerHTML = `<select class="etl-dest-col" style="${ss}"><option value="">—</option>${cols.map(c => `<option value="${c}">${c}</option>`).join('')}</select>`;
+        }
+
+        tr.querySelector('.etl-prop').style.display = isResult ? '' : 'none';
+        tr.querySelector('.etl-proc').style.display = isResult ? '' : 'none';
+        tr.querySelector('.etl-unit').style.display = isResult ? '' : 'none';
+        tr.querySelector('.etl-conv-cell').style.display = isResult ? '' : 'none';
+        tr.querySelector('.etl-proc').innerHTML = '<option value="">—</option>';
+        tr.querySelector('.etl-unit').innerHTML = '<option value="">—</option>';
+      });
+    });
+
+    // Cascade: property changes → load filtered procedures + units
+    tbody.querySelectorAll('.etl-prop').forEach(sel => {
+      sel.addEventListener('change', async () => {
+        const tr = sel.closest('tr');
+        const procSel = tr.querySelector('.etl-proc');
+        const unitSel = tr.querySelector('.etl-unit');
+        const propId = sel.value;
+        procSel.innerHTML = '<option value="">Loading...</option>';
+        unitSel.innerHTML = '<option value="">Loading...</option>';
+        if (!propId) {
+          procSel.innerHTML = '<option value="">—</option>';
+          unitSel.innerHTML = '<option value="">—</option>';
+          return;
+        }
+        try {
+          const [procs, units] = await Promise.all([
+            api.getProceduresForProperty(propId),
+            api.getUnitsForProperty(propId)
+          ]);
+          procSel.innerHTML = '<option value="">—</option>' +
+            procs.map(p => `<option value="${p.procedure_num_id}">${this.escapeHtml(p.procedure_name)}</option>`).join('');
+          unitSel.innerHTML = '<option value="">—</option>' +
+            units.map(u => `<option value="${u.unit_of_measure_id}">${this.escapeHtml(u.unit_of_measure_id)}</option>`).join('');
+        } catch (e) {
+          procSel.innerHTML = '<option value="">Error</option>';
+          unitSel.innerHTML = '<option value="">Error</option>';
+        }
+      });
+    });
+
+    // For existing mappings with property set, load their procedures + units, then restore selection
+    if (existingMappings) {
+      tbody.querySelectorAll('tr[data-col]').forEach(tr => {
+        const col = tr.dataset.col;
+        const existing = existingMap[col];
+        if (existing && existing.property_num_id) {
+          const propSel = tr.querySelector('.etl-prop');
+          const savedProc = existing.procedure_num_id;
+          const savedUnit = existing.unit_of_measure_id;
+          // Load then restore
+          Promise.all([
+            api.getProceduresForProperty(existing.property_num_id),
+            api.getUnitsForProperty(existing.property_num_id)
+          ]).then(([procs, units]) => {
+            const procSel = tr.querySelector('.etl-proc');
+            const unitSel = tr.querySelector('.etl-unit');
+            procSel.innerHTML = '<option value="">—</option>' +
+              procs.map(p => `<option value="${p.procedure_num_id}"${p.procedure_num_id === savedProc ? ' selected' : ''}>${this.escapeHtml(p.procedure_name)}</option>`).join('');
+            unitSel.innerHTML = '<option value="">—</option>' +
+              units.map(u => `<option value="${u.unit_of_measure_id}"${u.unit_of_measure_id === savedUnit ? ' selected' : ''}>${this.escapeHtml(u.unit_of_measure_id)}</option>`).join('');
+          }).catch(() => {});
+        }
+      });
+    }
+  }
+
+  // handleSaveMapping merged into handleEtlSave
 
   // ==================== Utility ====================
 

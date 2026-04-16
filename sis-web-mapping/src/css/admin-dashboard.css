@@ -640,6 +640,136 @@ input:checked + .toggle-slider:before {
     opacity: 0.3;
 }
 
+/* ---------- ETL tab ---------- */
+.etl-section {
+    margin-bottom: var(--sp-5);
+}
+
+.etl-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0 0 var(--sp-3) 0;
+    padding-bottom: var(--sp-2);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.etl-metadata-grid {
+    display: grid;
+    grid-template-columns: auto 280px;
+    gap: var(--sp-2) var(--sp-3);
+    align-items: center;
+    max-width: 500px;
+}
+
+.etl-metadata-grid label {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.etl-metadata-grid select,
+.etl-metadata-grid input {
+    padding: 4px 8px;
+    font-size: var(--fs-sm);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.etl-author-row {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: flex-end;
+    flex-wrap: wrap;
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.etl-author-row:last-child {
+    border-bottom: none;
+}
+
+.etl-author-header {
+    border-bottom: 1px solid var(--color-border-strong);
+    padding-bottom: var(--sp-1);
+    padding-right: 30px; /* space for the × button column in data rows */
+}
+
+.etl-author-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 140px;
+    flex: 1;
+}
+
+.etl-author-field-sm {
+    min-width: 100px;
+    flex: 0 1 130px;
+}
+
+.etl-author-field label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    margin-bottom: 2px;
+    white-space: nowrap;
+}
+
+.etl-author-field select,
+.etl-author-field input {
+    padding: 4px 8px;
+    font-size: var(--fs-sm);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.etl-remove-author {
+    align-self: flex-end;
+    margin-bottom: 2px;
+}
+
+.etl-new-entry {
+    background: var(--color-surface-alt, #f9f9f9);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    padding: var(--sp-2) var(--sp-3);
+    margin-top: 4px;
+}
+
+.etl-new-entry input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.etl-preview-scroll {
+    max-height: 350px;
+    overflow: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--sp-4);
+}
+
+.etl-preview-scroll .admin-table {
+    margin-top: 0;
+    border: none;
+    border-radius: 0;
+    font-size: var(--fs-xs);
+}
+
+.etl-preview-scroll td,
+.etl-preview-scroll th {
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .dashboard-header {

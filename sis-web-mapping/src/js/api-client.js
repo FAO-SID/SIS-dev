@@ -241,6 +241,136 @@ class SISApiClient {
     });
   }
 
+  // ==================== Codelist Endpoints (JWT Token) ====================
+
+  async getOrganisations() {
+    return this.authenticatedRequest('/api/codelist/organisations');
+  }
+
+  async getIndividuals() {
+    return this.authenticatedRequest('/api/codelist/individuals');
+  }
+
+  async getProjects() {
+    return this.authenticatedRequest('/api/codelist/projects');
+  }
+
+  async getProperties() {
+    return this.authenticatedRequest('/api/codelist/properties');
+  }
+
+  async getProcedures() {
+    return this.authenticatedRequest('/api/codelist/procedures');
+  }
+
+  async getUnits() {
+    return this.authenticatedRequest('/api/codelist/units');
+  }
+
+  async getProceduresForProperty(propertyNumId) {
+    return this.authenticatedRequest(`/api/codelist/procedures_for_property/${encodeURIComponent(propertyNumId)}`);
+  }
+
+  async getUnitsForProperty(propertyNumId) {
+    return this.authenticatedRequest(`/api/codelist/units_for_property/${encodeURIComponent(propertyNumId)}`);
+  }
+
+  async createProject(data) {
+    return this.authenticatedRequest('/api/codelist/projects', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async updateProject(projectId, data) {
+    return this.authenticatedRequest(`/api/codelist/projects/${encodeURIComponent(projectId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async createOrganisation(data) {
+    return this.authenticatedRequest('/api/codelist/organisations', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async createIndividual(data) {
+    return this.authenticatedRequest('/api/codelist/individuals', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  // ==================== ETL Endpoints (JWT Token) ====================
+
+  async saveEtlMetadata(metadata) {
+    return this.authenticatedRequest('/api/etl/metadata', {
+      method: 'PUT',
+      body: JSON.stringify(metadata)
+    });
+  }
+
+  async getProjectAuthors(projectId) {
+    return this.authenticatedRequest(`/api/etl/project/${encodeURIComponent(projectId)}/authors`);
+  }
+
+  async uploadCsv(file, projectId) {
+    if (!this.jwtToken) {
+      throw new Error('Not authenticated. Please login first.');
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    if (projectId) formData.append('project_id', projectId);
+    const response = await fetch(`${this.baseURL}/api/etl/upload`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${this.jwtToken}` },
+      body: formData
+    });
+    if (!response.ok) {
+      if (response.status === 401) {
+        this.jwtToken = null;
+        localStorage.removeItem('jwt_token');
+        throw new Error('Session expired. Please login again.');
+      }
+      const error = await response.json().catch(() => ({ detail: response.statusText }));
+      throw new Error(error.detail || `API Error: ${response.status}`);
+    }
+    return response.json();
+  }
+
+  async getDatasets() {
+    return this.authenticatedRequest('/api/etl/datasets');
+  }
+
+  async getDatasetPreview(tableName) {
+    return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/preview`);
+  }
+
+  async getDatasetColumns(tableName) {
+    return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/columns`);
+  }
+
+  async saveDatasetColumns(tableName, columns, epsg) {
+    return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/columns`, {
+      method: 'PUT',
+      body: JSON.stringify({ columns, epsg })
+    });
+  }
+
+  async ingestDataset(tableName) {
+    return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/ingest`, {
+      method: 'POST'
+    });
+  }
+
+  async pruneDataset(tableName) {
+    return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/prune`, {
+      method: 'POST'
+    });
+  }
+
   async updateOwnAccount(currentPassword, newUserId, newPassword) {
     const body = { current_password: currentPassword };
     if (newUserId) body.new_user_id = newUserId;
