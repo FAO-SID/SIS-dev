@@ -6,7 +6,7 @@ and authentication utilities — used by sis-api and sis-api-glosis.
 from fastapi import Depends, HTTPException, status, Header, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
-from typing import Optional, Annotated
+from typing import Optional, Annotated, List
 from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -89,6 +89,7 @@ class Layer(BaseModel):
     get_legend_url: Optional[str] = None
     get_feature_info_url: Optional[str] = None
     is_default: Optional[bool] = False
+    keywords: Optional[List[str]] = None
 
 class LayerCreate(BaseModel):
     project_id: Optional[str] = None

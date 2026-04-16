@@ -12,7 +12,7 @@ import { fromLonLat, toLonLat } from 'ol/proj';
 
 const BASE_MAP_OPTIONS = {
   'esri-imagery': {
-    label: 'ESRI Imagery',
+    label: 'Satellite',
     factory: () => new TileLayer({
       source: new XYZ({
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -194,7 +194,7 @@ class AdminDashboard {
                       <label for="setting-value">Value *</label>
                       <input type="text" id="setting-value">
                       <select id="setting-value-select" style="display:none;">
-                        <option value="esri-imagery">ESRI Imagery</option>
+                        <option value="esri-imagery">Satellite</option>
                         <option value="osm">OpenStreetMap</option>
                         <option value="terrain">Open TopoMap</option>
                       </select>
@@ -214,7 +214,7 @@ class AdminDashboard {
                 <p style="color:#555;font-size:0.9em;">
                   Navigate and zoom to set the default LATITUDE, LONGITUDE and ZOOM.
                 </p>
-                <div id="view-editor-map" style="width:100%;height:320px;border:1px solid #ccc;border-radius:4px;"></div>
+                <div id="view-editor-map" style="width:560px;height:240px;max-width:100%;aspect-ratio:21/9;border:1px solid #ccc;border-radius:4px;"></div>
                 <div class="form-actions" style="margin-top:10px;align-items:center;display:flex;gap:10px;">
                   <button type="button" class="btn btn-primary" id="save-view-btn">Save as Default View</button>
                   <span id="view-editor-status" style="font-size:0.9em;color:#555;"></span>
@@ -299,11 +299,10 @@ class AdminDashboard {
                       <th>Published</th>
                       <th>Default</th>
                       <th>WMS</th>
-                      <th style="width: 260px;">Actions</th>
                     </tr>
                   </thead>
                   <tbody id="layers-tbody">
-                    <tr><td colspan="7" class="loading">Loading layers...</td></tr>
+                    <tr><td colspan="6" class="loading">Loading layers...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -424,8 +423,7 @@ class AdminDashboard {
     const lat = getSetting('LATITUDE', 0);
     const lon = getSetting('LONGITUDE', 0);
     const zoom = getSetting('ZOOM', 2);
-    const baseName = (this.settings.find(s => s.key === 'BASE_MAP_DEFAULT') || {}).value;
-    const baseEntry = BASE_MAP_OPTIONS[baseName] || BASE_MAP_OPTIONS['osm'];
+    const baseEntry = BASE_MAP_OPTIONS['osm'];
 
     if (this.viewEditorMap) {
       this.viewEditorMap.setTarget(null);
@@ -793,35 +791,33 @@ class AdminDashboard {
     const tbody = document.getElementById('layers-tbody');
 
     if (this.layers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No layers found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No layers found</td></tr>';
       return;
     }
 
-    tbody.innerHTML = this.layers.map(layer => `
+    tbody.innerHTML = this.layers.map(layer => {
+      const id = this.escapeHtml(layer.layer_id);
+      const defaultCell = layer.is_default
+        ? `<button class="btn btn-secondary" onclick="adminDashboard.clearDefaultLayer()">Clear Default</button>`
+        : (layer.publish
+            ? `<button class="btn btn-primary" onclick="adminDashboard.setDefaultLayer('${id}')">Set Default</button>`
+            : '-');
+      return `
       <tr${layer.is_default ? ' style="background:#fff8d6;"' : ''}>
-        <td><strong>${this.escapeHtml(layer.layer_id)}</strong></td>
+        <td><strong>${id}</strong></td>
         <td>${this.escapeHtml(layer.project_name || '-')}</td>
         <td>${this.escapeHtml(layer.property_name || '-')}</td>
         <td>
-          <span class="badge ${layer.publish ? 'badge-success' : 'badge-danger'}">
-            ${layer.publish ? 'Published' : 'Unpublished'}
-          </span>
-        </td>
-        <td>${layer.is_default ? '<span class="badge badge-success">Default</span>' : '-'}</td>
-        <td id="wms-status-${this.escapeHtml(layer.layer_id)}">-</td>
-        <td class="actions">
           <button class="btn ${layer.publish ? 'btn-secondary' : 'btn-success'}"
-                  onclick="adminDashboard.toggleLayerPublish('${this.escapeHtml(layer.layer_id)}', ${!layer.publish})">
+                  onclick="adminDashboard.toggleLayerPublish('${id}', ${!layer.publish})">
             ${layer.publish ? 'Unpublish' : 'Publish'}
           </button>
-          ${layer.is_default
-            ? `<button class="btn btn-secondary" onclick="adminDashboard.clearDefaultLayer()">Clear Default</button>`
-            : (layer.publish
-                ? `<button class="btn btn-primary" onclick="adminDashboard.setDefaultLayer('${this.escapeHtml(layer.layer_id)}')">Set Default</button>`
-                : '')}
         </td>
+        <td>${defaultCell}</td>
+        <td id="wms-status-${id}">-</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   }
 
   async setDefaultLayer(layerId) {

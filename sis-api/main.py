@@ -10,6 +10,7 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 import os
+import re
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import requests as http_requests
@@ -559,10 +560,12 @@ def _to_relative_path(href: Optional[str]) -> Optional[str]:
 
 
 def _parse_property_name(title: str) -> str:
-    try:
-        return title.split(" - ")[1].split(" (")[0].strip()
-    except (IndexError, AttributeError):
+    # Strip the trailing " (...)..." segment, e.g. given
+    # 'GSNMap - Potassium (K+) - exchangeable (Bhutan - 250 m - 2024) - SOIL+'
+    # return 'GSNMap - Potassium (K+) - exchangeable'.
+    if not title:
         return title
+    return re.sub(r"\s*\([^()]*\)[^()]*$", "", title).strip()
 
 
 @app.post("/api/sync/layers")

@@ -1,5 +1,5 @@
 /* =====================================================================
-   FAO Soil Information System — Design tokens & base styles
+   Soil Information System — Design tokens & base styles
    ===================================================================== */
 :root {
     /* Color palette */
@@ -140,6 +140,7 @@ h1, h2, h3, h4, h5 {
     z-index: 1000;
     transition: transform var(--transition);
     min-width: 240px;
+    max-width: 320px;
 }
 
 .layer-switcher.collapsed .layer-switcher-content {
@@ -189,7 +190,7 @@ h1, h2, h3, h4, h5 {
 
 .layer-group-header {
     font-weight: 600;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-md);
     color: var(--color-text);
     margin-bottom: var(--sp-2);
     cursor: pointer;
@@ -197,8 +198,7 @@ h1, h2, h3, h4, h5 {
     align-items: center;
     gap: var(--sp-2);
     padding: var(--sp-1) 0;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
 }
 
 .layer-group-header::before {
@@ -210,6 +210,71 @@ h1, h2, h3, h4, h5 {
 
 .layer-group.collapsed .layer-group-header::before {
     content: '▸';
+}
+
+.layer-tag-filter-wrapper {
+    margin: var(--sp-1) 0 var(--sp-2);
+}
+
+.layer-tag-filter-toggle {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted, #555);
+    cursor: pointer;
+    user-select: none;
+    padding: 2px 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.layer-tag-filter-toggle::before {
+    content: '▾';
+    font-size: 9px;
+    transition: transform var(--transition);
+}
+
+.layer-tag-filter-wrapper.collapsed .layer-tag-filter-toggle::before {
+    content: '▸';
+}
+
+.layer-tag-filter-wrapper.collapsed .layer-tag-filter {
+    display: none;
+}
+
+.layer-tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+    padding: var(--sp-1) 0 0;
+}
+
+.layer-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.4;
+    border-radius: 999px;
+    background: var(--color-surface, #f0f0f0);
+    color: var(--color-text-muted, #555);
+    border: 1px solid var(--color-border, #d0d0d0);
+    cursor: pointer;
+    user-select: none;
+    transition: background var(--transition), color var(--transition);
+}
+
+.layer-tag:hover {
+    background: var(--color-border, #e0e0e0);
+}
+
+.layer-tag.active {
+    background: var(--color-primary, #2c5f2d);
+    color: #fff;
+    border-color: var(--color-primary, #2c5f2d);
+}
+
+.layer-group.collapsed .layer-tag-filter {
+    display: none;
 }
 
 .layer-group.collapsed .layer-group-content {
@@ -689,6 +754,8 @@ h1, h2, h3, h4, h5 {
     text-transform: none;
     letter-spacing: 0;
     line-height: 1.4;
+    flex: 0 0 auto;
+    width: auto;
 }
 
 /* Loading overlay */

@@ -156,13 +156,13 @@ async function loadLayers() {
     const layerGroupsContainer = document.getElementById('layer-groups');
     layerGroupsContainer.innerHTML = '';
 
-    // Add base maps group first
-    addBaseMapsGroup(layerGroupsContainer);
-
     // Add data layer groups
     for (const [groupName, groupLayers] of Object.entries(groupedLayers)) {
       addLayerGroup(layerGroupsContainer, groupName, groupLayers);
     }
+
+    // Add base maps group last
+    addBaseMapsGroup(layerGroupsContainer);
 
     // Load default layer if one is flagged in the layer list
     const defaultLayer = layers.find(l => l.is_default);
@@ -184,12 +184,12 @@ function addBaseMapsGroup(container) {
   const groupDiv = document.createElement('div');
   groupDiv.className = 'layer-group';
   groupDiv.innerHTML = `
-    <div class="layer-group-header">Base Maps</div>
+    <div class="layer-group-header">Base maps</div>
     <div class="layer-group-content">
       <div class="layer-item">
         <input type="radio" name="basemap" id="basemap-esri" value="esri-imagery" 
                ${appConfig.BASE_MAP_DEFAULT === 'esri-imagery' ? 'checked' : ''}>
-        <label for="basemap-esri">ESRI Imagery</label>
+        <label for="basemap-esri">Satellite</label>
       </div>
       <div class="layer-item">
         <input type="radio" name="basemap" id="basemap-osm" value="osm"
@@ -213,35 +213,92 @@ function addBaseMapsGroup(container) {
     });
   });
 
-  // Make group collapsible
-  groupDiv.classList.add('collapsed');
+  // Make group collapsible (expanded by default)
   groupDiv.querySelector('.layer-group-header').addEventListener('click', () => {
     groupDiv.classList.toggle('collapsed');
   });
 }
 
+const GROUP_NAME_OVERRIDES = {
+  'Soil Nutrients': 'Maps'
+};
+
 function addLayerGroup(container, groupName, layers) {
   const groupDiv = document.createElement('div');
   groupDiv.className = 'layer-group';
-  
+  const displayName = GROUP_NAME_OVERRIDES[groupName] || groupName;
+
   const headerDiv = document.createElement('div');
   headerDiv.className = 'layer-group-header';
-  headerDiv.textContent = groupName;
+  headerDiv.textContent = displayName;
   groupDiv.appendChild(headerDiv);
+
+  // Tag filter for the Maps group (driven by layer.keywords)
+  let activeTags = new Set();
+  if (displayName === 'Maps') {
+    const allTags = new Set();
+    layers.forEach(l => (l.keywords || []).forEach(k => k && allTags.add(k)));
+    if (allTags.size > 0) {
+      const filterWrapper = document.createElement('div');
+      filterWrapper.className = 'layer-tag-filter-wrapper';
+
+      const filterToggle = document.createElement('div');
+      filterToggle.className = 'layer-tag-filter-toggle';
+      filterToggle.textContent = 'Filter by tag';
+      filterWrapper.appendChild(filterToggle);
+
+      const filterDiv = document.createElement('div');
+      filterDiv.className = 'layer-tag-filter';
+      Array.from(allTags).sort().forEach(tag => {
+        const chip = document.createElement('span');
+        chip.className = 'layer-tag';
+        chip.textContent = tag;
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (activeTags.has(tag)) {
+            activeTags.delete(tag);
+            chip.classList.remove('active');
+          } else {
+            activeTags.add(tag);
+            chip.classList.add('active');
+          }
+          applyTagFilter();
+        });
+        filterDiv.appendChild(chip);
+      });
+      filterWrapper.appendChild(filterDiv);
+
+      filterToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        filterWrapper.classList.toggle('collapsed');
+      });
+
+      groupDiv.appendChild(filterWrapper);
+    }
+  }
 
   const contentDiv = document.createElement('div');
   contentDiv.className = 'layer-group-content';
 
+  const itemByLayerId = {};
   layers.forEach(layer => {
     const layerItem = createLayerItem(layer);
+    itemByLayerId[layer.layer_id] = { el: layerItem, keywords: layer.keywords || [] };
     contentDiv.appendChild(layerItem);
   });
+
+  function applyTagFilter() {
+    Object.values(itemByLayerId).forEach(({ el, keywords }) => {
+      const visible = activeTags.size === 0 ||
+        keywords.some(k => activeTags.has(k));
+      el.style.display = visible ? '' : 'none';
+    });
+  }
 
   groupDiv.appendChild(contentDiv);
   container.appendChild(groupDiv);
 
-  // Make group collapsible
-  groupDiv.classList.add('collapsed');
+  // Make group collapsible (expanded by default)
   headerDiv.addEventListener('click', () => {
     groupDiv.classList.toggle('collapsed');
   });
@@ -663,11 +720,15 @@ async function loadProfiles() {
         });
         
         // Set properties including project name for styling
+        const coords = profile.geometry && profile.geometry.coordinates;
         feature.setProperties({
           profile_code: profile.profile_code,
           project_name: profile.project_name || 'Unknown Project',
           altitude: profile.altitude,
-          date: profile.date
+          date: profile.date,
+          sampling_date: profile.date,
+          longitude: Array.isArray(coords) ? coords[0] : null,
+          latitude: Array.isArray(coords) ? coords[1] : null
         });
         
         return feature;
@@ -797,11 +858,11 @@ function addProfileLayerControl() {
   header.className = 'layer-group-header';
   header.style.display = 'flex';
   header.style.alignItems = 'center';
-  header.style.justifyContent = 'space-between';
+  header.style.justifyContent = 'flex-start';
   header.style.gap = '8px';
 
   const headerLabel = document.createElement('span');
-  headerLabel.textContent = 'Soil Profiles';
+  headerLabel.textContent = 'Soil profiles';
   header.appendChild(headerLabel);
 
   const showDataBtn = document.createElement('button');
@@ -810,6 +871,7 @@ function addProfileLayerControl() {
   showDataBtn.className = 'btn btn-primary';
   showDataBtn.style.padding = '2px 8px';
   showDataBtn.style.fontSize = '0.8em';
+  showDataBtn.style.marginLeft = 'auto';
   showDataBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     const panel = document.getElementById('profiles-data-modal');
@@ -920,8 +982,7 @@ function addProfileLayerControl() {
   const layerGroupsContainer = document.getElementById('layer-groups');
   layerGroupsContainer.insertBefore(profileGroup, layerGroupsContainer.firstChild);
 
-  // Make collapsible
-  profileGroup.classList.add('collapsed');
+  // Make collapsible (expanded by default)
   header.addEventListener('click', () => {
     profileGroup.classList.toggle('collapsed');
   });
@@ -1342,13 +1403,19 @@ async function refreshVisibleProfilesData() {
     if (!_allObservationsCache) {
       _allObservationsCache = await api.getObservations();
     }
-    const projectByCode = new Map();
+    const profileInfoByCode = new Map();
     allFeatures.forEach(f => {
       const code = f.get('profile_code');
-      if (code) projectByCode.set(code, f.get('project_name') || '');
+      if (code) profileInfoByCode.set(code, {
+        project_name: f.get('project_name') || '',
+        latitude: f.get('latitude'),
+        longitude: f.get('longitude'),
+        altitude: f.get('altitude'),
+        sampling_date: f.get('sampling_date') || f.get('date') || ''
+      });
     });
 
-    const baseCols = ['project_name', 'profile_code', 'upper_depth', 'lower_depth'];
+    const baseCols = ['project_name', 'profile_code', 'latitude', 'longitude', 'altitude', 'sampling_date', 'upper_depth', 'lower_depth'];
     const groups = {};
     const propColsSet = {};
     _allObservationsCache
@@ -1359,9 +1426,14 @@ async function refreshVisibleProfilesData() {
           (o.lower_depth == null ? '' : o.lower_depth);
         let row = groups[key];
         if (!row) {
+          const info = profileInfoByCode.get(o.profile_code) || {};
           row = {
-            project_name: projectByCode.get(o.profile_code) || '',
+            project_name: info.project_name || '',
             profile_code: o.profile_code,
+            latitude: info.latitude != null ? Number(info.latitude).toFixed(5) : '',
+            longitude: info.longitude != null ? Number(info.longitude).toFixed(5) : '',
+            altitude: info.altitude != null ? info.altitude : '',
+            sampling_date: info.sampling_date || '',
             upper_depth: o.upper_depth,
             lower_depth: o.lower_depth
           };
