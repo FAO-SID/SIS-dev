@@ -1,5 +1,5 @@
 /**
- * Admin Dashboard Module
+ * Admin Panel Module
  * Manages Settings and Layers through a tabbed interface
  */
 
@@ -113,7 +113,7 @@ class AdminDashboard {
     
     // Trigger map refresh to reload settings and layers
     if (window.refreshMapData && typeof window.refreshMapData === 'function') {
-      console.log('[Admin Dashboard] Triggering map data refresh');
+      console.log('[Admin Panel] Triggering map data refresh');
       window.refreshMapData();
     }
   }
@@ -166,7 +166,7 @@ class AdminDashboard {
       <div id="admin-dashboard" class="admin-dashboard">
         <div class="dashboard-content">
           <div class="dashboard-header">
-            <h2>Admin Dashboard</h2>
+            <h2>Admin Panel</h2>
             <div class="dashboard-header-actions">
               <button class="close-dashboard" id="close-dashboard">Back to Map</button>
               <button class="logout-btn" id="logout-dashboard">Logout</button>

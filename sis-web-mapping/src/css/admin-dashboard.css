@@ -1,5 +1,5 @@
 /* =====================================================================
-   Admin Dashboard — uses tokens defined in main.css :root
+   Admin Panel — uses tokens defined in main.css :root
    ===================================================================== */
 
 /* ---------- Login Modal ---------- */
@@ -181,7 +181,7 @@
 }
 
 /* =====================================================================
-   Admin Dashboard full-page view
+   Admin Panel full-page view
    ===================================================================== */
 .admin-dashboard {
     display: none;
