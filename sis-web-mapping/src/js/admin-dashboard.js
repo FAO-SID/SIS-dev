@@ -182,87 +182,44 @@ class AdminDashboard {
           <div class="dashboard-body">
             <!-- Administration Tab -->
             <div id="administration-tab" class="tab-pane active">
-              <div class="admin-form">
-                <h3>Add/Edit Setting</h3>
-                <form id="setting-form">
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="setting-key">Key *</label>
-                      <input type="text" id="setting-key" required>
-                    </div>
-                    <div class="form-group">
-                      <label for="setting-value">Value *</label>
-                      <input type="text" id="setting-value">
-                      <select id="setting-value-select" style="display:none;">
-                        <option value="esri-imagery">Satellite</option>
-                        <option value="osm">OpenStreetMap</option>
-                        <option value="terrain">Open TopoMap</option>
-                      </select>
+              <div class="admin-section">
+                <h3 class="admin-section-title">Settings</h3>
+
+                <div class="settings-map-layout">
+                  <div class="settings-table-side">
+                    <div id="settings-table-container">
+                      <table class="admin-table" id="settings-table" style="width:auto;">
+                        <thead>
+                          <tr>
+                            <th>Key</th>
+                            <th style="width:350px;">Value</th>
+                          </tr>
+                        </thead>
+                        <tbody id="settings-tbody">
+                          <tr><td colspan="2" class="loading">Loading settings...</td></tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                  <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                      <span id="setting-btn-text">Add Setting</span>
-                    </button>
-                    <button type="button" class="btn btn-secondary" id="cancel-setting">Cancel</button>
+                  <div class="settings-map-side">
+                    <div id="view-editor-map" style="width:100%;aspect-ratio:21/9;border:1px solid #ccc;border-radius:4px;min-height:180px;"></div>
                   </div>
-                </form>
-              </div>
-              
-              <div class="admin-form" style="margin-bottom:20px;">
-                <h3>Default Map View</h3>
-                <p style="color:#555;font-size:0.9em;">
-                  Navigate and zoom to set the default LATITUDE, LONGITUDE and ZOOM.
-                </p>
-                <div id="view-editor-map" style="width:560px;height:240px;max-width:100%;aspect-ratio:21/9;border:1px solid #ccc;border-radius:4px;"></div>
-                <div class="form-actions" style="margin-top:10px;align-items:center;display:flex;gap:10px;">
-                  <button type="button" class="btn btn-primary" id="save-view-btn">Save as Default View</button>
-                  <span id="view-editor-status" style="font-size:0.9em;color:#555;"></span>
                 </div>
-              </div>
-
-              <div id="settings-table-container">
-                <table class="admin-table" id="settings-table">
-                  <thead>
-                    <tr>
-                      <th>Key</th>
-                      <th>Value</th>
-                      <th style="width: 150px;">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="settings-tbody">
-                    <tr><td colspan="3" class="loading">Loading settings...</td></tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="admin-form" style="margin-top: 30px;">
-                <h3>Add User</h3>
-                <form id="user-form">
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="user-email">Email *</label>
-                      <input type="email" id="user-email" required>
-                    </div>
-                    <div class="form-group">
-                      <label for="user-password">Password *</label>
-                      <input type="password" id="user-password" required>
-                    </div>
-                    <div class="form-group">
-                      <label class="checkbox-label">
-                        <input type="checkbox" id="user-is-admin">
-                        Admin
-                      </label>
-                    </div>
-                  </div>
-                  <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Add User</button>
-                    <button type="button" class="btn btn-secondary" id="cancel-user">Cancel</button>
-                  </div>
+                <!-- hidden form elements kept for compatibility -->
+                <form id="setting-form" style="display:none;">
+                  <input type="text" id="setting-key">
+                  <input type="text" id="setting-value">
+                  <select id="setting-value-select"></select>
+                  <span id="setting-btn-text"></span>
+                  <button id="cancel-setting" type="button"></button>
                 </form>
               </div>
 
-              <div id="users-table-container">
+              <hr class="admin-divider">
+
+              <div class="admin-section">
+                <h3 class="admin-section-title">Users</h3>
+                <div id="users-table-container">
                 <table class="admin-table" id="users-table">
                   <thead>
                     <tr>
@@ -279,13 +236,31 @@ class AdminDashboard {
                   </tbody>
                 </table>
               </div>
+                <div style="margin-top:var(--sp-3);">
+                  <form id="user-form" style="display:flex;align-items:flex-end;gap:var(--sp-3);flex-wrap:wrap;">
+                    <div class="form-group" style="margin:0;">
+                      <label for="user-email" style="font-size:var(--fs-xs);margin-bottom:2px;">Email</label>
+                      <input type="email" id="user-email" required style="padding:4px 8px;font-size:var(--fs-sm);">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                      <label for="user-password" style="font-size:var(--fs-xs);margin-bottom:2px;">Password</label>
+                      <input type="password" id="user-password" required style="padding:4px 8px;font-size:var(--fs-sm);">
+                    </div>
+                    <label class="checkbox-label" style="font-size:var(--fs-sm);margin-bottom:4px;">
+                      <input type="checkbox" id="user-is-admin"> Admin
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-sm">Add User</button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="cancel-user" style="display:none;">Cancel</button>
+                  </form>
+                </div>
+              </div>
             </div>
             
             <!-- Layers Tab -->
             <div id="layers-tab" class="tab-pane">
               <div class="sync-bar" style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
                 <button type="button" class="btn btn-primary" id="sync-layers-btn">Sync from Metadata</button>
-                <button type="button" class="btn btn-secondary" id="check-wms-btn">Check WMS</button>
+                <button type="button" class="btn btn-primary" id="check-wms-btn">Check WMS</button>
                 <span id="sync-status" style="font-size: 0.9em; color: #555;"></span>
               </div>
 
@@ -310,32 +285,23 @@ class AdminDashboard {
 
             <!-- My Account Tab -->
             <div id="account-tab" class="tab-pane">
-              <div class="admin-form">
+              <div class="admin-form" style="max-width:500px;">
                 <h3>Change Email or Password</h3>
-                <p style="color:#555;font-size:0.9em;">
-                  Leave a field blank to keep it unchanged. Your current password is always required.
+                <p style="color:#555;font-size:0.85em;margin-bottom:var(--sp-4);">
+                  Leave a field blank to keep it unchanged. Current password is always required.
                 </p>
-                <form id="account-form">
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="account-current-password">Current Password *</label>
-                      <input type="password" id="account-current-password" required>
-                    </div>
+                <form id="account-form" style="display:grid;grid-template-columns:auto 220px;gap:var(--sp-2) var(--sp-3);align-items:center;">
+                  <label for="account-current-password" style="font-size:var(--fs-sm);white-space:nowrap;">Current Password *</label>
+                  <input type="password" id="account-current-password" required style="padding:4px 8px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;">
+                  <label for="account-new-email" style="font-size:var(--fs-sm);white-space:nowrap;">New Email</label>
+                  <input type="email" id="account-new-email" placeholder="Keep current" style="padding:4px 8px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;">
+                  <label for="account-new-password" style="font-size:var(--fs-sm);white-space:nowrap;">New Password</label>
+                  <input type="password" id="account-new-password" placeholder="Keep current" style="padding:4px 8px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;">
+                  <div></div>
+                  <div style="display:flex;align-items:center;gap:var(--sp-3);">
+                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                    <span id="account-status" style="font-size:0.85em;"></span>
                   </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="account-new-email">New Email</label>
-                      <input type="email" id="account-new-email" placeholder="Leave blank to keep current">
-                    </div>
-                    <div class="form-group">
-                      <label for="account-new-password">New Password</label>
-                      <input type="password" id="account-new-password" placeholder="Leave blank to keep current">
-                    </div>
-                  </div>
-                  <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Update Account</button>
-                  </div>
-                  <p id="account-status" style="margin-top:10px;font-size:0.9em;"></p>
                 </form>
               </div>
             </div>
@@ -405,10 +371,7 @@ class AdminDashboard {
       this.handleAccountSubmit();
     });
 
-    const saveViewBtn = document.getElementById('save-view-btn');
-    if (saveViewBtn) {
-      saveViewBtn.addEventListener('click', () => this.handleSaveView());
-    }
+    // Save view is now triggered automatically on map moveend
   }
 
   initViewEditor() {
@@ -440,6 +403,13 @@ class AdminDashboard {
     });
 
     setTimeout(() => this.viewEditorMap && this.viewEditorMap.updateSize(), 100);
+
+    // Auto-save lat/lon/zoom on map move
+    let saveTimeout = null;
+    this.viewEditorMap.on('moveend', () => {
+      if (saveTimeout) clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => this.handleSaveView(), 400);
+    });
   }
 
   async handleSaveView() {
@@ -447,9 +417,6 @@ class AdminDashboard {
     const view = this.viewEditorMap.getView();
     const [lon, lat] = toLonLat(view.getCenter());
     const zoom = view.getZoom();
-    const statusEl = document.getElementById('view-editor-status');
-    statusEl.textContent = 'Saving…';
-    statusEl.style.color = '#555';
 
     const upsert = async (key, value) => {
       const exists = this.settings.find(s => s.key === key);
@@ -464,13 +431,10 @@ class AdminDashboard {
       await upsert('LATITUDE', lat.toFixed(6));
       await upsert('LONGITUDE', lon.toFixed(6));
       await upsert('ZOOM', Math.round(zoom));
-      statusEl.textContent = `Saved: lat ${lat.toFixed(4)}, lon ${lon.toFixed(4)}, zoom ${Math.round(zoom)}`;
-      statusEl.style.color = '#2a7';
       await this.loadSettings();
       this.renderSettings();
     } catch (e) {
-      statusEl.textContent = 'Error: ' + e.message;
-      statusEl.style.color = '#c33';
+      console.error('Error saving view:', e.message);
     }
   }
 
@@ -545,10 +509,6 @@ class AdminDashboard {
     const btn = document.getElementById('sync-layers-btn');
     const statusEl = document.getElementById('sync-status');
 
-    if (!confirm('Sync layers from sis-metadata?\n\nThis will add new layers, update existing ones, and DELETE layers no longer in the metadata server.')) {
-      return;
-    }
-
     btn.disabled = true;
     const originalText = btn.textContent;
     btn.textContent = 'Syncing...';
@@ -604,49 +564,76 @@ class AdminDashboard {
 
   renderSettings() {
     const tbody = document.getElementById('settings-tbody');
-    
+    const mapKeys = ['LATITUDE', 'LONGITUDE', 'ZOOM'];
+    const keyOrder = ['APP_TITLE', 'ORG_LOGO_URL', 'BASE_MAP_DEFAULT', 'LATITUDE', 'LONGITUDE', 'ZOOM'];
+
     if (this.settings.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No settings found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="2" class="empty-state">No settings found</td></tr>';
       return;
     }
 
-    tbody.innerHTML = this.settings.map(setting => `
-      <tr>
-        <td><strong>${this.escapeHtml(setting.key)}</strong></td>
-        <td>${this.escapeHtml(setting.value)}</td>
-        <td class="actions">
-          <button class="btn btn-primary" onclick="adminDashboard.editSetting('${this.escapeHtml(setting.key)}')">Edit</button>
-          <button class="btn btn-danger" onclick="adminDashboard.deleteSetting('${this.escapeHtml(setting.key)}')">Delete</button>
-        </td>
-      </tr>
-    `).join('');
+    // Sort: known keys first in keyOrder, then remaining alphabetically
+    const sorted = [...this.settings].sort((a, b) => {
+      const ia = keyOrder.indexOf(a.key);
+      const ib = keyOrder.indexOf(b.key);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.key.localeCompare(b.key);
+    });
+
+    tbody.innerHTML = sorted.map(setting => {
+      const key = this.escapeHtml(setting.key);
+      const isMapKey = mapKeys.includes(setting.key);
+      const isBaseMap = setting.key === 'BASE_MAP_DEFAULT';
+      let valueCell;
+      if (isBaseMap) {
+        const opts = Object.entries(BASE_MAP_OPTIONS).map(([k, v]) =>
+          `<option value="${k}"${setting.value === k ? ' selected' : ''}>${v.label}</option>`
+        ).join('');
+        valueCell = `<select class="inline-edit" data-key="${key}" style="padding:2px 6px;font-size:var(--fs-sm);">${opts}</select>`;
+      } else {
+        valueCell = `<input class="inline-edit" data-key="${key}" value="${this.escapeHtml(setting.value)}" style="padding:2px 6px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;"${isMapKey ? ' readonly title="Controlled by the map"' : ''}>`;
+      }
+      return `
+        <tr>
+          <td><strong>${key}</strong></td>
+          <td>${valueCell}</td>
+        </tr>`;
+    }).join('');
+
+    // Attach inline save on blur / change
+    tbody.querySelectorAll('.inline-edit').forEach(el => {
+      const event = el.tagName === 'SELECT' ? 'change' : 'blur';
+      el.addEventListener(event, async () => {
+        const key = el.dataset.key;
+        const value = el.value.trim();
+        if (!value) return;
+        const setting = this.settings.find(s => s.key === key);
+        if (setting && setting.value === value) return;
+        try {
+          await api.updateSetting(key, value);
+          await this.loadSettings();
+          if (['BASE_MAP_DEFAULT', 'LATITUDE', 'LONGITUDE', 'ZOOM'].includes(key)) {
+            this.initViewEditor();
+          }
+        } catch (err) {
+          alert('Error saving: ' + err.message);
+        }
+      });
+      // Save on Enter for text inputs
+      if (el.tagName === 'INPUT') {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+        });
+      }
+    });
   }
 
   editSetting(key) {
-    const setting = this.settings.find(s => s.key === key);
-    if (!setting) return;
-
-    this.editingItem = { type: 'setting', key };
-    document.getElementById('setting-key').value = setting.key;
-    document.getElementById('setting-key').disabled = true;
-
-    const textInput = document.getElementById('setting-value');
-    const selectInput = document.getElementById('setting-value-select');
-    if (key === 'BASE_MAP_DEFAULT') {
-      textInput.style.display = 'none';
-      textInput.removeAttribute('required');
-      selectInput.style.display = '';
-      selectInput.value = BASE_MAP_OPTIONS[setting.value] ? setting.value : 'osm';
-    } else {
-      selectInput.style.display = 'none';
-      textInput.style.display = '';
-      textInput.setAttribute('required', 'required');
-      textInput.value = setting.value;
-    }
-    document.getElementById('setting-btn-text').textContent = 'Update Setting';
-    
-    // Scroll to form
-    document.getElementById('setting-form').scrollIntoView({ behavior: 'smooth' });
+    // Focus the inline input for this key
+    const input = document.querySelector(`.inline-edit[data-key="${key}"]`);
+    if (input) input.focus();
   }
 
   cancelSettingEdit() {
@@ -658,7 +645,8 @@ class AdminDashboard {
     textInput.style.display = '';
     textInput.setAttribute('required', 'required');
     selectInput.style.display = 'none';
-    document.getElementById('setting-btn-text').textContent = 'Add Setting';
+    document.getElementById('setting-btn-text').textContent = 'Add';
+    document.getElementById('cancel-setting').style.display = 'none';
   }
 
   async handleSettingSubmit() {
@@ -731,18 +719,47 @@ class AdminDashboard {
 
     const fmt = (d) => d ? new Date(d).toLocaleString() : '-';
 
-    tbody.innerHTML = this.users.map(u => `
-      <tr>
-        <td><strong>${this.escapeHtml(u.user_id)}</strong></td>
-        <td>${u.is_admin ? '<span class="badge badge-success">Admin</span>' : '-'}</td>
-        <td>${u.is_active ? 'Yes' : 'No'}</td>
-        <td>${fmt(u.created_at)}</td>
-        <td>${fmt(u.last_login)}</td>
-        <td class="actions">
-          <button class="btn btn-danger" onclick="adminDashboard.deleteUser('${this.escapeHtml(u.user_id)}')">Delete</button>
-        </td>
-      </tr>
-    `).join('');
+    const adminCount = this.users.filter(u => u.is_admin).length;
+
+    tbody.innerHTML = this.users.map(u => {
+      const isOnlyAdmin = u.is_admin && adminCount <= 1;
+      const deleteBtn = isOnlyAdmin
+        ? ''
+        : `<button class="btn btn-danger btn-sm" onclick="adminDashboard.deleteUser('${this.escapeHtml(u.user_id)}')">Delete</button>`;
+      let activeLabel;
+      if (isOnlyAdmin) {
+        activeLabel = '<span class="badge badge-success" title="Only admin — cannot deactivate">Yes</span>';
+      } else if (u.is_active) {
+        activeLabel = '<span class="badge badge-success toggle-active" style="cursor:pointer;" title="Click to deactivate">Yes</span>';
+      } else {
+        activeLabel = '<span class="badge badge-danger toggle-active" style="cursor:pointer;" title="Click to activate">No</span>';
+      }
+      return `
+        <tr>
+          <td><strong>${this.escapeHtml(u.user_id)}</strong></td>
+          <td>${u.is_admin ? '<span class="badge badge-success">Admin</span>' : '-'}</td>
+          <td data-user-id="${this.escapeHtml(u.user_id)}" data-active="${u.is_active}">${activeLabel}</td>
+          <td>${fmt(u.created_at)}</td>
+          <td>${fmt(u.last_login)}</td>
+          <td class="actions">${deleteBtn}</td>
+        </tr>`;
+    }).join('');
+
+    // Attach click handlers for active toggle
+    tbody.querySelectorAll('.toggle-active').forEach(el => {
+      el.addEventListener('click', async () => {
+        const td = el.closest('td');
+        const userId = td.dataset.userId;
+        const currentlyActive = td.dataset.active === 'true';
+        try {
+          await api.toggleUserActive(userId, !currentlyActive);
+          await this.loadUsers();
+          this.renderUsers();
+        } catch (err) {
+          alert('Error toggling active status: ' + err.message);
+        }
+      });
+    });
   }
 
   async handleUserSubmit() {

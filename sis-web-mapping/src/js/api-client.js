@@ -229,6 +229,12 @@ class SISApiClient {
     });
   }
 
+  async toggleUserActive(userId, isActive) {
+    return this.authenticatedRequest(`/api/users/${encodeURIComponent(userId)}/active?is_active=${isActive}`, {
+      method: 'PATCH'
+    });
+  }
+
   async deleteUser(userId) {
     return this.authenticatedRequest(`/api/users/${encodeURIComponent(userId)}`, {
       method: 'DELETE'

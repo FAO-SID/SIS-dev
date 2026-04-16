@@ -107,7 +107,6 @@
     background: var(--color-primary);
     color: #ffffff;
     border-color: var(--color-primary);
-    flex: 1;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -120,7 +119,6 @@
     background: var(--color-surface);
     color: var(--color-text);
     border-color: var(--color-border-strong);
-    flex: 1;
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -452,6 +450,83 @@
     margin-top: var(--sp-5);
     padding-top: var(--sp-4);
     border-top: 1px solid var(--color-border);
+}
+
+/* ---------- Compact button variant ---------- */
+.btn-sm {
+    padding: var(--sp-2) var(--sp-3) !important;
+    font-size: var(--fs-xs) !important;
+    flex: none !important;
+}
+
+/* ---------- Admin sections ---------- */
+.admin-section {
+    margin-bottom: var(--sp-5);
+}
+
+.admin-section-title {
+    color: var(--color-primary);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    margin: 0 0 var(--sp-4) 0;
+    padding-bottom: var(--sp-3);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.admin-divider {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: var(--sp-6) 0;
+}
+
+/* ---------- Inline edit inputs ---------- */
+.inline-edit {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: inherit;
+    transition: border-color var(--transition);
+}
+
+.inline-edit:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: var(--focus-ring);
+}
+
+.inline-edit[readonly] {
+    background: var(--color-surface-alt, #f5f5f5);
+    color: var(--color-text-muted);
+    cursor: default;
+}
+
+/* ---------- Settings + Map side-by-side ---------- */
+.settings-map-layout {
+    display: flex;
+    gap: var(--sp-5);
+    align-items: flex-start;
+    margin-bottom: var(--sp-4);
+}
+
+.settings-map-side {
+    flex: 1;
+    min-width: 300px;
+}
+
+.settings-table-side {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+    .settings-map-layout {
+        flex-direction: column;
+    }
+    .settings-map-side {
+        flex: none;
+        max-width: 100%;
+        width: 100%;
+    }
 }
 
 /* Sync bar helper */

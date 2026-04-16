@@ -172,6 +172,18 @@ async def list_users(current_user: dict = Depends(get_current_admin_user)):
             )
             return [dict(u) for u in cur.fetchall()]
 
+@app.patch("/api/users/{user_id}/active")
+async def toggle_user_active(user_id: str, is_active: bool, current_user: dict = Depends(get_current_admin_user)):
+    """Activate or deactivate a user (admin only)."""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE api.\"user\" SET is_active = %s WHERE user_id = %s", (is_active, user_id))
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            log_audit(current_user['user_id'], None, "user_active_toggled",
+                     {"user": user_id, "is_active": is_active}, None)
+            return {"message": f"User {'activated' if is_active else 'deactivated'} successfully"}
+
 @app.delete("/api/users/{user_id}")
 async def delete_user(user_id: str, current_user: dict = Depends(get_current_admin_user)):
     """Delete a user (admin only)."""
