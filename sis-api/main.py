@@ -5,7 +5,7 @@ Manages users, API clients, layers, and settings.
 
 from fastapi import FastAPI, Depends, HTTPException, status, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import EmailStr
+from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
@@ -906,11 +906,16 @@ async def upload_csv(
     ts = datetime.now().strftime('%Y%m%d_%H%M%S')
     table_name = f"{base_name}_{ts}"
 
+    # Protect _row_id reserved name
+    if any(h == '_row_id' for h in headers):
+        raise HTTPException(status_code=400, detail="Column name '_row_id' is reserved; please rename in your CSV.")
+
     with get_db() as conn:
         with conn.cursor() as cur:
-            # Create staging table with all TEXT columns
+            # Create staging table with _row_id surrogate key + all TEXT columns
             col_defs = pgsql.SQL(', ').join(
-                pgsql.SQL("{} TEXT").format(pgsql.Identifier(h)) for h in headers
+                [pgsql.SQL("_row_id SERIAL PRIMARY KEY")] +
+                [pgsql.SQL("{} TEXT").format(pgsql.Identifier(h)) for h in headers]
             )
             cur.execute(pgsql.SQL("CREATE TABLE {}.{} ({})").format(
                 pgsql.Identifier('soil_data_upload'),
@@ -969,19 +974,20 @@ async def list_datasets(current_user: dict = Depends(get_current_user)):
 
 @app.get("/api/etl/datasets/{table_name}/preview")
 async def get_dataset_preview(table_name: str, current_user: dict = Depends(get_current_user)):
-    """Get first 20 rows from a staging table."""
-    # Validate table exists in registry
+    """Get first 100 rows from a staging table."""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT 1 FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Dataset not found")
-            cur.execute(pgsql.SQL("SELECT * FROM {}.{} LIMIT 20").format(
+            cur.execute(pgsql.SQL("SELECT * FROM {}.{} ORDER BY _row_id LIMIT 100").format(
                 pgsql.Identifier('soil_data_upload'),
                 pgsql.Identifier(table_name)
             ))
             rows = cur.fetchall()
-            columns = [desc[0] for desc in cur.description] if cur.description else []
+            all_cols = [desc[0] for desc in cur.description] if cur.description else []
+            # Hide _row_id from the column list (keep it in each row for PATCH targeting)
+            columns = [c for c in all_cols if c != '_row_id']
             return {"columns": columns, "rows": [dict(r) for r in rows]}
 
 @app.get("/api/etl/datasets/{table_name}/columns")
@@ -992,7 +998,7 @@ async def get_dataset_columns(table_name: str, current_user: dict = Depends(get_
             cur.execute("""
                 SELECT column_name, property_num_id, procedure_num_id, unit_of_measure_id,
                        ignore_column, note, destination_table, destination_column,
-                       conversion_operation, conversion_value
+                       conversion_operation, conversion_value, validation
                 FROM api.uploaded_dataset_column
                 WHERE table_name = %s ORDER BY column_name
             """, (table_name,))
@@ -1099,8 +1105,8 @@ async def ingest_dataset(
                     "unit_of_measure_id": m.get("unit_of_measure_id"),
                 }
 
-            # Read all rows from staging table
-            cur.execute(pgsql.SQL("SELECT * FROM {}.{}").format(
+            # Read all rows from staging table (stable order by _row_id)
+            cur.execute(pgsql.SQL("SELECT * FROM {}.{} ORDER BY _row_id").format(
                 pgsql.Identifier("soil_data_upload"),
                 pgsql.Identifier(table_name)
             ))
@@ -1351,6 +1357,313 @@ async def ingest_dataset(
             }
 
 
+class CellEdit(BaseModel):
+    row_id: int
+    column: str
+    value: Optional[str] = None
+
+class CellEditBatch(BaseModel):
+    edits: List[CellEdit]
+
+
+@app.patch("/api/etl/datasets/{table_name}/cells")
+async def edit_dataset_cells(
+    table_name: str,
+    batch: CellEditBatch,
+    current_user: dict = Depends(get_current_user)
+):
+    """Edit one or more cells in a staging table. Writes to api.uploaded_dataset_edit for audit."""
+    if not batch.edits:
+        return {"updated": 0, "errors": []}
+
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            # Validate dataset exists
+            cur.execute("SELECT 1 FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="Dataset not found")
+
+            # Load valid column names for this dataset (prevents injection via column param)
+            cur.execute(
+                "SELECT column_name FROM api.uploaded_dataset_column WHERE table_name = %s",
+                (table_name,)
+            )
+            valid_cols = {r["column_name"] for r in cur.fetchall()}
+
+            updated = 0
+            errors = []
+            for edit in batch.edits:
+                if edit.column not in valid_cols:
+                    errors.append(f"row {edit.row_id}: unknown column '{edit.column}'")
+                    continue
+                # Capture old value for audit
+                cur.execute(
+                    pgsql.SQL("SELECT {} AS v FROM {}.{} WHERE _row_id = %s").format(
+                        pgsql.Identifier(edit.column),
+                        pgsql.Identifier("soil_data_upload"),
+                        pgsql.Identifier(table_name),
+                    ),
+                    (edit.row_id,)
+                )
+                old = cur.fetchone()
+                if not old:
+                    errors.append(f"row {edit.row_id}: not found")
+                    continue
+                old_value = old["v"]
+
+                cur.execute(
+                    pgsql.SQL("UPDATE {}.{} SET {} = %s WHERE _row_id = %s").format(
+                        pgsql.Identifier("soil_data_upload"),
+                        pgsql.Identifier(table_name),
+                        pgsql.Identifier(edit.column),
+                    ),
+                    (edit.value, edit.row_id)
+                )
+                if cur.rowcount:
+                    updated += 1
+                    cur.execute("""
+                        INSERT INTO api.uploaded_dataset_edit
+                            (table_name, row_id, column_name, old_value, new_value, user_id)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, (table_name, edit.row_id, edit.column, old_value, edit.value,
+                          current_user['user_id']))
+
+            log_audit(current_user['user_id'], None, "etl_cells_edited",
+                     {"table_name": table_name, "updated": updated, "errors": len(errors)}, None)
+
+            return {"updated": updated, "errors": errors}
+
+
+@app.post("/api/etl/datasets/{table_name}/validate")
+async def validate_dataset(
+    table_name: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Validate CSV values against destination column datatypes and check constraints.
+    Saves per-column result in api.uploaded_dataset_column.validation.
+    """
+    # Datatype + constraint rules per (dest_table, dest_column)
+    # kind: int | smallint | real | date | enum | text
+    RULES = {
+        ("plot", "altitude"):            {"kind": "smallint"},
+        ("plot", "positional_accuracy"): {"kind": "smallint"},
+        ("plot", "sampling_date"):       {"kind": "date"},
+        ("plot", "geom (longitude)"):    {"kind": "real", "min": -180, "max": 180},
+        ("plot", "geom (latitude)"):     {"kind": "real", "min": -90, "max": 90},
+        ("element", "upper_depth"):      {"kind": "int", "min": 0, "max": 1000},
+        ("element", "lower_depth"):      {"kind": "int", "min": 0},
+        ("element", "type"):             {"kind": "enum", "values": ["Horizon", "Layer"]},
+    }
+    SMALLINT_MIN, SMALLINT_MAX = -32768, 32767
+
+    def check_value(v, rule):
+        """Return None if valid, else error description."""
+        if v is None or v == "":
+            return None  # empty cells are allowed at validation stage
+        kind = rule["kind"]
+        if kind in ("int", "smallint"):
+            try:
+                n = int(float(v))
+            except (ValueError, TypeError):
+                return f"'{v}' not an integer"
+            if kind == "smallint" and not (SMALLINT_MIN <= n <= SMALLINT_MAX):
+                return f"{n} out of smallint range"
+            if "min" in rule and n < rule["min"]:
+                return f"{n} < {rule['min']}"
+            if "max" in rule and n > rule["max"]:
+                return f"{n} > {rule['max']}"
+            return None
+        if kind == "real":
+            try:
+                n = float(v)
+            except (ValueError, TypeError):
+                return f"'{v}' not a number"
+            if "min" in rule and n < rule["min"]:
+                return f"{n} < {rule['min']}"
+            if "max" in rule and n > rule["max"]:
+                return f"{n} > {rule['max']}"
+            return None
+        if kind == "date":
+            try:
+                datetime.strptime(str(v), "%Y-%m-%d")
+            except (ValueError, TypeError):
+                return f"'{v}' not a date (YYYY-MM-DD)"
+            return None
+        if kind == "enum":
+            if v not in rule["values"]:
+                return f"'{v}' not in {rule['values']}"
+            return None
+        return None
+
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            # Dataset exists?
+            cur.execute("SELECT table_name FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="Dataset not found")
+
+            # Load mappings
+            cur.execute("""
+                SELECT column_name, destination_table, destination_column,
+                       property_num_id, procedure_num_id
+                FROM api.uploaded_dataset_column
+                WHERE table_name = %s AND destination_table IS NOT NULL
+            """, (table_name,))
+            mappings = cur.fetchall()
+
+            if not mappings:
+                raise HTTPException(status_code=400, detail="No column mappings defined")
+
+            # Load staging rows (ordered by _row_id for stable row numbers)
+            cur.execute(pgsql.SQL("SELECT * FROM {}.{} ORDER BY _row_id").format(
+                pgsql.Identifier("soil_data_upload"),
+                pgsql.Identifier(table_name)
+            ))
+            rows = cur.fetchall()
+
+            # Preload value_min/max for result_num mappings
+            obs_bounds = {}  # (prop_id, proc_id) -> (min, max)
+            for m in mappings:
+                if m["destination_table"] == "result_num" and m["property_num_id"] and m["procedure_num_id"]:
+                    key = (m["property_num_id"], m["procedure_num_id"])
+                    if key not in obs_bounds:
+                        cur.execute("""
+                            SELECT value_min, value_max FROM soil_data.observation_num
+                            WHERE property_num_id = %s AND procedure_num_id = %s
+                        """, key)
+                        r = cur.fetchone()
+                        obs_bounds[key] = (r["value_min"], r["value_max"]) if r else (None, None)
+
+            # Validate each mapped column
+            col_results = {}  # csv_col -> {"status", "errors", "error_rows"}
+            upper_col = None
+            lower_col = None
+
+            MAX_DISPLAY = 10
+
+            for m in mappings:
+                csv_col = m["column_name"]
+                dt = m["destination_table"]
+                dc = m["destination_column"]
+                errors = []
+                error_rows = set()
+                truncated = False
+
+                if dt == "element" and dc == "upper_depth":
+                    upper_col = csv_col
+                if dt == "element" and dc == "lower_depth":
+                    lower_col = csv_col
+
+                rule = RULES.get((dt, dc))
+                if rule:
+                    for row in rows:
+                        rid = row["_row_id"]
+                        err = check_value(row.get(csv_col), rule)
+                        if err:
+                            error_rows.add(rid)
+                            if len(errors) < MAX_DISPLAY:
+                                errors.append(f"row {rid}: {err}")
+                            else:
+                                truncated = True
+
+                if dt == "result_num":
+                    bounds = obs_bounds.get((m["property_num_id"], m["procedure_num_id"]), (None, None))
+                    vmin, vmax = bounds
+                    for row in rows:
+                        rid = row["_row_id"]
+                        v = row.get(csv_col)
+                        if v is None or v == "":
+                            continue
+                        try:
+                            n = float(v)
+                        except (ValueError, TypeError):
+                            error_rows.add(rid)
+                            if len(errors) < MAX_DISPLAY:
+                                errors.append(f"row {rid}: '{v}' not a number")
+                            else:
+                                truncated = True
+                            continue
+                        if vmin is not None and n < vmin:
+                            error_rows.add(rid)
+                            if len(errors) < MAX_DISPLAY:
+                                errors.append(f"row {rid}: {n} < {vmin}")
+                            else:
+                                truncated = True
+                        elif vmax is not None and n > vmax:
+                            error_rows.add(rid)
+                            if len(errors) < MAX_DISPLAY:
+                                errors.append(f"row {rid}: {n} > {vmax}")
+                            else:
+                                truncated = True
+
+                if truncated:
+                    errors.append("...")
+
+                col_results[csv_col] = {
+                    "status": "OK" if not error_rows else "ERROR",
+                    "errors": errors,
+                    "error_rows": sorted(error_rows),
+                }
+
+            # Cross-column: upper_depth < lower_depth
+            if upper_col and lower_col:
+                depth_errors = []
+                depth_rows = set()
+                truncated = False
+                for row in rows:
+                    rid = row["_row_id"]
+                    u = row.get(upper_col)
+                    l = row.get(lower_col)
+                    if u in (None, "") or l in (None, ""):
+                        continue
+                    try:
+                        ui = int(float(u)); li = int(float(l))
+                    except (ValueError, TypeError):
+                        continue
+                    if ui >= li:
+                        depth_rows.add(rid)
+                        if len(depth_errors) < MAX_DISPLAY:
+                            depth_errors.append(f"row {rid}: upper {ui} >= lower {li}")
+                        else:
+                            truncated = True
+                if truncated:
+                    depth_errors.append("...")
+                if depth_rows:
+                    for c in (upper_col, lower_col):
+                        r = col_results.setdefault(c, {"status": "OK", "errors": [], "error_rows": []})
+                        r["errors"].extend(depth_errors)
+                        merged = set(r["error_rows"]) | depth_rows
+                        r["error_rows"] = sorted(merged)
+                        r["status"] = "ERROR"
+
+            # Persist per-column validation
+            total_errors = 0
+            for csv_col, r in col_results.items():
+                text = "OK" if r["status"] == "OK" else "; ".join(r["errors"])
+                cur.execute("""
+                    UPDATE api.uploaded_dataset_column
+                    SET validation = %s
+                    WHERE table_name = %s AND column_name = %s
+                """, (text, table_name, csv_col))
+                if r["status"] != "OK":
+                    total_errors += len([e for e in r["errors"] if e != "..."])
+
+            # Dataset-level note
+            n_cols_err = sum(1 for r in col_results.values() if r["status"] != "OK")
+            note = "Validation OK" if n_cols_err == 0 else f"Validation: {n_cols_err} column(s) with errors"
+            cur.execute("UPDATE api.uploaded_dataset SET note = %s WHERE table_name = %s",
+                        (note, table_name))
+
+            log_audit(current_user['user_id'], None, "etl_validated",
+                     {"table_name": table_name, "columns_with_errors": n_cols_err}, None)
+
+            return {
+                "message": note,
+                "columns": col_results,
+                "total_rows": len(rows),
+            }
+
+
 @app.post("/api/etl/datasets/{table_name}/prune")
 async def prune_dataset(
     table_name: str,
@@ -1440,6 +1753,146 @@ async def prune_dataset(
 
 
 # ==================== Health Check & Root ====================
+
+@app.get("/api/layer/soil_profiles")
+async def list_soil_profile_layers(current_user: dict = Depends(get_current_user)):
+    """List all soil-data projects as profile layers with total vs. published counts."""
+    sql = """
+        WITH profile_ranked AS (
+          SELECT ps.project_id,
+                 pr.profile_id,
+                 row_number() OVER (PARTITION BY ps.project_id ORDER BY pr.profile_id) AS rn
+          FROM soil_data.project_site ps
+          JOIN soil_data.plot pl ON pl.site_id = ps.site_id
+          JOIN soil_data.profile pr ON pr.plot_id = pl.plot_id
+        ),
+        profile_totals AS (
+          SELECT project_id, count(DISTINCT profile_id) AS total_profiles
+          FROM profile_ranked
+          GROUP BY project_id
+        ),
+        published_profiles AS (
+          SELECT pr.project_id, pr.profile_id
+          FROM profile_ranked pr
+          JOIN soil_data.project p ON p.project_id = pr.project_id
+          WHERE p.is_published = TRUE
+            AND (p.profile_limit IS NULL OR pr.rn <= p.profile_limit)
+        ),
+        published_profile_counts AS (
+          SELECT project_id, count(DISTINCT profile_id) AS published_profiles
+          FROM published_profiles
+          GROUP BY project_id
+        ),
+        total_obs AS (
+          SELECT ps.project_id, count(r.observation_num_id) AS total_observations
+          FROM soil_data.project_site ps
+          JOIN soil_data.plot pl ON pl.site_id = ps.site_id
+          JOIN soil_data.profile pr ON pr.plot_id = pl.plot_id
+          JOIN soil_data.element e ON e.profile_id = pr.profile_id
+          JOIN soil_data.specimen s ON s.element_id = e.element_id
+          JOIN soil_data.result_num r ON r.specimen_id = s.specimen_id
+          GROUP BY ps.project_id
+        ),
+        published_obs AS (
+          SELECT pp.project_id, count(r.observation_num_id) AS published_observations
+          FROM published_profiles pp
+          JOIN soil_data.element e ON e.profile_id = pp.profile_id
+          JOIN soil_data.specimen s ON s.element_id = e.element_id
+          JOIN soil_data.result_num r ON r.specimen_id = s.specimen_id
+          GROUP BY pp.project_id
+        )
+        SELECT
+          p.project_id,
+          p.name AS project_name,
+          p.is_published,
+          p.profile_limit,
+          p.spatial_blur_m,
+          COALESCE(pt.total_profiles, 0) AS total_profile_count,
+          COALESCE(ppc.published_profiles, 0) AS published_profile_count,
+          COALESCE(tobs.total_observations, 0) AS total_observation_count,
+          COALESCE(pobs.published_observations, 0) AS published_observation_count
+        FROM soil_data.project p
+        LEFT JOIN profile_totals pt ON pt.project_id = p.project_id
+        LEFT JOIN published_profile_counts ppc ON ppc.project_id = p.project_id
+        LEFT JOIN total_obs tobs ON tobs.project_id = p.project_id
+        LEFT JOIN published_obs pobs ON pobs.project_id = p.project_id
+        ORDER BY p.name;
+    """
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(sql)
+            return cur.fetchall()
+
+
+class SoilProfilePublishUpdate(BaseModel):
+    is_published: bool
+
+
+@app.patch("/api/layer/soil_profiles/{project_id}/publish")
+async def set_soil_profile_publish(
+    project_id: str,
+    body: SoilProfilePublishUpdate,
+    current_user: dict = Depends(get_current_user),
+):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE soil_data.project SET is_published = %s WHERE project_id = %s",
+                (body.is_published, project_id),
+            )
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Project not found")
+            conn.commit()
+    return {"project_id": project_id, "is_published": body.is_published}
+
+
+class SoilProfileLimitUpdate(BaseModel):
+    profile_limit: Optional[int] = None
+
+
+@app.patch("/api/layer/soil_profiles/{project_id}/limit")
+async def set_soil_profile_limit(
+    project_id: str,
+    body: SoilProfileLimitUpdate,
+    current_user: dict = Depends(get_current_user),
+):
+    if body.profile_limit is not None and body.profile_limit <= 0:
+        raise HTTPException(status_code=400, detail="profile_limit must be > 0 or null")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE soil_data.project SET profile_limit = %s WHERE project_id = %s",
+                (body.profile_limit, project_id),
+            )
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Project not found")
+            conn.commit()
+    return {"project_id": project_id, "profile_limit": body.profile_limit}
+
+
+class SoilProfileBlurUpdate(BaseModel):
+    spatial_blur_m: Optional[int] = None
+
+
+@app.patch("/api/layer/soil_profiles/{project_id}/blur")
+async def set_soil_profile_blur(
+    project_id: str,
+    body: SoilProfileBlurUpdate,
+    current_user: dict = Depends(get_current_user),
+):
+    if body.spatial_blur_m is not None and body.spatial_blur_m < 0:
+        raise HTTPException(status_code=400, detail="spatial_blur_m must be >= 0 or null")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE soil_data.project SET spatial_blur_m = %s WHERE project_id = %s",
+                (body.spatial_blur_m, project_id),
+            )
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Project not found")
+            conn.commit()
+    return {"project_id": project_id, "spatial_blur_m": body.spatial_blur_m}
+
 
 @app.get("/")
 async def root():

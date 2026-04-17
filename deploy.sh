@@ -106,102 +106,73 @@ docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
 #     sis-api    #
 ##################
 
-# Authentication:
-# 🔑 JWT tokens (for humans): Login with email/password to manage users, layers, API clients
-# 🎫 API keys (for applications): Long-lived keys for sis and external servers to access data
-
 # Build and start container
 docker compose up --build sis-api -d
 
-# Create admin user (admin@server.com/admin). This user can manage other users (humans) and API clients (servers)
-docker exec sis-database psql -U sis -d sis -c "
-  INSERT INTO api.user (user_id, password_hash, is_admin, is_active) 
-  VALUES ('admin@server.com', '\$2b\$12\$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5oi2W6H9j7K4G', true, true)
-  ON CONFLICT (user_id) DO NOTHING"
+# # Login (admin@server.com/admin) to get temporary token. This token is valid for 60 minutes.
+# # {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ","token_type":"bearer"}
+# curl -X POST http://$HOST_SIS_API/api/auth/login \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "user_id": "admin@server.com",
+#     "password": "admin"
+#   }'
 
-# Login as admin to get admin token. This should return something like:
-# Hash: $2b$12$G4.okdhRYFtDAd8.kDLcD.xLZw6wuFzuBt8/ud.1dsW0HtA1qP7lC
-# Admin user created successfully!
+# # Create the API client key for sis, also in env.
+# # {"message":"API client created successfully","api_client_id":"sis","api_key":"ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4","warning":"Save this API key now. You won't be able to see it again!"}
+# curl -X POST http://$HOST_SIS_API/api/clients \
+#   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "api_client_id": "sis",
+#     "description": "SIS OpenLayers web mapping application"
+#   }'
 
-docker exec -i sis-api python << 'EOF'
-from main import hash_password, get_db
-
-password_hash = hash_password("admin")
-print(f"Hash: {password_hash}")
-
-with get_db() as conn:
-    with conn.cursor() as cur:
-        cur.execute(
-            "INSERT INTO api.user (user_id, password_hash, is_admin, is_active) VALUES (%s, %s, %s, %s) ON CONFLICT (user_id) DO UPDATE SET password_hash = EXCLUDED.password_hash",
-            ('admin@server.com', password_hash, True, True)
-        )
-print("Admin user created successfully!")
-EOF
-
-# Login to get temporary token. This token is valid for 60 minutes.
-# {"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ","token_type":"bearer"}
-curl -X POST http://$HOST_SIS_API/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": "admin@server.com",
-    "password": "admin"
-  }'
-
-# Create the API client key for sis, also in env.
-# {"message":"API client created successfully","api_client_id":"sis","api_key":"ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4","warning":"Save this API key now. You won't be able to see it again!"}
-curl -X POST http://$HOST_SIS_API/api/clients \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "api_client_id": "sis",
-    "description": "SIS OpenLayers web mapping application"
-  }'
-
-# Create the API client key for glosis
-# {"message":"API client created successfully","api_client_id":"glosis","api_key":"82N_VVQ5Uo4QqaOCti6pOXDhvFZVGyE6qTLHkskV5WA","warning":"Save this API key now. You won't be able to see it again!"}
-curl -X POST http://$HOST_SIS_API/api/clients \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "api_client_id": "glosis",
-    "description": "GloSIS Discovery Hub access"
-  }'
+# # Create the API client key for glosis
+# # {"message":"API client created successfully","api_client_id":"glosis","api_key":"82N_VVQ5Uo4QqaOCti6pOXDhvFZVGyE6qTLHkskV5WA","warning":"Save this API key now. You won't be able to see it again!"}
+# curl -X POST http://$HOST_SIS_API/api/clients \
+#   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBzZXJ2ZXIuY29tIiwiZXhwIjoxNzc2MTc1MDA1fQ.pR4bWeq6_X0QFxzkjj702ou34Zhl08yrwyP9yDrgFSQ" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "api_client_id": "glosis",
+#     "description": "GloSIS Discovery Hub access"
+#   }'
 
 
-# Export overall layer info to build web-mapping interface
-psql -h localhost -p 5432 -U sis -d iso19139 -c "\copy (
-        SELECT  p.project_id,
-                p.project_name,
-                l.layer_id,
-                'TRUE' AS publish,
-                p2.name AS property_name,
-                l.dimension_depth || '-' || l.dimension_stats AS dimension,
-                m.creation_date::text AS version,
-                p2.unit_of_measure_id,
-                '/collections/metadata:main/items/'||m.file_identifier metadata_url,
-                u.url AS download_url,
-                'http://$HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=4.584249999999999936%2C116.5172270000000054%2C21.22970700000000122%2C126.8480870000000067&CRS=EPSG%3A4326&WIDTH=567&HEIGHT=914&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE' AS get_map_url,
-                'http://$HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.1.1&LAYER='||l.layer_id||'&REQUEST=getlegendgraphic&FORMAT=image/png' AS get_legend_url,
-                'http://$HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS='||l.layer_id||'&INFO_FORMAT=text%2Fhtml&I=282&J=429' AS get_feature_info_url
-        FROM spatial_metadata.layer l
-        LEFT JOIN spatial_metadata.mapset m ON m.mapset_id = l.mapset_id
-        LEFT JOIN spatial_metadata.project p ON p.country_id = m.country_id AND p.project_id = m.project_id
-        LEFT JOIN spatial_metadata.property p2 ON p2.property_id = m.property_id 
-        LEFT JOIN spatial_metadata.url u ON u.mapset_id = m.mapset_id AND u.url_name = 'Download '||l.dimension_depth || ' ' || l.dimension_stats
-        WHERE m.country_id = '$COUNTRY'
-        ORDER BY p.project_name, l.layer_id
-        ) 
-TO $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv WITH CSV HEADER"
+# # Export overall layer info to build web-mapping interface
+# psql -h localhost -p 5432 -U sis -d iso19139 -c "\copy (
+#         SELECT  p.project_id,
+#                 p.project_name,
+#                 l.layer_id,
+#                 'TRUE' AS publish,
+#                 p2.name AS property_name,
+#                 l.dimension_depth || '-' || l.dimension_stats AS dimension,
+#                 m.creation_date::text AS version,
+#                 p2.unit_of_measure_id,
+#                 '/collections/metadata:main/items/'||m.file_identifier metadata_url,
+#                 u.url AS download_url,
+#                 'http://$HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=4.584249999999999936%2C116.5172270000000054%2C21.22970700000000122%2C126.8480870000000067&CRS=EPSG%3A4326&WIDTH=567&HEIGHT=914&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&DPI=96&MAP_RESOLUTION=96&FORMAT_OPTIONS=dpi%3A96&TRANSPARENT=TRUE' AS get_map_url,
+#                 'http://$HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.1.1&LAYER='||l.layer_id||'&REQUEST=getlegendgraphic&FORMAT=image/png' AS get_legend_url,
+#                 'http://$HOST_SIS_WEB_SERVICES/?map=/etc/mapserver/'||l.layer_id||'.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo&LAYERS='||l.layer_id||'&STYLES=&FORMAT=image%2Fpng&QUERY_LAYERS='||l.layer_id||'&INFO_FORMAT=text%2Fhtml&I=282&J=429' AS get_feature_info_url
+#         FROM spatial_metadata.layer l
+#         LEFT JOIN spatial_metadata.mapset m ON m.mapset_id = l.mapset_id
+#         LEFT JOIN spatial_metadata.project p ON p.country_id = m.country_id AND p.project_id = m.project_id
+#         LEFT JOIN spatial_metadata.property p2 ON p2.property_id = m.property_id 
+#         LEFT JOIN spatial_metadata.url u ON u.mapset_id = m.mapset_id AND u.url_name = 'Download '||l.dimension_depth || ' ' || l.dimension_stats
+#         WHERE m.country_id = '$COUNTRY'
+#         ORDER BY p.project_name, l.layer_id
+#         ) 
+# TO $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv WITH CSV HEADER"
 
 
-# Copy to sis database
-docker cp $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv sis-database:/tmp/layer_info_${COUNTRY}.csv
-docker exec -i sis-database cat /tmp/layer_info_${COUNTRY}.csv | docker exec -i sis-database psql -d sis -U sis -c "COPY api.layer FROM STDIN WITH (FORMAT CSV, HEADER, NULL '')"
-rm $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv
+# # Copy to sis database
+# docker cp $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv sis-database:/tmp/layer_info_${COUNTRY}.csv
+# docker exec -i sis-database cat /tmp/layer_info_${COUNTRY}.csv | docker exec -i sis-database psql -d sis -U sis -c "COPY api.layer FROM STDIN WITH (FORMAT CSV, HEADER, NULL '')"
+# rm $PROJECT_DIR/sis-api/scripts/layer_info_${COUNTRY}.csv
 
-docker exec sis-database psql -d sis -U sis -c "
-  UPDATE api.layer SET project_name ='Soil Nutrients'
-  WHERE project_name ='GSNMap'"
+# docker exec sis-database psql -d sis -U sis -c "
+#   UPDATE api.layer SET project_name ='Soil Nutrients'
+#   WHERE project_name ='GSNMap'"
 
 # Add Profiles layers (Not necessary, for point data it uses the API)
 # docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.layer 

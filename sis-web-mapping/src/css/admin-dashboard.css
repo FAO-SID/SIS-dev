@@ -330,7 +330,6 @@
     text-align: left;
     font-weight: 600;
     font-size: var(--fs-xs);
-    text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--color-text-muted);
     border-bottom: 1px solid var(--color-border-strong);
@@ -645,13 +644,50 @@ input:checked + .toggle-slider:before {
     margin-bottom: var(--sp-5);
 }
 
-.etl-section-title {
+.etl-section-title,
+.layers-section-title {
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--color-primary);
     margin: 0 0 var(--sp-3) 0;
     padding-bottom: var(--sp-2);
     border-bottom: 2px solid var(--color-primary);
+}
+
+.layers-section + .layers-section {
+    margin-top: var(--sp-6, 24px);
+}
+
+.sp-limit-input,
+.sp-blur-input {
+    width: 110px;
+    padding: 4px 8px;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.sp-limit-input::-webkit-outer-spin-button,
+.sp-limit-input::-webkit-inner-spin-button,
+.sp-blur-input::-webkit-outer-spin-button,
+.sp-blur-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.sp-limit-status,
+.sp-blur-status {
+    margin-left: 6px;
+    font-size: 0.85em;
+    color: #555;
+}
+.sp-count-pub {
+    font-weight: 600;
+    color: #2e7d32;
+}
+.sp-count-sep {
+    margin: 0 4px;
+    color: #999;
+}
+.sp-count-total {
+    color: #555;
 }
 
 .etl-metadata-grid {
@@ -748,11 +784,31 @@ input:checked + .toggle-slider:before {
 }
 
 .etl-preview-scroll {
-    max-height: 350px;
+    height: 350px;
+    min-height: 120px;
+    max-height: 80vh;
     overflow: auto;
+    resize: vertical;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     margin-bottom: var(--sp-4);
+}
+
+.etl-preview-error {
+    background-color: #fde2e2 !important;
+    color: #a80000;
+}
+
+.etl-preview-cell {
+    cursor: text;
+    transition: background-color 0.3s;
+}
+
+.etl-preview-cell:focus {
+    outline: 2px solid #17a2b8;
+    outline-offset: -2px;
+    background-color: #fff;
+    color: #000;
 }
 
 .etl-preview-scroll .admin-table {
@@ -768,6 +824,14 @@ input:checked + .toggle-slider:before {
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.etl-preview-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--color-surface, #fff);
+    box-shadow: inset 0 -1px 0 var(--color-border);
 }
 
 /* ---------- Responsive ---------- */

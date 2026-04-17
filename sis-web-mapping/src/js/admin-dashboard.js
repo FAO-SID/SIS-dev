@@ -93,12 +93,15 @@ class AdminDashboard {
 
     await this.loadLayers();
     this.renderLayers();
+    await this.loadSoilProfileLayers();
+    this.renderSoilProfileLayers();
   }
 
   /**
    * Hide the admin dashboard
    */
   hide() {
+    this.flushPendingSoilProfileEdits();
     const dashboard = document.getElementById('admin-dashboard');
     if (dashboard) {
       dashboard.classList.remove('active');
@@ -232,7 +235,7 @@ class AdminDashboard {
                       <th>Admin</th>
                       <th>Active</th>
                       <th>Created</th>
-                      <th>Last Login</th>
+                      <th>Last login</th>
                       <th style="width: 120px;">Actions</th>
                     </tr>
                   </thead>
@@ -263,29 +266,56 @@ class AdminDashboard {
             
             <!-- Layers Tab -->
             <div id="layers-tab" class="tab-pane">
-              <div class="sync-bar" style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
-                <button type="button" class="btn btn-primary" id="sync-layers-btn">Sync from Metadata</button>
-                <button type="button" class="btn btn-primary" id="check-wms-btn">Check WMS</button>
-                <span id="sync-status" style="font-size: 0.9em; color: #555;"></span>
-              </div>
 
-              <div id="layers-table-container">
-                <table class="admin-table" id="layers-table">
-                  <thead>
-                    <tr>
-                      <th>Layer ID</th>
-                      <th>Project</th>
-                      <th>Property</th>
-                      <th>Published</th>
-                      <th>Default</th>
-                      <th>WMS</th>
-                    </tr>
-                  </thead>
-                  <tbody id="layers-tbody">
-                    <tr><td colspan="6" class="loading">Loading layers...</td></tr>
-                  </tbody>
-                </table>
-              </div>
+              <!-- Soil profiles section -->
+              <section class="layers-section">
+                <h3 class="layers-section-title">Soil profiles</h3>
+                <div id="soil-profile-layers-container">
+                  <table class="admin-table" id="soil-profile-layers-table">
+                    <thead>
+                      <tr>
+                        <th>Project</th>
+                        <th>Profiles</th>
+                        <th>Observations</th>
+                        <th>Public limit</th>
+                        <th title="Random coordinate offset in meters. Blank = precise coords.">Spatial blur (meters)</th>
+                        <th>Published</th>
+                      </tr>
+                    </thead>
+                    <tbody id="soil-profile-layers-tbody">
+                      <tr><td colspan="6" class="loading">Loading soil profile layers...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <!-- Maps section -->
+              <section class="layers-section" style="margin-top: var(--sp-6, 24px);">
+                <h3 class="layers-section-title">Maps</h3>
+                <div class="sync-bar" style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                  <button type="button" class="btn btn-primary" id="sync-layers-btn">Sync from Metadata</button>
+                  <button type="button" class="btn btn-primary" id="check-wms-btn">Check WMS</button>
+                  <span id="sync-status" style="font-size: 0.9em; color: #555;"></span>
+                </div>
+
+                <div id="layers-table-container">
+                  <table class="admin-table" id="layers-table">
+                    <thead>
+                      <tr>
+                        <th>Layer ID</th>
+                        <th>Project</th>
+                        <th>Property</th>
+                        <th>Published</th>
+                        <th>Default</th>
+                        <th>WMS</th>
+                      </tr>
+                    </thead>
+                    <tbody id="layers-tbody">
+                      <tr><td colspan="6" class="loading">Loading layers...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
             </div>
 
             <!-- ETL Tab -->
@@ -318,6 +348,11 @@ class AdminDashboard {
                         <thead id="etl-preview-thead"></thead>
                         <tbody id="etl-preview-tbody"></tbody>
                       </table>
+                    </div>
+                    <div id="etl-preview-pager" style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--fs-sm);margin-bottom:var(--sp-3);">
+                      <button type="button" class="btn btn-sm" id="etl-preview-prev">Previous</button>
+                      <span id="etl-preview-page-info"></span>
+                      <button type="button" class="btn btn-sm" id="etl-preview-next">Next</button>
                     </div>
                   </details>
 
@@ -402,22 +437,24 @@ class AdminDashboard {
                     <table class="admin-table" id="etl-mapping-table">
                       <thead>
                         <tr>
-                          <th>CSV Column</th>
-                          <th>Destination Table</th>
-                          <th>Destination Column</th>
+                          <th>CSV column</th>
+                          <th>Destination table</th>
+                          <th>Destination column</th>
                           <th>Property</th>
                           <th>Procedure</th>
                           <th>Unit</th>
                           <th>Conversion</th>
+                          <th>Validation</th>
                         </tr>
                       </thead>
                       <tbody id="etl-mapping-tbody"></tbody>
                     </table>
                   </div>
 
-                  <!-- Save -->
+                  <!-- Save / Validate -->
                   <div style="margin-top:var(--sp-5);display:flex;align-items:center;gap:var(--sp-3);">
                     <button type="button" class="btn btn-primary" id="etl-save-btn">Save</button>
+                    <button type="button" class="btn" id="etl-validate-btn" style="background:#17a2b8;color:#fff;">Validate</button>
                     <span id="etl-save-status" style="font-size:var(--fs-sm);"></span>
                   </div>
 
@@ -532,6 +569,21 @@ class AdminDashboard {
     // ETL unified save (attribution + standardization)
     document.getElementById('etl-save-btn').addEventListener('click', () => {
       this.handleEtlSave();
+    });
+
+    // ETL validate
+    document.getElementById('etl-validate-btn').addEventListener('click', () => {
+      this.handleEtlValidate();
+    });
+
+    // Preview pagination
+    document.getElementById('etl-preview-prev').addEventListener('click', () => {
+      if (this.etlPreviewPage > 0) { this.etlPreviewPage--; this.renderEtlPreviewPage(); }
+    });
+    document.getElementById('etl-preview-next').addEventListener('click', () => {
+      const total = (this.etlPreviewRows || []).length;
+      const max = Math.max(0, Math.ceil(total / (this.etlPreviewPageSize || 100)) - 1);
+      if (this.etlPreviewPage < max) { this.etlPreviewPage++; this.renderEtlPreviewPage(); }
     });
 
     // Save view is now triggered automatically on map moveend
@@ -696,6 +748,9 @@ class AdminDashboard {
    * Switch between tabs
    */
   switchTab(tab) {
+    if (this.currentTab === 'layers' && tab !== 'layers') {
+      this.flushPendingSoilProfileEdits();
+    }
     this.currentTab = tab;
 
     // Update tab buttons
@@ -1035,6 +1090,201 @@ class AdminDashboard {
     }
   }
 
+  // ==================== Soil Profile Layers ====================
+
+  async loadSoilProfileLayers() {
+    try {
+      this.soilProfileLayers = await api.getSoilProfileLayers();
+    } catch (error) {
+      console.error('Error loading soil profile layers:', error);
+      this.soilProfileLayers = [];
+    }
+  }
+
+  renderSoilProfileLayers() {
+    const tbody = document.getElementById('soil-profile-layers-tbody');
+    if (!tbody) return;
+
+    const rows = this.soilProfileLayers || [];
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No projects found</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => {
+      const pid = this.escapeHtml(r.project_id);
+      const name = this.escapeHtml(r.project_name || r.project_id);
+      const limitVal = r.profile_limit == null ? '' : String(r.profile_limit);
+      const blurVal = r.spatial_blur_m == null ? '' : String(r.spatial_blur_m);
+      const totalProfiles = Number(r.total_profile_count || 0);
+      const pubProfiles = Number(r.published_profile_count || 0);
+      const totalObs = Number(r.total_observation_count || 0);
+      const pubObs = Number(r.published_observation_count || 0);
+      return `
+      <tr>
+        <td><strong>${name}</strong></td>
+        <td title="Published / Total">
+          <span class="sp-count-pub">${pubProfiles.toLocaleString()}</span>
+          <span class="sp-count-sep">/</span>
+          <span class="sp-count-total">${totalProfiles.toLocaleString()}</span>
+        </td>
+        <td title="Published / Total">
+          <span class="sp-count-pub">${pubObs.toLocaleString()}</span>
+          <span class="sp-count-sep">/</span>
+          <span class="sp-count-total">${totalObs.toLocaleString()}</span>
+        </td>
+        <td>
+          <input type="number" min="1" step="1" class="sp-limit-input"
+                 data-project-id="${pid}" value="${this.escapeHtml(limitVal)}"
+                 placeholder="no limit" inputmode="numeric">
+          <span class="sp-limit-status" data-project-id="${pid}"></span>
+        </td>
+        <td>
+          <input type="number" min="0" step="1" class="sp-blur-input"
+                 data-project-id="${pid}" value="${this.escapeHtml(blurVal)}"
+                 placeholder="precise" inputmode="numeric">
+          <span class="sp-blur-status" data-project-id="${pid}"></span>
+        </td>
+        <td>
+          <button class="btn ${r.is_published ? 'btn-secondary' : 'btn-success'} sp-publish-btn"
+                  data-project-id="${pid}" data-publish="${r.is_published ? '0' : '1'}">
+            ${r.is_published ? 'Unpublish' : 'Publish'}
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('.sp-publish-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const projectId = e.currentTarget.dataset.projectId;
+        const publish = e.currentTarget.dataset.publish === '1';
+        await this.flushPendingSoilProfileEdits();
+        this.toggleSoilProfilePublish(projectId, publish);
+      });
+    });
+
+    this.pendingSoilProfileLimits = this.pendingSoilProfileLimits || {};
+    this.pendingSoilProfileBlurs = this.pendingSoilProfileBlurs || {};
+    tbody.querySelectorAll('.sp-limit-input').forEach(input => {
+      input.addEventListener('input', (e) => {
+        const projectId = e.currentTarget.dataset.projectId;
+        const raw = (e.currentTarget.value || '').trim();
+        const current = this.soilProfileLayers.find(r => r.project_id === projectId);
+        const original = current && current.profile_limit != null ? String(current.profile_limit) : '';
+        if (raw === original) {
+          delete this.pendingSoilProfileLimits[projectId];
+        } else {
+          this.pendingSoilProfileLimits[projectId] = raw;
+        }
+      });
+    });
+    tbody.querySelectorAll('.sp-blur-input').forEach(input => {
+      input.addEventListener('input', (e) => {
+        const projectId = e.currentTarget.dataset.projectId;
+        const raw = (e.currentTarget.value || '').trim();
+        const current = this.soilProfileLayers.find(r => r.project_id === projectId);
+        const original = current && current.spatial_blur_m != null ? String(current.spatial_blur_m) : '';
+        if (raw === original) {
+          delete this.pendingSoilProfileBlurs[projectId];
+        } else {
+          this.pendingSoilProfileBlurs[projectId] = raw;
+        }
+      });
+    });
+  }
+
+  setSoilProfileBlurStatus(projectId, text, isError = false) {
+    const el = document.querySelector(`.sp-blur-status[data-project-id="${CSS.escape(projectId)}"]`);
+    if (!el) return;
+    el.textContent = text;
+    el.style.color = isError ? '#a80000' : '#2e7d32';
+    if (text) setTimeout(() => { if (el.textContent === text) el.textContent = ''; }, 3000);
+  }
+
+  setSoilProfileLimitStatus(projectId, text, isError = false) {
+    const el = document.querySelector(`.sp-limit-status[data-project-id="${CSS.escape(projectId)}"]`);
+    if (!el) return;
+    el.textContent = text;
+    el.style.color = isError ? '#a80000' : '#2e7d32';
+    if (text) setTimeout(() => { if (el.textContent === text) el.textContent = ''; }, 3000);
+  }
+
+  async toggleSoilProfilePublish(projectId, publish) {
+    try {
+      await api.setSoilProfilePublish(projectId, publish);
+      await this.loadSoilProfileLayers();
+      this.renderSoilProfileLayers();
+    } catch (error) {
+      alert('Error updating publish state: ' + error.message);
+    }
+  }
+
+  async flushPendingSoilProfileLimits() {
+    const pending = this.pendingSoilProfileLimits || {};
+    const entries = Object.entries(pending);
+    if (entries.length === 0) return false;
+    this.pendingSoilProfileLimits = {};
+    let anySaved = false;
+    let anyError = false;
+    for (const [projectId, raw] of entries) {
+      const limit = raw === '' ? null : parseInt(raw, 10);
+      if (limit !== null && (Number.isNaN(limit) || limit <= 0)) {
+        this.setSoilProfileLimitStatus(projectId, 'Invalid — must be a positive integer', true);
+        anyError = true;
+        continue;
+      }
+      try {
+        await api.setSoilProfileLimit(projectId, limit);
+        const row = (this.soilProfileLayers || []).find(r => r.project_id === projectId);
+        if (row) row.profile_limit = limit;
+        anySaved = true;
+      } catch (error) {
+        this.setSoilProfileLimitStatus(projectId, error.message || 'Error saving limit', true);
+        anyError = true;
+      }
+    }
+    return { anySaved, anyError };
+  }
+
+  async flushPendingSoilProfileBlurs() {
+    const pending = this.pendingSoilProfileBlurs || {};
+    const entries = Object.entries(pending);
+    if (entries.length === 0) return { anySaved: false, anyError: false };
+    this.pendingSoilProfileBlurs = {};
+    let anySaved = false;
+    let anyError = false;
+    for (const [projectId, raw] of entries) {
+      const blur = raw === '' ? null : parseInt(raw, 10);
+      if (blur !== null && (Number.isNaN(blur) || blur < 0)) {
+        this.setSoilProfileBlurStatus(projectId, 'Invalid — must be ≥ 0 or blank', true);
+        anyError = true;
+        continue;
+      }
+      try {
+        await api.setSoilProfileBlur(projectId, blur);
+        const row = (this.soilProfileLayers || []).find(r => r.project_id === projectId);
+        if (row) row.spatial_blur_m = blur;
+        anySaved = true;
+      } catch (error) {
+        this.setSoilProfileBlurStatus(projectId, error.message || 'Error saving blur', true);
+        anyError = true;
+      }
+    }
+    return { anySaved, anyError };
+  }
+
+  async flushPendingSoilProfileEdits() {
+    const [a, b] = await Promise.all([
+      this.flushPendingSoilProfileLimits(),
+      this.flushPendingSoilProfileBlurs(),
+    ]);
+    if (a.anySaved || b.anySaved) {
+      await this.loadSoilProfileLayers();
+      this.renderSoilProfileLayers();
+    }
+    return a.anySaved || b.anySaved || a.anyError || b.anyError;
+  }
+
   // ==================== ETL ====================
 
   // Destination table → column options
@@ -1335,6 +1585,54 @@ class AdminDashboard {
     }
   }
 
+  async handleEtlValidate() {
+    const statusEl = document.getElementById('etl-save-status');
+    const section = document.getElementById('etl-mapping-section');
+    const tableName = section.dataset.tableName;
+    if (!tableName) {
+      statusEl.textContent = 'No dataset open.';
+      statusEl.style.color = '#c33';
+      return;
+    }
+    statusEl.textContent = 'Validating...';
+    statusEl.style.color = '#555';
+    try {
+      const result = await api.validateDataset(tableName);
+      const cols = result.columns || {};
+
+      // Apply per-column results in the mapping table
+      document.querySelectorAll('#etl-mapping-tbody tr').forEach(tr => {
+        const colName = tr.dataset.col;
+        const cell = tr.querySelector('.etl-validation');
+        if (!cell) return;
+        const r = cols[colName];
+        if (!r) {
+          cell.textContent = '';
+          cell.style.color = '#555';
+          return;
+        }
+        const text = r.status === 'OK' ? 'OK' : r.errors.join('; ');
+        cell.textContent = text;
+        cell.style.color = r.status === 'OK' ? '#28a745' : '#dc3545';
+      });
+
+      // Rebuild error-cell map and re-render preview to highlight
+      this.etlErrorCells = {};
+      Object.entries(cols).forEach(([colName, r]) => {
+        if (r.error_rows && r.error_rows.length) {
+          this.etlErrorCells[colName] = new Set(r.error_rows);
+        }
+      });
+      this.renderEtlPreviewPage();
+
+      statusEl.textContent = result.message;
+      statusEl.style.color = /OK/.test(result.message) ? '#28a745' : '#dc3545';
+    } catch (e) {
+      statusEl.textContent = 'Validation failed: ' + e.message;
+      statusEl.style.color = '#c33';
+    }
+  }
+
   async handleEtlUpload() {
     const fileInput = document.getElementById('etl-file-input');
     const statusEl = document.getElementById('etl-upload-status');
@@ -1411,7 +1709,8 @@ class AdminDashboard {
         api.getDatasetColumns(tableName)
       ]);
       this.etlUploadResult = { table_name: tableName, columns: preview.columns };
-      this.showEtlPreview(preview.columns, preview.rows.map(r => preview.columns.map(c => r[c])));
+      this.etlErrorCells = {};
+      this.showEtlPreview(preview.columns, preview.rows);
       this.showEtlMapping(tableName, preview.columns, columns);
 
       // Restore project and authors from the dataset record
@@ -1484,14 +1783,180 @@ class AdminDashboard {
   }
 
   showEtlPreview(columns, rows) {
+    this.etlPreviewColumns = columns;
+    this.etlPreviewRows = rows;
+    this.etlPreviewPage = 0;
+    this.etlPreviewPageSize = 100;
+    this.etlErrorCells = this.etlErrorCells || {};
+    this.etlSort = [];
+    this.renderEtlPreviewPage();
+  }
+
+  etlToggleSort(col, additive) {
+    if (!this.etlSort) this.etlSort = [];
+    const idx = this.etlSort.findIndex(s => s.col === col);
+    if (!additive) {
+      // Plain click: if only this column is sorted, cycle it; else replace with asc on this column
+      if (this.etlSort.length === 1 && idx === 0) {
+        const dir = this.etlSort[0].dir;
+        if (dir === 'asc') this.etlSort = [{ col, dir: 'desc' }];
+        else this.etlSort = [];
+      } else {
+        this.etlSort = [{ col, dir: 'asc' }];
+      }
+    } else {
+      // Shift+click: add or cycle this column within existing sort
+      if (idx === -1) {
+        this.etlSort.push({ col, dir: 'asc' });
+      } else if (this.etlSort[idx].dir === 'asc') {
+        this.etlSort[idx].dir = 'desc';
+      } else {
+        this.etlSort.splice(idx, 1);
+      }
+    }
+    this.etlPreviewPage = 0;
+    this.renderEtlPreviewPage();
+  }
+
+  renderEtlPreviewPage() {
     const thead = document.getElementById('etl-preview-thead');
     const tbody = document.getElementById('etl-preview-tbody');
     const info = document.getElementById('etl-preview-info');
-    info.textContent = `(showing ${rows.length} rows)`;
-    thead.innerHTML = '<tr>' + columns.map(c => `<th>${this.escapeHtml(c)}</th>`).join('') + '</tr>';
-    tbody.innerHTML = rows.map(row =>
-      '<tr>' + (Array.isArray(row) ? row : columns.map(c => row[c])).map(v => `<td>${this.escapeHtml(String(v ?? ''))}</td>`).join('') + '</tr>'
-    ).join('');
+    const pageInfo = document.getElementById('etl-preview-page-info');
+    const prevBtn = document.getElementById('etl-preview-prev');
+    const nextBtn = document.getElementById('etl-preview-next');
+
+    const columns = this.etlPreviewColumns || [];
+    const rows = this.etlPreviewRows || [];
+    const pageSize = this.etlPreviewPageSize || 100;
+    const total = rows.length;
+
+    // Build index array, sort if requested — preserves original indices for error highlighting
+    let order = rows.map((_, i) => i);
+    const sortList = this.etlSort || [];
+    if (sortList.length) {
+      const asNum = v => {
+        if (v === null || v === undefined || v === '') return null;
+        const n = Number(v);
+        return Number.isFinite(n) ? n : null;
+      };
+      const getVal = (idx, col) => {
+        const row = rows[idx];
+        return Array.isArray(row) ? row[columns.indexOf(col)] : row[col];
+      };
+      order.sort((a, b) => {
+        for (const { col, dir } of sortList) {
+          const va = getVal(a, col), vb = getVal(b, col);
+          const aEmpty = va === null || va === undefined || va === '';
+          const bEmpty = vb === null || vb === undefined || vb === '';
+          if (aEmpty && bEmpty) continue;
+          if (aEmpty) return 1;
+          if (bEmpty) return -1;
+          const na = asNum(va), nb = asNum(vb);
+          let cmp;
+          if (na !== null && nb !== null) cmp = na - nb;
+          else cmp = String(va).localeCompare(String(vb));
+          if (cmp !== 0) return dir === 'asc' ? cmp : -cmp;
+        }
+        return 0;
+      });
+    }
+
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (this.etlPreviewPage >= totalPages) this.etlPreviewPage = totalPages - 1;
+    if (this.etlPreviewPage < 0) this.etlPreviewPage = 0;
+    const start = this.etlPreviewPage * pageSize;
+    const end = Math.min(start + pageSize, total);
+
+    info.textContent = `(${total} rows loaded)`;
+    pageInfo.textContent = `Page ${this.etlPreviewPage + 1}/${totalPages} — rows ${start + 1}-${end}`;
+    prevBtn.disabled = this.etlPreviewPage === 0;
+    nextBtn.disabled = this.etlPreviewPage >= totalPages - 1;
+
+    const sortIndicator = c => {
+      const i = sortList.findIndex(s => s.col === c);
+      if (i === -1) return '';
+      const arrow = sortList[i].dir === 'asc' ? '▲' : '▼';
+      const badge = sortList.length > 1 ? `<sup style="font-size:0.75em;">${i + 1}</sup>` : '';
+      return ` ${arrow}${badge}`;
+    };
+    thead.innerHTML = '<tr><th style="width:40px;">#</th>' + columns.map(c =>
+      `<th class="etl-preview-sort" data-col="${this.escapeHtml(c)}" style="cursor:pointer;user-select:none;" title="Click to sort; Shift+click to add secondary sort">${this.escapeHtml(c)}${sortIndicator(c)}</th>`
+    ).join('') + '</tr>';
+
+    thead.querySelectorAll('.etl-preview-sort').forEach(th => {
+      th.addEventListener('click', (e) => this.etlToggleSort(th.dataset.col, e.shiftKey));
+    });
+
+    const errCells = this.etlErrorCells || {};
+    const getErrCols = rid => {
+      const cols = [];
+      columns.forEach(c => {
+        const set = errCells[c];
+        if (set && set.has(rid)) cols.push(c);
+      });
+      return new Set(cols);
+    };
+
+    const html = [];
+    for (let pos = start; pos < end; pos++) {
+      const i = order[pos];
+      const row = rows[i];
+      const rid = row._row_id;
+      const errSet = getErrCols(rid);
+      html.push(`<tr data-rid="${rid}"><td style="color:#777;">${rid}</td>` + columns.map(c => {
+        const v = row[c];
+        const val = v == null ? '' : String(v);
+        const cls = errSet.has(c) ? 'etl-preview-cell etl-preview-error' : 'etl-preview-cell';
+        return `<td class="${cls}" contenteditable="true" data-rid="${rid}" data-col="${this.escapeHtml(c)}" data-orig="${this.escapeHtml(val)}" spellcheck="false">${this.escapeHtml(val)}</td>`;
+      }).join('') + '</tr>');
+    }
+    tbody.innerHTML = html.join('');
+
+    // Wire cell edits
+    tbody.querySelectorAll('.etl-preview-cell').forEach(td => {
+      td.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); td.blur(); }
+        if (e.key === 'Escape') { td.textContent = td.dataset.orig; td.blur(); }
+      });
+      td.addEventListener('blur', () => this.handleEtlCellEdit(td));
+    });
+  }
+
+  async handleEtlCellEdit(td) {
+    const section = document.getElementById('etl-mapping-section');
+    const tableName = section.dataset.tableName;
+    if (!tableName) return;
+    const rid = parseInt(td.dataset.rid, 10);
+    const col = td.dataset.col;
+    const orig = td.dataset.orig;
+    const newVal = td.textContent;
+    if (newVal === orig) return;
+    td.style.backgroundColor = '#fff3cd';
+    try {
+      const result = await api.editDatasetCells(tableName, [{ row_id: rid, column: col, value: newVal }]);
+      if (result.updated) {
+        td.dataset.orig = newVal;
+        // Update local row data
+        const row = (this.etlPreviewRows || []).find(r => r._row_id === rid);
+        if (row) row[col] = newVal;
+        td.style.backgroundColor = '#d4edda';
+        setTimeout(() => { td.style.backgroundColor = ''; }, 800);
+        // Debounce revalidate
+        clearTimeout(this._etlRevalidateTimer);
+        this._etlRevalidateTimer = setTimeout(() => this.handleEtlValidate(), 1000);
+      } else {
+        td.textContent = orig;
+        td.style.backgroundColor = '';
+        if (result.errors && result.errors.length) {
+          alert('Edit failed: ' + result.errors.join('; '));
+        }
+      }
+    } catch (e) {
+      td.textContent = orig;
+      td.style.backgroundColor = '';
+      alert('Edit failed: ' + e.message);
+    }
   }
 
   showEtlMapping(tableName, columns, existingMappings) {
@@ -1543,6 +2008,9 @@ class AdminDashboard {
 
       const hideResult = isResult ? '' : 'display:none;';
 
+      const validation = existing.validation || '';
+      const valColor = validation === 'OK' ? '#28a745' : (validation ? '#dc3545' : '#555');
+
       return `
         <tr data-col="${this.escapeHtml(col)}">
           <td><strong>${this.escapeHtml(col)}</strong></td>
@@ -1555,6 +2023,7 @@ class AdminDashboard {
             <select class="etl-conv-op" style="${ss}width:50px;">${convOpOpts}</select>
             <select class="etl-conv-val" style="${ss}width:70px;">${convValOpts}</select>
           </td>
+          <td class="etl-validation" style="font-size:var(--fs-xs);max-width:260px;white-space:pre-wrap;color:${valColor};">${this.escapeHtml(validation)}</td>
         </tr>`;
     }).join('');
 

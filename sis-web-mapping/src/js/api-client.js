@@ -212,6 +212,32 @@ class SISApiClient {
     });
   }
 
+  // Soil profile layers (per-project)
+  async getSoilProfileLayers() {
+    return this.authenticatedRequest('/api/layer/soil_profiles');
+  }
+
+  async setSoilProfilePublish(projectId, isPublished) {
+    return this.authenticatedRequest(`/api/layer/soil_profiles/${encodeURIComponent(projectId)}/publish`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_published: isPublished })
+    });
+  }
+
+  async setSoilProfileLimit(projectId, profileLimit) {
+    return this.authenticatedRequest(`/api/layer/soil_profiles/${encodeURIComponent(projectId)}/limit`, {
+      method: 'PATCH',
+      body: JSON.stringify({ profile_limit: profileLimit })
+    });
+  }
+
+  async setSoilProfileBlur(projectId, spatialBlurM) {
+    return this.authenticatedRequest(`/api/layer/soil_profiles/${encodeURIComponent(projectId)}/blur`, {
+      method: 'PATCH',
+      body: JSON.stringify({ spatial_blur_m: spatialBlurM })
+    });
+  }
+
   // ==================== User Management (Admin JWT) ====================
 
   async verifyAuth() {
@@ -368,6 +394,19 @@ class SISApiClient {
   async pruneDataset(tableName) {
     return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/prune`, {
       method: 'POST'
+    });
+  }
+
+  async validateDataset(tableName) {
+    return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/validate`, {
+      method: 'POST'
+    });
+  }
+
+  async editDatasetCells(tableName, edits) {
+    return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/cells`, {
+      method: 'PATCH',
+      body: JSON.stringify({ edits })
     });
   }
 
