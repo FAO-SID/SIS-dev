@@ -69,6 +69,7 @@ services:
     container_name: sis-nginx
     volumes:
       - ./sis-nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./sis-web-services/volume:/srv/rasters:ro
       # - ./sis-nginx/ssl:/etc/nginx/ssl:ro
     ports:
       - "80:80"

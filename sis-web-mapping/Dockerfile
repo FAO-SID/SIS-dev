@@ -11,6 +11,7 @@ RUN npm install
 # Copy source code
 COPY src ./src
 COPY public ./public
+COPY .proxyrc.json ./
 
 # Build arguments for environment variables
 ARG API_URL=http://localhost

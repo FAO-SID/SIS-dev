@@ -602,6 +602,16 @@ async def sync_layers_from_metadata(current_user: dict = Depends(get_current_adm
     added, updated = 0, 0
     seen_layer_ids = set()
 
+    # Resolve local download base URL from the Settings table so that a change
+    # in DOWNLOAD_BASE_URL takes effect on the next Sync.
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT value FROM api.setting WHERE key = 'DOWNLOAD_BASE_URL'")
+            row = cur.fetchone()
+    download_base = (row[0] if row else "/downloads/") or "/downloads/"
+    if not download_base.endswith("/"):
+        download_base += "/"
+
     for feature in features:
         props = feature.get("properties", {})
         links = feature.get("links", [])
@@ -643,9 +653,9 @@ async def sync_layers_from_metadata(current_user: dict = Depends(get_current_adm
             project_id = parts[1]
             stat = parts[-1]
             dimension = f"{parts[-3]}-{parts[-2]}-{parts[-1]}"
-            download_url = _to_relative_path(next(
-                (l["href"] for l in download_links if f"D-{stat}" in l.get("href", "")),
-                None))
+            # Always point download_url at the local raster served by sis-nginx,
+            # regardless of what the upstream metadata record advertises.
+            download_url = f"{download_base}{layer_id}.tif"
             get_map_url, get_legend_url, get_feature_info_url = _build_wms_urls(map_path, layer_id)
 
             with get_db() as conn:

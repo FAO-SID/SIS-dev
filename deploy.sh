@@ -205,7 +205,8 @@ docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.setting(key, val
  ('LATITUDE','27.5'),
  ('LONGITUDE','89.7'),
  ('ZOOM','9'),
- ('BASE_MAP_DEFAULT','esri-imagery')"
+ ('BASE_MAP_DEFAULT','esri-imagery'),
+ ('DOWNLOAD_BASE_URL' '/downloads/');
 
 
 # Test SIS API

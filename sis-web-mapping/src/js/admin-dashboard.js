@@ -182,11 +182,11 @@ class AdminDashboard {
           </div>
           
           <ul class="dashboard-tabs">
+            <li><button class="tab-btn" data-tab="account">My Account</button></li>
             <li><button class="tab-btn active" data-tab="administration">Administration</button></li>
-            <li><button class="tab-btn" data-tab="dashboard">Dashboard</button></li>
             <li><button class="tab-btn" data-tab="layers">Layers</button></li>
             <li><button class="tab-btn" data-tab="etl">ETL</button></li>
-            <li><button class="tab-btn" data-tab="account">My Account</button></li>
+            <li><button class="tab-btn" data-tab="dashboard">Dashboard</button></li>
           </ul>
 
           <div class="dashboard-body">
@@ -340,10 +340,11 @@ class AdminDashboard {
                         <th>Published</th>
                         <th>Default</th>
                         <th>WMS</th>
+                        <th>Download</th>
                       </tr>
                     </thead>
                     <tbody id="layers-tbody">
-                      <tr><td colspan="6" class="loading">Loading layers...</td></tr>
+                      <tr><td colspan="7" class="loading">Loading layers...</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -1067,9 +1068,12 @@ class AdminDashboard {
     const tbody = document.getElementById('layers-tbody');
 
     if (this.layers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No layers found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No layers found</td></tr>';
       return;
     }
+
+    const baseSetting = (this.settings || []).find(s => s.key === 'DOWNLOAD_BASE_URL');
+    const downloadBase = baseSetting ? baseSetting.value : '/downloads/';
 
     tbody.innerHTML = this.layers.map(layer => {
       const id = this.escapeHtml(layer.layer_id);
@@ -1078,6 +1082,9 @@ class AdminDashboard {
         : (layer.publish
             ? `<button class="btn btn-primary" onclick="adminDashboard.setDefaultLayer('${id}')">Set Default</button>`
             : '-');
+      const downloadUrl = layer.download_url
+        || (downloadBase.replace(/\/$/, '') + '/' + layer.layer_id + '.tif');
+      const downloadCell = `<a class="btn btn-sm btn-secondary" href="${this.escapeHtml(downloadUrl)}" download title="Download GeoTIFF">GeoTIFF</a>`;
       return `
       <tr${layer.is_default ? ' style="background:#fff8d6;"' : ''}>
         <td><strong>${id}</strong></td>
@@ -1091,6 +1098,7 @@ class AdminDashboard {
         </td>
         <td>${defaultCell}</td>
         <td id="wms-status-${id}">-</td>
+        <td>${downloadCell}</td>
       </tr>
     `;
     }).join('');
