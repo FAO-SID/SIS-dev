@@ -658,6 +658,79 @@ input:checked + .toggle-slider:before {
     margin-top: var(--sp-6, 24px);
 }
 
+/* ---------- Dashboard tab ---------- */
+.stat-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.stat-card {
+    position: relative;
+    padding: 18px 18px 16px;
+    border-radius: 10px;
+    color: #fff;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+}
+.stat-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 60%);
+    pointer-events: none;
+}
+.stat-card-value {
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+.stat-card-label {
+    margin-top: 4px;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    opacity: 0.9;
+}
+.stat-card-a { background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%); }
+.stat-card-b { background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%); }
+.stat-card-c { background: linear-gradient(135deg, #ef6c00 0%, #ffa726 100%); }
+.stat-card-d { background: linear-gradient(135deg, #6a1b9a 0%, #ab47bc 100%); }
+.stat-card-e { background: linear-gradient(135deg, #00838f 0%, #26c6da 100%); }
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+}
+.chart-card {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 10px;
+    padding: 14px 16px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.chart-card-wide {
+    grid-column: 1 / -1;
+}
+.chart-title {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text, #333);
+}
+.chart-wrap {
+    position: relative;
+    height: 280px;
+}
+.chart-card-wide .chart-wrap {
+    height: 260px;
+}
+
 .sp-limit-input,
 .sp-blur-input {
     width: 110px;

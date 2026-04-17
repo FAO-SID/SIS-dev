@@ -9,6 +9,7 @@ import View from 'ol/View';
 import { Tile as TileLayer } from 'ol/layer';
 import { OSM, XYZ } from 'ol/source';
 import { fromLonLat, toLonLat } from 'ol/proj';
+import Chart from 'chart.js/auto';
 
 const BASE_MAP_OPTIONS = {
   'esri-imagery': {
@@ -182,6 +183,7 @@ class AdminDashboard {
           
           <ul class="dashboard-tabs">
             <li><button class="tab-btn active" data-tab="administration">Administration</button></li>
+            <li><button class="tab-btn" data-tab="dashboard">Dashboard</button></li>
             <li><button class="tab-btn" data-tab="layers">Layers</button></li>
             <li><button class="tab-btn" data-tab="etl">ETL</button></li>
             <li><button class="tab-btn" data-tab="account">My Account</button></li>
@@ -264,6 +266,36 @@ class AdminDashboard {
               </div>
             </div>
             
+            <!-- Dashboard Tab -->
+            <div id="dashboard-tab" class="tab-pane">
+              <div id="dashboard-empty" style="padding:var(--sp-5,24px);color:#777;">Loading dashboard…</div>
+              <div id="dashboard-content" style="display:none;">
+                <div class="stat-card-grid" id="stat-card-grid"></div>
+                <div class="chart-grid">
+                  <div class="chart-card">
+                    <h4 class="chart-title">Profiles per project</h4>
+                    <div class="chart-wrap"><canvas id="chart-profiles-per-project"></canvas></div>
+                  </div>
+                  <div class="chart-card">
+                    <h4 class="chart-title">Top measured properties</h4>
+                    <div class="chart-wrap"><canvas id="chart-top-properties"></canvas></div>
+                  </div>
+                  <div class="chart-card chart-card-wide">
+                    <h4 class="chart-title">Profiles sampled per year</h4>
+                    <div class="chart-wrap"><canvas id="chart-profiles-per-year"></canvas></div>
+                  </div>
+                  <div class="chart-card">
+                    <h4 class="chart-title">Observation depth distribution</h4>
+                    <div class="chart-wrap"><canvas id="chart-depth-distribution"></canvas></div>
+                  </div>
+                  <div class="chart-card">
+                    <h4 class="chart-title">Value range per property (min / Q1–Q3 / max)</h4>
+                    <div class="chart-wrap"><canvas id="chart-value-summary"></canvas></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Layers Tab -->
             <div id="layers-tab" class="tab-pane">
 
@@ -771,6 +803,10 @@ class AdminDashboard {
     // Load ETL codelists when tab is first opened
     if (tab === 'etl' && !this.etlCodelistsLoaded) {
       this.loadEtlCodelists();
+    }
+
+    if (tab === 'dashboard') {
+      this.loadDashboard();
     }
   }
 
@@ -1283,6 +1319,196 @@ class AdminDashboard {
       this.renderSoilProfileLayers();
     }
     return a.anySaved || b.anySaved || a.anyError || b.anyError;
+  }
+
+  // ==================== Dashboard (stats) ====================
+
+  async loadDashboard() {
+    const empty = document.getElementById('dashboard-empty');
+    const content = document.getElementById('dashboard-content');
+    if (!empty || !content) return;
+
+    if (this.dashboardLoaded) return; // one-shot; user can reload page to refresh
+    try {
+      empty.textContent = 'Loading dashboard…';
+      const stats = await api.getDashboardStats();
+      this.renderDashboardCards(stats.totals || {});
+      this.renderDashboardCharts(stats);
+      empty.style.display = 'none';
+      content.style.display = '';
+      this.dashboardLoaded = true;
+    } catch (e) {
+      console.error('Dashboard load failed:', e);
+      empty.textContent = 'Failed to load dashboard: ' + (e.message || e);
+    }
+  }
+
+  renderDashboardCards(t) {
+    const grid = document.getElementById('stat-card-grid');
+    if (!grid) return;
+    const fmt = (n) => Number(n || 0).toLocaleString();
+    const cards = [
+      { label: 'Profiles', value: fmt(t.profile_count), accent: 'a' },
+      { label: 'Observations', value: fmt(t.observation_count), accent: 'b' },
+      { label: 'Projects', value: fmt(t.project_count), accent: 'c' },
+      { label: 'Properties', value: fmt(t.property_count), accent: 'd' },
+      { label: 'Sites', value: fmt(t.site_count), accent: 'e' },
+    ];
+    grid.innerHTML = cards.map(c => `
+      <div class="stat-card stat-card-${c.accent}">
+        <div class="stat-card-value">${this.escapeHtml(c.value)}</div>
+        <div class="stat-card-label">${this.escapeHtml(c.label)}</div>
+      </div>
+    `).join('');
+  }
+
+  renderDashboardCharts(stats) {
+    if (this._dashboardCharts) {
+      Object.values(this._dashboardCharts).forEach(c => c && c.destroy && c.destroy());
+    }
+    this._dashboardCharts = {};
+
+    const palette = [
+      '#2e7d32', '#1976d2', '#ef6c00', '#8e24aa',
+      '#c62828', '#00838f', '#6d4c41', '#455a64',
+      '#558b2f', '#ad1457'
+    ];
+    const paletteFor = (n) => Array.from({ length: n }, (_, i) => palette[i % palette.length]);
+
+    const baseOpts = {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700, easing: 'easeOutQuart' },
+      plugins: { legend: { display: false } },
+    };
+
+    // Profiles per project (horizontal bar)
+    const pp = stats.profiles_per_project || [];
+    this._dashboardCharts.profilesPerProject = new Chart(
+      document.getElementById('chart-profiles-per-project'),
+      {
+        type: 'bar',
+        data: {
+          labels: pp.map(r => r.project_name),
+          datasets: [{
+            data: pp.map(r => r.profile_count),
+            backgroundColor: paletteFor(pp.length),
+            borderRadius: 4,
+          }],
+        },
+        options: { ...baseOpts, indexAxis: 'y', scales: { x: { beginAtZero: true } } },
+      }
+    );
+
+    // Top properties (horizontal bar)
+    const tp = stats.top_properties || [];
+    this._dashboardCharts.topProperties = new Chart(
+      document.getElementById('chart-top-properties'),
+      {
+        type: 'bar',
+        data: {
+          labels: tp.map(r => r.property),
+          datasets: [{
+            data: tp.map(r => r.observation_count),
+            backgroundColor: paletteFor(tp.length),
+            borderRadius: 4,
+          }],
+        },
+        options: { ...baseOpts, indexAxis: 'y', scales: { x: { beginAtZero: true } } },
+      }
+    );
+
+    // Profiles per year (line, filled)
+    const py = stats.profiles_per_year || [];
+    this._dashboardCharts.profilesPerYear = new Chart(
+      document.getElementById('chart-profiles-per-year'),
+      {
+        type: 'line',
+        data: {
+          labels: py.map(r => String(r.year)),
+          datasets: [{
+            data: py.map(r => r.profile_count),
+            borderColor: '#2e7d32',
+            backgroundColor: 'rgba(46,125,50,0.15)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            borderWidth: 2,
+          }],
+        },
+        options: { ...baseOpts, scales: { y: { beginAtZero: true } } },
+      }
+    );
+
+    // Depth distribution (vertical bar)
+    const dd = stats.depth_distribution || [];
+    this._dashboardCharts.depthDistribution = new Chart(
+      document.getElementById('chart-depth-distribution'),
+      {
+        type: 'bar',
+        data: {
+          labels: dd.map(r => r.depth_range + ' cm'),
+          datasets: [{
+            data: dd.map(r => r.element_count),
+            backgroundColor: paletteFor(dd.length),
+            borderRadius: 4,
+          }],
+        },
+        options: { ...baseOpts, scales: { y: { beginAtZero: true } } },
+      }
+    );
+
+    // Value summary — floating bars for Q1-Q3, with whiskers from min/max
+    const vs = stats.value_summary || [];
+    this._dashboardCharts.valueSummary = new Chart(
+      document.getElementById('chart-value-summary'),
+      {
+        type: 'bar',
+        data: {
+          labels: vs.map(r => r.property),
+          datasets: [
+            {
+              label: 'min–max',
+              data: vs.map(r => [r.vmin, r.vmax]),
+              backgroundColor: 'rgba(25,118,210,0.12)',
+              borderColor: 'rgba(25,118,210,0.4)',
+              borderWidth: 1,
+              borderRadius: 2,
+            },
+            {
+              label: 'Q1–Q3',
+              data: vs.map(r => [r.q1, r.q3]),
+              backgroundColor: paletteFor(vs.length),
+              borderRadius: 4,
+            },
+          ],
+        },
+        options: {
+          ...baseOpts,
+          indexAxis: 'y',
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const r = vs[ctx.dataIndex] || {};
+                  return [
+                    `n: ${Number(r.n).toLocaleString()}`,
+                    `min: ${r.vmin}`,
+                    `Q1: ${r.q1}`,
+                    `median: ${r.median}`,
+                    `Q3: ${r.q3}`,
+                    `max: ${r.vmax}`,
+                  ];
+                },
+              },
+            },
+          },
+          scales: { x: { beginAtZero: false } },
+        },
+      }
+    );
   }
 
   // ==================== ETL ====================

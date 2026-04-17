@@ -1894,6 +1894,122 @@ async def set_soil_profile_blur(
     return {"project_id": project_id, "spatial_blur_m": body.spatial_blur_m}
 
 
+@app.get("/api/stats/dashboard")
+async def dashboard_stats(current_user: dict = Depends(get_current_user)):
+    """Aggregated stats across soil_data for the dashboard tab."""
+    out = {}
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            # Top-line cards
+            cur.execute("""
+                SELECT
+                  (SELECT count(*) FROM soil_data.profile) AS profile_count,
+                  (SELECT count(*) FROM soil_data.result_num) AS observation_count,
+                  (SELECT count(*) FROM soil_data.project) AS project_count,
+                  (SELECT count(DISTINCT property_num_id) FROM soil_data.observation_num) AS property_count,
+                  (SELECT count(*) FROM soil_data.site) AS site_count;
+            """)
+            out["totals"] = cur.fetchone()
+
+            # Profiles per project
+            cur.execute("""
+                SELECT p.name AS project_name,
+                       count(DISTINCT pr.profile_id) AS profile_count
+                FROM soil_data.project p
+                LEFT JOIN soil_data.project_site ps ON ps.project_id = p.project_id
+                LEFT JOIN soil_data.plot pl ON pl.site_id = ps.site_id
+                LEFT JOIN soil_data.profile pr ON pr.plot_id = pl.plot_id
+                GROUP BY p.name
+                ORDER BY profile_count DESC;
+            """)
+            out["profiles_per_project"] = cur.fetchall()
+
+            # Top 10 measured properties
+            cur.execute("""
+                SELECT o.property_num_id AS property,
+                       count(*) AS observation_count
+                FROM soil_data.result_num r
+                JOIN soil_data.observation_num o ON o.observation_num_id = r.observation_num_id
+                GROUP BY o.property_num_id
+                ORDER BY observation_count DESC
+                LIMIT 10;
+            """)
+            out["top_properties"] = cur.fetchall()
+
+            # Profiles sampled per year
+            cur.execute("""
+                SELECT extract(year FROM pl.sampling_date)::int AS year,
+                       count(DISTINCT pr.profile_id) AS profile_count
+                FROM soil_data.plot pl
+                JOIN soil_data.profile pr ON pr.plot_id = pl.plot_id
+                WHERE pl.sampling_date IS NOT NULL
+                GROUP BY year
+                ORDER BY year;
+            """)
+            out["profiles_per_year"] = cur.fetchall()
+
+            # Depth distribution (bins of 25cm up to 2m, then >200)
+            cur.execute("""
+                WITH depths AS (
+                  SELECT CASE
+                           WHEN lower_depth IS NULL THEN NULL
+                           WHEN lower_depth <= 25 THEN '0-25'
+                           WHEN lower_depth <= 50 THEN '25-50'
+                           WHEN lower_depth <= 75 THEN '50-75'
+                           WHEN lower_depth <= 100 THEN '75-100'
+                           WHEN lower_depth <= 150 THEN '100-150'
+                           WHEN lower_depth <= 200 THEN '150-200'
+                           ELSE '>200'
+                         END AS bucket,
+                         CASE
+                           WHEN lower_depth IS NULL THEN 999
+                           WHEN lower_depth <= 25 THEN 0
+                           WHEN lower_depth <= 50 THEN 1
+                           WHEN lower_depth <= 75 THEN 2
+                           WHEN lower_depth <= 100 THEN 3
+                           WHEN lower_depth <= 150 THEN 4
+                           WHEN lower_depth <= 200 THEN 5
+                           ELSE 6
+                         END AS sort_idx
+                  FROM soil_data.element
+                  WHERE lower_depth IS NOT NULL
+                )
+                SELECT bucket AS depth_range, count(*) AS element_count
+                FROM depths
+                GROUP BY bucket, sort_idx
+                ORDER BY sort_idx;
+            """)
+            out["depth_distribution"] = cur.fetchall()
+
+            # Value summary per top property (min, q1, median, q3, max)
+            cur.execute("""
+                WITH top_props AS (
+                  SELECT o.property_num_id
+                  FROM soil_data.result_num r
+                  JOIN soil_data.observation_num o ON o.observation_num_id = r.observation_num_id
+                  GROUP BY o.property_num_id
+                  ORDER BY count(*) DESC
+                  LIMIT 8
+                )
+                SELECT o.property_num_id AS property,
+                       count(r.value)::int AS n,
+                       min(r.value)::float AS vmin,
+                       percentile_cont(0.25) WITHIN GROUP (ORDER BY r.value)::float AS q1,
+                       percentile_cont(0.5)  WITHIN GROUP (ORDER BY r.value)::float AS median,
+                       percentile_cont(0.75) WITHIN GROUP (ORDER BY r.value)::float AS q3,
+                       max(r.value)::float AS vmax
+                FROM soil_data.result_num r
+                JOIN soil_data.observation_num o ON o.observation_num_id = r.observation_num_id
+                JOIN top_props tp ON tp.property_num_id = o.property_num_id
+                WHERE r.value IS NOT NULL
+                GROUP BY o.property_num_id
+                ORDER BY n DESC;
+            """)
+            out["value_summary"] = cur.fetchall()
+
+    return out
+
+
 @app.get("/")
 async def root():
     return {

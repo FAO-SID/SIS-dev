@@ -238,6 +238,11 @@ class SISApiClient {
     });
   }
 
+  // Dashboard
+  async getDashboardStats() {
+    return this.authenticatedRequest('/api/stats/dashboard');
+  }
+
   // ==================== User Management (Admin JWT) ====================
 
   async verifyAuth() {
