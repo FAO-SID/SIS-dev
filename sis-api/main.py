@@ -1352,7 +1352,9 @@ async def ingest_dataset(
             if errors:
                 note += f", {len(errors)} errors"
             cur.execute("""
-                UPDATE api.uploaded_dataset SET status = %s, note = %s WHERE table_name = %s
+                UPDATE api.uploaded_dataset
+                SET status = %s, note = %s, ingestion_date = CURRENT_DATE
+                WHERE table_name = %s
             """, (status, note, table_name))
 
             log_audit(current_user['user_id'], None, "etl_ingested",
@@ -1760,6 +1762,31 @@ async def prune_dataset(
                      {"table_name": table_name, "project_id": project_id, "deleted": deleted}, None)
 
             return {"message": note, "project_id": project_id, "deleted": deleted}
+
+
+@app.delete("/api/etl/datasets/{table_name}")
+async def delete_dataset(
+    table_name: str,
+    current_user: dict = Depends(get_current_admin_user)
+):
+    """Drop the staging table and remove all related rows from api.uploaded_dataset(_column)."""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1 FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="Dataset not found")
+
+            cur.execute(pgsql.SQL("DROP TABLE IF EXISTS {}.{}").format(
+                pgsql.Identifier('soil_data_upload'),
+                pgsql.Identifier(table_name)
+            ))
+            cur.execute("DELETE FROM api.uploaded_dataset_column WHERE table_name = %s", (table_name,))
+            cur.execute("DELETE FROM api.uploaded_dataset WHERE table_name = %s", (table_name,))
+
+            log_audit(current_user['user_id'], None, "etl_dataset_deleted",
+                     {"table_name": table_name}, None)
+
+            return {"message": f"Deleted dataset {table_name}"}
 
 
 # ==================== Health Check & Root ====================

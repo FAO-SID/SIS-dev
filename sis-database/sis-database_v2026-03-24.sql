@@ -5193,14 +5193,6 @@ ALTER TABLE ONLY api.uploaded_dataset_column
     ADD CONSTRAINT uploaded_dataset_column_pkey PRIMARY KEY (table_name, column_name);
 
 
---
--- TOC entry 4839 (class 2606 OID 55494635)
--- Name: uploaded_dataset uploaded_dataset_file_name_key; Type: CONSTRAINT; Schema: api; Owner: sis
---
-
-ALTER TABLE ONLY api.uploaded_dataset
-    ADD CONSTRAINT uploaded_dataset_file_name_key UNIQUE (file_name);
-
 
 --
 -- TOC entry 4841 (class 2606 OID 55494637)

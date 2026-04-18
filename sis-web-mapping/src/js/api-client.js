@@ -63,6 +63,7 @@ class SISApiClient {
       if (response.status === 401) {
         this.jwtToken = null;
         localStorage.removeItem('jwt_token');
+        window.dispatchEvent(new Event('auth:expired'));
         throw new Error('Session expired. Please login again.');
       }
       const error = await response.json().catch(() => ({ detail: response.statusText }));
@@ -363,6 +364,7 @@ class SISApiClient {
       if (response.status === 401) {
         this.jwtToken = null;
         localStorage.removeItem('jwt_token');
+        window.dispatchEvent(new Event('auth:expired'));
         throw new Error('Session expired. Please login again.');
       }
       const error = await response.json().catch(() => ({ detail: response.statusText }));
@@ -399,6 +401,12 @@ class SISApiClient {
   async pruneDataset(tableName) {
     return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/prune`, {
       method: 'POST'
+    });
+  }
+
+  async deleteDataset(tableName) {
+    return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}`, {
+      method: 'DELETE'
     });
   }
 

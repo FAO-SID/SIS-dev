@@ -389,9 +389,9 @@ class AdminDashboard {
                     </div>
                   </details>
 
-                  <!-- Attribution -->
+                  <!-- Metadata -->
                   <div id="etl-section-metadata" class="etl-section">
-                    <h3 class="etl-section-title">Attribution</h3>
+                    <h3 class="etl-section-title">Metadata</h3>
                     <form id="etl-metadata-form">
                       <div class="etl-metadata-grid" style="margin-bottom:var(--sp-4);">
                         <label for="etl-project">Project</label>
@@ -423,6 +423,8 @@ class AdminDashboard {
                             <option value="Public Domain Mark">Public Domain Mark</option>
                           </select>
                         </div>
+                        <label for="etl-epsg">EPSG code of the coordinates</label>
+                        <div><input type="text" id="etl-epsg" value="4326" style="width:80px;padding:2px 6px;font-size:var(--fs-sm);"></div>
                       </div>
 
                       <div class="etl-author-row etl-author-header">
@@ -463,10 +465,6 @@ class AdminDashboard {
                   <!-- Standardization -->
                   <div id="etl-mapping-section" class="etl-section">
                     <h3 class="etl-section-title">Standardization</h3>
-                    <div style="margin-bottom:var(--sp-3);display:flex;align-items:center;gap:var(--sp-3);">
-                      <label style="font-size:var(--fs-sm);font-weight:600;">EPSG Code:</label>
-                      <input type="text" id="etl-epsg" value="4326" style="width:80px;padding:2px 6px;font-size:var(--fs-sm);">
-                    </div>
                     <table class="admin-table" id="etl-mapping-table">
                       <thead>
                         <tr>
@@ -1912,22 +1910,31 @@ class AdminDashboard {
       container.innerHTML = '<p style="font-size:var(--fs-sm);color:#555;">No datasets uploaded yet.</p>';
       return;
     }
+    const fmtDate = v => {
+      if (!v) return '-';
+      const d = new Date(v);
+      return isNaN(d) ? this.escapeHtml(String(v)) : d.toISOString().slice(0, 10);
+    };
     container.innerHTML = `
       <table class="admin-table">
-        <thead><tr><th>Table</th><th>Status</th><th>Rows</th><th>Cols</th><th>Actions</th><th>Result</th></tr></thead>
+        <thead><tr><th>Table</th><th>User</th><th>Uploaded</th><th>Ingested</th><th>Status</th><th>Cols</th><th>Rows</th><th>Actions</th><th>Result</th></tr></thead>
         <tbody>${this.etlDatasets.map(d => {
           const tn = this.escapeHtml(d.table_name);
           const ingested = d.status === 'Ingested' || d.status === 'Partial';
           const noPrune = d.status === 'Uploaded' || d.status === 'Removed' || !d.status;
           return `<tr data-table="${tn}">
             <td>${tn}</td>
+            <td>${this.escapeHtml(d.user_id || '-')}</td>
+            <td>${fmtDate(d.upload_date)}</td>
+            <td>${fmtDate(d.ingestion_date)}</td>
             <td>${this.escapeHtml(d.status || '-')}</td>
-            <td>${d.n_rows ?? '-'}</td>
             <td>${d.n_col ?? '-'}</td>
+            <td>${d.n_rows ?? '-'}</td>
             <td>
               <button class="btn btn-primary btn-sm" onclick="adminDashboard.openDataset('${tn}')">Open</button>
               <button class="btn btn-sm" style="background:#28a745;color:#fff;margin-left:4px;${ingested ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.ingestDataset('${tn}')"${ingested ? ' disabled' : ''}>Ingest</button>
               <button class="btn btn-sm" style="background:#dc3545;color:#fff;margin-left:4px;${noPrune ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.pruneDataset('${tn}')"${noPrune ? ' disabled' : ''}>Prune DB</button>
+              ${this.isAdmin ? `<button class="btn btn-sm" style="background:#6c757d;color:#fff;margin-left:4px;" onclick="adminDashboard.deleteDataset('${tn}')">Delete</button>` : ''}
             </td>
             <td class="etl-result" style="font-size:var(--fs-xs);max-width:300px;white-space:pre-wrap;">${this.escapeHtml(d.note || '')}</td>
           </tr>`;
@@ -2011,6 +2018,16 @@ class AdminDashboard {
       const result = await api.pruneDataset(tableName);
       this.setRowResult(tableName, this.escapeHtml(result.message), false);
       this.loadEtlDatasets();
+    } catch (e) {
+      this.setRowResult(tableName, this.escapeHtml(e.message), true);
+    }
+  }
+
+  async deleteDataset(tableName) {
+    this.setRowResult(tableName, 'Deleting...', false);
+    try {
+      await api.deleteDataset(tableName);
+      await this.loadEtlDatasets();
     } catch (e) {
       this.setRowResult(tableName, this.escapeHtml(e.message), true);
     }
@@ -2253,11 +2270,13 @@ class AdminDashboard {
           <td><select class="etl-prop" style="${ss}${hideResult}">${propOpts}</select></td>
           <td><select class="etl-proc" style="${ss}${hideResult}"><option value="">—</option></select></td>
           <td><select class="etl-unit" style="${ss}${hideResult}"><option value="">—</option></select></td>
-          <td class="etl-conv-cell" style="white-space:nowrap;${hideResult}">
-            <select class="etl-conv-op" style="${ss}width:50px;">${convOpOpts}</select>
-            <select class="etl-conv-val" style="${ss}width:70px;">${convValOpts}</select>
+          <td class="etl-conv-cell" style="white-space:nowrap;">
+            <span class="etl-conv-inner" style="${hideResult}">
+              <select class="etl-conv-op" style="${ss}width:50px;">${convOpOpts}</select>
+              <select class="etl-conv-val" style="${ss}width:70px;">${convValOpts}</select>
+            </span>
           </td>
-          <td class="etl-validation" style="font-size:var(--fs-xs);max-width:260px;white-space:pre-wrap;color:${valColor};">${this.escapeHtml(validation)}</td>
+          <td class="etl-validation" style="font-size:var(--fs-xs);max-width:260px;white-space:pre-wrap;color:${valColor};vertical-align:middle;">${this.escapeHtml(validation)}</td>
         </tr>`;
     }).join('');
 
@@ -2279,7 +2298,7 @@ class AdminDashboard {
         tr.querySelector('.etl-prop').style.display = isResult ? '' : 'none';
         tr.querySelector('.etl-proc').style.display = isResult ? '' : 'none';
         tr.querySelector('.etl-unit').style.display = isResult ? '' : 'none';
-        tr.querySelector('.etl-conv-cell').style.display = isResult ? '' : 'none';
+        tr.querySelector('.etl-conv-inner').style.display = isResult ? '' : 'none';
         tr.querySelector('.etl-proc').innerHTML = '<option value="">—</option>';
         tr.querySelector('.etl-unit').innerHTML = '<option value="">—</option>';
       });

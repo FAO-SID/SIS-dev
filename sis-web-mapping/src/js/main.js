@@ -8,6 +8,7 @@ import { ScaleLine, defaults as defaultControls } from 'ol/control';
 import Overlay from 'ol/Overlay';
 import { Circle as CircleStyle, Fill, Stroke, Style, Text } from 'ol/style';
 import { GeoJSON } from 'ol/format';
+import { getCenter } from 'ol/extent';
 import api, { MAPSERVER_URL } from './api-client.js';
 import adminDashboard from './admin-dashboard.js';
 
@@ -244,7 +245,7 @@ function addLayerGroup(container, groupName, layers) {
 
       const filterToggle = document.createElement('div');
       filterToggle.className = 'layer-tag-filter-toggle';
-      filterToggle.textContent = 'Filter by tag';
+      filterToggle.textContent = 'Filter by keywords';
       filterWrapper.appendChild(filterToggle);
 
       const filterDiv = document.createElement('div');
@@ -867,7 +868,7 @@ function addProfileLayerControl() {
 
   const showDataBtn = document.createElement('button');
   showDataBtn.type = 'button';
-  showDataBtn.textContent = 'Show data';
+  showDataBtn.textContent = 'Data';
   showDataBtn.className = 'btn btn-primary';
   showDataBtn.style.padding = '2px 8px';
   showDataBtn.style.fontSize = '0.8em';
@@ -879,13 +880,23 @@ function addProfileLayerControl() {
       panel.style.display = 'none';
       selectedProfileCodes.clear();
       refreshHighlight();
-      showDataBtn.textContent = 'Show data';
+      showDataBtn.textContent = 'Data';
     } else {
       showVisibleProfilesData();
-      showDataBtn.textContent = 'Hide data';
+      showDataBtn.textContent = 'Hide';
     }
   });
   header.appendChild(showDataBtn);
+
+  const csvIcons = document.createElement('div');
+  csvIcons.className = 'layer-icons';
+  csvIcons.innerHTML = `<a href="#" title="Download CSV"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z'/%3E%3C/svg%3E" alt="Download"></a>`;
+  csvIcons.querySelector('a').addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    downloadProfilesCsv();
+  });
+  header.appendChild(csvIcons);
 
   profileGroup.appendChild(header);
   
@@ -1077,7 +1088,7 @@ function setupPopup() {
         const panel = document.getElementById('profiles-data-modal');
         if (panel && panel.style.display !== 'none') {
           const code = clusterFeatures[0].get('profile_code');
-          toggleProfileSelection(code);
+          toggleProfileSelection(code, { scrollIntoView: true });
           return;
         }
         // Single profile - show observations
@@ -1186,6 +1197,12 @@ function addLoginButton() {
   }
 
   document.body.appendChild(loginBtn);
+
+  window.addEventListener('auth:expired', () => {
+    if (adminDashboard && typeof adminDashboard.hide === 'function') adminDashboard.hide();
+    loginBtn.textContent = 'Login';
+    loginBtn.onclick = showLoginModal;
+  });
 }
 
 // ==================== Admin Functions ====================
@@ -1332,26 +1349,53 @@ function refreshHighlight() {
     .map(f => f.clone());
   src.addFeatures(feats);
 
-  const tbody = document.getElementById('profiles-data-tbody');
-  if (tbody) {
-    tbody.querySelectorAll('tr[data-profile-code]').forEach(tr => {
-      const code = tr.getAttribute('data-profile-code');
-      if (selectedProfileCodes.has(code)) {
-        tr.style.background = '#fff8c4';
-      } else {
-        tr.style.background = '';
-      }
-    });
+  const modal = document.getElementById('profiles-data-modal');
+  if (modal && modal._state && modal.style.display !== 'none') {
+    renderProfilesDataTable();
   }
 }
 
-function toggleProfileSelection(profileCode) {
+function toggleProfileSelection(profileCode, opts) {
   if (!profileCode) return;
-  if (selectedProfileCodes.has(profileCode)) selectedProfileCodes.delete(profileCode);
+  const wasSelected = selectedProfileCodes.has(profileCode);
+  if (wasSelected) selectedProfileCodes.delete(profileCode);
   else selectedProfileCodes.add(profileCode);
   refreshHighlight();
+  if (!wasSelected && opts && opts.scrollIntoView) scrollProfileRowIntoView(profileCode);
 }
 window.toggleProfileSelection = toggleProfileSelection;
+
+function panMapToSelectedProfiles() {
+  const unifiedLayer = profileLayers['all'];
+  if (!unifiedLayer || selectedProfileCodes.size === 0) return;
+  const allFeatures = unifiedLayer.get('allFeatures') || [];
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  let count = 0;
+  allFeatures.forEach(f => {
+    if (!selectedProfileCodes.has(f.get('profile_code'))) return;
+    const geom = f.getGeometry();
+    if (!geom) return;
+    const [x, y] = geom.getType() === 'Point' ? geom.getCoordinates() : getCenter(geom.getExtent());
+    if (x < minX) minX = x;
+    if (y < minY) minY = y;
+    if (x > maxX) maxX = x;
+    if (y > maxY) maxY = y;
+    count++;
+  });
+  if (!count) return;
+  map.getView().animate({ center: [(minX + maxX) / 2, (minY + maxY) / 2], duration: 400 });
+}
+
+function scrollProfileRowIntoView() {
+  const modal = document.getElementById('profiles-data-modal');
+  if (!modal || !modal._state || modal.style.display === 'none') return;
+  if (modal._state.page !== 0) {
+    modal._state.page = 0;
+    renderProfilesDataTable();
+  }
+  const scroller = document.querySelector('#profiles-data-modal div[style*="overflow:auto"]');
+  if (scroller) scroller.scrollTop = 0;
+}
 
 async function showVisibleProfilesData() {
   if (!profileLayers['all']) {
@@ -1442,24 +1486,35 @@ async function refreshVisibleProfilesData() {
         const prop = o.property_num_id || o.property_phys_chem_id || '';
         const proc = o.procedure_num_id || o.procedure_phys_chem_id || '';
         const unit = o.unit_of_measure_id || '';
-        const colName = [prop, proc, unit].filter(Boolean).join('.');
-        if (!colName) return;
-        propColsSet[colName] = true;
-        row[colName] = o.value;
+        const colKey = [prop, proc, unit].filter(Boolean).join('.');
+        if (!colKey) return;
+        if (!propColsSet[colKey]) propColsSet[colKey] = { key: colKey, prop, proc, unit };
+        row[colKey] = o.value;
       });
 
-    const rows = Object.keys(groups).map(k => groups[k]).sort((a, b) => {
-      if (a.profile_code !== b.profile_code) return String(a.profile_code).localeCompare(String(b.profile_code));
-      return (a.upper_depth || 0) - (b.upper_depth || 0);
+    const rows = Object.keys(groups).map(k => groups[k]);
+    const propCols = Object.keys(propColsSet).sort().map(k => propColsSet[k]);
+    const columns = baseCols.concat(propCols.map(c => c.key));
+    const columnMeta = {};
+    baseCols.forEach(c => { columnMeta[c] = { key: c, line1: c, line2: '' }; });
+    propCols.forEach(c => {
+      columnMeta[c.key] = {
+        key: c.key,
+        line1: [c.prop, c.unit].filter(Boolean).join(' '),
+        line2: c.proc || ''
+      };
     });
-    const columns = baseCols.concat(Object.keys(propColsSet).sort());
-
-    const thead = document.querySelector('#profiles-data-table thead tr');
-    thead.innerHTML = columns.map(c => `<th>${escapeHtml(c)}</th>`).join('');
 
     const modal = document.getElementById('profiles-data-modal');
     const prevPage = modal._state ? modal._state.page : 0;
-    modal._state = { rows, filtered: rows, page: prevPage, columns };
+    modal._state = {
+      rows,
+      filtered: rows,
+      page: prevPage,
+      columns,
+      columnMeta,
+      sort: [{ col: 'profile_code', dir: 'asc' }, { col: 'upper_depth', dir: 'asc' }]
+    };
     renderProfilesDataTable();
   } catch (e) {
     tbody.innerHTML = `<tr><td class="empty-state">Error: ${escapeHtml(e.message)}</td></tr>`;
@@ -1498,7 +1553,6 @@ function ensureProfilesDataModal() {
       </div>
       <div style="padding:4px 16px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:0.85em;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <button type="button" id="profiles-data-csv" title="Download CSV" style="padding:2px 8px;font-size:0.9em;cursor:pointer;">⬇ CSV</button>
           <span id="profiles-data-count" style="color:#555;"></span>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
@@ -1537,7 +1591,10 @@ function ensureProfilesDataModal() {
   document.getElementById('profiles-data-tbody').addEventListener('click', (e) => {
     const tr = e.target.closest('tr[data-profile-code]');
     if (!tr) return;
-    toggleProfileSelection(tr.getAttribute('data-profile-code'));
+    const code = tr.getAttribute('data-profile-code');
+    const wasSelected = selectedProfileCodes.has(code);
+    toggleProfileSelection(code);
+    if (!wasSelected) panMapToSelectedProfiles();
   });
   document.getElementById('profiles-data-pagesize').addEventListener('change', () => {
     if (!modal._state) return;
@@ -1553,29 +1610,81 @@ function ensureProfilesDataModal() {
     const max = Math.ceil(modal._state.filtered.length / pageSize) - 1;
     if (modal._state.page < max) { modal._state.page++; renderProfilesDataTable(); }
   });
-  document.getElementById('profiles-data-csv').addEventListener('click', () => {
-    if (!modal._state) return;
-    const { filtered, columns } = modal._state;
-    const csv = [columns.join(',')].concat(
-      filtered.map(r => columns.map(c => {
-        const v = r[c] == null ? '' : String(r[c]);
-        return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
-      }).join(','))
-    ).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'visible_observations.csv'; a.click();
-    URL.revokeObjectURL(url);
-  });
+}
+
+function downloadProfilesCsv() {
+  const modal = document.getElementById('profiles-data-modal');
+  if (!modal || !modal._state) {
+    alert('Open the data panel first to load observations.');
+    return;
+  }
+  const { filtered, columns } = modal._state;
+  const csv = [columns.join(',')].concat(
+    filtered.map(r => columns.map(c => {
+      const v = r[c] == null ? '' : String(r[c]);
+      return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
+    }).join(','))
+  ).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'visible_observations.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function toggleProfilesDataSort(col, additive) {
+  const modal = document.getElementById('profiles-data-modal');
+  if (!modal || !modal._state) return;
+  const state = modal._state;
+  if (!state.sort) state.sort = [];
+  const idx = state.sort.findIndex(s => s.col === col);
+  if (!additive) {
+    if (state.sort.length === 1 && idx === 0) {
+      state.sort = state.sort[0].dir === 'asc' ? [{ col, dir: 'desc' }] : [];
+    } else {
+      state.sort = [{ col, dir: 'asc' }];
+    }
+  } else {
+    if (idx === -1) state.sort.push({ col, dir: 'asc' });
+    else if (state.sort[idx].dir === 'asc') state.sort[idx].dir = 'desc';
+    else state.sort.splice(idx, 1);
+  }
+  state.page = 0;
+  renderProfilesDataTable();
 }
 
 function renderProfilesDataTable() {
   const modal = document.getElementById('profiles-data-modal');
   if (!modal || !modal._state) return;
-  const { rows, columns } = modal._state;
+  const { rows, columns, columnMeta } = modal._state;
+  const sortList = modal._state.sort || [];
   const pageSize = parseInt(document.getElementById('profiles-data-pagesize').value, 10);
-  const filtered = rows;
+
+  let filtered = rows.slice();
+  const asNum = v => {
+    if (v === null || v === undefined || v === '') return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+  filtered.sort((a, b) => {
+    const aSel = selectedProfileCodes.has(a.profile_code) ? 0 : 1;
+    const bSel = selectedProfileCodes.has(b.profile_code) ? 0 : 1;
+    if (aSel !== bSel) return aSel - bSel;
+    for (const { col, dir } of sortList) {
+      const va = a[col], vb = b[col];
+      const aEmpty = va === null || va === undefined || va === '';
+      const bEmpty = vb === null || vb === undefined || vb === '';
+      if (aEmpty && bEmpty) continue;
+      if (aEmpty) return 1;
+      if (bEmpty) return -1;
+      const na = asNum(va), nb = asNum(vb);
+      let cmp;
+      if (na !== null && nb !== null) cmp = na - nb;
+      else cmp = String(va).localeCompare(String(vb));
+      if (cmp !== 0) return dir === 'asc' ? cmp : -cmp;
+    }
+    return 0;
+  });
   modal._state.filtered = filtered;
 
   const total = filtered.length;
@@ -1583,6 +1692,25 @@ function renderProfilesDataTable() {
   if (modal._state.page > maxPage) modal._state.page = maxPage;
   const start = modal._state.page * pageSize;
   const pageRows = filtered.slice(start, start + pageSize);
+
+  const sortIndicator = c => {
+    const i = sortList.findIndex(s => s.col === c);
+    if (i === -1) return '';
+    const arrow = sortList[i].dir === 'asc' ? '▲' : '▼';
+    const badge = sortList.length > 1 ? `<sup style="font-size:0.75em;">${i + 1}</sup>` : '';
+    return ` ${arrow}${badge}`;
+  };
+  const thead = document.querySelector('#profiles-data-table thead tr');
+  thead.innerHTML = columns.map(c => {
+    const meta = (columnMeta && columnMeta[c]) || { line1: c, line2: '' };
+    const line1 = escapeHtml(meta.line1 || '') + sortIndicator(c);
+    const line2 = escapeHtml(meta.line2 || '\u00A0');
+    return `<th class="pd-sort" data-col="${escapeHtml(c)}" style="cursor:pointer;user-select:none;" title="Click to sort; Shift+click to add secondary sort">` +
+      `<div>${line1}</div><div style="font-weight:normal;color:#666;">${line2}</div></th>`;
+  }).join('');
+  thead.querySelectorAll('.pd-sort').forEach(th => {
+    th.addEventListener('click', (e) => toggleProfilesDataSort(th.dataset.col, e.shiftKey));
+  });
 
   const tbody = document.getElementById('profiles-data-tbody');
   tbody.innerHTML = pageRows.length

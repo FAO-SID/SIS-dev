@@ -811,12 +811,14 @@ input:checked + .toggle-slider:before {
     display: flex;
     flex-direction: column;
     min-width: 140px;
-    flex: 1;
+    flex: 0 1 200px;
+    max-width: 220px;
 }
 
 .etl-author-field-sm {
     min-width: 100px;
     flex: 0 1 130px;
+    max-width: 150px;
 }
 
 .etl-author-field label {
@@ -840,6 +842,14 @@ input:checked + .toggle-slider:before {
 .etl-remove-author {
     align-self: flex-end;
     margin-bottom: 2px;
+}
+
+#etl-mapping-table .etl-prop {
+    max-width: 200px;
+}
+
+#etl-mapping-table .etl-proc {
+    max-width: 350px;
 }
 
 .etl-new-entry {
