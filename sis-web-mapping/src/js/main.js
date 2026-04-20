@@ -1507,12 +1507,14 @@ async function refreshVisibleProfilesData() {
 
     const modal = document.getElementById('profiles-data-modal');
     const prevPage = modal._state ? modal._state.page : 0;
+    const prevHidden = modal._state && modal._state.hiddenCols ? modal._state.hiddenCols : new Set();
     modal._state = {
       rows,
       filtered: rows,
       page: prevPage,
       columns,
       columnMeta,
+      hiddenCols: new Set([...prevHidden].filter(c => columns.includes(c))),
       sort: [{ col: 'profile_code', dir: 'asc' }, { col: 'upper_depth', dir: 'asc' }]
     };
     renderProfilesDataTable();
@@ -1552,8 +1554,10 @@ function ensureProfilesDataModal() {
         </table>
       </div>
       <div style="padding:4px 16px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:0.85em;">
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;position:relative;">
           <span id="profiles-data-count" style="color:#555;"></span>
+          <button type="button" id="profiles-data-columns-btn" style="padding:2px 6px;">Columns</button>
+          <div id="profiles-data-columns-popover" style="display:none;position:absolute;bottom:100%;left:0;margin-bottom:4px;background:#fff;border:1px solid #ccc;box-shadow:0 2px 8px rgba(0,0,0,0.15);padding:6px 8px;max-height:300px;overflow:auto;z-index:10;min-width:220px;"></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
           Rows:
@@ -1610,6 +1614,63 @@ function ensureProfilesDataModal() {
     const max = Math.ceil(modal._state.filtered.length / pageSize) - 1;
     if (modal._state.page < max) { modal._state.page++; renderProfilesDataTable(); }
   });
+
+  const columnsBtn = document.getElementById('profiles-data-columns-btn');
+  const columnsPop = document.getElementById('profiles-data-columns-popover');
+  columnsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (columnsPop.style.display === 'none') {
+      renderProfilesColumnsPopover();
+      columnsPop.style.display = 'block';
+    } else {
+      columnsPop.style.display = 'none';
+    }
+  });
+  document.addEventListener('click', (e) => {
+    if (columnsPop.style.display !== 'none' && !columnsPop.contains(e.target) && e.target !== columnsBtn) {
+      columnsPop.style.display = 'none';
+    }
+  });
+}
+
+function renderProfilesColumnsPopover() {
+  const modal = document.getElementById('profiles-data-modal');
+  if (!modal || !modal._state) return;
+  const { columns, columnMeta, hiddenCols } = modal._state;
+  const pop = document.getElementById('profiles-data-columns-popover');
+  const rows = columns.map(c => {
+    const meta = (columnMeta && columnMeta[c]) || { line1: c, line2: '' };
+    const label = [meta.line1, meta.line2].filter(Boolean).join(' — ') || c;
+    const checked = !hiddenCols.has(c) ? 'checked' : '';
+    return `<label style="display:flex;align-items:center;gap:6px;padding:2px 0;white-space:nowrap;">
+      <input type="checkbox" data-col="${escapeHtml(c)}" ${checked}>${escapeHtml(label)}
+    </label>`;
+  }).join('');
+  pop.innerHTML = `
+    <div style="display:flex;gap:6px;margin-bottom:4px;border-bottom:1px solid #eee;padding-bottom:4px;">
+      <button type="button" id="profiles-cols-all" style="padding:1px 6px;font-size:0.9em;">All</button>
+      <button type="button" id="profiles-cols-none" style="padding:1px 6px;font-size:0.9em;">None</button>
+    </div>
+    ${rows}
+  `;
+  pop.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const col = cb.dataset.col;
+      if (cb.checked) hiddenCols.delete(col);
+      else hiddenCols.add(col);
+      renderProfilesDataTable();
+    });
+  });
+  pop.querySelector('#profiles-cols-all').addEventListener('click', () => {
+    hiddenCols.clear();
+    renderProfilesColumnsPopover();
+    renderProfilesDataTable();
+  });
+  pop.querySelector('#profiles-cols-none').addEventListener('click', () => {
+    columns.forEach(c => hiddenCols.add(c));
+    renderProfilesColumnsPopover();
+    renderProfilesDataTable();
+  });
 }
 
 function downloadProfilesCsv() {
@@ -1619,8 +1680,10 @@ function downloadProfilesCsv() {
     return;
   }
   const { filtered, columns } = modal._state;
-  const csv = [columns.join(',')].concat(
-    filtered.map(r => columns.map(c => {
+  const hiddenCols = modal._state.hiddenCols || new Set();
+  const exportCols = columns.filter(c => !hiddenCols.has(c));
+  const csv = [exportCols.join(',')].concat(
+    filtered.map(r => exportCols.map(c => {
       const v = r[c] == null ? '' : String(r[c]);
       return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
     }).join(','))
@@ -1657,6 +1720,8 @@ function renderProfilesDataTable() {
   const modal = document.getElementById('profiles-data-modal');
   if (!modal || !modal._state) return;
   const { rows, columns, columnMeta } = modal._state;
+  const hiddenCols = modal._state.hiddenCols || new Set();
+  const visibleColumns = columns.filter(c => !hiddenCols.has(c));
   const sortList = modal._state.sort || [];
   const pageSize = parseInt(document.getElementById('profiles-data-pagesize').value, 10);
 
@@ -1701,7 +1766,7 @@ function renderProfilesDataTable() {
     return ` ${arrow}${badge}`;
   };
   const thead = document.querySelector('#profiles-data-table thead tr');
-  thead.innerHTML = columns.map(c => {
+  thead.innerHTML = visibleColumns.map(c => {
     const meta = (columnMeta && columnMeta[c]) || { line1: c, line2: '' };
     const line1 = escapeHtml(meta.line1 || '') + sortIndicator(c);
     const line2 = escapeHtml(meta.line2 || '\u00A0');
@@ -1719,10 +1784,10 @@ function renderProfilesDataTable() {
         const selected = selectedProfileCodes.has(code);
         const bg = selected ? 'background:#fff8c4;' : '';
         return `<tr data-profile-code="${escapeHtml(code)}" style="cursor:pointer;${bg}">` +
-          columns.map(c => `<td>${escapeHtml(r[c] == null ? '' : String(r[c]))}</td>`).join('') +
+          visibleColumns.map(c => `<td>${escapeHtml(r[c] == null ? '' : String(r[c]))}</td>`).join('') +
           '</tr>';
       }).join('')
-    : `<tr><td colspan="${columns.length}" class="empty-state">No observations for visible profiles</td></tr>`;
+    : `<tr><td colspan="${visibleColumns.length || 1}" class="empty-state">No observations for visible profiles</td></tr>`;
 
   document.getElementById('profiles-data-count').textContent = `${total} observation${total === 1 ? '' : 's'}`;
   document.getElementById('profiles-data-pageinfo').textContent =
