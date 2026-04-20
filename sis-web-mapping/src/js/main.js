@@ -183,7 +183,7 @@ async function loadLayers() {
 
 function addBaseMapsGroup(container) {
   const groupDiv = document.createElement('div');
-  groupDiv.className = 'layer-group';
+  groupDiv.className = 'layer-group collapsed';
   groupDiv.innerHTML = `
     <div class="layer-group-header">Base maps</div>
     <div class="layer-group-content">
@@ -234,6 +234,9 @@ function addLayerGroup(container, groupName, layers) {
   headerDiv.textContent = displayName;
   groupDiv.appendChild(headerDiv);
 
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'layer-group-content';
+
   // Tag filter for the Maps group (driven by layer.keywords)
   let activeTags = new Set();
   if (displayName === 'Maps') {
@@ -274,12 +277,9 @@ function addLayerGroup(container, groupName, layers) {
         filterWrapper.classList.toggle('collapsed');
       });
 
-      groupDiv.appendChild(filterWrapper);
+      contentDiv.appendChild(filterWrapper);
     }
   }
-
-  const contentDiv = document.createElement('div');
-  contentDiv.className = 'layer-group-content';
 
   const itemByLayerId = {};
   layers.forEach(layer => {
@@ -723,6 +723,7 @@ async function loadProfiles() {
         // Set properties including project name for styling
         const coords = profile.geometry && profile.geometry.coordinates;
         feature.setProperties({
+          profile_id: profile.gid,
           profile_code: profile.profile_code,
           project_name: profile.project_name || 'Unknown Project',
           altitude: profile.altitude,
@@ -1451,6 +1452,7 @@ async function refreshVisibleProfilesData() {
     allFeatures.forEach(f => {
       const code = f.get('profile_code');
       if (code) profileInfoByCode.set(code, {
+        profile_id: f.get('profile_id'),
         project_name: f.get('project_name') || '',
         latitude: f.get('latitude'),
         longitude: f.get('longitude'),
@@ -1459,7 +1461,7 @@ async function refreshVisibleProfilesData() {
       });
     });
 
-    const baseCols = ['project_name', 'profile_code', 'latitude', 'longitude', 'altitude', 'sampling_date', 'upper_depth', 'lower_depth'];
+    const baseCols = ['project_name', 'profile_id', 'profile_code', 'latitude', 'longitude', 'altitude', 'sampling_date', 'upper_depth', 'lower_depth'];
     const groups = {};
     const propColsSet = {};
     _allObservationsCache
@@ -1472,6 +1474,7 @@ async function refreshVisibleProfilesData() {
         if (!row) {
           const info = profileInfoByCode.get(o.profile_code) || {};
           row = {
+            profile_id: info.profile_id != null ? info.profile_id : '',
             project_name: info.project_name || '',
             profile_code: o.profile_code,
             latitude: info.latitude != null ? Number(info.latitude).toFixed(5) : '',
@@ -1496,7 +1499,7 @@ async function refreshVisibleProfilesData() {
     const propCols = Object.keys(propColsSet).sort().map(k => propColsSet[k]);
     const columns = baseCols.concat(propCols.map(c => c.key));
     const columnMeta = {};
-    baseCols.forEach(c => { columnMeta[c] = { key: c, line1: c, line2: '' }; });
+    baseCols.forEach(c => { columnMeta[c] = { key: c, line1: c, line2: '', isBase: true }; });
     propCols.forEach(c => {
       columnMeta[c.key] = {
         key: c.key,
@@ -1507,14 +1510,19 @@ async function refreshVisibleProfilesData() {
 
     const modal = document.getElementById('profiles-data-modal');
     const prevPage = modal._state ? modal._state.page : 0;
-    const prevHidden = modal._state && modal._state.hiddenCols ? modal._state.hiddenCols : new Set();
+    const hadState = !!(modal._state && modal._state.hiddenCols);
+    const prevHidden = hadState ? modal._state.hiddenCols : new Set();
+    const defaultHidden = ['profile_id', 'latitude', 'longitude', 'altitude', 'project_name'];
+    const hiddenCols = hadState
+      ? new Set([...prevHidden].filter(c => columns.includes(c)))
+      : new Set(defaultHidden.filter(c => columns.includes(c)));
     modal._state = {
       rows,
       filtered: rows,
       page: prevPage,
       columns,
       columnMeta,
-      hiddenCols: new Set([...prevHidden].filter(c => columns.includes(c))),
+      hiddenCols,
       sort: [{ col: 'profile_code', dir: 'asc' }, { col: 'upper_depth', dir: 'asc' }]
     };
     renderProfilesDataTable();
@@ -1546,6 +1554,13 @@ function ensureProfilesDataModal() {
           z-index: 2;
           box-shadow: inset 0 -1px 0 #ccc;
         }
+        #profiles-data-table td.pd-base,
+        #profiles-data-table th.pd-base {
+          width: 1%;
+          background: #f0f4f8;
+        }
+        #profiles-data-table thead th.pd-base { background: #e4ecf3; }
+        #profiles-data-table tr[style*="background:#fff8c4"] td.pd-base { background: #f5ecb4; }
       </style>
       <div style="overflow:auto;flex:1;padding:6px 16px 0 16px;font-size:0.78em;">
         <table class="admin-table" id="profiles-data-table" style="width:100%;font-size:inherit;">
@@ -1556,7 +1571,7 @@ function ensureProfilesDataModal() {
       <div style="padding:4px 16px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:0.85em;">
         <div style="display:flex;align-items:center;gap:8px;position:relative;">
           <span id="profiles-data-count" style="color:#555;"></span>
-          <button type="button" id="profiles-data-columns-btn" style="padding:2px 6px;">Columns</button>
+          <button type="button" id="profiles-data-columns-btn" class="btn btn-primary" style="padding:2px 8px;font-size:0.9em;">Columns</button>
           <div id="profiles-data-columns-popover" style="display:none;position:absolute;bottom:100%;left:0;margin-bottom:4px;background:#fff;border:1px solid #ccc;box-shadow:0 2px 8px rgba(0,0,0,0.15);padding:6px 8px;max-height:300px;overflow:auto;z-index:10;min-width:220px;"></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
@@ -1680,12 +1695,10 @@ function downloadProfilesCsv() {
     return;
   }
   const { filtered, columns } = modal._state;
-  const hiddenCols = modal._state.hiddenCols || new Set();
-  const exportCols = columns.filter(c => !hiddenCols.has(c));
-  const csv = [exportCols.join(',')].concat(
-    filtered.map(r => exportCols.map(c => {
+  const csv = [columns.join(',')].concat(
+    filtered.map(r => columns.map(c => {
       const v = r[c] == null ? '' : String(r[c]);
-      return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
+      return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
     }).join(','))
   ).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
@@ -1770,7 +1783,8 @@ function renderProfilesDataTable() {
     const meta = (columnMeta && columnMeta[c]) || { line1: c, line2: '' };
     const line1 = escapeHtml(meta.line1 || '') + sortIndicator(c);
     const line2 = escapeHtml(meta.line2 || '\u00A0');
-    return `<th class="pd-sort" data-col="${escapeHtml(c)}" style="cursor:pointer;user-select:none;" title="Click to sort; Shift+click to add secondary sort">` +
+    const baseCls = meta.isBase ? ' pd-base' : '';
+    return `<th class="pd-sort${baseCls}" data-col="${escapeHtml(c)}" style="cursor:pointer;user-select:none;" title="Click to sort; Shift+click to add secondary sort">` +
       `<div>${line1}</div><div style="font-weight:normal;color:#666;">${line2}</div></th>`;
   }).join('');
   thead.querySelectorAll('.pd-sort').forEach(th => {
@@ -1784,7 +1798,11 @@ function renderProfilesDataTable() {
         const selected = selectedProfileCodes.has(code);
         const bg = selected ? 'background:#fff8c4;' : '';
         return `<tr data-profile-code="${escapeHtml(code)}" style="cursor:pointer;${bg}">` +
-          visibleColumns.map(c => `<td>${escapeHtml(r[c] == null ? '' : String(r[c]))}</td>`).join('') +
+          visibleColumns.map(c => {
+            const meta = (columnMeta && columnMeta[c]) || {};
+            const cls = meta.isBase ? ' class="pd-base"' : '';
+            return `<td${cls}>${escapeHtml(r[c] == null ? '' : String(r[c]))}</td>`;
+          }).join('') +
           '</tr>';
       }).join('')
     : `<tr><td colspan="${visibleColumns.length || 1}" class="empty-state">No observations for visible profiles</td></tr>`;

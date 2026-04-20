@@ -469,8 +469,7 @@ class AdminDashboard {
                       <thead>
                         <tr>
                           <th>CSV column</th>
-                          <th>Destination table</th>
-                          <th>Destination column</th>
+                          <th>Destination</th>
                           <th>Property</th>
                           <th>Procedure</th>
                           <th>Unit</th>
@@ -1519,15 +1518,26 @@ class AdminDashboard {
 
   // ==================== ETL ====================
 
-  // Destination table → column options
-  get ETL_DEST_COLUMNS() {
-    return {
-      'site': ['site_id'],
-      'plot': ['plot_code', 'geom (longitude)', 'geom (latitude)', 'type', 'altitude', 'sampling_date', 'positional_accuracy'],
-      'profile': ['profile_code'],
-      'element': ['upper_depth', 'lower_depth', 'type'],
-      'result_num': ['value']
-    };
+  // Single combined destination dropdown: friendly label → (table, column)
+  get ETL_DEST_OPTIONS() {
+    return [
+      { label: 'Profile code',                          table: 'plot',       column: 'plot_code' },
+      { label: 'Longitude',                             table: 'plot',       column: 'geom (longitude)' },
+      { label: 'Latitude',                              table: 'plot',       column: 'geom (latitude)' },
+      { label: 'Profile type (TrialPit or Borehole)',   table: 'plot',       column: 'type' },
+      { label: 'Altitude',                              table: 'plot',       column: 'altitude' },
+      { label: 'Sampling date',                         table: 'plot',       column: 'sampling_date' },
+      { label: 'Positional accuracy',                   table: 'plot',       column: 'positional_accuracy' },
+      { label: 'Upper depth',                           table: 'element',    column: 'upper_depth' },
+      { label: 'Lower depth',                           table: 'element',    column: 'lower_depth' },
+      { label: 'Layer type (Horizon or Layer)',         table: 'element',    column: 'type' },
+      { label: 'Horizon',                               table: 'element',    column: 'horizon' },
+      { label: 'Soil property',                         table: 'result_num', column: 'value' },
+    ];
+  }
+
+  etlDestValue(table, column) {
+    return table && column ? `${table}|${column}` : '';
   }
 
   async loadEtlCodelists() {
@@ -1782,10 +1792,8 @@ class AdminDashboard {
         const columns = [];
         mappingRows.forEach(tr => {
           const colName = tr.dataset.col;
-          const destTable = tr.querySelector('.etl-dest-table').value;
-          const destColSel = tr.querySelector('.etl-dest-col');
-          const destColHidden = tr.querySelector('.etl-dest-col-val');
-          const destCol = destColSel ? destColSel.value : (destColHidden ? destColHidden.value : '');
+          const destVal = tr.querySelector('.etl-dest').value;
+          const [destTable, destCol] = destVal ? destVal.split('|') : [null, null];
           const convOp = tr.querySelector('.etl-conv-op').value || null;
           const convVal = tr.querySelector('.etl-conv-val').value;
           const entry = {
@@ -2215,7 +2223,7 @@ class AdminDashboard {
     const tbody = document.getElementById('etl-mapping-tbody');
     section.dataset.tableName = tableName;
 
-    const destTables = Object.keys(this.ETL_DEST_COLUMNS);
+    const destOptions = this.ETL_DEST_OPTIONS;
     const cl = this.etlCodelists;
     const ss = 'font-size:var(--fs-xs);padding:2px 4px;';
 
@@ -2231,24 +2239,16 @@ class AdminDashboard {
       const existing = existingMap[col] || {};
       const selTable = existing.destination_table || '';
       const selCol = existing.destination_column || '';
+      const selVal = this.etlDestValue(selTable, selCol);
       const isResult = selTable === 'result_num';
       const exConvOp = existing.conversion_operation || '';
       const exConvVal = existing.conversion_value != null ? String(existing.conversion_value) : '';
 
-      const tableOpts = '<option value="">(skip)</option>' +
-        destTables.map(t => `<option value="${t}"${selTable === t ? ' selected' : ''}>${t}</option>`).join('');
-
-      let colCell;
-      if (isResult) {
-        colCell = `<span style="${ss}color:var(--color-text-muted);">value</span><input type="hidden" class="etl-dest-col-val" value="value">`;
-      } else {
-        let colOpts = '<option value="">—</option>';
-        if (selTable && this.ETL_DEST_COLUMNS[selTable]) {
-          colOpts = '<option value="">—</option>' +
-            this.ETL_DEST_COLUMNS[selTable].map(c => `<option value="${c}"${selCol === c ? ' selected' : ''}>${c}</option>`).join('');
-        }
-        colCell = `<select class="etl-dest-col" style="${ss}">${colOpts}</select>`;
-      }
+      const destOpts = '<option value="">(skip)</option>' +
+        destOptions.map(o => {
+          const v = `${o.table}|${o.column}`;
+          return `<option value="${v}"${selVal === v ? ' selected' : ''}>${this.escapeHtml(o.label)}</option>`;
+        }).join('');
 
       const propOpts = '<option value="">—</option>' + (cl.properties || []).map(p =>
         `<option value="${p.property_num_id}"${existing.property_num_id == p.property_num_id ? ' selected' : ''}>${this.escapeHtml(p.property_name)}</option>`
@@ -2265,8 +2265,7 @@ class AdminDashboard {
       return `
         <tr data-col="${this.escapeHtml(col)}">
           <td><strong>${this.escapeHtml(col)}</strong></td>
-          <td><select class="etl-dest-table" style="${ss}">${tableOpts}</select></td>
-          <td class="etl-col-cell">${colCell}</td>
+          <td><select class="etl-dest" style="${ss}">${destOpts}</select></td>
           <td><select class="etl-prop" style="${ss}${hideResult}">${propOpts}</select></td>
           <td><select class="etl-proc" style="${ss}${hideResult}"><option value="">—</option></select></td>
           <td><select class="etl-unit" style="${ss}${hideResult}"><option value="">—</option></select></td>
@@ -2280,27 +2279,21 @@ class AdminDashboard {
         </tr>`;
     }).join('');
 
-    // Cascade: dest table changes
-    tbody.querySelectorAll('.etl-dest-table').forEach(sel => {
+    // Cascade: destination changes → toggle result_num extras
+    tbody.querySelectorAll('.etl-dest').forEach(sel => {
       sel.addEventListener('change', () => {
         const tr = sel.closest('tr');
-        const colCell = tr.querySelector('.etl-col-cell');
-        const table = sel.value;
+        const [table] = (sel.value || '').split('|');
         const isResult = table === 'result_num';
-
-        if (isResult) {
-          colCell.innerHTML = `<span style="${ss}color:var(--color-text-muted);">value</span><input type="hidden" class="etl-dest-col-val" value="value">`;
-        } else {
-          const cols = this.ETL_DEST_COLUMNS[table] || [];
-          colCell.innerHTML = `<select class="etl-dest-col" style="${ss}"><option value="">—</option>${cols.map(c => `<option value="${c}">${c}</option>`).join('')}</select>`;
-        }
 
         tr.querySelector('.etl-prop').style.display = isResult ? '' : 'none';
         tr.querySelector('.etl-proc').style.display = isResult ? '' : 'none';
         tr.querySelector('.etl-unit').style.display = isResult ? '' : 'none';
         tr.querySelector('.etl-conv-inner').style.display = isResult ? '' : 'none';
-        tr.querySelector('.etl-proc').innerHTML = '<option value="">—</option>';
-        tr.querySelector('.etl-unit').innerHTML = '<option value="">—</option>';
+        if (!isResult) {
+          tr.querySelector('.etl-proc').innerHTML = '<option value="">—</option>';
+          tr.querySelector('.etl-unit').innerHTML = '<option value="">—</option>';
+        }
       });
     });
 

@@ -1169,28 +1169,29 @@ async def ingest_dataset(
             result_num_count = 0
             errors = []
 
+            if not project_id:
+                raise HTTPException(status_code=400, detail="Project is required for ingest")
+
+            # Ensure the site for this project exists (site_id = project_id)
+            site_id = project_id
+            cur.execute("""
+                INSERT INTO soil_data.site (site_id) VALUES (%s)
+                ON CONFLICT (site_id) DO NOTHING
+            """, (site_id,))
+            cur.execute("""
+                INSERT INTO soil_data.project_site (project_id, site_id)
+                VALUES (%s, %s) ON CONFLICT DO NOTHING
+            """, (project_id, site_id))
+            sites_inserted.add(site_id)
+            project_sites_inserted.add((project_id, site_id))
+
             for i, row in enumerate(rows):
                 row_num = i + 2  # 1-based + header
                 try:
-                    # --- site ---
-                    site_id = get_val(row, "site", "site_id")
-                    if site_id and site_id not in sites_inserted:
-                        cur.execute("""
-                            INSERT INTO soil_data.site (site_id) VALUES (%s)
-                            ON CONFLICT (site_id) DO NOTHING
-                        """, (site_id,))
-                        sites_inserted.add(site_id)
-                        # link project ↔ site
-                        if project_id and (project_id, site_id) not in project_sites_inserted:
-                            cur.execute("""
-                                INSERT INTO soil_data.project_site (project_id, site_id)
-                                VALUES (%s, %s) ON CONFLICT DO NOTHING
-                            """, (project_id, site_id))
-                            project_sites_inserted.add((project_id, site_id))
-
                     # --- plot ---
                     plot_id = None
-                    if "plot" in col_map and site_id:
+                    plot_code = None
+                    if "plot" in col_map:
                         plot_code = get_val(row, "plot", "plot_code")
                         lon = get_val(row, "plot", "geom (longitude)")
                         lat = get_val(row, "plot", "geom (latitude)")
@@ -1199,11 +1200,10 @@ async def ingest_dataset(
                         sampling_date = get_val(row, "plot", "sampling_date")
                         pos_accuracy = get_val(row, "plot", "positional_accuracy")
 
-                        cache_key = (site_id, plot_code or f"_row{i}")
-                        if cache_key in plots_cache:
+                        cache_key = plot_code or f"_row{i}"
+                        if plot_code and cache_key in plots_cache:
                             plot_id = plots_cache[cache_key]
                         else:
-                            # Build geom if coordinates provided
                             geom_expr = None
                             geom_params = []
                             if lon and lat:
@@ -1213,41 +1213,56 @@ async def ingest_dataset(
                             if geom_expr:
                                 cur.execute(f"""
                                     INSERT INTO soil_data.plot
-                                        (site_id, plot_code, geom, type, altitude, sampling_date, positional_accuracy)
-                                    VALUES (%s, %s, {geom_expr}, %s, %s, %s, %s)
+                                        (site_id, plot_code, geom, type, altitude, sampling_date, positional_accuracy, csv)
+                                    VALUES (%s, %s, {geom_expr}, %s, %s, %s, %s, %s)
+                                    ON CONFLICT (plot_code) DO UPDATE SET
+                                        geom = EXCLUDED.geom,
+                                        type = COALESCE(EXCLUDED.type, soil_data.plot.type),
+                                        altitude = COALESCE(EXCLUDED.altitude, soil_data.plot.altitude),
+                                        sampling_date = COALESCE(EXCLUDED.sampling_date, soil_data.plot.sampling_date),
+                                        positional_accuracy = COALESCE(EXCLUDED.positional_accuracy, soil_data.plot.positional_accuracy),
+                                        csv = COALESCE(soil_data.plot.csv, EXCLUDED.csv)
                                     RETURNING plot_id
                                 """, (site_id, plot_code, *geom_params, plot_type,
                                       int(altitude) if altitude else None,
                                       sampling_date or None,
-                                      int(pos_accuracy) if pos_accuracy else None))
+                                      int(pos_accuracy) if pos_accuracy else None,
+                                      table_name))
                             else:
                                 cur.execute("""
                                     INSERT INTO soil_data.plot
-                                        (site_id, plot_code, type, altitude, sampling_date, positional_accuracy)
-                                    VALUES (%s, %s, %s, %s, %s, %s)
+                                        (site_id, plot_code, type, altitude, sampling_date, positional_accuracy, csv)
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                    ON CONFLICT (plot_code) DO UPDATE SET
+                                        type = COALESCE(EXCLUDED.type, soil_data.plot.type),
+                                        altitude = COALESCE(EXCLUDED.altitude, soil_data.plot.altitude),
+                                        sampling_date = COALESCE(EXCLUDED.sampling_date, soil_data.plot.sampling_date),
+                                        positional_accuracy = COALESCE(EXCLUDED.positional_accuracy, soil_data.plot.positional_accuracy),
+                                        csv = COALESCE(soil_data.plot.csv, EXCLUDED.csv)
                                     RETURNING plot_id
                                 """, (site_id, plot_code, plot_type,
                                       int(altitude) if altitude else None,
                                       sampling_date or None,
-                                      int(pos_accuracy) if pos_accuracy else None))
+                                      int(pos_accuracy) if pos_accuracy else None,
+                                      table_name))
                             plot_id = cur.fetchone()["plot_id"]
-                            plots_cache[cache_key] = plot_id
+                            if plot_code:
+                                plots_cache[cache_key] = plot_id
 
-                    # --- profile ---
+                    # --- profile (profile_code = plot_code) ---
                     profile_id = None
-                    profile_code = get_val(row, "profile", "profile_code")
-                    if profile_code:
-                        if profile_code in profiles_cache:
-                            profile_id = profiles_cache[profile_code]
+                    if plot_id and plot_code:
+                        if plot_code in profiles_cache:
+                            profile_id = profiles_cache[plot_code]
                         else:
                             cur.execute("""
                                 INSERT INTO soil_data.profile (plot_id, profile_code)
                                 VALUES (%s, %s)
-                                ON CONFLICT (profile_code) DO UPDATE SET plot_id = COALESCE(soil_data.profile.plot_id, EXCLUDED.plot_id)
+                                ON CONFLICT (profile_code) DO UPDATE SET plot_id = EXCLUDED.plot_id
                                 RETURNING profile_id
-                            """, (plot_id, profile_code))
+                            """, (plot_id, plot_code))
                             profile_id = cur.fetchone()["profile_id"]
-                            profiles_cache[profile_code] = profile_id
+                            profiles_cache[plot_code] = profile_id
 
                     # --- element ---
                     element_id = None
@@ -1255,6 +1270,7 @@ async def ingest_dataset(
                         upper = get_val(row, "element", "upper_depth")
                         lower = get_val(row, "element", "lower_depth")
                         elem_type = get_val(row, "element", "type") or "Layer"
+                        horizon = get_val(row, "element", "horizon")
                         if upper is not None and lower is not None:
                             upper_i = int(float(upper))
                             lower_i = int(float(lower))
@@ -1263,10 +1279,10 @@ async def ingest_dataset(
                                 element_id = elements_cache[elem_key]
                             else:
                                 cur.execute("""
-                                    INSERT INTO soil_data.element (profile_id, upper_depth, lower_depth, type)
-                                    VALUES (%s, %s, %s, %s)
+                                    INSERT INTO soil_data.element (profile_id, upper_depth, lower_depth, type, horizon)
+                                    VALUES (%s, %s, %s, %s, %s)
                                     RETURNING element_id
-                                """, (profile_id, upper_i, lower_i, elem_type))
+                                """, (profile_id, upper_i, lower_i, elem_type, horizon))
                                 element_id = cur.fetchone()["element_id"]
                                 elements_cache[elem_key] = element_id
 
@@ -1457,6 +1473,7 @@ async def validate_dataset(
     # Datatype + constraint rules per (dest_table, dest_column)
     # kind: int | smallint | real | date | enum | text
     RULES = {
+        ("plot", "type"):                {"kind": "enum", "values": ["TrialPit", "Borehole"]},
         ("plot", "altitude"):            {"kind": "smallint"},
         ("plot", "positional_accuracy"): {"kind": "smallint"},
         ("plot", "sampling_date"):       {"kind": "date"},
@@ -1694,15 +1711,15 @@ async def prune_dataset(
             if not project_id:
                 raise HTTPException(status_code=400, detail="No project associated with this dataset")
 
-            # Collect IDs top-down: project → sites → plots → profiles → elements → specimens
+            # Collect IDs top-down: plots tagged with this CSV → profiles → elements → specimens
             cur.execute("SELECT site_id FROM soil_data.project_site WHERE project_id = %s", (project_id,))
             site_ids = [r["site_id"] for r in cur.fetchall()]
 
-            if not site_ids:
-                return {"message": "No data found for this project", "deleted": {}}
-
-            cur.execute("SELECT plot_id FROM soil_data.plot WHERE site_id = ANY(%s)", (site_ids,))
+            cur.execute("SELECT plot_id FROM soil_data.plot WHERE csv = %s", (table_name,))
             plot_ids = [r["plot_id"] for r in cur.fetchall()]
+
+            if not plot_ids:
+                return {"message": "No data found for this dataset", "deleted": {}}
 
             profile_ids = []
             if plot_ids:
@@ -1740,13 +1757,16 @@ async def prune_dataset(
                 cur.execute("DELETE FROM soil_data.plot WHERE plot_id = ANY(%s)", (plot_ids,))
                 deleted["plot"] = cur.rowcount
 
-            # Remove project ↔ site links
-            cur.execute("DELETE FROM soil_data.project_site WHERE project_id = %s", (project_id,))
-            deleted["project_site"] = cur.rowcount
-
-            # Delete sites only if no other project references them
+            # Delete sites only if no plots remain AND no other project references them
+            deleted["project_site"] = 0
             deleted["site"] = 0
             for site_id in site_ids:
+                cur.execute("SELECT 1 FROM soil_data.plot WHERE site_id = %s LIMIT 1", (site_id,))
+                if cur.fetchone():
+                    continue  # plots still exist (from other CSVs) — keep site
+                cur.execute("DELETE FROM soil_data.project_site WHERE project_id = %s AND site_id = %s",
+                            (project_id, site_id))
+                deleted["project_site"] += cur.rowcount
                 cur.execute("SELECT COUNT(*) AS cnt FROM soil_data.project_site WHERE site_id = %s", (site_id,))
                 if cur.fetchone()["cnt"] == 0:
                     cur.execute("DELETE FROM soil_data.site WHERE site_id = %s", (site_id,))

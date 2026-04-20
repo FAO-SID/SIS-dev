@@ -282,6 +282,11 @@ h1, h2, h3, h4, h5 {
     display: none;
 }
 
+.layer-group.collapsed .layer-group-header .btn,
+.layer-group.collapsed .layer-group-header .layer-icons {
+    display: none;
+}
+
 .layer-item {
     margin: var(--sp-1) 0;
     padding: var(--sp-1) var(--sp-2) var(--sp-1) var(--sp-5);
