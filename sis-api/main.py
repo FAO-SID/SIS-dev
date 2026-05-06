@@ -1062,7 +1062,7 @@ async def get_dataset_columns(table_name: str, current_user: dict = Depends(get_
             cur.execute("""
                 SELECT column_name, property_num_id, procedure_num_id, unit_of_measure_id,
                        ignore_column, note, destination_table, destination_column,
-                       conversion_operation, conversion_value, validation
+                       validation
                 FROM api.uploaded_dataset_column
                 WHERE table_name = %s ORDER BY column_name
             """, (table_name,))
@@ -1094,9 +1094,7 @@ async def save_dataset_columns(
                         procedure_num_id = %s,
                         unit_of_measure_id = %s,
                         ignore_column = %s,
-                        note = %s,
-                        conversion_operation = %s,
-                        conversion_value = %s
+                        note = %s
                     WHERE table_name = %s AND column_name = %s
                 """, (
                     col.get("destination_table"),
@@ -1106,8 +1104,6 @@ async def save_dataset_columns(
                     col.get("unit_of_measure_id"),
                     col.get("ignore_column", True),
                     col.get("note"),
-                    col.get("conversion_operation"),
-                    col.get("conversion_value"),
                     table_name,
                     col["column_name"]
                 ))
@@ -1146,8 +1142,7 @@ async def ingest_dataset(
             # Get column mappings (non-ignored)
             cur.execute("""
                 SELECT column_name, destination_table, destination_column,
-                       property_num_id, procedure_num_id, unit_of_measure_id,
-                       conversion_operation, conversion_value
+                       property_num_id, procedure_num_id, unit_of_measure_id
                 FROM api.uploaded_dataset_column
                 WHERE table_name = %s AND (ignore_column = false OR destination_table IS NOT NULL)
             """, (table_name,))
@@ -1158,7 +1153,7 @@ async def ingest_dataset(
 
             # Build lookup: destination_table.destination_column → csv_column_name (and extras)
             # For result_num, use csv column name as key since multiple columns map to "value"
-            col_map = {}  # {dest_table: {key: {csv_col, conversion_op, conversion_val, prop, proc, unit}}}
+            col_map = {}  # {dest_table: {key: {csv_col, prop, proc, unit}}}
             for m in mappings:
                 dt = m["destination_table"]
                 if not dt:
@@ -1168,8 +1163,6 @@ async def ingest_dataset(
                 key = m["column_name"] if dt == "result_num" else (m["destination_column"] or "value")
                 col_map[dt][key] = {
                     "csv_col": m["column_name"],
-                    "conv_op": m.get("conversion_operation"),
-                    "conv_val": m.get("conversion_value"),
                     "property_num_id": m.get("property_num_id"),
                     "procedure_num_id": m.get("procedure_num_id"),
                     "unit_of_measure_id": m.get("unit_of_measure_id"),
@@ -1193,27 +1186,6 @@ async def ingest_dataset(
                 v = row.get(info["csv_col"])
                 if v is None or v == "":
                     return None
-                return v
-
-            def get_val_converted(row, table, col):
-                info = col_map.get(table, {}).get(col)
-                if not info:
-                    return None
-                v = row.get(info["csv_col"])
-                if v is None or v == "":
-                    return None
-                try:
-                    v = float(v)
-                except (ValueError, TypeError):
-                    return None
-                op = info.get("conv_op")
-                cv = info.get("conv_val")
-                if op and cv:
-                    cv = float(cv)
-                    if op == "*":
-                        v = v * cv
-                    elif op == "/":
-                        v = v / cv
                 return v
 
             # Caches to avoid duplicate inserts
@@ -1711,6 +1683,17 @@ async def validate_dataset(
                                 truncated = True
 
                 if dt == "result_num":
+                    missing_meta = []
+                    if not m.get("property_num_id"):    missing_meta.append("property")
+                    if not m.get("procedure_num_id"):   missing_meta.append("procedure")
+                    if not m.get("unit_of_measure_id"): missing_meta.append("unit")
+                    if missing_meta:
+                        errors.append("missing " + ", ".join(missing_meta))
+                        # mark every populated row so the user can see this column failed overall
+                        for row in rows:
+                            v = row.get(csv_col)
+                            if v is not None and v != "":
+                                error_rows.add(row["_row_id"])
                     bounds = obs_bounds.get((m["property_num_id"], m["procedure_num_id"]), (None, None, None))
                     vmin, vmax, canonical_unit = bounds
                     source_unit = m.get("unit_of_measure_id")

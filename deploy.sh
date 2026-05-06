@@ -83,23 +83,6 @@ sleep 5
 docker exec sis-database psql -d sis -U sis -f /tmp/init.sql
 docker exec sis-database psql -d sis -U sis -f /tmp/sis-database_latest_with_codelist.sql
 
-# Federation-only view of api.api_client (filters tokens by description)
-# and grants for the read-only sis_glosis role used by sis-api-glosis.
-docker exec sis-database psql -d sis -U sis -c "
-    CREATE OR REPLACE VIEW api.vw_glosis_federation_token AS
-    SELECT api_client_id, api_key, is_active, expires_at
-    FROM api.api_client
-    WHERE description = 'glosis-federation';
-    ALTER VIEW api.vw_glosis_federation_token OWNER TO sis;
-
-    GRANT USAGE ON SCHEMA api TO sis_glosis;
-    GRANT SELECT ON TABLE api.vw_api_manifest TO sis_glosis;
-    GRANT SELECT ON TABLE api.vw_api_profile TO sis_glosis;
-    GRANT SELECT ON TABLE api.vw_api_observation TO sis_glosis;
-    GRANT SELECT ON TABLE api.vw_glosis_federation_token TO sis_glosis;
-    GRANT SELECT ON TABLE api.setting TO sis_glosis;
-    GRANT INSERT ON TABLE api.audit TO sis_glosis;"
-
 # insert dummy data for test
 docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
                                                     p_project_id := 'DUMMY_DATA_1',

@@ -2363,7 +2363,31 @@ class AdminDashboard {
         </tr>`;
     }).join('');
 
-    // Cascade: destination changes → toggle result_num extras
+    // Rebuild every dest dropdown so options already used by other rows are hidden.
+    // result_num|value is the only multi-use destination (one per soil-property column).
+    const refreshDestDropdowns = () => {
+      const allSelects = tbody.querySelectorAll('.etl-dest');
+      const used = new Set();
+      allSelects.forEach(s => {
+        if (s.value && s.value !== 'result_num|value') used.add(s.value);
+      });
+      allSelects.forEach(s => {
+        const current = s.value;
+        const opts = ['<option value="">(skip)</option>'];
+        destOptions.forEach(o => {
+          const v = `${o.table}|${o.column}`;
+          if (used.has(v) && v !== current) return; // hide if taken by another row
+          const labelText = (o.required ? '* ' : '') + o.label;
+          const styleAttr = o.required ? ' style="font-weight:bold;"' : '';
+          const selected = current === v ? ' selected' : '';
+          opts.push(`<option value="${v}"${selected}${styleAttr}>${this.escapeHtml(labelText)}</option>`);
+        });
+        s.innerHTML = opts.join('');
+      });
+    };
+    refreshDestDropdowns();
+
+    // Cascade: destination changes → toggle result_num extras + refilter all dropdowns
     tbody.querySelectorAll('.etl-dest').forEach(sel => {
       sel.addEventListener('change', () => {
         const tr = sel.closest('tr');
@@ -2387,6 +2411,7 @@ class AdminDashboard {
           updateRefLink(tr.querySelector('.etl-proc'), '.etl-proc-link');
           updateUnitLink(tr);
         }
+        refreshDestDropdowns();
       });
     });
 
