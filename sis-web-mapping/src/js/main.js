@@ -237,9 +237,9 @@ function addLayerGroup(container, groupName, layers) {
   const contentDiv = document.createElement('div');
   contentDiv.className = 'layer-group-content';
 
-  // Tag filter for the Maps group (driven by layer.keywords)
+  // Tag filter (driven by layer.keywords) — shown for any group that has keywords
   let activeTags = new Set();
-  if (displayName === 'Maps') {
+  {
     const allTags = new Set();
     layers.forEach(l => (l.keywords || []).forEach(k => k && allTags.add(k)));
     if (allTags.size > 0) {
@@ -323,6 +323,21 @@ function createLayerItem(layer) {
   `;
 
   const radio = itemDiv.querySelector('input[type="radio"]');
+  // Track pre-click state so a click on an already-selected radio toggles it off
+  let wasChecked = false;
+  itemDiv.addEventListener('mousedown', () => { wasChecked = radio.checked; });
+  radio.addEventListener('click', (e) => {
+    if (wasChecked) {
+      e.preventDefault();
+      radio.checked = false;
+      if (activeLayer) {
+        map.removeLayer(activeLayer);
+        activeLayer = null;
+        const legend = document.getElementById('legend');
+        if (legend) legend.style.display = 'none';
+      }
+    }
+  });
   radio.addEventListener('change', (e) => {
     if (e.target.checked) {
       switchLayer(layer);
