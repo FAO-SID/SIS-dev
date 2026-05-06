@@ -145,7 +145,7 @@ async function loadLayers() {
     
     // Group layers by project_name
     const groupedLayers = layers.reduce((acc, layer) => {
-      const group = layer.project_name || 'Ungrouped';
+      const group = layer.project_name || 'Rasters';
       if (!acc[group]) {
         acc[group] = [];
       }
@@ -1224,8 +1224,8 @@ function showLoginModal() {
       <div id="login-error" class="login-error"></div>
       <form class="login-form" id="login-form">
         <div class="form-group">
-          <label for="login-email">Email</label>
-          <input type="email" id="login-email" required>
+          <label for="login-email">Username</label>
+          <input type="text" id="login-email" required>
         </div>
         <div class="form-group">
           <label for="login-password">Password</label>

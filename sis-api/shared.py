@@ -50,7 +50,7 @@ def get_db():
 # ==================== Pydantic Models ====================
 
 class UserLogin(BaseModel):
-    user_id: EmailStr
+    user_id: str
     password: str
 
 class Token(BaseModel):

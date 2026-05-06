@@ -84,7 +84,12 @@ class SISApiClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: 'Login failed' }));
-      throw new Error(error.detail);
+      const msg = typeof error.detail === 'string'
+        ? error.detail
+        : Array.isArray(error.detail)
+          ? error.detail.map(e => e.msg || JSON.stringify(e)).join('; ')
+          : 'Login failed';
+      throw new Error(msg);
     }
 
     const data = await response.json();
@@ -307,6 +312,12 @@ class SISApiClient {
     return this.authenticatedRequest(`/api/codelist/units_for_property/${encodeURIComponent(propertyNumId)}`);
   }
 
+  async getSourceUnitsForObservation(propertyNumId, procedureNumId) {
+    return this.authenticatedRequest(
+      `/api/codelist/source_units/${encodeURIComponent(propertyNumId)}/${encodeURIComponent(procedureNumId)}`
+    );
+  }
+
   async createProject(data) {
     return this.authenticatedRequest('/api/codelist/projects', {
       method: 'POST',
@@ -385,10 +396,10 @@ class SISApiClient {
     return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/columns`);
   }
 
-  async saveDatasetColumns(tableName, columns, epsg) {
+  async saveDatasetColumns(tableName, columns, epsg, projectId) {
     return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/columns`, {
       method: 'PUT',
-      body: JSON.stringify({ columns, epsg })
+      body: JSON.stringify({ columns, epsg, project_id: projectId || null })
     });
   }
 

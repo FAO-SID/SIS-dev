@@ -473,7 +473,6 @@ class AdminDashboard {
                           <th>Property</th>
                           <th>Procedure</th>
                           <th>Unit</th>
-                          <th>Conversion</th>
                           <th>Validation</th>
                         </tr>
                       </thead>
@@ -1519,20 +1518,21 @@ class AdminDashboard {
   // ==================== ETL ====================
 
   // Single combined destination dropdown: friendly label → (table, column)
+  // required: true → must be mapped (validated in backend)
   get ETL_DEST_OPTIONS() {
     return [
-      { label: 'Profile code',                          table: 'plot',       column: 'plot_code' },
-      { label: 'Longitude',                             table: 'plot',       column: 'geom (longitude)' },
-      { label: 'Latitude',                              table: 'plot',       column: 'geom (latitude)' },
-      { label: 'Profile type (TrialPit or Borehole)',   table: 'plot',       column: 'type' },
-      { label: 'Altitude',                              table: 'plot',       column: 'altitude' },
-      { label: 'Sampling date',                         table: 'plot',       column: 'sampling_date' },
-      { label: 'Positional accuracy',                   table: 'plot',       column: 'positional_accuracy' },
-      { label: 'Upper depth',                           table: 'element',    column: 'upper_depth' },
-      { label: 'Lower depth',                           table: 'element',    column: 'lower_depth' },
-      { label: 'Layer type (Horizon or Layer)',         table: 'element',    column: 'type' },
-      { label: 'Horizon',                               table: 'element',    column: 'horizon' },
-      { label: 'Soil property',                         table: 'result_num', column: 'value' },
+      { label: 'Profile code',                          table: 'plot',       column: 'plot_code',           required: true  },
+      { label: 'Longitude',                             table: 'plot',       column: 'geom (longitude)',    required: true  },
+      { label: 'Latitude',                              table: 'plot',       column: 'geom (latitude)',     required: true  },
+      { label: 'Profile type (TrialPit or Borehole)',   table: 'plot',       column: 'type',                required: false },
+      { label: 'Altitude',                              table: 'plot',       column: 'altitude',            required: false },
+      { label: 'Sampling date',                         table: 'plot',       column: 'sampling_date',       required: true  },
+      { label: 'Positional accuracy',                   table: 'plot',       column: 'positional_accuracy', required: false },
+      { label: 'Upper depth',                           table: 'element',    column: 'upper_depth',         required: true  },
+      { label: 'Lower depth',                           table: 'element',    column: 'lower_depth',         required: true  },
+      { label: 'Layer type (Horizon or Layer)',         table: 'element',    column: 'type',                required: false },
+      { label: 'Horizon',                               table: 'element',    column: 'horizon',             required: false },
+      { label: 'Soil property',                         table: 'result_num', column: 'value',               required: true  },
     ];
   }
 
@@ -1794,8 +1794,6 @@ class AdminDashboard {
           const colName = tr.dataset.col;
           const destVal = tr.querySelector('.etl-dest').value;
           const [destTable, destCol] = destVal ? destVal.split('|') : [null, null];
-          const convOp = tr.querySelector('.etl-conv-op').value || null;
-          const convVal = tr.querySelector('.etl-conv-val').value;
           const entry = {
             column_name: colName,
             destination_table: destTable || null,
@@ -1804,8 +1802,8 @@ class AdminDashboard {
             property_num_id: null,
             procedure_num_id: null,
             unit_of_measure_id: null,
-            conversion_operation: convOp,
-            conversion_value: convVal ? parseFloat(convVal) : null
+            conversion_operation: null,
+            conversion_value: null
           };
           if (destTable === 'result_num') {
             entry.property_num_id = tr.querySelector('.etl-prop').value || null;
@@ -1815,7 +1813,7 @@ class AdminDashboard {
           columns.push(entry);
         });
         const epsg = document.getElementById('etl-epsg').value.trim();
-        await api.saveDatasetColumns(tableName, columns, epsg);
+        await api.saveDatasetColumns(tableName, columns, epsg, projectId);
       }
 
       this.closeDetailPanel();
@@ -1823,6 +1821,40 @@ class AdminDashboard {
       statusEl.textContent = 'Error: ' + e.message;
       statusEl.style.color = '#c33';
     }
+  }
+
+  async persistCurrentMappings() {
+    const section = document.getElementById('etl-mapping-section');
+    const tableName = section ? section.dataset.tableName : null;
+    if (!tableName) return;
+    const mappingRows = document.querySelectorAll('#etl-mapping-tbody tr');
+    const columns = [];
+    mappingRows.forEach(tr => {
+      const colName = tr.dataset.col;
+      const destVal = tr.querySelector('.etl-dest').value;
+      const [destTable, destCol] = destVal ? destVal.split('|') : [null, null];
+      const entry = {
+        column_name: colName,
+        destination_table: destTable || null,
+        destination_column: destCol || null,
+        ignore_column: !destTable,
+        property_num_id: null,
+        procedure_num_id: null,
+        unit_of_measure_id: null,
+        conversion_operation: null,
+        conversion_value: null
+      };
+      if (destTable === 'result_num') {
+        entry.property_num_id = tr.querySelector('.etl-prop').value || null;
+        entry.procedure_num_id = tr.querySelector('.etl-proc').value || null;
+        entry.unit_of_measure_id = tr.querySelector('.etl-unit').value || null;
+      }
+      columns.push(entry);
+    });
+    const epsg = document.getElementById('etl-epsg').value.trim();
+    const projectId = document.getElementById('etl-project').value;
+    const projectIdToSave = (projectId && projectId !== '__new__') ? projectId : null;
+    await api.saveDatasetColumns(tableName, columns, epsg, projectIdToSave);
   }
 
   async handleEtlValidate() {
@@ -1837,6 +1869,7 @@ class AdminDashboard {
     statusEl.textContent = 'Validating...';
     statusEl.style.color = '#555';
     try {
+      await this.persistCurrentMappings();
       const result = await api.validateDataset(tableName);
       const cols = result.columns || {};
 
@@ -2232,48 +2265,46 @@ class AdminDashboard {
       existingMappings.forEach(m => { existingMap[m.column_name] = m; });
     }
 
-    const convOps = ['', '*', '/'];
-    const convVals = ['', '10', '100', '1000', '10000'];
-
     tbody.innerHTML = columns.map(col => {
       const existing = existingMap[col] || {};
       const selTable = existing.destination_table || '';
       const selCol = existing.destination_column || '';
       const selVal = this.etlDestValue(selTable, selCol);
       const isResult = selTable === 'result_num';
-      const exConvOp = existing.conversion_operation || '';
-      const exConvVal = existing.conversion_value != null ? String(existing.conversion_value) : '';
 
       const destOpts = '<option value="">(skip)</option>' +
         destOptions.map(o => {
           const v = `${o.table}|${o.column}`;
-          return `<option value="${v}"${selVal === v ? ' selected' : ''}>${this.escapeHtml(o.label)}</option>`;
+          const labelText = (o.required ? '* ' : '') + o.label;
+          const styleAttr = o.required ? ' style="font-weight:bold;"' : '';
+          return `<option value="${v}"${selVal === v ? ' selected' : ''}${styleAttr}>${this.escapeHtml(labelText)}</option>`;
         }).join('');
 
       const propOpts = '<option value="">—</option>' + (cl.properties || []).map(p =>
-        `<option value="${p.property_num_id}"${existing.property_num_id == p.property_num_id ? ' selected' : ''}>${this.escapeHtml(p.property_name)}</option>`
+        `<option value="${p.property_num_id}" data-uri="${this.escapeHtml(p.uri || '')}"${existing.property_num_id == p.property_num_id ? ' selected' : ''}>${this.escapeHtml(p.property_name)}</option>`
       ).join('');
-
-      const convOpOpts = convOps.map(o => `<option value="${o}"${exConvOp === o ? ' selected' : ''}>${o || '—'}</option>`).join('');
-      const convValOpts = convVals.map(v => `<option value="${v}"${exConvVal === v ? ' selected' : ''}>${v || '—'}</option>`).join('');
 
       const hideResult = isResult ? '' : 'display:none;';
 
       const validation = existing.validation || '';
       const valColor = validation === 'OK' ? '#28a745' : (validation ? '#dc3545' : '#555');
 
+      const linkSS = 'margin-left:4px;font-size:var(--fs-xs);text-decoration:none;';
       return `
         <tr data-col="${this.escapeHtml(col)}">
           <td><strong>${this.escapeHtml(col)}</strong></td>
           <td><select class="etl-dest" style="${ss}">${destOpts}</select></td>
-          <td><select class="etl-prop" style="${ss}${hideResult}">${propOpts}</select></td>
-          <td><select class="etl-proc" style="${ss}${hideResult}"><option value="">—</option></select></td>
-          <td><select class="etl-unit" style="${ss}${hideResult}"><option value="">—</option></select></td>
-          <td class="etl-conv-cell" style="white-space:nowrap;">
-            <span class="etl-conv-inner" style="${hideResult}">
-              <select class="etl-conv-op" style="${ss}width:50px;">${convOpOpts}</select>
-              <select class="etl-conv-val" style="${ss}width:70px;">${convValOpts}</select>
-            </span>
+          <td style="white-space:nowrap;">
+            <select class="etl-prop" style="${ss}${hideResult}">${propOpts}</select>
+            <a class="etl-prop-link" href="" target="_blank" rel="noopener" title="Open property reference" style="${linkSS}display:none;">↗</a>
+          </td>
+          <td style="white-space:nowrap;">
+            <select class="etl-proc" style="${ss}${hideResult}"><option value="">—</option></select>
+            <a class="etl-proc-link" href="" target="_blank" rel="noopener" title="Open procedure reference" style="${linkSS}display:none;">↗</a>
+          </td>
+          <td style="white-space:nowrap;">
+            <select class="etl-unit" style="${ss}${hideResult}"><option value="">—</option></select>
+            <a class="etl-unit-link" href="" target="_blank" rel="noopener" title="Open unit reference" style="${linkSS}display:none;">↗</a>
           </td>
           <td class="etl-validation" style="font-size:var(--fs-xs);max-width:260px;white-space:pre-wrap;color:${valColor};vertical-align:middle;">${this.escapeHtml(validation)}</td>
         </tr>`;
@@ -2289,64 +2320,137 @@ class AdminDashboard {
         tr.querySelector('.etl-prop').style.display = isResult ? '' : 'none';
         tr.querySelector('.etl-proc').style.display = isResult ? '' : 'none';
         tr.querySelector('.etl-unit').style.display = isResult ? '' : 'none';
-        tr.querySelector('.etl-conv-inner').style.display = isResult ? '' : 'none';
+        const propLink = tr.querySelector('.etl-prop-link');
+        const procLink = tr.querySelector('.etl-proc-link');
+        const unitLink = tr.querySelector('.etl-unit-link');
         if (!isResult) {
           tr.querySelector('.etl-proc').innerHTML = '<option value="">—</option>';
           tr.querySelector('.etl-unit').innerHTML = '<option value="">—</option>';
+          if (propLink) propLink.style.display = 'none';
+          if (procLink) procLink.style.display = 'none';
+          if (unitLink) unitLink.style.display = 'none';
+        } else {
+          updateRefLink(tr.querySelector('.etl-prop'), '.etl-prop-link');
+          updateRefLink(tr.querySelector('.etl-proc'), '.etl-proc-link');
+          updateUnitLink(tr);
         }
       });
     });
 
-    // Cascade: property changes → load filtered procedures + units
+    const updateRefLink = (selectEl, linkClass) => {
+      const tr = selectEl.closest('tr');
+      const link = tr.querySelector(linkClass);
+      if (!link) return;
+      const opt = selectEl.options[selectEl.selectedIndex];
+      const uri = (opt && opt.dataset && opt.dataset.uri) ? opt.dataset.uri : '';
+      if (uri) {
+        link.href = uri;
+        link.style.display = '';
+      } else {
+        link.removeAttribute('href');
+        link.style.display = 'none';
+      }
+    };
+
+    // Initial state for prop links (procedure links are wired after async load)
+    tbody.querySelectorAll('.etl-prop').forEach(sel => updateRefLink(sel, '.etl-prop-link'));
+
+    const updateUnitLink = (tr) => {
+      const link = tr.querySelector('.etl-unit-link');
+      const unitSel = tr.querySelector('.etl-unit');
+      if (!link || !unitSel) return;
+      const uri = unitSel.dataset.canonicalUri || '';
+      if (uri) {
+        link.href = uri;
+        link.style.display = '';
+      } else {
+        link.removeAttribute('href');
+        link.style.display = 'none';
+      }
+    };
+
+    const reloadUnits = async (tr, selectedUnit) => {
+      const propId = tr.querySelector('.etl-prop').value;
+      const procId = tr.querySelector('.etl-proc').value;
+      const unitSel = tr.querySelector('.etl-unit');
+      delete unitSel.dataset.canonicalUri;
+      if (!propId || !procId) {
+        unitSel.innerHTML = '<option value="">—</option>';
+        updateUnitLink(tr);
+        return;
+      }
+      unitSel.innerHTML = '<option value="">Loading...</option>';
+      try {
+        const opts = await api.getSourceUnitsForObservation(propId, procId);
+        const canonical = opts.find(u => u.is_canonical);
+        if (canonical && canonical.uri) unitSel.dataset.canonicalUri = canonical.uri;
+        unitSel.innerHTML = '<option value="">—</option>' + opts.map(u => {
+          const v = u.unit_of_measure_id;
+          const sel = selectedUnit && selectedUnit === v ? ' selected' : '';
+          const label = u.is_canonical
+            ? `${v} (canonical)`
+            : `${v} → ${u.unit_to} (${u.operation}${u.value})`;
+          return `<option value="${v}"${sel}>${this.escapeHtml(label)}</option>`;
+        }).join('');
+      } catch (e) {
+        unitSel.innerHTML = '<option value="">Error</option>';
+      }
+      updateUnitLink(tr);
+    };
+
+    const procOptionsHtml = (procs, selectedId) => '<option value="">—</option>' +
+      procs.map(p => {
+        const sel = selectedId && p.procedure_num_id === selectedId ? ' selected' : '';
+        return `<option value="${p.procedure_num_id}" data-uri="${this.escapeHtml(p.uri || '')}"${sel}>${this.escapeHtml(p.procedure_name)}</option>`;
+      }).join('');
+
+    // Cascade: property changes → load procedures, clear units, update prop link
     tbody.querySelectorAll('.etl-prop').forEach(sel => {
       sel.addEventListener('change', async () => {
+        updateRefLink(sel, '.etl-prop-link');
         const tr = sel.closest('tr');
         const procSel = tr.querySelector('.etl-proc');
         const unitSel = tr.querySelector('.etl-unit');
         const propId = sel.value;
+        unitSel.innerHTML = '<option value="">—</option>';
         procSel.innerHTML = '<option value="">Loading...</option>';
-        unitSel.innerHTML = '<option value="">Loading...</option>';
+        updateRefLink(procSel, '.etl-proc-link');
         if (!propId) {
           procSel.innerHTML = '<option value="">—</option>';
-          unitSel.innerHTML = '<option value="">—</option>';
           return;
         }
         try {
-          const [procs, units] = await Promise.all([
-            api.getProceduresForProperty(propId),
-            api.getUnitsForProperty(propId)
-          ]);
-          procSel.innerHTML = '<option value="">—</option>' +
-            procs.map(p => `<option value="${p.procedure_num_id}">${this.escapeHtml(p.procedure_name)}</option>`).join('');
-          unitSel.innerHTML = '<option value="">—</option>' +
-            units.map(u => `<option value="${u.unit_of_measure_id}">${this.escapeHtml(u.unit_of_measure_id)}</option>`).join('');
+          const procs = await api.getProceduresForProperty(propId);
+          procSel.innerHTML = procOptionsHtml(procs, null);
         } catch (e) {
           procSel.innerHTML = '<option value="">Error</option>';
-          unitSel.innerHTML = '<option value="">Error</option>';
         }
+        updateRefLink(procSel, '.etl-proc-link');
       });
     });
 
-    // For existing mappings with property set, load their procedures + units, then restore selection
+    // Cascade: procedure changes → load source-unit options + update proc link
+    tbody.querySelectorAll('.etl-proc').forEach(sel => {
+      sel.addEventListener('change', () => {
+        updateRefLink(sel, '.etl-proc-link');
+        reloadUnits(sel.closest('tr'), null);
+      });
+    });
+
+
+    // For existing mappings, restore procedures and units
     if (existingMappings) {
       tbody.querySelectorAll('tr[data-col]').forEach(tr => {
         const col = tr.dataset.col;
         const existing = existingMap[col];
         if (existing && existing.property_num_id) {
-          const propSel = tr.querySelector('.etl-prop');
           const savedProc = existing.procedure_num_id;
           const savedUnit = existing.unit_of_measure_id;
-          // Load then restore
-          Promise.all([
-            api.getProceduresForProperty(existing.property_num_id),
-            api.getUnitsForProperty(existing.property_num_id)
-          ]).then(([procs, units]) => {
+          api.getProceduresForProperty(existing.property_num_id).then(procs => {
             const procSel = tr.querySelector('.etl-proc');
-            const unitSel = tr.querySelector('.etl-unit');
-            procSel.innerHTML = '<option value="">—</option>' +
-              procs.map(p => `<option value="${p.procedure_num_id}"${p.procedure_num_id === savedProc ? ' selected' : ''}>${this.escapeHtml(p.procedure_name)}</option>`).join('');
-            unitSel.innerHTML = '<option value="">—</option>' +
-              units.map(u => `<option value="${u.unit_of_measure_id}"${u.unit_of_measure_id === savedUnit ? ' selected' : ''}>${this.escapeHtml(u.unit_of_measure_id)}</option>`).join('');
+            procSel.innerHTML = procOptionsHtml(procs, savedProc);
+            updateRefLink(procSel, '.etl-proc-link');
+            if (savedProc) reloadUnits(tr, savedUnit);
           }).catch(() => {});
         }
       });

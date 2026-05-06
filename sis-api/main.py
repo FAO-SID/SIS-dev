@@ -737,14 +737,14 @@ async def get_projects(current_user: dict = Depends(get_current_user)):
 async def get_properties(current_user: dict = Depends(get_current_user)):
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT property_num_id, property_name FROM soil_data.property_num ORDER BY property_name")
+            cur.execute("SELECT property_num_id, property_name, uri FROM soil_data.property_num ORDER BY property_name")
             return cur.fetchall()
 
 @app.get("/api/codelist/procedures")
 async def get_procedures(current_user: dict = Depends(get_current_user)):
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT procedure_num_id, procedure_name FROM soil_data.procedure_num ORDER BY procedure_name")
+            cur.execute("SELECT procedure_num_id, procedure_name, uri FROM soil_data.procedure_num ORDER BY procedure_name")
             return cur.fetchall()
 
 @app.get("/api/codelist/units")
@@ -760,7 +760,7 @@ async def get_procedures_for_property(property_num_id: str, current_user: dict =
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
-                SELECT DISTINCT o.procedure_num_id, p.procedure_name
+                SELECT DISTINCT o.procedure_num_id, p.procedure_name, p.uri
                 FROM soil_data.observation_num o
                 JOIN soil_data.procedure_num p ON p.procedure_num_id = o.procedure_num_id
                 WHERE o.property_num_id = %s
@@ -780,6 +780,63 @@ async def get_units_for_property(property_num_id: str, current_user: dict = Depe
                 ORDER BY o.unit_of_measure_id
             """, (property_num_id,))
             return cur.fetchall()
+
+@app.get("/api/codelist/source_units/{property_num_id}/{procedure_num_id}")
+async def get_source_units(
+    property_num_id: str,
+    procedure_num_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Source-unit options for an observation (canonical unit + any conversions to it).
+
+    The canonical unit comes from observation_num.unit_of_measure_id.
+    Other entries are sourced from soil_data.unit_conversion where unit_to = canonical.
+    """
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT unit_of_measure_id
+                FROM soil_data.observation_num
+                WHERE property_num_id = %s AND procedure_num_id = %s
+            """, (property_num_id, procedure_num_id))
+            row = cur.fetchone()
+            if not row or not row["unit_of_measure_id"]:
+                return []
+            canonical = row["unit_of_measure_id"]
+
+            cur.execute("""
+                SELECT c.unit_from, c.operation, c.value, c.unit_to,
+                       uf.uri AS unit_from_uri, ut.uri AS unit_to_uri
+                FROM soil_data.unit_conversion c
+                LEFT JOIN soil_data.unit_of_measure uf ON uf.unit_of_measure_id = c.unit_from
+                LEFT JOIN soil_data.unit_of_measure ut ON ut.unit_of_measure_id = c.unit_to
+                WHERE c.unit_to = %s
+                ORDER BY c.unit_from
+            """, (canonical,))
+            convs = cur.fetchall()
+
+            cur.execute("SELECT uri FROM soil_data.unit_of_measure WHERE unit_of_measure_id = %s", (canonical,))
+            canonical_uri_row = cur.fetchone()
+            canonical_uri = canonical_uri_row["uri"] if canonical_uri_row else None
+
+            options = [{
+                "unit_of_measure_id": canonical,
+                "operation": None,
+                "value": None,
+                "unit_to": canonical,
+                "is_canonical": True,
+                "uri": canonical_uri,
+            }]
+            for c in convs:
+                options.append({
+                    "unit_of_measure_id": c["unit_from"],
+                    "operation": c["operation"],
+                    "value": float(c["value"]) if c["value"] is not None else None,
+                    "unit_to": c["unit_to"],
+                    "is_canonical": False,
+                    "uri": c["unit_from_uri"],
+                })
+            return options
 
 @app.post("/api/codelist/projects", status_code=status.HTTP_201_CREATED)
 async def create_project(payload: dict, current_user: dict = Depends(get_current_user)):
@@ -1029,6 +1086,7 @@ async def save_dataset_columns(
 
             columns = payload.get("columns", [])
             epsg = payload.get("epsg")
+            project_id = payload.get("project_id")
 
             for col in columns:
                 cur.execute("""
@@ -1061,6 +1119,11 @@ async def save_dataset_columns(
                 cur.execute("""
                     UPDATE api.uploaded_dataset SET cords_epsg = %s WHERE table_name = %s
                 """, (epsg, table_name))
+
+            if project_id:
+                cur.execute("""
+                    UPDATE api.uploaded_dataset SET project_id = %s WHERE table_name = %s
+                """, (project_id, table_name))
 
             log_audit(current_user['user_id'], None, "etl_columns_saved",
                      {"table_name": table_name, "columns": len(columns)}, None)
@@ -1163,7 +1226,8 @@ async def ingest_dataset(
             profiles_cache = {}    # profile_code → profile_id
             elements_cache = {}    # (profile_id, upper, lower) → element_id
             specimens_cache = {}   # element_id → specimen_id
-            obs_num_cache = {}     # (prop, proc) → observation_num_id
+            obs_num_cache = {}     # (prop, proc) → (observation_num_id, canonical_unit)
+            unit_conv_cache = {}   # (source_unit, canonical_unit) → {operation, value} or None
 
             ingested = 0
             result_num_count = 0
@@ -1304,32 +1368,49 @@ async def ingest_dataset(
                         for dest_col, info in col_map["result_num"].items():
                             prop_id = info.get("property_num_id")
                             proc_id = info.get("procedure_num_id")
-                            unit_id = info.get("unit_of_measure_id")
+                            source_unit = info.get("unit_of_measure_id")
                             if not prop_id or not proc_id:
                                 continue
 
-                            # Get observation_num_id
+                            # Get observation_num_id and its canonical unit
                             obs_key = (prop_id, proc_id)
                             if obs_key in obs_num_cache:
-                                obs_num_id = obs_num_cache[obs_key]
+                                obs_num_id, canonical_unit = obs_num_cache[obs_key]
                             else:
                                 cur.execute("""
-                                    SELECT observation_num_id FROM soil_data.observation_num
+                                    SELECT observation_num_id, unit_of_measure_id
+                                    FROM soil_data.observation_num
                                     WHERE property_num_id = %s AND procedure_num_id = %s
                                 """, (prop_id, proc_id))
                                 obs_row = cur.fetchone()
                                 if not obs_row:
-                                    # Create observation_num if not exists
+                                    # No observation_num exists — fall back to the source unit as canonical
                                     cur.execute("""
                                         INSERT INTO soil_data.observation_num
                                             (property_num_id, procedure_num_id, unit_of_measure_id)
-                                        VALUES (%s, %s, %s) RETURNING observation_num_id
-                                    """, (prop_id, proc_id, unit_id or "Unknown"))
+                                        VALUES (%s, %s, %s)
+                                        RETURNING observation_num_id, unit_of_measure_id
+                                    """, (prop_id, proc_id, source_unit or "Unknown"))
                                     obs_row = cur.fetchone()
                                 obs_num_id = obs_row["observation_num_id"]
-                                obs_num_cache[obs_key] = obs_num_id
+                                canonical_unit = obs_row["unit_of_measure_id"]
+                                obs_num_cache[obs_key] = (obs_num_id, canonical_unit)
 
-                            # Get value with conversion
+                            # Resolve conversion (source -> canonical) once per pair
+                            if source_unit and canonical_unit and source_unit != canonical_unit:
+                                conv_key = (source_unit, canonical_unit)
+                                if conv_key in unit_conv_cache:
+                                    conv = unit_conv_cache[conv_key]
+                                else:
+                                    cur.execute("""
+                                        SELECT operation, value FROM soil_data.unit_conversion
+                                        WHERE unit_from = %s AND unit_to = %s
+                                    """, (source_unit, canonical_unit))
+                                    conv = cur.fetchone()
+                                    unit_conv_cache[conv_key] = conv
+                            else:
+                                conv = None  # no conversion needed
+
                             raw_val = row.get(info["csv_col"])
                             if raw_val is None or raw_val == "":
                                 continue
@@ -1337,13 +1418,11 @@ async def ingest_dataset(
                                 val = float(raw_val)
                             except (ValueError, TypeError):
                                 continue
-                            op = info.get("conv_op")
-                            cv = info.get("conv_val")
-                            if op and cv:
-                                cv = float(cv)
-                                if op == "*":
+                            if conv:
+                                cv = float(conv["value"])
+                                if conv["operation"] == "*":
                                     val = val * cv
-                                elif op == "/":
+                                elif conv["operation"] == "/":
                                     val = val / cv
 
                             cur.execute("""
@@ -1483,6 +1562,16 @@ async def validate_dataset(
         ("element", "lower_depth"):      {"kind": "int", "min": 0},
         ("element", "type"):             {"kind": "enum", "values": ["Horizon", "Layer"]},
     }
+    # Destinations that must be mapped at least once (label, table, column)
+    REQUIRED_DESTINATIONS = [
+        ("Profile code",   "plot",       "plot_code"),
+        ("Longitude",      "plot",       "geom (longitude)"),
+        ("Latitude",       "plot",       "geom (latitude)"),
+        ("Sampling date",  "plot",       "sampling_date"),
+        ("Upper depth",    "element",    "upper_depth"),
+        ("Lower depth",    "element",    "lower_depth"),
+        ("Soil property",  "result_num", "value"),
+    ]
     SMALLINT_MIN, SMALLINT_MAX = -32768, 32767
 
     def check_value(v, rule):
@@ -1534,7 +1623,7 @@ async def validate_dataset(
             # Load mappings
             cur.execute("""
                 SELECT column_name, destination_table, destination_column,
-                       property_num_id, procedure_num_id
+                       property_num_id, procedure_num_id, unit_of_measure_id
                 FROM api.uploaded_dataset_column
                 WHERE table_name = %s AND destination_table IS NOT NULL
             """, (table_name,))
@@ -1550,18 +1639,47 @@ async def validate_dataset(
             ))
             rows = cur.fetchall()
 
-            # Preload value_min/max for result_num mappings
-            obs_bounds = {}  # (prop_id, proc_id) -> (min, max)
+            # Preload value_min/max + canonical unit for result_num mappings
+            obs_bounds = {}  # (prop_id, proc_id) -> (min, max, canonical_unit)
             for m in mappings:
                 if m["destination_table"] == "result_num" and m["property_num_id"] and m["procedure_num_id"]:
                     key = (m["property_num_id"], m["procedure_num_id"])
                     if key not in obs_bounds:
                         cur.execute("""
-                            SELECT value_min, value_max FROM soil_data.observation_num
+                            SELECT value_min, value_max, unit_of_measure_id
+                            FROM soil_data.observation_num
                             WHERE property_num_id = %s AND procedure_num_id = %s
                         """, key)
                         r = cur.fetchone()
-                        obs_bounds[key] = (r["value_min"], r["value_max"]) if r else (None, None)
+                        obs_bounds[key] = (
+                            (r["value_min"], r["value_max"], r["unit_of_measure_id"]) if r else (None, None, None)
+                        )
+
+            # Conversion lookup cache: (source_unit, canonical_unit) -> {operation, value} or None
+            unit_conv_cache = {}
+            def get_conversion(source, canonical):
+                if not source or not canonical or source == canonical:
+                    return None
+                k = (source, canonical)
+                if k in unit_conv_cache:
+                    return unit_conv_cache[k]
+                cur.execute("""
+                    SELECT operation, value FROM soil_data.unit_conversion
+                    WHERE unit_from = %s AND unit_to = %s
+                """, (source, canonical))
+                conv = cur.fetchone()
+                unit_conv_cache[k] = conv
+                return conv
+
+            def convert_value(n, conv):
+                if not conv:
+                    return n
+                cv = float(conv["value"])
+                if conv["operation"] == "*":
+                    return n * cv
+                if conv["operation"] == "/":
+                    return n / cv
+                return n
 
             # Validate each mapped column
             col_results = {}  # csv_col -> {"status", "errors", "error_rows"}
@@ -1596,8 +1714,10 @@ async def validate_dataset(
                                 truncated = True
 
                 if dt == "result_num":
-                    bounds = obs_bounds.get((m["property_num_id"], m["procedure_num_id"]), (None, None))
-                    vmin, vmax = bounds
+                    bounds = obs_bounds.get((m["property_num_id"], m["procedure_num_id"]), (None, None, None))
+                    vmin, vmax, canonical_unit = bounds
+                    source_unit = m.get("unit_of_measure_id")
+                    conv = get_conversion(source_unit, canonical_unit)
                     for row in rows:
                         rid = row["_row_id"]
                         v = row.get(csv_col)
@@ -1612,6 +1732,7 @@ async def validate_dataset(
                             else:
                                 truncated = True
                             continue
+                        n = convert_value(n, conv)
                         if vmin is not None and n < vmin:
                             error_rows.add(rid)
                             if len(errors) < MAX_DISPLAY:
@@ -1677,19 +1798,32 @@ async def validate_dataset(
                 if r["status"] != "OK":
                     total_errors += len([e for e in r["errors"] if e != "..."])
 
+            # Required destinations: every entry in REQUIRED_DESTINATIONS must be mapped
+            mapped_targets = {(m["destination_table"], m["destination_column"]) for m in mappings}
+            missing_required = [
+                lbl for (lbl, t, c) in REQUIRED_DESTINATIONS if (t, c) not in mapped_targets
+            ]
+
             # Dataset-level note
             n_cols_err = sum(1 for r in col_results.values() if r["status"] != "OK")
-            note = "Validation OK" if n_cols_err == 0 else f"Validation: {n_cols_err} column(s) with errors"
+            parts = []
+            if missing_required:
+                parts.append("missing required: " + ", ".join(missing_required))
+            if n_cols_err:
+                parts.append(f"{n_cols_err} column(s) with errors")
+            note = "Validation OK" if not parts else "Validation: " + "; ".join(parts)
             cur.execute("UPDATE api.uploaded_dataset SET note = %s WHERE table_name = %s",
                         (note, table_name))
 
             log_audit(current_user['user_id'], None, "etl_validated",
-                     {"table_name": table_name, "columns_with_errors": n_cols_err}, None)
+                     {"table_name": table_name, "columns_with_errors": n_cols_err,
+                      "missing_required": missing_required}, None)
 
             return {
                 "message": note,
                 "columns": col_results,
                 "total_rows": len(rows),
+                "missing_required": missing_required,
             }
 
 
