@@ -575,12 +575,7 @@ def _to_relative_path(href: Optional[str]) -> Optional[str]:
 
 
 def _parse_property_name(title: str) -> str:
-    # Strip the trailing " (...)..." segment, e.g. given
-    # 'GSNMap - Potassium (K+) - exchangeable (Bhutan - 250 m - 2024) - SOIL+'
-    # return 'GSNMap - Potassium (K+) - exchangeable'.
-    if not title:
-        return title
-    return re.sub(r"\s*\([^()]*\)[^()]*$", "", title).strip()
+    return title.strip() if title else title
 
 
 @app.post("/api/sync/layers")
@@ -663,15 +658,16 @@ async def sync_layers_from_metadata(current_user: dict = Depends(get_current_adm
                     cur.execute("SELECT layer_id FROM api.layer WHERE layer_id = %s", (layer_id,))
                     exists = cur.fetchone()
                     if exists:
+                        # Preserve manually-curated property_name on existing rows
                         cur.execute("""
                             UPDATE api.layer SET
-                                project_id = %s, property_name = %s, dimension = %s,
+                                project_id = %s, dimension = %s,
                                 version = %s, metadata_url = %s, download_url = %s,
                                 get_map_url = %s, get_legend_url = %s, get_feature_info_url = %s,
                                 keywords = %s
                             WHERE layer_id = %s
                             """,
-                            (project_id, property_name, dimension, version,
+                            (project_id, dimension, version,
                              metadata_url, download_url, get_map_url,
                              get_legend_url, get_feature_info_url, keywords, layer_id))
                         updated += 1

@@ -323,7 +323,7 @@ class AdminDashboard {
 
               <!-- Maps section -->
               <section class="layers-section" style="margin-top: var(--sp-6, 24px);">
-                <h3 class="layers-section-title">Maps</h3>
+                <h3 class="layers-section-title">Rasters</h3>
                 <div class="sync-bar" style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
                   <button type="button" class="btn btn-primary" id="sync-layers-btn">Sync from Metadata</button>
                   <button type="button" class="btn btn-primary" id="check-wms-btn">Check WMS</button>
@@ -334,9 +334,9 @@ class AdminDashboard {
                   <table class="admin-table" id="layers-table">
                     <thead>
                       <tr>
-                        <th>Layer ID</th>
-                        <th>Project</th>
-                        <th>Property</th>
+                        <th>Raster ID</th>
+                        <th style="width:120px;">Group</th>
+                        <th>Raster name</th>
                         <th>Published</th>
                         <th>Default</th>
                         <th>WMS</th>
@@ -1075,6 +1075,7 @@ class AdminDashboard {
     const baseSetting = (this.settings || []).find(s => s.key === 'DOWNLOAD_BASE_URL');
     const downloadBase = baseSetting ? baseSetting.value : '/downloads/';
 
+    const editStyle = 'padding:2px 6px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;background:transparent;border:1px solid transparent;';
     tbody.innerHTML = this.layers.map(layer => {
       const id = this.escapeHtml(layer.layer_id);
       const defaultCell = layer.is_default
@@ -1088,8 +1089,8 @@ class AdminDashboard {
       return `
       <tr${layer.is_default ? ' style="background:#fff8d6;"' : ''}>
         <td><strong>${id}</strong></td>
-        <td>${this.escapeHtml(layer.project_name || '-')}</td>
-        <td>${this.escapeHtml(layer.property_name || '-')}</td>
+        <td style="width:120px;"><input class="layer-edit" data-layer-id="${id}" data-field="project_name" value="${this.escapeHtml(layer.project_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit"></td>
+        <td><input class="layer-edit" data-layer-id="${id}" data-field="property_name" value="${this.escapeHtml(layer.property_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit"></td>
         <td>
           <button class="btn ${layer.publish ? 'btn-secondary' : 'btn-success'}"
                   onclick="adminDashboard.toggleLayerPublish('${id}', ${!layer.publish})">
@@ -1102,6 +1103,29 @@ class AdminDashboard {
       </tr>
     `;
     }).join('');
+
+    tbody.querySelectorAll('.layer-edit').forEach(el => {
+      el.addEventListener('focus', () => { el.style.border = '1px solid #ccc'; el.style.background = '#fff'; });
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') el.blur(); });
+      el.addEventListener('blur', async () => {
+        el.style.border = '1px solid transparent';
+        el.style.background = 'transparent';
+        const layerId = el.dataset.layerId;
+        const field = el.dataset.field;
+        const newValue = el.value.trim() || null;
+        const layer = this.layers.find(l => l.layer_id === layerId);
+        if (!layer) return;
+        if ((layer[field] || null) === newValue) return;
+        const updated = { ...layer, [field]: newValue };
+        try {
+          await api.updateLayer(layerId, updated);
+          layer[field] = newValue;
+        } catch (e) {
+          alert('Failed to save: ' + e.message);
+          el.value = layer[field] || '';
+        }
+      });
+    });
   }
 
   async setDefaultLayer(layerId) {
