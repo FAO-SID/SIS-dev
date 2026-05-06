@@ -822,14 +822,18 @@ class AdminDashboard {
     const tbody = document.getElementById('settings-tbody');
     const mapKeys = ['LATITUDE', 'LONGITUDE', 'ZOOM'];
     const keyOrder = ['APP_TITLE', 'ORG_LOGO_URL', 'BASE_MAP_DEFAULT', 'LATITUDE', 'LONGITUDE', 'ZOOM'];
+    // Infrastructure settings — kept in DB but hidden from the UI to avoid accidental edits
+    const hiddenKeys = new Set(['DOWNLOAD_BASE_URL']);
 
-    if (this.settings.length === 0) {
+    const visible = this.settings.filter(s => !hiddenKeys.has(s.key));
+
+    if (visible.length === 0) {
       tbody.innerHTML = '<tr><td colspan="2" class="empty-state">No settings found</td></tr>';
       return;
     }
 
     // Sort: known keys first in keyOrder, then remaining alphabetically
-    const sorted = [...this.settings].sort((a, b) => {
+    const sorted = [...visible].sort((a, b) => {
       const ia = keyOrder.indexOf(a.key);
       const ib = keyOrder.indexOf(b.key);
       if (ia !== -1 && ib !== -1) return ia - ib;
