@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict hnow9KHWXE4MfHEE94VXYpQZyi5L3C4s7yMybrhzuNWx9Y0ubfSO2yPc5sz8Kqa
+\restrict 10mqGgekEidR8jvkYbV0b6BZR70Zh4FX6eJKAMqgTAummIniw3bLH4UhbM3teZr
 
 -- Dumped from database version 12.22 (Ubuntu 12.22-3.pgdg22.04+1)
 -- Dumped by pg_dump version 18.3 (Ubuntu 18.3-1.pgdg22.04+1)
 
--- Started on 2026-04-28 12:10:08 CEST
+-- Started on 2026-05-06 13:04:09 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1168,8 +1168,6 @@ CREATE TABLE api.uploaded_dataset_column (
     property_num_id text,
     procedure_num_id text,
     unit_of_measure_id text,
-    conversion_operation text,
-    conversion_value real,
     ignore_column boolean DEFAULT false,
     note text,
     validation text
@@ -5542,7 +5540,7 @@ COPY api.uploaded_dataset (user_id, project_id, table_name, file_name, upload_da
 -- Data for Name: uploaded_dataset_column; Type: TABLE DATA; Schema: api; Owner: sis
 --
 
-COPY api.uploaded_dataset_column (table_name, column_name, destination_table, destination_column, property_num_id, procedure_num_id, unit_of_measure_id, conversion_operation, conversion_value, ignore_column, note, validation) FROM stdin;
+COPY api.uploaded_dataset_column (table_name, column_name, destination_table, destination_column, property_num_id, procedure_num_id, unit_of_measure_id, ignore_column, note, validation) FROM stdin;
 \.
 
 
@@ -12052,11 +12050,11 @@ ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data GRANT SELECT ON TABLES
 ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data_upload GRANT SELECT ON TABLES TO sis_r;
 
 
--- Completed on 2026-04-28 12:10:08 CEST
+-- Completed on 2026-05-06 13:04:09 CEST
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict hnow9KHWXE4MfHEE94VXYpQZyi5L3C4s7yMybrhzuNWx9Y0ubfSO2yPc5sz8Kqa
+\unrestrict 10mqGgekEidR8jvkYbV0b6BZR70Zh4FX6eJKAMqgTAummIniw3bLH4UhbM3teZr
 
