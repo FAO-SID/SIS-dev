@@ -4,6 +4,9 @@ CREATE ROLE pycsw WITH LOGIN NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLI
 ALTER ROLE pycsw SET search_path = spatial_metadata;
 CREATE ROLE kobo WITH LOGIN NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD 'kobo';
 ALTER ROLE kobo SET search_path = kobo;
+-- Read-only role used by sis-api-glosis. Grants are applied after the schema dump
+-- runs (see deploy.sh) because the api.vw_api_* views don't exist yet at this point.
+CREATE ROLE sis_glosis WITH LOGIN NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD 'sis_glosis';
 
 -- add extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA public;

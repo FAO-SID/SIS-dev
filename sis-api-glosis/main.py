@@ -1,14 +1,24 @@
 """
-SIS GloSIS API — API key authentication (for applications)
-Read-only data access for GloSIS federation: manifest, profiles, observations, layers, settings.
+SIS GloSIS API — federation read-only data API.
+
+The DB connection uses the read-only `sis_glosis` Postgres role, which has
+SELECT only on the federation views and api.setting (plus INSERT on api.audit
+for logging). Even with a valid token, callers cannot read or write anything
+beyond manifest, profile, and observation.
+
+In addition to the DB-layer guard, every request requires a federation token
+(api.api_client.description = 'glosis-federation') AND the admin must have
+flipped the GLOSIS_FEDERATION_ENABLED setting on.
 """
 
-from fastapi import FastAPI, Depends, Request
+from typing import Annotated, Optional
+from datetime import datetime
+
+from fastapi import FastAPI, Depends, Request, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Optional
 from psycopg2.extras import RealDictCursor
 
-from shared import get_db, log_audit, Layer, Setting, verify_api_key
+from shared import get_db, log_audit
 
 app = FastAPI(
     title="SIS GloSIS API",
@@ -23,43 +33,101 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+async def verify_federation_token(
+    request: Request,
+    x_api_key: Annotated[Optional[str], Header()] = None
+) -> dict:
+    """Validate a GloSIS federation token.
+
+    Two gates:
+    1. api.setting GLOSIS_FEDERATION_ENABLED must be 'true' (admin opt-in).
+    2. The provided X-API-Key must match an active, non-expired row in
+       api.vw_glosis_federation_token (filtered to description='glosis-federation').
+    """
+    if not x_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="API key required. Include X-API-Key header in your request.",
+            headers={"WWW-Authenticate": "ApiKey"}
+        )
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                "SELECT value FROM api.setting WHERE key = 'GLOSIS_FEDERATION_ENABLED'"
+            )
+            row = cur.fetchone()
+            enabled = bool(row and str(row["value"]).strip().lower() == "true")
+            if not enabled:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="GloSIS federation is disabled on this node."
+                )
+
+            cur.execute(
+                "SELECT api_client_id, is_active, expires_at "
+                "FROM api.vw_glosis_federation_token WHERE api_key = %s",
+                (x_api_key,)
+            )
+            client = cur.fetchone()
+            if not client:
+                log_audit(None, None, "glosis_token_invalid",
+                          {"api_key_prefix": x_api_key[:8] + "..."},
+                          request.client.host)
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                    detail="Invalid federation token")
+            if not client["is_active"]:
+                log_audit(None, client["api_client_id"], "glosis_token_inactive",
+                          None, request.client.host)
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                    detail="Federation token is inactive")
+            if client["expires_at"] and client["expires_at"] < datetime.now().date():
+                log_audit(None, client["api_client_id"], "glosis_token_expired",
+                          None, request.client.host)
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                    detail="Federation token has expired")
+            return dict(client)
+
+
 # ==================== GloSIS Federation Endpoints ====================
 
 @app.get("/manifest")
 async def get_manifest(
     request: Request,
-    api_client: dict = Depends(verify_api_key)
+    api_client: dict = Depends(verify_federation_token)
 ):
-    """Get the soil properties manifest."""
+    """Aggregated soil-property manifest for this node."""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT * FROM api.vw_api_manifest")
             data = cur.fetchall()
-            log_audit(None, api_client['api_client_id'], "manifest_accessed",
-                     {"record_count": len(data)}, request.client.host)
+            log_audit(None, api_client["api_client_id"], "glosis_manifest_accessed",
+                      {"record_count": len(data)}, request.client.host)
             return [dict(row) for row in data]
+
 
 @app.get("/profile")
 async def get_profiles(
     request: Request,
-    api_client: dict = Depends(verify_api_key)
+    api_client: dict = Depends(verify_federation_token)
 ):
-    """Get soil profiles."""
+    """Soil profiles for this node."""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT * FROM api.vw_api_profile")
             data = cur.fetchall()
-            log_audit(None, api_client['api_client_id'], "profiles_accessed",
-                     {"record_count": len(data)}, request.client.host)
+            log_audit(None, api_client["api_client_id"], "glosis_profiles_accessed",
+                      {"record_count": len(data)}, request.client.host)
             return [dict(row) for row in data]
+
 
 @app.get("/observation")
 async def get_observations(
     request: Request,
     profile_code: Optional[str] = None,
-    api_client: dict = Depends(verify_api_key)
+    api_client: dict = Depends(verify_federation_token)
 ):
-    """Get observational data, optionally filtered by profile code."""
+    """Observational data, optionally filtered by profile_code."""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             if profile_code:
@@ -70,37 +138,11 @@ async def get_observations(
             else:
                 cur.execute("SELECT * FROM api.vw_api_observation")
             data = cur.fetchall()
-            log_audit(None, api_client['api_client_id'], "observations_accessed",
-                     {"profile_code": profile_code, "record_count": len(data)}, request.client.host)
+            log_audit(None, api_client["api_client_id"], "glosis_observations_accessed",
+                      {"profile_code": profile_code, "record_count": len(data)},
+                      request.client.host)
             return [dict(row) for row in data]
 
-@app.get("/layer", response_model=List[Layer])
-async def get_published_layers(
-    request: Request,
-    api_client: dict = Depends(verify_api_key)
-):
-    """Get published layers only."""
-    with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT * FROM api.layer WHERE LOWER(publish) = 'true' ORDER BY layer_id")
-            layers = cur.fetchall()
-            log_audit(None, api_client['api_client_id'], "published_layers_accessed",
-                     {"layer_count": len(layers)}, request.client.host)
-            return [dict(layer) for layer in layers]
-
-@app.get("/setting", response_model=List[Setting])
-async def get_settings(
-    request: Request,
-    api_client: dict = Depends(verify_api_key)
-):
-    """Get application settings."""
-    with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT key, value FROM api.setting ORDER BY key")
-            settings = cur.fetchall()
-            log_audit(None, api_client['api_client_id'], "settings_accessed",
-                     {"setting_count": len(settings)}, request.client.host)
-            return [dict(s) for s in settings]
 
 # ==================== Health Check & Root ====================
 
@@ -112,6 +154,7 @@ async def root():
         "docs": "/docs",
         "authentication": "Include X-API-Key header in all requests"
     }
+
 
 @app.get("/health")
 async def health_check():

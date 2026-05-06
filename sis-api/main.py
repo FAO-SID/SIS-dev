@@ -13,6 +13,7 @@ import os
 import re
 import csv
 import io
+import secrets
 import psycopg2
 from psycopg2 import sql as pgsql
 from psycopg2.extras import RealDictCursor
@@ -2195,6 +2196,121 @@ async def dashboard_stats(current_user: dict = Depends(get_current_user)):
             out["value_summary"] = cur.fetchall()
 
     return out
+
+
+# ==================== GloSIS Federation (admin) ====================
+
+GLOSIS_FED_DESCRIPTION = "glosis-federation"
+GLOSIS_FED_SETTING = "GLOSIS_FEDERATION_ENABLED"
+
+
+def _glosis_get_enabled(cur) -> bool:
+    cur.execute("SELECT value FROM api.setting WHERE key = %s", (GLOSIS_FED_SETTING,))
+    row = cur.fetchone()
+    return bool(row and str(row["value"]).strip().lower() == "true")
+
+
+def _glosis_get_token(cur):
+    """Return the singleton federation token row (with plaintext api_key) or None.
+
+    Stored plaintext per design — admin needs to be able to copy it back to
+    the Discovery Hub at any time, not just once at generation.
+    """
+    cur.execute("""
+        SELECT api_client_id, api_key, is_active, created_at, last_login
+        FROM api.api_client
+        WHERE description = %s
+        ORDER BY created_at NULLS LAST
+        LIMIT 1
+    """, (GLOSIS_FED_DESCRIPTION,))
+    return cur.fetchone()
+
+
+@app.get("/api/glosis/status")
+async def glosis_status(current_user: dict = Depends(get_current_admin_user)):
+    """Return federation enabled flag and the singleton token metadata (no plaintext)."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            enabled = _glosis_get_enabled(cur)
+            token = _glosis_get_token(cur)
+            return {"enabled": enabled, "token": token}
+
+
+@app.post("/api/glosis/enable")
+async def glosis_enable(current_user: dict = Depends(get_current_admin_user)):
+    """Enable federation. Creates the singleton token if missing (returns plaintext once),
+    or re-activates the existing one if currently inactive (no plaintext returned)."""
+    new_api_key = None
+    new_api_client_id = None
+    audit_action = "glosis_federation_enabled"
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                INSERT INTO api.setting (key, value) VALUES (%s, 'true')
+                ON CONFLICT (key) DO UPDATE SET value = 'true'
+            """, (GLOSIS_FED_SETTING,))
+            existing = _glosis_get_token(cur)
+            if not existing:
+                new_api_key = generate_api_key()
+                new_api_client_id = f"glosis-{secrets.token_urlsafe(8)}"
+                cur.execute("""
+                    INSERT INTO api.api_client (api_client_id, api_key, description, is_active)
+                    VALUES (%s, %s, %s, true)
+                """, (new_api_client_id, new_api_key, GLOSIS_FED_DESCRIPTION))
+                audit_action = "glosis_federation_enabled_token_created"
+            elif not existing["is_active"]:
+                cur.execute("""
+                    UPDATE api.api_client SET is_active = true
+                    WHERE api_client_id = %s
+                """, (existing["api_client_id"],))
+    # log_audit uses its own connection; call after the parent transaction commits
+    log_audit(current_user["user_id"], new_api_client_id,
+              audit_action, None, None)
+    return {
+        "message": "GloSIS federation enabled",
+        "api_key": new_api_key,  # only set on first-ever enable
+        "api_client_id": new_api_client_id,
+    }
+
+
+@app.post("/api/glosis/disable")
+async def glosis_disable(current_user: dict = Depends(get_current_admin_user)):
+    """Disable federation. The token row is kept intact so re-enabling reuses it."""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO api.setting (key, value) VALUES (%s, 'false')
+                ON CONFLICT (key) DO UPDATE SET value = 'false'
+            """, (GLOSIS_FED_SETTING,))
+    log_audit(current_user["user_id"], None, "glosis_federation_disabled", None, None)
+    return {"message": "GloSIS federation disabled"}
+
+
+@app.post("/api/glosis/disable_and_delete")
+async def glosis_disable_and_delete(current_user: dict = Depends(get_current_admin_user)):
+    """Disable federation AND delete the token. Re-enabling later mints a fresh key.
+
+    Audit rows referencing the deleted token have their api_client_id nulled
+    out (rather than cascading the delete) so the audit trail is preserved.
+    """
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO api.setting (key, value) VALUES (%s, 'false')
+                ON CONFLICT (key) DO UPDATE SET value = 'false'
+            """, (GLOSIS_FED_SETTING,))
+            cur.execute("""
+                UPDATE api.audit SET api_client_id = NULL
+                WHERE api_client_id IN (
+                    SELECT api_client_id FROM api.api_client WHERE description = %s
+                )
+            """, (GLOSIS_FED_DESCRIPTION,))
+            cur.execute("""
+                DELETE FROM api.api_client WHERE description = %s
+            """, (GLOSIS_FED_DESCRIPTION,))
+    log_audit(current_user["user_id"], None,
+              "glosis_federation_disabled_and_deleted", None, None)
+    return {"message": "GloSIS federation disabled and token deleted"}
 
 
 @app.get("/")

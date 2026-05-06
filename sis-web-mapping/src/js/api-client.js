@@ -434,6 +434,24 @@ class SISApiClient {
     });
   }
 
+  // ==================== GloSIS Federation (Admin) ====================
+
+  async getGlosisStatus() {
+    return this.authenticatedRequest('/api/glosis/status');
+  }
+
+  async enableGlosis() {
+    return this.authenticatedRequest('/api/glosis/enable', { method: 'POST' });
+  }
+
+  async disableGlosis() {
+    return this.authenticatedRequest('/api/glosis/disable', { method: 'POST' });
+  }
+
+  async disableAndDeleteGlosis() {
+    return this.authenticatedRequest('/api/glosis/disable_and_delete', { method: 'POST' });
+  }
+
   async updateOwnAccount(currentPassword, newUserId, newPassword) {
     const body = { current_password: currentPassword };
     if (newUserId) body.new_user_id = newUserId;

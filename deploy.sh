@@ -83,6 +83,23 @@ sleep 5
 docker exec sis-database psql -d sis -U sis -f /tmp/init.sql
 docker exec sis-database psql -d sis -U sis -f /tmp/sis-database_latest_with_codelist.sql
 
+# Federation-only view of api.api_client (filters tokens by description)
+# and grants for the read-only sis_glosis role used by sis-api-glosis.
+docker exec sis-database psql -d sis -U sis -c "
+    CREATE OR REPLACE VIEW api.vw_glosis_federation_token AS
+    SELECT api_client_id, api_key, is_active, expires_at
+    FROM api.api_client
+    WHERE description = 'glosis-federation';
+    ALTER VIEW api.vw_glosis_federation_token OWNER TO sis;
+
+    GRANT USAGE ON SCHEMA api TO sis_glosis;
+    GRANT SELECT ON TABLE api.vw_api_manifest TO sis_glosis;
+    GRANT SELECT ON TABLE api.vw_api_profile TO sis_glosis;
+    GRANT SELECT ON TABLE api.vw_api_observation TO sis_glosis;
+    GRANT SELECT ON TABLE api.vw_glosis_federation_token TO sis_glosis;
+    GRANT SELECT ON TABLE api.setting TO sis_glosis;
+    GRANT INSERT ON TABLE api.audit TO sis_glosis;"
+
 # insert dummy data for test
 docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
                                                     p_project_id := 'DUMMY_DATA_1',
@@ -137,17 +154,12 @@ curl -s http://localhost:8002/health
 # sis-api-glosis #
 ##################
 
-# # Authentication:
-# # 🎫 API keys (for applications): Long-lived keys for sis and external servers to access data
-
-# # Build and start container
-# docker compose up --build sis-api-glosis -d
-
-# # Test GloSIS API
-# curl http://$HOST_SIS_API/glosis/manifest -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
-# curl http://$HOST_SIS_API/glosis/profile -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
-# curl http://$HOST_SIS_API/glosis/observation -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
-# curl http://$HOST_SIS_API/glosis/layer -H "X-API-Key: ZvupUGGiOeogP3H81CBW4Y1PzJX7ClrfV__L-cJTsf4"
+# Connects as the read-only sis_glosis Postgres role. Federation access is
+# OFF by default — the SIS admin enables it from Administration → GloSIS
+# Federation, which sets api.setting GLOSIS_FEDERATION_ENABLED='true' and
+# generates the token to share with the Discovery Hub.
+docker compose up --build sis-api-glosis -d
+curl -s http://localhost:8006/health
 
 
 ####################

@@ -86,6 +86,7 @@ class AdminDashboard {
       this.renderSettings();
       this.renderUsers();
       this.initViewEditor();
+      this.initGlosis();
     } else {
       if (adminTabBtn) adminTabBtn.style.display = 'none';
       if (adminPane) adminPane.style.display = 'none';
@@ -264,8 +265,32 @@ class AdminDashboard {
                   </form>
                 </div>
               </div>
+
+              <hr class="admin-divider">
+
+              <div class="admin-section" id="glosis-section">
+                <h3 class="admin-section-title">GloSIS Federation</h3>
+                <p style="color:#555;font-size:var(--fs-sm);margin:0 0 var(--sp-3);">
+                  When enabled, this SIS connects to the GloSIS Federation.<br>
+                  The profiles shown in the federation will be the same ones currently visible on this SIS
+                  (customizable under Layers → Soil profiles).<br>
+                  Rasters will be advertised separately via the public metadata catalogue.
+                </p>
+                <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-3);">
+                  <span><strong>Status:</strong> <span id="glosis-status">…</span></span>
+                  <button type="button" class="btn btn-success btn-sm" id="glosis-enable-btn">Enable</button>
+                  <button type="button" class="btn btn-sm" id="glosis-disable-btn" style="background:#ffc107;color:#212529;">Disable</button>
+                  <button type="button" class="btn btn-sm" id="glosis-disable-delete-btn" style="background:#dc3545;color:#fff;">Disable &amp; Delete token</button>
+                </div>
+
+                <div style="margin-bottom:var(--sp-3);">
+                  <strong>Endpoints to share with the GloSIS Discovery Hub:</strong>
+                  <ul id="glosis-endpoints" style="margin:4px 0 0 18px;font-size:var(--fs-sm);"></ul>
+                </div>
+
+              </div>
             </div>
-            
+
             <!-- Dashboard Tab -->
             <div id="dashboard-tab" class="tab-pane">
               <div id="dashboard-empty" style="padding:var(--sp-5,24px);color:#777;">Loading dashboard…</div>
@@ -823,7 +848,7 @@ class AdminDashboard {
     const mapKeys = ['LATITUDE', 'LONGITUDE', 'ZOOM'];
     const keyOrder = ['APP_TITLE', 'ORG_LOGO_URL', 'BASE_MAP_DEFAULT', 'LATITUDE', 'LONGITUDE', 'ZOOM'];
     // Infrastructure settings — kept in DB but hidden from the UI to avoid accidental edits
-    const hiddenKeys = new Set(['DOWNLOAD_BASE_URL']);
+    const hiddenKeys = new Set(['DOWNLOAD_BASE_URL', 'GLOSIS_FEDERATION_ENABLED']);
 
     const visible = this.settings.filter(s => !hiddenKeys.has(s.key));
 
@@ -2486,6 +2511,73 @@ class AdminDashboard {
   }
 
   // handleSaveMapping merged into handleEtlSave
+
+  // ==================== GloSIS Federation ====================
+
+  initGlosis() {
+    const enableBtn = document.getElementById('glosis-enable-btn');
+    const disableBtn = document.getElementById('glosis-disable-btn');
+    const disableDeleteBtn = document.getElementById('glosis-disable-delete-btn');
+    if (!enableBtn || !disableBtn || !disableDeleteBtn) return;
+
+    enableBtn.addEventListener('click', async () => {
+      try {
+        await api.enableGlosis();
+        await this.loadGlosis();
+      } catch (e) {
+        alert('Failed to enable: ' + e.message);
+      }
+    });
+    disableBtn.addEventListener('click', async () => {
+      try { await api.disableGlosis(); await this.loadGlosis(); }
+      catch (e) { alert('Failed to disable: ' + e.message); }
+    });
+    disableDeleteBtn.addEventListener('click', async () => {
+      if (!confirm('Disable federation and delete the token? Re-enabling will mint a new key — the current one stops working.')) return;
+      try { await api.disableAndDeleteGlosis(); await this.loadGlosis(); }
+      catch (e) { alert('Failed: ' + e.message); }
+    });
+
+    this.renderGlosisEndpoints();
+    this.loadGlosis();
+  }
+
+  renderGlosisEndpoints(apiKey) {
+    const ul = document.getElementById('glosis-endpoints');
+    if (!ul) return;
+    const origin = window.location.origin;
+    const tokenDisplay = apiKey
+      ? `<code>${this.escapeHtml(apiKey)}</code>`
+      : '<em>&lt;federation token — Enable to generate&gt;</em>';
+    // sis-api-glosis is exposed on host port 8006 in dev. In prod (nginx-only),
+    // the operator should front it under e.g. /glosis/ — show both.
+    const items = [
+      `<li>Manifest: <code>${origin}:8006/manifest</code> (or via nginx, <code>/glosis/manifest</code>)</li>`,
+      `<li>Profiles: <code>${origin}:8006/profile</code></li>`,
+      `<li>Observations: <code>${origin}:8006/observation</code></li>`,
+      `<li>Header to send: <code>X-API-Key:</code> ${tokenDisplay}</li>`,
+      `<li>Metadata catalogue (rasters, public): <code>${origin}:8003/collections/metadata:main/items</code></li>`,
+    ];
+    ul.innerHTML = items.join('');
+  }
+
+  async loadGlosis() {
+    const statusEl = document.getElementById('glosis-status');
+    if (!statusEl) return;
+    try {
+      const data = await api.getGlosisStatus();
+      const enabled = !!data.enabled;
+      statusEl.textContent = enabled ? 'Enabled' : 'Disabled';
+      statusEl.style.color = enabled ? '#28a745' : '#777';
+      document.getElementById('glosis-enable-btn').disabled = enabled;
+      document.getElementById('glosis-disable-btn').disabled = !enabled;
+      document.getElementById('glosis-disable-delete-btn').disabled = !data.token;
+      this.renderGlosisEndpoints(data.token ? data.token.api_key : null);
+    } catch (e) {
+      statusEl.textContent = 'Error';
+      statusEl.style.color = '#c33';
+    }
+  }
 
   // ==================== Utility ====================
 
