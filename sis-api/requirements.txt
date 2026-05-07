@@ -1,8 +1,12 @@
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
 psycopg2-binary==2.9.9
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
+# Switched from python-jose (unmaintained, CVE-2024-33663/33664) to PyJWT.
+PyJWT[crypto]>=2.8.0,<3.0
+# bcrypt directly — passlib (which only wrapped it) was unmaintained.
+bcrypt>=4.1,<5.0
+# CVE-2024-24762 fixed in 0.0.7; pinning a more recent line.
+python-multipart>=0.0.18,<1.0
 pydantic[email]==2.5.3
-requests==2.31.0
+# CVE-2024-35195 fixed in 2.32.0.
+requests>=2.32.3,<3.0

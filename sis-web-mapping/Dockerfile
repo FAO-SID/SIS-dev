@@ -1,36 +1,39 @@
-FROM node:18-alpine
+# =============================================================================
+# Build stage — Parcel produces a static SPA in /app/dist
+# =============================================================================
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+# No package-lock.json checked in, so use `install` rather than `ci`.
+RUN npm install --no-audit --no-fund
 
-# Install dependencies
-RUN npm install
-
-# Copy source code
 COPY src ./src
 COPY public ./public
-COPY .proxyrc.json ./
 
-# Build arguments for environment variables
+# Build args become inlined at build time via Parcel's process.env.* substitution.
 ARG API_URL=http://localhost
 ARG API_KEY
 ARG MAPSERVER_URL=http://localhost/mapserver
-
-# Set as regular environment variables (not prefixed)
-ENV API_URL=$API_URL
-ENV API_KEY=$API_KEY
-ENV MAPSERVER_URL=$MAPSERVER_URL
 ENV NODE_ENV=production
 
-# Create .env file for Parcel to read at build time
 RUN echo "API_URL=${API_URL}" > .env && \
     echo "API_KEY=${API_KEY}" >> .env && \
     echo "MAPSERVER_URL=${MAPSERVER_URL}" >> .env
 
-# Expose port
-EXPOSE 8000
+# --no-source-maps keeps originals out of the production bundle.
+RUN npx parcel build src/index.html --public-url ./ --no-source-maps
 
-# Start Parcel dev server
-CMD ["npm", "start", "--", "--port", "8000", "--host", "0.0.0.0"]
+# =============================================================================
+# Runtime stage — unprivileged nginx (uid 101) serves the static dist/
+# =============================================================================
+FROM nginxinc/nginx-unprivileged:1.27-alpine
+
+# Replace the default server block with our SPA-friendly config.
+COPY nginx-static.conf /etc/nginx/conf.d/default.conf
+
+# Copy only the built artifacts — no node_modules, no source, no parcel cache.
+COPY --from=builder --chown=101:101 /app/dist /usr/share/nginx/html
+
+EXPOSE 8000

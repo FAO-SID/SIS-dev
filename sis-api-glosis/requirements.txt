@@ -1,6 +1,7 @@
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
 psycopg2-binary==2.9.9
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
+# Switched from python-jose (unmaintained, CVE-2024-33663/33664) to PyJWT.
+PyJWT[crypto]>=2.8.0,<3.0
+bcrypt>=4.1,<5.0
 pydantic[email]==2.5.3

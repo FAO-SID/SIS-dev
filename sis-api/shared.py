@@ -10,7 +10,8 @@ from typing import Optional, Annotated, List
 from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from jose import jwt, JWTError
+import jwt
+from jwt import InvalidTokenError
 import bcrypt
 import secrets
 import os
@@ -65,13 +66,13 @@ class User(BaseModel):
     last_login: Optional[datetime] = None
 
 class UserCreate(BaseModel):
-    user_id: EmailStr
+    user_id: str
     password: str
     is_admin: bool = False
 
 class UserSelfUpdate(BaseModel):
     current_password: str
-    new_user_id: Optional[EmailStr] = None
+    new_user_id: Optional[str] = None
     new_password: Optional[str] = None
 
 class Layer(BaseModel):
@@ -142,12 +143,28 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
-    to_encode.update({"exp": expire})
+    now = datetime.utcnow()
+    expire = now + (expires_delta or timedelta(minutes=15))
+    # iat (issued-at) is used by get_current_user to invalidate tokens whose
+    # owners have rotated their password since the token was issued.
+    to_encode.update({"exp": expire, "iat": now})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def generate_api_key() -> str:
     return secrets.token_urlsafe(32)
+
+def get_client_ip(request) -> Optional[str]:
+    """Return the real client IP, trusting X-Forwarded-For from the upstream
+    proxy (sis-nginx in our deployment). Falls back to the direct connection
+    address. NOTE: in dev, backend ports may be reachable directly, in which
+    case the header can be spoofed — pin trusted proxy IPs at the front
+    door before relying on these audit logs for forensics.
+    """
+    xff = request.headers.get("x-forwarded-for") if hasattr(request, "headers") else None
+    if xff:
+        return xff.split(",")[0].strip()
+    client = getattr(request, "client", None)
+    return client.host if client else None
 
 def log_audit(user_id: Optional[str], api_client_id: Optional[str],
               action: str, details: Optional[dict], ip_address: Optional[str]):
@@ -181,14 +198,23 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         with get_db() as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute(
-                    "SELECT user_id, is_active, is_admin FROM api.user WHERE user_id = %s",
+                    "SELECT user_id, is_active, is_admin, password_changed_at "
+                    "FROM api.user WHERE user_id = %s",
                     (user_id,)
                 )
                 user = cur.fetchone()
                 if user is None or not user['is_active']:
                     raise credentials_exception
+                # Reject tokens issued before the user's last password change.
+                # token "iat" is unix epoch seconds; password_changed_at is a UTC datetime.
+                iat = payload.get("iat")
+                pwd_changed = user.get("password_changed_at")
+                if iat is not None and pwd_changed is not None:
+                    iat_dt = datetime.utcfromtimestamp(int(iat))
+                    if iat_dt < pwd_changed.replace(tzinfo=None):
+                        raise credentials_exception
                 return dict(user)
-    except JWTError:
+    except InvalidTokenError:
         raise credentials_exception
 
 async def get_current_admin_user(current_user: dict = Depends(get_current_user)) -> dict:
@@ -220,15 +246,15 @@ async def verify_api_key(
             client = cur.fetchone()
             if not client:
                 log_audit(None, None, "api_key_invalid_attempt",
-                         {"api_key_prefix": x_api_key[:8] + "..."}, request.client.host)
+                         {"api_key_prefix": x_api_key[:8] + "..."}, get_client_ip(request))
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key")
             if not client['is_active']:
                 log_audit(None, client['api_client_id'], "api_key_inactive_attempt",
-                         None, request.client.host)
+                         None, get_client_ip(request))
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key is inactive")
             if client['expires_at'] and client['expires_at'] < datetime.now().date():
                 log_audit(None, client['api_client_id'], "api_key_expired_attempt",
-                         None, request.client.host)
+                         None, get_client_ip(request))
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key has expired")
             cur.execute(
                 "UPDATE api.api_client SET last_login = %s WHERE api_client_id = %s",

@@ -318,7 +318,7 @@ function createLayerItem(layer) {
     <label for="layer-${layer.layer_id}" title="${layerName}">${layerName}</label>
     <div class="layer-icons">
       ${layer.metadata_url ? `<a href="#" class="metadata-link" data-url="${layer.metadata_url}" title="Metadata"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z'/%3E%3C/svg%3E" alt="Info"></a>` : ''}
-      ${layer.download_url ? `<a href="${layer.download_url}" title="Download"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z'/%3E%3C/svg%3E" alt="Download"></a>` : ''}
+      ${layer.download_url ? `<a href="${layer.download_url}" download title="Download GeoTIFF"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z'/%3E%3C/svg%3E" alt="Download"></a>` : ''}
     </div>
   `;
 
@@ -430,26 +430,44 @@ function createWMSLayer(layerConfig) {
 
 // ==================== Metadata ====================
 
+// Allow only http(s) URLs through; everything else (javascript:, data:, etc.) becomes "#".
+function safeUrl(url) {
+  if (!url) return '#';
+  try {
+    const u = new URL(url, window.location.origin);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '#';
+  } catch (e) { return '#'; }
+}
+
+// Restrictive mailto: builder — only allow simple email-shaped strings.
+function safeMailto(addr) {
+  if (typeof addr !== 'string') return '#';
+  return /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(addr) ? `mailto:${addr}` : '#';
+}
+
 function formatMetadata(metadata) {
+  // Source data is XML records served by pyCSW — escape every interpolation
+  // since records can contain attacker-controlled markup.
+  const e = escapeHtml;
   let html = '';
-  
+
   // Title
   if (metadata.properties?.title) {
-    html += `<h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">${metadata.properties.title}</h3>`;
+    html += `<h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">${e(metadata.properties.title)}</h3>`;
   }
-  
+
   // Description
   if (metadata.properties?.description) {
     html += `<div style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-left: 3px solid #3498db; border-radius: 3px;">
       <strong>Description:</strong><br/>
-      <p style="margin: 8px 0 0 0; line-height: 1.6;">${metadata.properties.description}</p>
+      <p style="margin: 8px 0 0 0; line-height: 1.6;">${e(metadata.properties.description)}</p>
     </div>`;
   }
-  
+
   // Basic Information
   html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Basic Information</h4>';
   html += '<table style="width: 100%; border-collapse: collapse;">';
-  
+
   const basicInfo = [
     { label: 'Type', value: metadata.properties?.type },
     { label: 'Language', value: metadata.properties?.language },
@@ -457,27 +475,27 @@ function formatMetadata(metadata) {
     { label: 'Updated', value: metadata.properties?.updated },
     { label: 'ID', value: metadata.id }
   ];
-  
+
   basicInfo.forEach(item => {
     if (item.value) {
       html += `<tr style="border-bottom: 1px solid #eee;">
-        <td style="padding: 8px; font-weight: bold; width: 30%; color: #555;">${item.label}:</td>
-        <td style="padding: 8px;">${item.value}</td>
+        <td style="padding: 8px; font-weight: bold; width: 30%; color: #555;">${e(item.label)}:</td>
+        <td style="padding: 8px;">${e(item.value)}</td>
       </tr>`;
     }
   });
   html += '</table></div>';
-  
+
   // Keywords
   if (metadata.properties?.keywords && metadata.properties.keywords.length > 0) {
     html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Keywords</h4>';
     html += '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
     metadata.properties.keywords.forEach(keyword => {
-      html += `<span style="background: #e8f4f8; color: #2980b9; padding: 5px 12px; border-radius: 15px; font-size: 13px;">${keyword}</span>`;
+      html += `<span style="background: #e8f4f8; color: #2980b9; padding: 5px 12px; border-radius: 15px; font-size: 13px;">${e(keyword)}</span>`;
     });
     html += '</div></div>';
   }
-  
+
   // Themes
   if (metadata.properties?.themes && metadata.properties.themes.length > 0) {
     html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Themes</h4>';
@@ -485,28 +503,29 @@ function formatMetadata(metadata) {
       if (theme.concepts && theme.concepts.length > 0) {
         html += `<div style="margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 3px;">`;
         if (theme.scheme) {
-          html += `<div style="font-size: 12px; color: #666; margin-bottom: 5px;">${theme.scheme}</div>`;
+          html += `<div style="font-size: 12px; color: #666; margin-bottom: 5px;">${e(theme.scheme)}</div>`;
         }
         theme.concepts.forEach(concept => {
-          html += `<span style="background: #fff; border: 1px solid #ddd; padding: 4px 10px; border-radius: 3px; margin-right: 8px; display: inline-block; margin-bottom: 5px;">${concept.id}</span>`;
+          html += `<span style="background: #fff; border: 1px solid #ddd; padding: 4px 10px; border-radius: 3px; margin-right: 8px; display: inline-block; margin-bottom: 5px;">${e(concept.id)}</span>`;
         });
         html += '</div>';
       }
     });
     html += '</div>';
   }
-  
+
   // Contacts
   if (metadata.properties?.contacts && metadata.properties.contacts.length > 0) {
     html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Contacts</h4>';
     metadata.properties.contacts.forEach((contact) => {
       html += `<div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 5px; border-left: 3px solid #27ae60;">`;
-      if (contact.name) html += `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">${contact.name}</div>`;
-      if (contact.organization) html += `<div style="margin-bottom: 3px;"><strong>Organization:</strong> ${contact.organization}</div>`;
-      if (contact.position) html += `<div style="margin-bottom: 3px;"><strong>Position:</strong> ${contact.position}</div>`;
-      if (contact.roles && contact.roles.length > 0) html += `<div style="margin-bottom: 3px;"><strong>Role:</strong> ${contact.roles.join(', ')}</div>`;
+      if (contact.name) html += `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">${e(contact.name)}</div>`;
+      if (contact.organization) html += `<div style="margin-bottom: 3px;"><strong>Organization:</strong> ${e(contact.organization)}</div>`;
+      if (contact.position) html += `<div style="margin-bottom: 3px;"><strong>Position:</strong> ${e(contact.position)}</div>`;
+      if (contact.roles && contact.roles.length > 0) html += `<div style="margin-bottom: 3px;"><strong>Role:</strong> ${e(contact.roles.join(', '))}</div>`;
       if (contact.emails && contact.emails.length > 0 && contact.emails[0].value) {
-        html += `<div style="margin-bottom: 3px;"><strong>Email:</strong> <a href="mailto:${contact.emails[0].value}" style="color: #3498db;">${contact.emails[0].value}</a></div>`;
+        const email = contact.emails[0].value;
+        html += `<div style="margin-bottom: 3px;"><strong>Email:</strong> <a href="${e(safeMailto(email))}" style="color: #3498db;">${e(email)}</a></div>`;
       }
       if (contact.addresses && contact.addresses.length > 0) {
         const addr = contact.addresses[0];
@@ -516,14 +535,14 @@ function formatMetadata(metadata) {
         if (addr.postalCode) addressParts.push(addr.postalCode);
         if (addr.country) addressParts.push(addr.country);
         if (addressParts.length > 0) {
-          html += `<div style="margin-top: 5px; font-size: 13px; color: #555;">${addressParts.join(', ')}</div>`;
+          html += `<div style="margin-top: 5px; font-size: 13px; color: #555;">${e(addressParts.join(', '))}</div>`;
         }
       }
       html += '</div>';
     });
     html += '</div>';
   }
-  
+
   // Geometry/Extent
   if (metadata.geometry) {
     html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Spatial Extent</h4>';
@@ -532,62 +551,60 @@ function formatMetadata(metadata) {
       const [minLon, minLat] = coords[0];
       const [maxLon, maxLat] = coords[2];
       html += `<div style="padding: 10px; background: #f8f9fa; border-radius: 3px; font-family: monospace; font-size: 13px;">
-        West: ${minLon}° | East: ${maxLon}°<br/>
-        South: ${minLat}° | North: ${maxLat}°
+        West: ${e(String(minLon))}° | East: ${e(String(maxLon))}°<br/>
+        South: ${e(String(minLat))}° | North: ${e(String(maxLat))}°
       </div>`;
     }
     html += '</div>';
   }
-  
+
   // Time Period
   if (metadata.time?.interval) {
     html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Temporal Extent</h4>';
     html += `<div style="padding: 10px; background: #f8f9fa; border-radius: 3px;">
-      From: <strong>${metadata.time.interval[0]}</strong> to <strong>${metadata.time.interval[1]}</strong>
+      From: <strong>${e(metadata.time.interval[0])}</strong> to <strong>${e(metadata.time.interval[1])}</strong>
     </div></div>`;
   }
-  
+
   // Formats
   if (metadata.properties?.formats && metadata.properties.formats.length > 0) {
     html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Available Formats</h4>';
     html += '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
     metadata.properties.formats.forEach(format => {
-      html += `<span style="background: #e8f4f8; padding: 5px 12px; border-radius: 3px; font-size: 13px; border: 1px solid #3498db;">${format.name}</span>`;
+      html += `<span style="background: #e8f4f8; padding: 5px 12px; border-radius: 3px; font-size: 13px; border: 1px solid #3498db;">${e(format.name)}</span>`;
     });
     html += '</div></div>';
   }
-  
+
   // Links
   if (metadata.links && metadata.links.length > 0) {
-    // Filter out 'preview' - only keep 'information' and 'download'
-    const dataLinks = metadata.links.filter(link => 
+    const dataLinks = metadata.links.filter(link =>
       link.rel === 'information' || link.rel === 'download'
     );
-    
+
     if (dataLinks.length > 0) {
       html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Data Access Links</h4>';
       html += '<div style="display: flex; flex-direction: column; gap: 8px;">';
-      
+
       dataLinks.forEach(link => {
-        // Removed preview emoji - only download and information
         const linkType = link.rel === 'download' ? '📥' : '🔗';
         const linkName = link.name || link.title || link.rel;
-        html += `<a href="${link.href}" target="_blank" style="padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; color: #2c3e50; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" 
+        const safeHref = safeUrl(link.href);
+        html += `<a href="${e(safeHref)}" target="_blank" rel="noopener noreferrer" style="padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; color: #2c3e50; display: flex; align-items: center; gap: 10px; transition: all 0.2s;"
           onmouseover="this.style.background='#f0f0f0'; this.style.borderColor='#3498db';"
           onmouseout="this.style.background='#fff'; this.style.borderColor='#ddd';">
           <span style="font-size: 20px;">${linkType}</span>
           <div style="flex: 1;">
-            <div style="font-weight: bold;">${linkName}</div>
-            ${link.protocol ? `<div style="font-size: 12px; color: #666;">${link.protocol}</div>` : ''}
+            <div style="font-weight: bold;">${e(linkName)}</div>
+            ${link.protocol ? `<div style="font-size: 12px; color: #666;">${e(link.protocol)}</div>` : ''}
           </div>
         </a>`;
       });
-      
-      html += '</div></div>';
-  }
-}
 
-  
+      html += '</div></div>';
+    }
+  }
+
   return html;
 }
 
@@ -1710,9 +1727,14 @@ function downloadProfilesCsv() {
     return;
   }
   const { filtered, columns } = modal._state;
+  // Defuse Excel/LibreOffice formula injection: cells that begin with =, +,
+  // -, @, tab, or CR get a leading apostrophe so spreadsheet apps treat
+  // them as text. https://owasp.org/www-community/attacks/CSV_Injection
+  const defuse = (s) => /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
   const csv = [columns.join(',')].concat(
     filtered.map(r => columns.map(c => {
-      const v = r[c] == null ? '' : String(r[c]);
+      const raw = r[c] == null ? '' : String(r[c]);
+      const v = defuse(raw);
       return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
     }).join(','))
   ).join('\n');

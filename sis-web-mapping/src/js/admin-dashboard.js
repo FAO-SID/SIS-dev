@@ -234,7 +234,7 @@ class AdminDashboard {
                 <table class="admin-table" id="users-table">
                   <thead>
                     <tr>
-                      <th>Email</th>
+                      <th>Username</th>
                       <th>Admin</th>
                       <th>Active</th>
                       <th>Created</th>
@@ -250,8 +250,8 @@ class AdminDashboard {
                 <div style="margin-top:var(--sp-3);">
                   <form id="user-form" style="display:flex;align-items:flex-end;gap:var(--sp-3);flex-wrap:wrap;">
                     <div class="form-group" style="margin:0;">
-                      <label for="user-email" style="font-size:var(--fs-xs);margin-bottom:2px;">Email</label>
-                      <input type="email" id="user-email" required style="padding:4px 8px;font-size:var(--fs-sm);">
+                      <label for="user-email" style="font-size:var(--fs-xs);margin-bottom:2px;">Username</label>
+                      <input type="text" id="user-email" required style="padding:4px 8px;font-size:var(--fs-sm);">
                     </div>
                     <div class="form-group" style="margin:0;">
                       <label for="user-password" style="font-size:var(--fs-xs);margin-bottom:2px;">Password</label>
@@ -527,8 +527,8 @@ class AdminDashboard {
                 <form id="account-form" style="display:grid;grid-template-columns:auto 220px;gap:var(--sp-2) var(--sp-3);align-items:center;">
                   <label for="account-current-password" style="font-size:var(--fs-sm);white-space:nowrap;">Current Password *</label>
                   <input type="password" id="account-current-password" required style="padding:4px 8px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;">
-                  <label for="account-new-email" style="font-size:var(--fs-sm);white-space:nowrap;">New Email</label>
-                  <input type="email" id="account-new-email" placeholder="Keep current" style="padding:4px 8px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;">
+                  <label for="account-new-email" style="font-size:var(--fs-sm);white-space:nowrap;">New username</label>
+                  <input type="text" id="account-new-email" placeholder="Keep current" style="padding:4px 8px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;">
                   <label for="account-new-password" style="font-size:var(--fs-sm);white-space:nowrap;">New Password</label>
                   <input type="password" id="account-new-password" placeholder="Keep current" style="padding:4px 8px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;">
                   <div></div>
@@ -1010,7 +1010,7 @@ class AdminDashboard {
       const isOnlyAdmin = u.is_admin && adminCount <= 1;
       const deleteBtn = isOnlyAdmin
         ? ''
-        : `<button class="btn btn-danger btn-sm" onclick="adminDashboard.deleteUser('${this.escapeHtml(u.user_id)}')">Delete</button>`;
+        : `<button class="btn btn-danger btn-sm" onclick="adminDashboard.deleteUser('${this.escapeJsAttr(u.user_id)}')">Delete</button>`;
       let activeLabel;
       if (isOnlyAdmin) {
         activeLabel = '<span class="badge badge-success" title="Only admin — cannot deactivate">Yes</span>';
@@ -1103,10 +1103,11 @@ class AdminDashboard {
     const editStyle = 'padding:2px 6px;font-size:var(--fs-sm);width:100%;box-sizing:border-box;background:transparent;border:1px solid transparent;';
     tbody.innerHTML = this.layers.map(layer => {
       const id = this.escapeHtml(layer.layer_id);
+      const idJs = this.escapeJsAttr(layer.layer_id);
       const defaultCell = layer.is_default
         ? `<button class="btn btn-secondary" onclick="adminDashboard.clearDefaultLayer()">Clear Default</button>`
         : (layer.publish
-            ? `<button class="btn btn-primary" onclick="adminDashboard.setDefaultLayer('${id}')">Set Default</button>`
+            ? `<button class="btn btn-primary" onclick="adminDashboard.setDefaultLayer('${idJs}')">Set Default</button>`
             : '-');
       const downloadUrl = layer.download_url
         || (downloadBase.replace(/\/$/, '') + '/' + layer.layer_id + '.tif');
@@ -1118,7 +1119,7 @@ class AdminDashboard {
         <td><input class="layer-edit" data-layer-id="${id}" data-field="property_name" value="${this.escapeHtml(layer.property_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit"></td>
         <td>
           <button class="btn ${layer.publish ? 'btn-secondary' : 'btn-success'}"
-                  onclick="adminDashboard.toggleLayerPublish('${id}', ${!layer.publish})">
+                  onclick="adminDashboard.toggleLayerPublish('${idJs}', ${!layer.publish})">
             ${layer.publish ? 'Unpublish' : 'Publish'}
           </button>
         </td>
@@ -2014,6 +2015,7 @@ class AdminDashboard {
         <thead><tr><th>Table</th><th>User</th><th>Uploaded</th><th>Ingested</th><th>Status</th><th>Cols</th><th>Rows</th><th>Actions</th><th>Result</th></tr></thead>
         <tbody>${this.etlDatasets.map(d => {
           const tn = this.escapeHtml(d.table_name);
+          const tnJs = this.escapeJsAttr(d.table_name);
           const ingested = d.status === 'Ingested' || d.status === 'Partial';
           const noPrune = d.status === 'Uploaded' || d.status === 'Removed' || !d.status;
           return `<tr data-table="${tn}">
@@ -2025,10 +2027,10 @@ class AdminDashboard {
             <td>${d.n_col ?? '-'}</td>
             <td>${d.n_rows ?? '-'}</td>
             <td>
-              <button class="btn btn-primary btn-sm" onclick="adminDashboard.openDataset('${tn}')">Open</button>
-              <button class="btn btn-sm" style="background:#28a745;color:#fff;margin-left:4px;${ingested ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.ingestDataset('${tn}')"${ingested ? ' disabled' : ''}>Ingest</button>
-              <button class="btn btn-sm" style="background:#dc3545;color:#fff;margin-left:4px;${noPrune ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.pruneDataset('${tn}')"${noPrune ? ' disabled' : ''}>Prune DB</button>
-              ${this.isAdmin ? `<button class="btn btn-sm" style="background:#6c757d;color:#fff;margin-left:4px;" onclick="adminDashboard.deleteDataset('${tn}')">Delete</button>` : ''}
+              <button class="btn btn-primary btn-sm" onclick="adminDashboard.openDataset('${tnJs}')">Open</button>
+              <button class="btn btn-sm" style="background:#28a745;color:#fff;margin-left:4px;${ingested ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.ingestDataset('${tnJs}')"${ingested ? ' disabled' : ''}>Ingest</button>
+              <button class="btn btn-sm" style="background:#dc3545;color:#fff;margin-left:4px;${noPrune ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.pruneDataset('${tnJs}')"${noPrune ? ' disabled' : ''}>Prune DB</button>
+              ${this.isAdmin ? `<button class="btn btn-sm" style="background:#6c757d;color:#fff;margin-left:4px;" onclick="adminDashboard.deleteDataset('${tnJs}')">Delete</button>` : ''}
             </td>
             <td class="etl-result" style="font-size:var(--fs-xs);max-width:300px;white-space:pre-wrap;">${this.escapeHtml(d.note || '')}</td>
           </tr>`;
@@ -2611,6 +2613,21 @@ class AdminDashboard {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Escape a value so it can appear inside a single-quoted JS string literal
+  // that is itself inside an HTML attribute. Protects against payloads like
+  // ');alert(1);// breaking out of the JS string and executing.
+  escapeJsAttr(text) {
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '&quot;')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\r?\n/g, '\\n');
   }
 }
 

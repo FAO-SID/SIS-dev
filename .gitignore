@@ -1,1 +1,4 @@
 ﻿/sis-database/volume/
+
+# Per-deployment secrets — never commit. Use .env.example as a template.
+.env

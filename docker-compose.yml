@@ -18,6 +18,12 @@ services:
 
 
   # sis-database (PostgreSQL)
+  # NOT published to the host. Use `docker exec sis-database psql -U sis -d sis`
+  # for local administration. To expose to the host for tooling like pgAdmin,
+  # use a per-developer docker-compose.override.yml (gitignored) that adds:
+  #   sis-database:
+  #     ports:
+  #       - "127.0.0.1:8005:5432"
   sis-database:
     container_name: sis-database
     image: postgis/postgis:17-3.5
@@ -25,8 +31,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "8005:5432"
+    expose:
+      - "5432"
     volumes:
       - ./sis-database/volume:/var/lib/postgresql/data
     networks:
@@ -84,9 +90,12 @@ services:
     restart: unless-stopped
 
   # sis-metadata (pyCSW)
+  # 3.0.0-beta1 is a pre-release. Pinned by digest below for reproducibility
+  # (so future `docker pull` doesn't silently swap implementations on us).
+  # Re-pin to a stable 3.0.x tag once geopython publishes one.
   sis-metadata:
     container_name: sis-metadata
-    image: geopython/pycsw:3.0.0-beta1
+    image: geopython/pycsw:3.0.0-beta1@sha256:e17ecf1fe5271ed2671ca27a49561d07b597927889f55242dfb65c24003f7bca
     environment:
       PYCSW_SERVER_URL: http://localhost:8003
       POSTGRES_HOST: ${POSTGRES_HOST}

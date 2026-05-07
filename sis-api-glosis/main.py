@@ -11,6 +11,7 @@ In addition to the DB-layer guard, every request requires a federation token
 flipped the GLOSIS_FEDERATION_ENABLED setting on.
 """
 
+import os
 from typing import Annotated, Optional
 from datetime import datetime
 
@@ -18,12 +19,18 @@ from fastapi import FastAPI, Depends, Request, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from psycopg2.extras import RealDictCursor
 
-from shared import get_db, log_audit
+from shared import get_db, log_audit, get_client_ip
 
+# /docs, /redoc, /openapi.json reveal the full API surface to anonymous
+# callers. Off by default; set ENABLE_DOCS=true in the env for local dev.
+_docs_on = os.getenv("ENABLE_DOCS", "false").strip().lower() == "true"
 app = FastAPI(
     title="SIS GloSIS API",
     description="API key-protected read-only API for GloSIS federation data access.",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url="/docs" if _docs_on else None,
+    redoc_url="/redoc" if _docs_on else None,
+    openapi_url="/openapi.json" if _docs_on else None,
 )
 
 app.add_middleware(
@@ -73,17 +80,17 @@ async def verify_federation_token(
             if not client:
                 log_audit(None, None, "glosis_token_invalid",
                           {"api_key_prefix": x_api_key[:8] + "..."},
-                          request.client.host)
+                          get_client_ip(request))
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                     detail="Invalid federation token")
             if not client["is_active"]:
                 log_audit(None, client["api_client_id"], "glosis_token_inactive",
-                          None, request.client.host)
+                          None, get_client_ip(request))
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                     detail="Federation token is inactive")
             if client["expires_at"] and client["expires_at"] < datetime.now().date():
                 log_audit(None, client["api_client_id"], "glosis_token_expired",
-                          None, request.client.host)
+                          None, get_client_ip(request))
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                     detail="Federation token has expired")
             return dict(client)
@@ -102,7 +109,7 @@ async def get_manifest(
             cur.execute("SELECT * FROM api.vw_api_manifest")
             data = cur.fetchall()
             log_audit(None, api_client["api_client_id"], "glosis_manifest_accessed",
-                      {"record_count": len(data)}, request.client.host)
+                      {"record_count": len(data)}, get_client_ip(request))
             return [dict(row) for row in data]
 
 
@@ -117,7 +124,7 @@ async def get_profiles(
             cur.execute("SELECT * FROM api.vw_api_profile")
             data = cur.fetchall()
             log_audit(None, api_client["api_client_id"], "glosis_profiles_accessed",
-                      {"record_count": len(data)}, request.client.host)
+                      {"record_count": len(data)}, get_client_ip(request))
             return [dict(row) for row in data]
 
 
@@ -140,7 +147,7 @@ async def get_observations(
             data = cur.fetchall()
             log_audit(None, api_client["api_client_id"], "glosis_observations_accessed",
                       {"profile_code": profile_code, "record_count": len(data)},
-                      request.client.host)
+                      get_client_ip(request))
             return [dict(row) for row in data]
 
 
@@ -162,6 +169,7 @@ async def health_check():
         with get_db() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT 1")
-        return {"status": "healthy", "database": "connected"}
-    except Exception as e:
-        return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
+        return {"status": "healthy"}
+    except Exception:
+        # Don't leak DB error strings to anonymous callers.
+        return {"status": "unhealthy"}

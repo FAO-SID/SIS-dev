@@ -83,7 +83,7 @@ metadata:
             end: YYYY-MM-DD
  
 repository:
-    database: 'postgresql://sis:sis@sis-database:5432/sis'
+    database: 'postgresql://sis:__POSTGRES_PASSWORD__@sis-database:5432/sis'
     table: spatial_metadata.records
     facets:
         - type

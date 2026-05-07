@@ -21,7 +21,7 @@ import requests as http_requests
 
 from shared import (
     DB_CONFIG, ACCESS_TOKEN_EXPIRE_MINUTES,
-    get_db, log_audit,
+    get_db, log_audit, get_client_ip,
     hash_password, verify_password, create_access_token,
     generate_api_key,
     UserLogin, Token, User, UserCreate, UserSelfUpdate, Layer, LayerCreate, PublishUpdate,
@@ -29,10 +29,16 @@ from shared import (
     get_current_user, get_current_admin_user, verify_api_key,
 )
 
+# /docs, /redoc, /openapi.json reveal the full API surface. Off by default;
+# set ENABLE_DOCS=true in the env to re-enable for local development.
+_docs_on = os.getenv("ENABLE_DOCS", "false").strip().lower() == "true"
 app = FastAPI(
     title="SIS Admin API",
     description="JWT-protected API for managing users, API clients, layers, and settings.",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url="/docs" if _docs_on else None,
+    redoc_url="/redoc" if _docs_on else None,
+    openapi_url="/openapi.json" if _docs_on else None,
 )
 
 app.add_middleware(
@@ -41,7 +47,6 @@ app.add_middleware(
         "http://localhost",
         "http://localhost:80",
         "http://localhost:8001",
-        "*"  # For development - remove in production!
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -50,32 +55,81 @@ app.add_middleware(
 
 # ==================== Authentication ====================
 
+LOGIN_MAX_ATTEMPTS = 5
+LOGIN_LOCKOUT_MINUTES = 15
+
 @app.post("/api/auth/login", response_model=Token)
 async def login(user_credentials: UserLogin, request: Request):
-    """Login with email/password — returns a JWT token."""
+    """Login with email/password — returns a JWT token.
+
+    After LOGIN_MAX_ATTEMPTS consecutive failures the account is locked for
+    LOGIN_LOCKOUT_MINUTES. A successful login resets the counter.
+    """
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
-                "SELECT user_id, password_hash, is_active FROM api.user WHERE user_id = %s",
+                "SELECT user_id, password_hash, is_active, "
+                "       failed_login_attempts, locked_until "
+                "FROM api.user WHERE user_id = %s",
                 (user_credentials.user_id,)
             )
             user = cur.fetchone()
-            if not user or not verify_password(user_credentials.password, user['password_hash']):
-                log_audit(user_credentials.user_id, None, "login_failed", None, request.client.host)
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Incorrect username or password"
-                )
+
+            # Generic auth-error response — same message for unknown user / bad
+            # password / locked account so we don't leak which one it was.
+            generic_unauthorized = HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password"
+            )
+
+            if not user:
+                log_audit(user_credentials.user_id, None, "login_failed",
+                          {"reason": "unknown_user"}, get_client_ip(request))
+                raise generic_unauthorized
+
+            # Lockout window still active?
+            if user.get("locked_until") and user["locked_until"] > datetime.now(user["locked_until"].tzinfo):
+                log_audit(user["user_id"], None, "login_locked",
+                          {"locked_until": user["locked_until"].isoformat()},
+                          get_client_ip(request))
+                raise generic_unauthorized
+
+            if not verify_password(user_credentials.password, user['password_hash']):
+                # Increment failed counter; lock if threshold reached
+                attempts = (user.get("failed_login_attempts") or 0) + 1
+                if attempts >= LOGIN_MAX_ATTEMPTS:
+                    cur.execute(
+                        "UPDATE api.user SET failed_login_attempts = %s, "
+                        "       locked_until = now() + (%s || ' minutes')::interval "
+                        "WHERE user_id = %s",
+                        (attempts, LOGIN_LOCKOUT_MINUTES, user["user_id"])
+                    )
+                    log_audit(user["user_id"], None, "login_account_locked",
+                              {"attempts": attempts}, get_client_ip(request))
+                else:
+                    cur.execute(
+                        "UPDATE api.user SET failed_login_attempts = %s "
+                        "WHERE user_id = %s",
+                        (attempts, user["user_id"])
+                    )
+                    log_audit(user["user_id"], None, "login_failed",
+                              {"attempts": attempts}, get_client_ip(request))
+                raise generic_unauthorized
+
             if not user['is_active']:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="User account is inactive"
                 )
+
+            # Successful login — reset lockout state
             cur.execute(
-                "UPDATE api.user SET last_login = %s WHERE user_id = %s",
+                "UPDATE api.user SET last_login = %s, "
+                "       failed_login_attempts = 0, locked_until = NULL "
+                "WHERE user_id = %s",
                 (datetime.now(), user['user_id'])
             )
-            log_audit(user['user_id'], None, "login_success", None, request.client.host)
+            log_audit(user['user_id'], None, "login_success", None, get_client_ip(request))
             access_token = create_access_token(
                 data={"sub": user['user_id']},
                 expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -111,13 +165,17 @@ async def update_own_account(
                     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                         detail="Email already in use")
 
+            # Bump password_changed_at on every password change so old JWTs
+            # for this user are rejected by get_current_user (see shared.py).
             if payload.new_password and payload.new_user_id:
                 cur.execute(
-                    "UPDATE api.user SET user_id = %s, password_hash = %s WHERE user_id = %s",
+                    "UPDATE api.user SET user_id = %s, password_hash = %s, "
+                    "password_changed_at = now() WHERE user_id = %s",
                     (payload.new_user_id, hash_password(payload.new_password), current_user['user_id']))
             elif payload.new_password:
                 cur.execute(
-                    "UPDATE api.user SET password_hash = %s WHERE user_id = %s",
+                    "UPDATE api.user SET password_hash = %s, password_changed_at = now() "
+                    "WHERE user_id = %s",
                     (hash_password(payload.new_password), current_user['user_id']))
             elif payload.new_user_id:
                 cur.execute(
@@ -406,7 +464,7 @@ async def get_all_layers(current_user: dict = Depends(get_current_user)):
 # ==================== Settings Management ====================
 
 @app.post("/api/setting", status_code=status.HTTP_201_CREATED)
-async def create_setting(setting: SettingCreate, current_user: dict = Depends(get_current_user)):
+async def create_setting(setting: SettingCreate, current_user: dict = Depends(get_current_admin_user)):
     """Create a new setting."""
     with get_db() as conn:
         with conn.cursor() as cur:
@@ -424,7 +482,7 @@ async def create_setting(setting: SettingCreate, current_user: dict = Depends(ge
 async def update_setting(
     key: str,
     setting_update: SettingUpdate,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_admin_user)
 ):
     """Update a setting value."""
     with get_db() as conn:
@@ -436,7 +494,7 @@ async def update_setting(
             return {"message": "Setting updated successfully"}
 
 @app.delete("/api/setting/{key}")
-async def delete_setting(key: str, current_user: dict = Depends(get_current_user)):
+async def delete_setting(key: str, current_user: dict = Depends(get_current_admin_user)):
     """Delete a setting."""
     with get_db() as conn:
         with conn.cursor() as cur:
@@ -469,7 +527,7 @@ async def get_published_layers(
             cur.execute("SELECT * FROM api.layer WHERE LOWER(publish) = 'true' ORDER BY layer_id")
             layers = cur.fetchall()
             log_audit(None, api_client['api_client_id'], "published_layers_accessed",
-                     {"layer_count": len(layers)}, request.client.host)
+                     {"layer_count": len(layers)}, get_client_ip(request))
             return [dict(layer) for layer in layers]
 
 @app.get("/api/setting", response_model=List[Setting])
@@ -483,7 +541,7 @@ async def get_settings(
             cur.execute("SELECT key, value FROM api.setting ORDER BY key")
             settings = cur.fetchall()
             log_audit(None, api_client['api_client_id'], "settings_accessed",
-                     {"setting_count": len(settings)}, request.client.host)
+                     {"setting_count": len(settings)}, get_client_ip(request))
             return [dict(s) for s in settings]
 
 @app.get("/api/manifest")
@@ -497,7 +555,7 @@ async def get_manifest(
             cur.execute("SELECT * FROM api.vw_api_manifest")
             data = cur.fetchall()
             log_audit(None, api_client['api_client_id'], "manifest_accessed",
-                     {"record_count": len(data)}, request.client.host)
+                     {"record_count": len(data)}, get_client_ip(request))
             return [dict(row) for row in data]
 
 @app.get("/api/profile")
@@ -511,7 +569,7 @@ async def get_profiles(
             cur.execute("SELECT * FROM api.vw_api_profile")
             data = cur.fetchall()
             log_audit(None, api_client['api_client_id'], "profiles_accessed",
-                     {"record_count": len(data)}, request.client.host)
+                     {"record_count": len(data)}, get_client_ip(request))
             return [dict(row) for row in data]
 
 @app.get("/api/observation")
@@ -533,13 +591,29 @@ async def get_observations(
             data = cur.fetchall()
             log_audit(None, api_client['api_client_id'], "observations_accessed",
                      {"profile_code": profile_code, "record_count": len(data)},
-                     request.client.host)
+                     get_client_ip(request))
             return [dict(row) for row in data]
 
 # ==================== Metadata Sync ====================
 
 PYCSW_URL = os.getenv("PYCSW_URL", "http://sis-metadata:8000")
 MAPSERVER_WMS_URL = os.getenv("MAPSERVER_WMS_URL", "http://localhost:8004")
+
+def _validate_pycsw_url(url: str) -> str:
+    """Reject anything that isn't an http(s) URL pointing at our metadata
+    container. Hardcoding the parser stops a future bug from turning
+    PYCSW_URL into a user-controlled SSRF vector."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise HTTPException(status_code=500, detail="PYCSW_URL must be http(s)")
+    # Allow only the docker hostname or explicit operator-trusted hosts.
+    allowed_hosts = {"sis-metadata", "localhost", "127.0.0.1"}
+    if parsed.hostname not in allowed_hosts:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PYCSW_URL host '{parsed.hostname}' is not in the allowlist"
+        )
+    return url
 
 
 def _parse_layer_id(info_href: str):
@@ -580,15 +654,16 @@ def _parse_property_name(title: str) -> str:
 
 
 @app.post("/api/sync/layers")
-async def sync_layers_from_metadata(current_user: dict = Depends(get_current_admin_user)):
+async def sync_layers_from_metadata(current_user: dict = Depends(get_current_user)):
     """Sync api.layer with records from the sis-metadata (pyCSW) server.
 
     Preserves manually-curated fields (project_name, unit_of_measure_id) on existing rows.
     """
     try:
+        _validate_pycsw_url(PYCSW_URL)
         resp = http_requests.get(
             f"{PYCSW_URL}/collections/metadata:main/items?f=json&limit=1000",
-            timeout=30)
+            timeout=30, allow_redirects=False)
         resp.raise_for_status()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY,
@@ -938,6 +1013,9 @@ async def get_project_authors(project_id: str, current_user: dict = Depends(get_
             """, (project_id,))
             return cur.fetchall()
 
+CSV_UPLOAD_MAX_BYTES = 50 * 1024 * 1024   # 50 MB
+CSV_UPLOAD_MAX_ROWS  = 200_000
+
 @app.post("/api/etl/upload")
 async def upload_csv(
     file: UploadFile = File(...),
@@ -948,12 +1026,23 @@ async def upload_csv(
     if not file.filename or not file.filename.lower().endswith('.csv'):
         raise HTTPException(status_code=400, detail="Only CSV files are accepted")
 
-    contents = await file.read()
+    # Read with a hard byte cap so a malicious or runaway upload can't OOM us.
+    contents = await file.read(CSV_UPLOAD_MAX_BYTES + 1)
+    if len(contents) > CSV_UPLOAD_MAX_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"CSV exceeds {CSV_UPLOAD_MAX_BYTES // (1024 * 1024)} MB limit"
+        )
     text = contents.decode('utf-8-sig')
     reader = csv.reader(io.StringIO(text))
     rows = list(reader)
     if len(rows) < 2:
         raise HTTPException(status_code=400, detail="CSV must have a header row and at least one data row")
+    if len(rows) - 1 > CSV_UPLOAD_MAX_ROWS:
+        raise HTTPException(
+            status_code=413,
+            detail=f"CSV exceeds {CSV_UPLOAD_MAX_ROWS} data-row limit"
+        )
 
     raw_headers = [h.strip() for h in rows[0]]
     data_rows = rows[1:]
@@ -965,8 +1054,11 @@ async def upload_csv(
 
     headers = [sanitize_col(h) for h in raw_headers]
 
-    # Build a safe table name: sanitized filename + timestamp
-    base_name = re.sub(r'[^a-zA-Z0-9_]', '_', file.filename.rsplit('.', 1)[0]).lower()
+    # Build a safe table name. Postgres truncates identifiers at 63 chars, so
+    # if two long filenames sanitize to the same prefix the second upload's
+    # CREATE TABLE silently collides with the first. Cap the base at 40 chars
+    # (timestamp suffix is 16 chars + an underscore = 57, well under 63).
+    base_name = re.sub(r'[^a-zA-Z0-9_]', '_', file.filename.rsplit('.', 1)[0]).lower()[:40]
     ts = datetime.now().strftime('%Y%m%d_%H%M%S')
     table_name = f"{base_name}_{ts}"
 
@@ -2311,6 +2403,7 @@ async def health_check():
         with get_db() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT 1")
-        return {"status": "healthy", "database": "connected"}
-    except Exception as e:
-        return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
+        return {"status": "healthy"}
+    except Exception:
+        # Don't leak DB error strings (may include creds/hostnames) to anonymous callers.
+        return {"status": "unhealthy"}
