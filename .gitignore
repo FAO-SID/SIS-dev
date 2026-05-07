@@ -2,3 +2,6 @@
 
 # Per-deployment secrets — never commit. Use .env.example as a template.
 .env
+
+# Working notes, not for the public repo
+PRODUCTION-PLAN.md
