@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict L1gZGqlSRJQHh5ENaRmroyTiVZk6mRpswbOMOmWwbiVooFpfvmP7bezHDsG0qTs
+\restrict 2I6KQYuaZqxtdfOOcE9AKthsozWRLGeBmREG7qWqKTM0IAh6thiu4aAUoBTjSDc
 
 -- Dumped from database version 12.22 (Ubuntu 12.22-3.pgdg22.04+1)
 -- Dumped by pg_dump version 18.3 (Ubuntu 18.3-1.pgdg22.04+1)
 
--- Started on 2026-05-07 19:42:58 CEST
+-- Started on 2026-05-09 10:49:17 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,7 +22,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 11 (class 2615 OID 55588427)
+-- TOC entry 11 (class 2615 OID 55596936)
 -- Name: api; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -41,7 +41,7 @@ COMMENT ON SCHEMA api IS 'REST API tables';
 
 
 --
--- TOC entry 12 (class 2615 OID 55588428)
+-- TOC entry 12 (class 2615 OID 55596937)
 -- Name: kobo; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -70,7 +70,7 @@ COMMENT ON SCHEMA kobo IS 'GloSIS data collection database schema';
 ALTER SCHEMA public OWNER TO sis;
 
 --
--- TOC entry 14 (class 2615 OID 55588429)
+-- TOC entry 14 (class 2615 OID 55596938)
 -- Name: soil_data; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -89,7 +89,7 @@ COMMENT ON SCHEMA soil_data IS 'Core entities and relations from the ISO-28258 d
 
 
 --
--- TOC entry 15 (class 2615 OID 55588430)
+-- TOC entry 15 (class 2615 OID 55596939)
 -- Name: soil_data_upload; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -108,7 +108,7 @@ COMMENT ON SCHEMA soil_data_upload IS 'Schema to upload soil data';
 
 
 --
--- TOC entry 16 (class 2615 OID 55588431)
+-- TOC entry 16 (class 2615 OID 55596940)
 -- Name: spatial_metadata; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -127,7 +127,7 @@ COMMENT ON SCHEMA spatial_metadata IS 'Schema for spatial metadata';
 
 
 --
--- TOC entry 5 (class 3079 OID 55586692)
+-- TOC entry 5 (class 3079 OID 55595201)
 -- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -144,7 +144,7 @@ COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types an
 
 
 --
--- TOC entry 4 (class 3079 OID 55587778)
+-- TOC entry 4 (class 3079 OID 55596287)
 -- Name: postgis_raster; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -161,7 +161,7 @@ COMMENT ON EXTENSION postgis_raster IS 'PostGIS raster types and functions';
 
 
 --
--- TOC entry 3 (class 3079 OID 55588339)
+-- TOC entry 3 (class 3079 OID 55596848)
 -- Name: postgis_sfcgal; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -178,7 +178,7 @@ COMMENT ON EXTENSION postgis_sfcgal IS 'PostGIS SFCGAL functions';
 
 
 --
--- TOC entry 2 (class 3079 OID 55588416)
+-- TOC entry 2 (class 3079 OID 55596925)
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -195,7 +195,7 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 
 
 --
--- TOC entry 1651 (class 1255 OID 55589528)
+-- TOC entry 1645 (class 1255 OID 55596941)
 -- Name: audit_no_modify(); Type: FUNCTION; Schema: api; Owner: sis
 --
 
@@ -219,7 +219,7 @@ $$;
 ALTER FUNCTION api.audit_no_modify() OWNER TO sis;
 
 --
--- TOC entry 1645 (class 1255 OID 55588432)
+-- TOC entry 1646 (class 1255 OID 55596942)
 -- Name: blur_geom(public.geometry, text, integer); Type: FUNCTION; Schema: api; Owner: sis
 --
 
@@ -245,7 +245,7 @@ $$;
 ALTER FUNCTION api.blur_geom(g public.geometry, seed text, radius_m integer) OWNER TO sis;
 
 --
--- TOC entry 1646 (class 1255 OID 55588433)
+-- TOC entry 1647 (class 1255 OID 55596943)
 -- Name: insert_dummy_data(text, text, integer, integer[], double precision, double precision, double precision, double precision); Type: FUNCTION; Schema: api; Owner: sis
 --
 
@@ -417,7 +417,7 @@ $$;
 ALTER FUNCTION api.insert_dummy_data(p_project_id text, p_project_name text, p_num_plots integer, p_observation_ids integer[], p_xmin double precision, p_xmax double precision, p_ymin double precision, p_ymax double precision) OWNER TO sis;
 
 --
--- TOC entry 1647 (class 1255 OID 55588435)
+-- TOC entry 1648 (class 1255 OID 55596945)
 -- Name: check_result_value(); Type: FUNCTION; Schema: soil_data; Owner: sis
 --
 
@@ -445,7 +445,7 @@ ALTER FUNCTION soil_data.check_result_value() OWNER TO sis;
 
 --
 -- TOC entry 5371 (class 0 OID 0)
--- Dependencies: 1647
+-- Dependencies: 1648
 -- Name: FUNCTION check_result_value(); Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -453,7 +453,7 @@ COMMENT ON FUNCTION soil_data.check_result_value() IS 'Checks if the value assig
 
 
 --
--- TOC entry 1648 (class 1255 OID 55588436)
+-- TOC entry 1649 (class 1255 OID 55596946)
 -- Name: class(); Type: FUNCTION; Schema: spatial_metadata; Owner: sis
 --
 
@@ -572,7 +572,7 @@ ALTER FUNCTION spatial_metadata.class() OWNER TO sis;
 
 --
 -- TOC entry 5373 (class 0 OID 0)
--- Dependencies: 1648
+-- Dependencies: 1649
 -- Name: FUNCTION class(); Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -580,7 +580,7 @@ COMMENT ON FUNCTION spatial_metadata.class() IS 'Trigger function that automatic
 
 
 --
--- TOC entry 1649 (class 1255 OID 55588437)
+-- TOC entry 1650 (class 1255 OID 55596947)
 -- Name: map(); Type: FUNCTION; Schema: spatial_metadata; Owner: sis
 --
 
@@ -665,7 +665,7 @@ ALTER FUNCTION spatial_metadata.map() OWNER TO sis;
 
 --
 -- TOC entry 5375 (class 0 OID 0)
--- Dependencies: 1649
+-- Dependencies: 1650
 -- Name: FUNCTION map(); Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -673,7 +673,7 @@ COMMENT ON FUNCTION spatial_metadata.map() IS 'Trigger function that generates M
 
 
 --
--- TOC entry 1650 (class 1255 OID 55588438)
+-- TOC entry 1651 (class 1255 OID 55596948)
 -- Name: sld(); Type: FUNCTION; Schema: spatial_metadata; Owner: sis
 --
 
@@ -746,7 +746,7 @@ ALTER FUNCTION spatial_metadata.sld() OWNER TO sis;
 
 --
 -- TOC entry 5377 (class 0 OID 0)
--- Dependencies: 1650
+-- Dependencies: 1651
 -- Name: FUNCTION sld(); Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -758,7 +758,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 226 (class 1259 OID 55588439)
+-- TOC entry 226 (class 1259 OID 55596949)
 -- Name: api_client; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -848,7 +848,7 @@ COMMENT ON COLUMN api.api_client.description IS 'Description of the API client p
 
 
 --
--- TOC entry 227 (class 1259 OID 55588448)
+-- TOC entry 227 (class 1259 OID 55596958)
 -- Name: audit; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -938,7 +938,7 @@ COMMENT ON COLUMN api.audit.created_at IS 'Timestamp when the action occurred';
 
 
 --
--- TOC entry 228 (class 1259 OID 55588455)
+-- TOC entry 228 (class 1259 OID 55596965)
 -- Name: audit_audit_id_seq; Type: SEQUENCE; Schema: api; Owner: sis
 --
 
@@ -953,7 +953,7 @@ ALTER TABLE api.audit ALTER COLUMN audit_id ADD GENERATED BY DEFAULT AS IDENTITY
 
 
 --
--- TOC entry 229 (class 1259 OID 55588457)
+-- TOC entry 229 (class 1259 OID 55596967)
 -- Name: layer; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -979,7 +979,7 @@ CREATE TABLE api.layer (
 ALTER TABLE api.layer OWNER TO sis;
 
 --
--- TOC entry 230 (class 1259 OID 55588463)
+-- TOC entry 230 (class 1259 OID 55596973)
 -- Name: setting; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1019,7 +1019,7 @@ COMMENT ON COLUMN api.setting.value IS 'Setting value';
 
 
 --
--- TOC entry 231 (class 1259 OID 55588469)
+-- TOC entry 231 (class 1259 OID 55596979)
 -- Name: uploaded_dataset; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1180,7 +1180,7 @@ COMMENT ON COLUMN api.uploaded_dataset.note IS 'Additional notes about the datas
 
 
 --
--- TOC entry 232 (class 1259 OID 55588478)
+-- TOC entry 232 (class 1259 OID 55596988)
 -- Name: uploaded_dataset_column; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1273,7 +1273,7 @@ COMMENT ON COLUMN api.uploaded_dataset_column.note IS 'Additional notes about th
 
 
 --
--- TOC entry 233 (class 1259 OID 55588485)
+-- TOC entry 233 (class 1259 OID 55596995)
 -- Name: uploaded_dataset_edit; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1292,7 +1292,7 @@ CREATE TABLE api.uploaded_dataset_edit (
 ALTER TABLE api.uploaded_dataset_edit OWNER TO sis;
 
 --
--- TOC entry 234 (class 1259 OID 55588492)
+-- TOC entry 234 (class 1259 OID 55597002)
 -- Name: uploaded_dataset_edit_edit_id_seq; Type: SEQUENCE; Schema: api; Owner: sis
 --
 
@@ -1317,7 +1317,7 @@ ALTER SEQUENCE api.uploaded_dataset_edit_edit_id_seq OWNED BY api.uploaded_datas
 
 
 --
--- TOC entry 235 (class 1259 OID 55588494)
+-- TOC entry 235 (class 1259 OID 55597004)
 -- Name: user; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1410,7 +1410,7 @@ COMMENT ON COLUMN api."user".last_login IS 'Timestamp of the last successful log
 
 
 --
--- TOC entry 236 (class 1259 OID 55588506)
+-- TOC entry 236 (class 1259 OID 55597016)
 -- Name: element; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1496,7 +1496,7 @@ COMMENT ON COLUMN soil_data.element.type IS 'Type of profile element, Horizon or
 
 
 --
--- TOC entry 237 (class 1259 OID 55588517)
+-- TOC entry 237 (class 1259 OID 55597027)
 -- Name: observation_num; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1579,7 +1579,7 @@ COMMENT ON COLUMN soil_data.observation_num.value_max IS 'Maximum admissable val
 
 
 --
--- TOC entry 238 (class 1259 OID 55588524)
+-- TOC entry 238 (class 1259 OID 55597034)
 -- Name: plot; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1629,7 +1629,7 @@ COMMENT ON COLUMN soil_data.plot.site_id IS 'Foreign key to Site table.';
 
 
 --
--- TOC entry 239 (class 1259 OID 55588532)
+-- TOC entry 239 (class 1259 OID 55597042)
 -- Name: profile; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1679,7 +1679,7 @@ COMMENT ON COLUMN soil_data.profile.profile_code IS 'Natural primary key, if exi
 
 
 --
--- TOC entry 240 (class 1259 OID 55588538)
+-- TOC entry 240 (class 1259 OID 55597048)
 -- Name: project; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1727,7 +1727,7 @@ COMMENT ON COLUMN soil_data.project.name IS 'Natural key with project name.';
 
 
 --
--- TOC entry 241 (class 1259 OID 55588548)
+-- TOC entry 241 (class 1259 OID 55597058)
 -- Name: project_site; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1767,7 +1767,7 @@ COMMENT ON COLUMN soil_data.project_site.site_id IS 'Reference to the site';
 
 
 --
--- TOC entry 242 (class 1259 OID 55588554)
+-- TOC entry 242 (class 1259 OID 55597064)
 -- Name: result_num; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1781,7 +1781,7 @@ CREATE TABLE soil_data.result_num (
 ALTER TABLE soil_data.result_num OWNER TO sis;
 
 --
--- TOC entry 243 (class 1259 OID 55588557)
+-- TOC entry 243 (class 1259 OID 55597067)
 -- Name: site; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1821,7 +1821,7 @@ COMMENT ON COLUMN soil_data.site.geom IS 'Site extent expressed with geodetic co
 
 
 --
--- TOC entry 244 (class 1259 OID 55588563)
+-- TOC entry 244 (class 1259 OID 55597073)
 -- Name: specimen; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1881,7 +1881,7 @@ COMMENT ON COLUMN soil_data.specimen.code IS 'External code used to identify the
 
 
 --
--- TOC entry 245 (class 1259 OID 55588569)
+-- TOC entry 245 (class 1259 OID 55597079)
 -- Name: vw_api_manifest; Type: VIEW; Schema: api; Owner: sis
 --
 
@@ -1922,7 +1922,7 @@ CREATE VIEW api.vw_api_manifest AS
 ALTER VIEW api.vw_api_manifest OWNER TO sis;
 
 --
--- TOC entry 246 (class 1259 OID 55588574)
+-- TOC entry 246 (class 1259 OID 55597084)
 -- Name: vw_api_observation; Type: VIEW; Schema: api; Owner: sis
 --
 
@@ -1964,7 +1964,7 @@ CREATE VIEW api.vw_api_observation AS
 ALTER VIEW api.vw_api_observation OWNER TO sis;
 
 --
--- TOC entry 247 (class 1259 OID 55588579)
+-- TOC entry 247 (class 1259 OID 55597089)
 -- Name: vw_api_profile; Type: VIEW; Schema: api; Owner: sis
 --
 
@@ -2011,7 +2011,7 @@ CREATE VIEW api.vw_api_profile AS
 ALTER VIEW api.vw_api_profile OWNER TO sis;
 
 --
--- TOC entry 248 (class 1259 OID 55588584)
+-- TOC entry 248 (class 1259 OID 55597094)
 -- Name: vw_glosis_federation_token; Type: VIEW; Schema: api; Owner: sis
 --
 
@@ -2027,7 +2027,7 @@ CREATE VIEW api.vw_glosis_federation_token AS
 ALTER VIEW api.vw_glosis_federation_token OWNER TO sis;
 
 --
--- TOC entry 249 (class 1259 OID 55588588)
+-- TOC entry 249 (class 1259 OID 55597098)
 -- Name: category_desc; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2061,7 +2061,7 @@ COMMENT ON COLUMN soil_data.category_desc.category_desc_id IS 'Primary key ident
 
 
 --
--- TOC entry 250 (class 1259 OID 55588594)
+-- TOC entry 250 (class 1259 OID 55597104)
 -- Name: element_element_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -2076,7 +2076,7 @@ ALTER TABLE soil_data.element ALTER COLUMN element_id ADD GENERATED BY DEFAULT A
 
 
 --
--- TOC entry 251 (class 1259 OID 55588596)
+-- TOC entry 251 (class 1259 OID 55597106)
 -- Name: individual; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2116,7 +2116,7 @@ COMMENT ON COLUMN soil_data.individual.email IS 'Email address of the individual
 
 
 --
--- TOC entry 252 (class 1259 OID 55588602)
+-- TOC entry 252 (class 1259 OID 55597112)
 -- Name: languages; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2156,7 +2156,7 @@ COMMENT ON COLUMN soil_data.languages.language_name IS 'Full name of the languag
 
 
 --
--- TOC entry 253 (class 1259 OID 55588608)
+-- TOC entry 253 (class 1259 OID 55597118)
 -- Name: observation_desc; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2175,7 +2175,7 @@ CREATE TABLE soil_data.observation_desc (
 ALTER TABLE soil_data.observation_desc OWNER TO sis;
 
 --
--- TOC entry 254 (class 1259 OID 55588614)
+-- TOC entry 254 (class 1259 OID 55597124)
 -- Name: observation_num_observation_num_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -2190,7 +2190,7 @@ ALTER TABLE soil_data.observation_num ALTER COLUMN observation_num_id ADD GENERA
 
 
 --
--- TOC entry 255 (class 1259 OID 55588616)
+-- TOC entry 255 (class 1259 OID 55597126)
 -- Name: organisation; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2300,7 +2300,7 @@ COMMENT ON COLUMN soil_data.organisation.facsimile IS 'Fax number of the organiz
 
 
 --
--- TOC entry 256 (class 1259 OID 55588622)
+-- TOC entry 256 (class 1259 OID 55597132)
 -- Name: plot_plot_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -2315,7 +2315,7 @@ ALTER TABLE soil_data.plot ALTER COLUMN plot_id ADD GENERATED BY DEFAULT AS IDEN
 
 
 --
--- TOC entry 257 (class 1259 OID 55588624)
+-- TOC entry 257 (class 1259 OID 55597134)
 -- Name: procedure_desc; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2365,7 +2365,7 @@ COMMENT ON COLUMN soil_data.procedure_desc.uri IS 'URI to the corresponding publ
 
 
 --
--- TOC entry 258 (class 1259 OID 55588630)
+-- TOC entry 258 (class 1259 OID 55597140)
 -- Name: procedure_model; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2378,7 +2378,7 @@ CREATE TABLE soil_data.procedure_model (
 ALTER TABLE soil_data.procedure_model OWNER TO sis;
 
 --
--- TOC entry 259 (class 1259 OID 55588636)
+-- TOC entry 259 (class 1259 OID 55597146)
 -- Name: procedure_model_def; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2392,7 +2392,7 @@ CREATE TABLE soil_data.procedure_model_def (
 ALTER TABLE soil_data.procedure_model_def OWNER TO sis;
 
 --
--- TOC entry 260 (class 1259 OID 55588642)
+-- TOC entry 260 (class 1259 OID 55597152)
 -- Name: procedure_model_procedure_model_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -2407,7 +2407,7 @@ ALTER TABLE soil_data.procedure_model ALTER COLUMN procedure_model_id ADD GENERA
 
 
 --
--- TOC entry 261 (class 1259 OID 55588644)
+-- TOC entry 261 (class 1259 OID 55597154)
 -- Name: procedure_num; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2451,7 +2451,7 @@ COMMENT ON COLUMN soil_data.procedure_num.broader_id IS 'Foreign key to brader p
 
 
 --
--- TOC entry 262 (class 1259 OID 55588650)
+-- TOC entry 262 (class 1259 OID 55597160)
 -- Name: procedure_spectrometer; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2464,7 +2464,7 @@ CREATE TABLE soil_data.procedure_spectrometer (
 ALTER TABLE soil_data.procedure_spectrometer OWNER TO sis;
 
 --
--- TOC entry 263 (class 1259 OID 55588656)
+-- TOC entry 263 (class 1259 OID 55597166)
 -- Name: procedure_spectrometer_def; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2478,7 +2478,7 @@ CREATE TABLE soil_data.procedure_spectrometer_def (
 ALTER TABLE soil_data.procedure_spectrometer_def OWNER TO sis;
 
 --
--- TOC entry 264 (class 1259 OID 55588662)
+-- TOC entry 264 (class 1259 OID 55597172)
 -- Name: procedure_spectrometer_procedure_spectrometer_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -2493,7 +2493,7 @@ ALTER TABLE soil_data.procedure_spectrometer ALTER COLUMN procedure_spectrometer
 
 
 --
--- TOC entry 265 (class 1259 OID 55588664)
+-- TOC entry 265 (class 1259 OID 55597174)
 -- Name: profile_profile_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -2508,7 +2508,7 @@ ALTER TABLE soil_data.profile ALTER COLUMN profile_id ADD GENERATED BY DEFAULT A
 
 
 --
--- TOC entry 266 (class 1259 OID 55588666)
+-- TOC entry 266 (class 1259 OID 55597176)
 -- Name: proj_x_org_x_ind; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2590,7 +2590,7 @@ COMMENT ON COLUMN soil_data.proj_x_org_x_ind.role IS 'ISO 19115 CI_RoleCode: aut
 
 
 --
--- TOC entry 267 (class 1259 OID 55588674)
+-- TOC entry 267 (class 1259 OID 55597184)
 -- Name: project_soil_map; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2640,7 +2640,7 @@ COMMENT ON COLUMN soil_data.project_soil_map.remarks IS 'Additional remarks or n
 
 
 --
--- TOC entry 268 (class 1259 OID 55588680)
+-- TOC entry 268 (class 1259 OID 55597190)
 -- Name: property_desc; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2682,7 +2682,7 @@ COMMENT ON COLUMN soil_data.property_desc.property_name IS 'Human-readable displ
 
 
 --
--- TOC entry 269 (class 1259 OID 55588686)
+-- TOC entry 269 (class 1259 OID 55597196)
 -- Name: property_num; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2715,7 +2715,7 @@ COMMENT ON COLUMN soil_data.property_num.property_num_id IS 'Synthetic primary k
 
 
 --
--- TOC entry 270 (class 1259 OID 55588692)
+-- TOC entry 270 (class 1259 OID 55597202)
 -- Name: result_desc_element; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2765,7 +2765,7 @@ COMMENT ON COLUMN soil_data.result_desc_element.category_desc_id IS 'Foreign key
 
 
 --
--- TOC entry 271 (class 1259 OID 55588698)
+-- TOC entry 271 (class 1259 OID 55597208)
 -- Name: result_desc_plot; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2815,7 +2815,7 @@ COMMENT ON COLUMN soil_data.result_desc_plot.category_desc_id IS 'Foreign key to
 
 
 --
--- TOC entry 272 (class 1259 OID 55588704)
+-- TOC entry 272 (class 1259 OID 55597214)
 -- Name: result_desc_profile; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2865,7 +2865,7 @@ COMMENT ON COLUMN soil_data.result_desc_profile.category_desc_id IS 'Foreign key
 
 
 --
--- TOC entry 273 (class 1259 OID 55588710)
+-- TOC entry 273 (class 1259 OID 55597220)
 -- Name: result_desc_surface; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2879,7 +2879,7 @@ CREATE TABLE soil_data.result_desc_surface (
 ALTER TABLE soil_data.result_desc_surface OWNER TO sis;
 
 --
--- TOC entry 274 (class 1259 OID 55588716)
+-- TOC entry 274 (class 1259 OID 55597226)
 -- Name: result_spectral; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2894,7 +2894,7 @@ CREATE TABLE soil_data.result_spectral (
 ALTER TABLE soil_data.result_spectral OWNER TO sis;
 
 --
--- TOC entry 275 (class 1259 OID 55588719)
+-- TOC entry 275 (class 1259 OID 55597229)
 -- Name: result_spectral_result_spectral_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -2909,7 +2909,7 @@ ALTER TABLE soil_data.result_spectral ALTER COLUMN result_spectral_id ADD GENERA
 
 
 --
--- TOC entry 276 (class 1259 OID 55588721)
+-- TOC entry 276 (class 1259 OID 55597231)
 -- Name: soil_map; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3009,7 +3009,7 @@ COMMENT ON COLUMN soil_data.soil_map.geom IS 'Polygon geometry representing the 
 
 
 --
--- TOC entry 277 (class 1259 OID 55588727)
+-- TOC entry 277 (class 1259 OID 55597237)
 -- Name: soil_map_soil_map_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3024,7 +3024,7 @@ ALTER TABLE soil_data.soil_map ALTER COLUMN soil_map_id ADD GENERATED BY DEFAULT
 
 
 --
--- TOC entry 278 (class 1259 OID 55588729)
+-- TOC entry 278 (class 1259 OID 55597239)
 -- Name: soil_mapping_unit; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3094,7 +3094,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit.geom IS 'MultiPolygon geometry of 
 
 
 --
--- TOC entry 279 (class 1259 OID 55588735)
+-- TOC entry 279 (class 1259 OID 55597245)
 -- Name: soil_mapping_unit_category; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3204,7 +3204,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.remarks IS 'Additional re
 
 
 --
--- TOC entry 280 (class 1259 OID 55588741)
+-- TOC entry 280 (class 1259 OID 55597251)
 -- Name: soil_mapping_unit_category_category_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3219,7 +3219,7 @@ ALTER TABLE soil_data.soil_mapping_unit_category ALTER COLUMN category_id ADD GE
 
 
 --
--- TOC entry 281 (class 1259 OID 55588743)
+-- TOC entry 281 (class 1259 OID 55597253)
 -- Name: soil_mapping_unit_mapping_unit_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3234,7 +3234,7 @@ ALTER TABLE soil_data.soil_mapping_unit ALTER COLUMN mapping_unit_id ADD GENERAT
 
 
 --
--- TOC entry 282 (class 1259 OID 55588745)
+-- TOC entry 282 (class 1259 OID 55597255)
 -- Name: soil_mapping_unit_profile; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3294,7 +3294,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_profile.remarks IS 'Additional rem
 
 
 --
--- TOC entry 283 (class 1259 OID 55588752)
+-- TOC entry 283 (class 1259 OID 55597262)
 -- Name: soil_typological_unit; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3374,7 +3374,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit.remarks IS 'Additional remarks
 
 
 --
--- TOC entry 284 (class 1259 OID 55588758)
+-- TOC entry 284 (class 1259 OID 55597268)
 -- Name: soil_typological_unit_mapping_unit; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3435,7 +3435,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_mapping_unit.remarks IS 'Addit
 
 
 --
--- TOC entry 285 (class 1259 OID 55588765)
+-- TOC entry 285 (class 1259 OID 55597275)
 -- Name: soil_typological_unit_profile; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3495,7 +3495,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_profile.remarks IS 'Additional
 
 
 --
--- TOC entry 286 (class 1259 OID 55588772)
+-- TOC entry 286 (class 1259 OID 55597282)
 -- Name: soil_typological_unit_typological_unit_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3510,7 +3510,7 @@ ALTER TABLE soil_data.soil_typological_unit ALTER COLUMN typological_unit_id ADD
 
 
 --
--- TOC entry 287 (class 1259 OID 55588774)
+-- TOC entry 287 (class 1259 OID 55597284)
 -- Name: specimen_prep_process; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3570,7 +3570,7 @@ COMMENT ON COLUMN soil_data.specimen_prep_process.definition IS 'Further details
 
 
 --
--- TOC entry 288 (class 1259 OID 55588780)
+-- TOC entry 288 (class 1259 OID 55597290)
 -- Name: specimen_prep_process_specimen_prep_process_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3585,7 +3585,7 @@ ALTER TABLE soil_data.specimen_prep_process ALTER COLUMN specimen_prep_process_i
 
 
 --
--- TOC entry 289 (class 1259 OID 55588782)
+-- TOC entry 289 (class 1259 OID 55597292)
 -- Name: specimen_specimen_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3600,7 +3600,7 @@ ALTER TABLE soil_data.specimen ALTER COLUMN specimen_id ADD GENERATED BY DEFAULT
 
 
 --
--- TOC entry 290 (class 1259 OID 55588784)
+-- TOC entry 290 (class 1259 OID 55597294)
 -- Name: specimen_storage; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3650,7 +3650,7 @@ COMMENT ON COLUMN soil_data.specimen_storage.definition IS 'Long definition prov
 
 
 --
--- TOC entry 291 (class 1259 OID 55588790)
+-- TOC entry 291 (class 1259 OID 55597300)
 -- Name: specimen_storage_specimen_storage_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3665,7 +3665,7 @@ ALTER TABLE soil_data.specimen_storage ALTER COLUMN specimen_storage_id ADD GENE
 
 
 --
--- TOC entry 292 (class 1259 OID 55588792)
+-- TOC entry 292 (class 1259 OID 55597302)
 -- Name: specimen_transport; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3715,7 +3715,7 @@ COMMENT ON COLUMN soil_data.specimen_transport.definition IS 'Long definition pr
 
 
 --
--- TOC entry 293 (class 1259 OID 55588798)
+-- TOC entry 293 (class 1259 OID 55597308)
 -- Name: specimen_transport_specimen_transport_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3730,7 +3730,7 @@ ALTER TABLE soil_data.specimen_transport ALTER COLUMN specimen_transport_id ADD 
 
 
 --
--- TOC entry 294 (class 1259 OID 55588800)
+-- TOC entry 294 (class 1259 OID 55597310)
 -- Name: spectral_sample; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3743,7 +3743,7 @@ CREATE TABLE soil_data.spectral_sample (
 ALTER TABLE soil_data.spectral_sample OWNER TO sis;
 
 --
--- TOC entry 295 (class 1259 OID 55588806)
+-- TOC entry 295 (class 1259 OID 55597316)
 -- Name: spectrum; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3758,7 +3758,7 @@ CREATE TABLE soil_data.spectrum (
 ALTER TABLE soil_data.spectrum OWNER TO sis;
 
 --
--- TOC entry 296 (class 1259 OID 55588812)
+-- TOC entry 296 (class 1259 OID 55597322)
 -- Name: spectrum_spectrum_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3773,7 +3773,7 @@ ALTER TABLE soil_data.spectrum ALTER COLUMN spectrum_id ADD GENERATED BY DEFAULT
 
 
 --
--- TOC entry 297 (class 1259 OID 55588814)
+-- TOC entry 297 (class 1259 OID 55597324)
 -- Name: spectrum_x_result_spectral; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3786,7 +3786,7 @@ CREATE TABLE soil_data.spectrum_x_result_spectral (
 ALTER TABLE soil_data.spectrum_x_result_spectral OWNER TO sis;
 
 --
--- TOC entry 298 (class 1259 OID 55588817)
+-- TOC entry 298 (class 1259 OID 55597327)
 -- Name: translate; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3856,7 +3856,7 @@ COMMENT ON COLUMN soil_data.translate.translation IS 'Translated string in the t
 
 
 --
--- TOC entry 299 (class 1259 OID 55588823)
+-- TOC entry 299 (class 1259 OID 55597333)
 -- Name: unit_conversion; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3873,7 +3873,7 @@ CREATE TABLE soil_data.unit_conversion (
 ALTER TABLE soil_data.unit_conversion OWNER TO sis;
 
 --
--- TOC entry 300 (class 1259 OID 55588831)
+-- TOC entry 300 (class 1259 OID 55597341)
 -- Name: unit_of_measure; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3915,7 +3915,7 @@ COMMENT ON COLUMN soil_data.unit_of_measure.unit_name IS 'Short label for this u
 
 
 --
--- TOC entry 301 (class 1259 OID 55588837)
+-- TOC entry 301 (class 1259 OID 55597347)
 -- Name: class; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -4005,7 +4005,7 @@ COMMENT ON COLUMN spatial_metadata.class.publish IS 'Flag indicating whether thi
 
 
 --
--- TOC entry 302 (class 1259 OID 55588843)
+-- TOC entry 302 (class 1259 OID 55597353)
 -- Name: country; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -4026,8 +4026,8 @@ CREATE TABLE spatial_metadata.country (
     capital text,
     continent text,
     un_reg text,
-    unreg_note text,
-    continent_custom text
+    geom_centroid public.geometry(Point,4326),
+    geom_convexhull public.geometry(MultiPolygon,4326)
 );
 
 
@@ -4187,25 +4187,7 @@ COMMENT ON COLUMN spatial_metadata.country.un_reg IS 'UN region classification';
 
 
 --
--- TOC entry 5670 (class 0 OID 0)
--- Dependencies: 302
--- Name: COLUMN country.unreg_note; Type: COMMENT; Schema: spatial_metadata; Owner: sis
---
-
-COMMENT ON COLUMN spatial_metadata.country.unreg_note IS 'Notes about UN region classification';
-
-
---
--- TOC entry 5671 (class 0 OID 0)
--- Dependencies: 302
--- Name: COLUMN country.continent_custom; Type: COMMENT; Schema: spatial_metadata; Owner: sis
---
-
-COMMENT ON COLUMN spatial_metadata.country.continent_custom IS 'Custom continent grouping for specific applications';
-
-
---
--- TOC entry 303 (class 1259 OID 55588849)
+-- TOC entry 303 (class 1259 OID 55597359)
 -- Name: individual; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -4218,7 +4200,7 @@ CREATE TABLE spatial_metadata.individual (
 ALTER TABLE spatial_metadata.individual OWNER TO sis;
 
 --
--- TOC entry 5673 (class 0 OID 0)
+-- TOC entry 5671 (class 0 OID 0)
 -- Dependencies: 303
 -- Name: TABLE individual; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4227,7 +4209,7 @@ COMMENT ON TABLE spatial_metadata.individual IS 'Individuals associated with spa
 
 
 --
--- TOC entry 5674 (class 0 OID 0)
+-- TOC entry 5672 (class 0 OID 0)
 -- Dependencies: 303
 -- Name: COLUMN individual.individual_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4236,7 +4218,7 @@ COMMENT ON COLUMN spatial_metadata.individual.individual_id IS 'Unique identifie
 
 
 --
--- TOC entry 5675 (class 0 OID 0)
+-- TOC entry 5673 (class 0 OID 0)
 -- Dependencies: 303
 -- Name: COLUMN individual.email; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4245,7 +4227,7 @@ COMMENT ON COLUMN spatial_metadata.individual.email IS 'Email address of the ind
 
 
 --
--- TOC entry 304 (class 1259 OID 55588855)
+-- TOC entry 304 (class 1259 OID 55597365)
 -- Name: layer; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -4294,7 +4276,7 @@ CREATE TABLE spatial_metadata.layer (
 ALTER TABLE spatial_metadata.layer OWNER TO sis;
 
 --
--- TOC entry 5677 (class 0 OID 0)
+-- TOC entry 5675 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: TABLE layer; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4303,7 +4285,7 @@ COMMENT ON TABLE spatial_metadata.layer IS 'Raster layer metadata and file infor
 
 
 --
--- TOC entry 5678 (class 0 OID 0)
+-- TOC entry 5676 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.mapset_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4312,7 +4294,7 @@ COMMENT ON COLUMN spatial_metadata.layer.mapset_id IS 'Reference to the parent m
 
 
 --
--- TOC entry 5679 (class 0 OID 0)
+-- TOC entry 5677 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.dimension_depth; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4321,7 +4303,7 @@ COMMENT ON COLUMN spatial_metadata.layer.dimension_depth IS 'Depth dimension val
 
 
 --
--- TOC entry 5680 (class 0 OID 0)
+-- TOC entry 5678 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.dimension_stats; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4330,7 +4312,7 @@ COMMENT ON COLUMN spatial_metadata.layer.dimension_stats IS 'Statistical dimensi
 
 
 --
--- TOC entry 5681 (class 0 OID 0)
+-- TOC entry 5679 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.file_path; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4339,7 +4321,7 @@ COMMENT ON COLUMN spatial_metadata.layer.file_path IS 'File system path to the r
 
 
 --
--- TOC entry 5682 (class 0 OID 0)
+-- TOC entry 5680 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.layer_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4348,7 +4330,7 @@ COMMENT ON COLUMN spatial_metadata.layer.layer_id IS 'Unique identifier for the 
 
 
 --
--- TOC entry 5683 (class 0 OID 0)
+-- TOC entry 5681 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.file_extension; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4357,7 +4339,7 @@ COMMENT ON COLUMN spatial_metadata.layer.file_extension IS 'File extension (e.g.
 
 
 --
--- TOC entry 5684 (class 0 OID 0)
+-- TOC entry 5682 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.file_size; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4366,7 +4348,7 @@ COMMENT ON COLUMN spatial_metadata.layer.file_size IS 'File size in bytes';
 
 
 --
--- TOC entry 5685 (class 0 OID 0)
+-- TOC entry 5683 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.file_size_pretty; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4375,7 +4357,7 @@ COMMENT ON COLUMN spatial_metadata.layer.file_size_pretty IS 'Human-readable fil
 
 
 --
--- TOC entry 5686 (class 0 OID 0)
+-- TOC entry 5684 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.reference_layer; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4384,7 +4366,7 @@ COMMENT ON COLUMN spatial_metadata.layer.reference_layer IS 'Flag indicating if 
 
 
 --
--- TOC entry 5687 (class 0 OID 0)
+-- TOC entry 5685 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.reference_system_identifier_code; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4393,7 +4375,7 @@ COMMENT ON COLUMN spatial_metadata.layer.reference_system_identifier_code IS 'EP
 
 
 --
--- TOC entry 5688 (class 0 OID 0)
+-- TOC entry 5686 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.distance; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4402,7 +4384,7 @@ COMMENT ON COLUMN spatial_metadata.layer.distance IS 'Spatial resolution value';
 
 
 --
--- TOC entry 5689 (class 0 OID 0)
+-- TOC entry 5687 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.distance_uom; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4411,7 +4393,7 @@ COMMENT ON COLUMN spatial_metadata.layer.distance_uom IS 'Unit of measure for di
 
 
 --
--- TOC entry 5690 (class 0 OID 0)
+-- TOC entry 5688 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.extent; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4420,7 +4402,7 @@ COMMENT ON COLUMN spatial_metadata.layer.extent IS 'Bounding box extent as text'
 
 
 --
--- TOC entry 5691 (class 0 OID 0)
+-- TOC entry 5689 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.west_bound_longitude; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4429,7 +4411,7 @@ COMMENT ON COLUMN spatial_metadata.layer.west_bound_longitude IS 'Western bounda
 
 
 --
--- TOC entry 5692 (class 0 OID 0)
+-- TOC entry 5690 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.east_bound_longitude; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4438,7 +4420,7 @@ COMMENT ON COLUMN spatial_metadata.layer.east_bound_longitude IS 'Eastern bounda
 
 
 --
--- TOC entry 5693 (class 0 OID 0)
+-- TOC entry 5691 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.south_bound_latitude; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4447,7 +4429,7 @@ COMMENT ON COLUMN spatial_metadata.layer.south_bound_latitude IS 'Southern bound
 
 
 --
--- TOC entry 5694 (class 0 OID 0)
+-- TOC entry 5692 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.north_bound_latitude; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4456,7 +4438,7 @@ COMMENT ON COLUMN spatial_metadata.layer.north_bound_latitude IS 'Northern bound
 
 
 --
--- TOC entry 5695 (class 0 OID 0)
+-- TOC entry 5693 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.distribution_format; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4465,7 +4447,7 @@ COMMENT ON COLUMN spatial_metadata.layer.distribution_format IS 'Data distributi
 
 
 --
--- TOC entry 5696 (class 0 OID 0)
+-- TOC entry 5694 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.compression; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4474,7 +4456,7 @@ COMMENT ON COLUMN spatial_metadata.layer.compression IS 'Compression type used';
 
 
 --
--- TOC entry 5697 (class 0 OID 0)
+-- TOC entry 5695 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.raster_size_x; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4483,7 +4465,7 @@ COMMENT ON COLUMN spatial_metadata.layer.raster_size_x IS 'Number of columns in 
 
 
 --
--- TOC entry 5698 (class 0 OID 0)
+-- TOC entry 5696 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.raster_size_y; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4492,7 +4474,7 @@ COMMENT ON COLUMN spatial_metadata.layer.raster_size_y IS 'Number of rows in the
 
 
 --
--- TOC entry 5699 (class 0 OID 0)
+-- TOC entry 5697 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.pixel_size_x; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4501,7 +4483,7 @@ COMMENT ON COLUMN spatial_metadata.layer.pixel_size_x IS 'Pixel width in map uni
 
 
 --
--- TOC entry 5700 (class 0 OID 0)
+-- TOC entry 5698 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.pixel_size_y; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4510,7 +4492,7 @@ COMMENT ON COLUMN spatial_metadata.layer.pixel_size_y IS 'Pixel height in map un
 
 
 --
--- TOC entry 5701 (class 0 OID 0)
+-- TOC entry 5699 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.origin_x; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4519,7 +4501,7 @@ COMMENT ON COLUMN spatial_metadata.layer.origin_x IS 'X coordinate of the raster
 
 
 --
--- TOC entry 5702 (class 0 OID 0)
+-- TOC entry 5700 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.origin_y; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4528,7 +4510,7 @@ COMMENT ON COLUMN spatial_metadata.layer.origin_y IS 'Y coordinate of the raster
 
 
 --
--- TOC entry 5703 (class 0 OID 0)
+-- TOC entry 5701 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.spatial_reference; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4537,7 +4519,7 @@ COMMENT ON COLUMN spatial_metadata.layer.spatial_reference IS 'Full spatial refe
 
 
 --
--- TOC entry 5704 (class 0 OID 0)
+-- TOC entry 5702 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.data_type; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4546,7 +4528,7 @@ COMMENT ON COLUMN spatial_metadata.layer.data_type IS 'Raster data type (e.g., F
 
 
 --
--- TOC entry 5705 (class 0 OID 0)
+-- TOC entry 5703 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.no_data_value; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4555,7 +4537,7 @@ COMMENT ON COLUMN spatial_metadata.layer.no_data_value IS 'NoData value for the 
 
 
 --
--- TOC entry 5706 (class 0 OID 0)
+-- TOC entry 5704 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.stats_minimum; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4564,7 +4546,7 @@ COMMENT ON COLUMN spatial_metadata.layer.stats_minimum IS 'Minimum value in the 
 
 
 --
--- TOC entry 5707 (class 0 OID 0)
+-- TOC entry 5705 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.stats_maximum; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4573,7 +4555,7 @@ COMMENT ON COLUMN spatial_metadata.layer.stats_maximum IS 'Maximum value in the 
 
 
 --
--- TOC entry 5708 (class 0 OID 0)
+-- TOC entry 5706 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.stats_mean; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4582,7 +4564,7 @@ COMMENT ON COLUMN spatial_metadata.layer.stats_mean IS 'Mean value in the raster
 
 
 --
--- TOC entry 5709 (class 0 OID 0)
+-- TOC entry 5707 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.stats_std_dev; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4591,7 +4573,7 @@ COMMENT ON COLUMN spatial_metadata.layer.stats_std_dev IS 'Standard deviation of
 
 
 --
--- TOC entry 5710 (class 0 OID 0)
+-- TOC entry 5708 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.scale; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4600,7 +4582,7 @@ COMMENT ON COLUMN spatial_metadata.layer.scale IS 'Map scale (e.g., 1:250000)';
 
 
 --
--- TOC entry 5711 (class 0 OID 0)
+-- TOC entry 5709 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.n_bands; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4609,7 +4591,7 @@ COMMENT ON COLUMN spatial_metadata.layer.n_bands IS 'Number of bands in the rast
 
 
 --
--- TOC entry 5712 (class 0 OID 0)
+-- TOC entry 5710 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.metadata; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4618,7 +4600,7 @@ COMMENT ON COLUMN spatial_metadata.layer.metadata IS 'Array of additional metada
 
 
 --
--- TOC entry 5713 (class 0 OID 0)
+-- TOC entry 5711 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: COLUMN layer.map; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4627,7 +4609,7 @@ COMMENT ON COLUMN spatial_metadata.layer.map IS 'Generated MapServer MAP file co
 
 
 --
--- TOC entry 305 (class 1259 OID 55588864)
+-- TOC entry 305 (class 1259 OID 55597374)
 -- Name: mapset; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -4686,7 +4668,7 @@ CREATE TABLE spatial_metadata.mapset (
 ALTER TABLE spatial_metadata.mapset OWNER TO sis;
 
 --
--- TOC entry 5715 (class 0 OID 0)
+-- TOC entry 5713 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: TABLE mapset; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4695,7 +4677,7 @@ COMMENT ON TABLE spatial_metadata.mapset IS 'Mapset metadata container for organ
 
 
 --
--- TOC entry 5716 (class 0 OID 0)
+-- TOC entry 5714 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.country_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4704,7 +4686,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.country_id IS 'Reference to the countr
 
 
 --
--- TOC entry 5717 (class 0 OID 0)
+-- TOC entry 5715 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.project_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4713,7 +4695,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.project_id IS 'Reference to the projec
 
 
 --
--- TOC entry 5718 (class 0 OID 0)
+-- TOC entry 5716 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.property_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4722,7 +4704,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.property_id IS 'Reference to the soil 
 
 
 --
--- TOC entry 5719 (class 0 OID 0)
+-- TOC entry 5717 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.mapset_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4731,7 +4713,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.mapset_id IS 'Unique identifier for th
 
 
 --
--- TOC entry 5720 (class 0 OID 0)
+-- TOC entry 5718 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.dimension; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4740,7 +4722,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.dimension IS 'Dimension type: depth or
 
 
 --
--- TOC entry 5721 (class 0 OID 0)
+-- TOC entry 5719 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.parent_identifier; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4749,7 +4731,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.parent_identifier IS 'UUID of a parent
 
 
 --
--- TOC entry 5722 (class 0 OID 0)
+-- TOC entry 5720 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.file_identifier; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4758,7 +4740,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.file_identifier IS 'UUID for ISO 19139
 
 
 --
--- TOC entry 5723 (class 0 OID 0)
+-- TOC entry 5721 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.language_code; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4767,7 +4749,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.language_code IS 'ISO 639-2 language c
 
 
 --
--- TOC entry 5724 (class 0 OID 0)
+-- TOC entry 5722 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.metadata_standard_name; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4776,7 +4758,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.metadata_standard_name IS 'Name of the
 
 
 --
--- TOC entry 5725 (class 0 OID 0)
+-- TOC entry 5723 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.metadata_standard_version; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4785,7 +4767,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.metadata_standard_version IS 'Version 
 
 
 --
--- TOC entry 5726 (class 0 OID 0)
+-- TOC entry 5724 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.reference_system_identifier_code_space; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4794,7 +4776,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.reference_system_identifier_code_space
 
 
 --
--- TOC entry 5727 (class 0 OID 0)
+-- TOC entry 5725 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.title; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4803,7 +4785,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.title IS 'Title of the mapset for disp
 
 
 --
--- TOC entry 5728 (class 0 OID 0)
+-- TOC entry 5726 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.unit_of_measure_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4812,7 +4794,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.unit_of_measure_id IS 'Reference to th
 
 
 --
--- TOC entry 5729 (class 0 OID 0)
+-- TOC entry 5727 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.creation_date; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4821,7 +4803,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.creation_date IS 'Date when the mapset
 
 
 --
--- TOC entry 5730 (class 0 OID 0)
+-- TOC entry 5728 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.publication_date; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4830,7 +4812,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.publication_date IS 'Date when the map
 
 
 --
--- TOC entry 5731 (class 0 OID 0)
+-- TOC entry 5729 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.revision_date; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4839,7 +4821,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.revision_date IS 'Date of the last rev
 
 
 --
--- TOC entry 5732 (class 0 OID 0)
+-- TOC entry 5730 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.edition; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4848,7 +4830,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.edition IS 'Edition or version identif
 
 
 --
--- TOC entry 5733 (class 0 OID 0)
+-- TOC entry 5731 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.citation_md_identifier_code; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4857,7 +4839,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.citation_md_identifier_code IS 'DOI or
 
 
 --
--- TOC entry 5734 (class 0 OID 0)
+-- TOC entry 5732 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.citation_md_identifier_code_space; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4866,7 +4848,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.citation_md_identifier_code_space IS '
 
 
 --
--- TOC entry 5735 (class 0 OID 0)
+-- TOC entry 5733 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.abstract; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4875,7 +4857,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.abstract IS 'Abstract describing the m
 
 
 --
--- TOC entry 5736 (class 0 OID 0)
+-- TOC entry 5734 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.status; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4884,7 +4866,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.status IS 'ISO 19115 MD_ProgressCode: 
 
 
 --
--- TOC entry 5737 (class 0 OID 0)
+-- TOC entry 5735 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.update_frequency; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4893,7 +4875,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.update_frequency IS 'ISO 19115 MD_Main
 
 
 --
--- TOC entry 5738 (class 0 OID 0)
+-- TOC entry 5736 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.md_browse_graphic; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4902,7 +4884,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.md_browse_graphic IS 'URL to a browse 
 
 
 --
--- TOC entry 5739 (class 0 OID 0)
+-- TOC entry 5737 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.keyword_theme; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4911,7 +4893,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.keyword_theme IS 'Array of thematic ke
 
 
 --
--- TOC entry 5740 (class 0 OID 0)
+-- TOC entry 5738 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.keyword_place; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4920,7 +4902,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.keyword_place IS 'Array of place keywo
 
 
 --
--- TOC entry 5741 (class 0 OID 0)
+-- TOC entry 5739 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.keyword_discipline; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4929,7 +4911,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.keyword_discipline IS 'Array of discip
 
 
 --
--- TOC entry 5742 (class 0 OID 0)
+-- TOC entry 5740 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.access_constraints; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4938,7 +4920,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.access_constraints IS 'ISO 19115 MD_Re
 
 
 --
--- TOC entry 5743 (class 0 OID 0)
+-- TOC entry 5741 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.use_constraints; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4947,7 +4929,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.use_constraints IS 'ISO 19115 MD_Restr
 
 
 --
--- TOC entry 5744 (class 0 OID 0)
+-- TOC entry 5742 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.other_constraints; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4956,7 +4938,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.other_constraints IS 'Text description
 
 
 --
--- TOC entry 5745 (class 0 OID 0)
+-- TOC entry 5743 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.spatial_representation_type_code; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4965,7 +4947,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.spatial_representation_type_code IS 'I
 
 
 --
--- TOC entry 5746 (class 0 OID 0)
+-- TOC entry 5744 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.presentation_form; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4974,7 +4956,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.presentation_form IS 'ISO 19115 CI_Pre
 
 
 --
--- TOC entry 5747 (class 0 OID 0)
+-- TOC entry 5745 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.topic_category; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4983,7 +4965,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.topic_category IS 'Array of ISO 19115 
 
 
 --
--- TOC entry 5748 (class 0 OID 0)
+-- TOC entry 5746 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.time_period_begin; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -4992,7 +4974,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.time_period_begin IS 'Start date of th
 
 
 --
--- TOC entry 5749 (class 0 OID 0)
+-- TOC entry 5747 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.time_period_end; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5001,7 +4983,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.time_period_end IS 'End date of the te
 
 
 --
--- TOC entry 5750 (class 0 OID 0)
+-- TOC entry 5748 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.scope_code; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5010,7 +4992,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.scope_code IS 'ISO 19115 MD_ScopeCode'
 
 
 --
--- TOC entry 5751 (class 0 OID 0)
+-- TOC entry 5749 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.lineage_statement; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5019,7 +5001,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.lineage_statement IS 'Statement descri
 
 
 --
--- TOC entry 5752 (class 0 OID 0)
+-- TOC entry 5750 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.lineage_source_uuidref; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5028,7 +5010,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.lineage_source_uuidref IS 'UUID refere
 
 
 --
--- TOC entry 5753 (class 0 OID 0)
+-- TOC entry 5751 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.lineage_source_title; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5037,7 +5019,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.lineage_source_title IS 'Title of sour
 
 
 --
--- TOC entry 5754 (class 0 OID 0)
+-- TOC entry 5752 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.xml; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5046,7 +5028,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.xml IS 'Generated ISO 19139 XML metada
 
 
 --
--- TOC entry 5755 (class 0 OID 0)
+-- TOC entry 5753 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: COLUMN mapset.sld; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5055,7 +5037,7 @@ COMMENT ON COLUMN spatial_metadata.mapset.sld IS 'Generated SLD XML for styling'
 
 
 --
--- TOC entry 306 (class 1259 OID 55588894)
+-- TOC entry 306 (class 1259 OID 55597404)
 -- Name: organisation; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -5075,7 +5057,7 @@ CREATE TABLE spatial_metadata.organisation (
 ALTER TABLE spatial_metadata.organisation OWNER TO sis;
 
 --
--- TOC entry 5757 (class 0 OID 0)
+-- TOC entry 5755 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: TABLE organisation; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5084,7 +5066,7 @@ COMMENT ON TABLE spatial_metadata.organisation IS 'Organizations associated with
 
 
 --
--- TOC entry 5758 (class 0 OID 0)
+-- TOC entry 5756 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.organisation_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5093,7 +5075,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.organisation_id IS 'Unique ident
 
 
 --
--- TOC entry 5759 (class 0 OID 0)
+-- TOC entry 5757 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.url; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5102,7 +5084,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.url IS 'Website URL of the organ
 
 
 --
--- TOC entry 5760 (class 0 OID 0)
+-- TOC entry 5758 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.email; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5111,7 +5093,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.email IS 'Contact email for the 
 
 
 --
--- TOC entry 5761 (class 0 OID 0)
+-- TOC entry 5759 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.country; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5120,7 +5102,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.country IS 'Country where the or
 
 
 --
--- TOC entry 5762 (class 0 OID 0)
+-- TOC entry 5760 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.city; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5129,7 +5111,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.city IS 'City where the organiza
 
 
 --
--- TOC entry 5763 (class 0 OID 0)
+-- TOC entry 5761 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.postal_code; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5138,7 +5120,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.postal_code IS 'Postal code of t
 
 
 --
--- TOC entry 5764 (class 0 OID 0)
+-- TOC entry 5762 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.delivery_point; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5147,7 +5129,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.delivery_point IS 'Street addres
 
 
 --
--- TOC entry 5765 (class 0 OID 0)
+-- TOC entry 5763 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.phone; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5156,7 +5138,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.phone IS 'Phone number of the or
 
 
 --
--- TOC entry 5766 (class 0 OID 0)
+-- TOC entry 5764 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: COLUMN organisation.facsimile; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5165,7 +5147,7 @@ COMMENT ON COLUMN spatial_metadata.organisation.facsimile IS 'Fax number of the 
 
 
 --
--- TOC entry 307 (class 1259 OID 55588900)
+-- TOC entry 307 (class 1259 OID 55597410)
 -- Name: proj_x_org_x_ind; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -5185,7 +5167,7 @@ CREATE TABLE spatial_metadata.proj_x_org_x_ind (
 ALTER TABLE spatial_metadata.proj_x_org_x_ind OWNER TO sis;
 
 --
--- TOC entry 5768 (class 0 OID 0)
+-- TOC entry 5766 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: TABLE proj_x_org_x_ind; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5194,7 +5176,7 @@ COMMENT ON TABLE spatial_metadata.proj_x_org_x_ind IS 'Junction table linking sp
 
 
 --
--- TOC entry 5769 (class 0 OID 0)
+-- TOC entry 5767 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: COLUMN proj_x_org_x_ind.country_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5203,7 +5185,7 @@ COMMENT ON COLUMN spatial_metadata.proj_x_org_x_ind.country_id IS 'Reference to 
 
 
 --
--- TOC entry 5770 (class 0 OID 0)
+-- TOC entry 5768 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: COLUMN proj_x_org_x_ind.project_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5212,7 +5194,7 @@ COMMENT ON COLUMN spatial_metadata.proj_x_org_x_ind.project_id IS 'Reference to 
 
 
 --
--- TOC entry 5771 (class 0 OID 0)
+-- TOC entry 5769 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: COLUMN proj_x_org_x_ind.organisation_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5221,7 +5203,7 @@ COMMENT ON COLUMN spatial_metadata.proj_x_org_x_ind.organisation_id IS 'Referenc
 
 
 --
--- TOC entry 5772 (class 0 OID 0)
+-- TOC entry 5770 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: COLUMN proj_x_org_x_ind.individual_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5230,7 +5212,7 @@ COMMENT ON COLUMN spatial_metadata.proj_x_org_x_ind.individual_id IS 'Reference 
 
 
 --
--- TOC entry 5773 (class 0 OID 0)
+-- TOC entry 5771 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: COLUMN proj_x_org_x_ind."position"; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5239,7 +5221,7 @@ COMMENT ON COLUMN spatial_metadata.proj_x_org_x_ind."position" IS 'Position or j
 
 
 --
--- TOC entry 5774 (class 0 OID 0)
+-- TOC entry 5772 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: COLUMN proj_x_org_x_ind.tag; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5248,7 +5230,7 @@ COMMENT ON COLUMN spatial_metadata.proj_x_org_x_ind.tag IS 'Contact type: contac
 
 
 --
--- TOC entry 5775 (class 0 OID 0)
+-- TOC entry 5773 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: COLUMN proj_x_org_x_ind.role; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5257,7 +5239,7 @@ COMMENT ON COLUMN spatial_metadata.proj_x_org_x_ind.role IS 'ISO 19115 CI_RoleCo
 
 
 --
--- TOC entry 308 (class 1259 OID 55588908)
+-- TOC entry 308 (class 1259 OID 55597418)
 -- Name: project; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -5272,7 +5254,7 @@ CREATE TABLE spatial_metadata.project (
 ALTER TABLE spatial_metadata.project OWNER TO sis;
 
 --
--- TOC entry 5777 (class 0 OID 0)
+-- TOC entry 5775 (class 0 OID 0)
 -- Dependencies: 308
 -- Name: TABLE project; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5281,7 +5263,7 @@ COMMENT ON TABLE spatial_metadata.project IS 'Spatial data projects organized by
 
 
 --
--- TOC entry 5778 (class 0 OID 0)
+-- TOC entry 5776 (class 0 OID 0)
 -- Dependencies: 308
 -- Name: COLUMN project.country_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5290,7 +5272,7 @@ COMMENT ON COLUMN spatial_metadata.project.country_id IS 'Reference to the count
 
 
 --
--- TOC entry 5779 (class 0 OID 0)
+-- TOC entry 5777 (class 0 OID 0)
 -- Dependencies: 308
 -- Name: COLUMN project.project_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5299,7 +5281,7 @@ COMMENT ON COLUMN spatial_metadata.project.project_id IS 'Unique identifier for 
 
 
 --
--- TOC entry 5780 (class 0 OID 0)
+-- TOC entry 5778 (class 0 OID 0)
 -- Dependencies: 308
 -- Name: COLUMN project.project_name; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5308,7 +5290,7 @@ COMMENT ON COLUMN spatial_metadata.project.project_name IS 'Human-readable name 
 
 
 --
--- TOC entry 5781 (class 0 OID 0)
+-- TOC entry 5779 (class 0 OID 0)
 -- Dependencies: 308
 -- Name: COLUMN project.project_description; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5317,7 +5299,7 @@ COMMENT ON COLUMN spatial_metadata.project.project_description IS 'Description o
 
 
 --
--- TOC entry 309 (class 1259 OID 55588914)
+-- TOC entry 309 (class 1259 OID 55597424)
 -- Name: property; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -5341,7 +5323,7 @@ CREATE TABLE spatial_metadata.property (
 ALTER TABLE spatial_metadata.property OWNER TO sis;
 
 --
--- TOC entry 5783 (class 0 OID 0)
+-- TOC entry 5781 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: TABLE property; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5350,7 +5332,7 @@ COMMENT ON TABLE spatial_metadata.property IS 'Soil properties for spatial data 
 
 
 --
--- TOC entry 5784 (class 0 OID 0)
+-- TOC entry 5782 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.property_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5359,7 +5341,7 @@ COMMENT ON COLUMN spatial_metadata.property.property_id IS 'Unique identifier fo
 
 
 --
--- TOC entry 5785 (class 0 OID 0)
+-- TOC entry 5783 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.name; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5368,7 +5350,7 @@ COMMENT ON COLUMN spatial_metadata.property.name IS 'Human-readable name of the 
 
 
 --
--- TOC entry 5786 (class 0 OID 0)
+-- TOC entry 5784 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.property_num_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5377,7 +5359,7 @@ COMMENT ON COLUMN spatial_metadata.property.property_num_id IS 'Reference to the
 
 
 --
--- TOC entry 5787 (class 0 OID 0)
+-- TOC entry 5785 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.unit_of_measure_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5386,7 +5368,7 @@ COMMENT ON COLUMN spatial_metadata.property.unit_of_measure_id IS 'Reference to 
 
 
 --
--- TOC entry 5788 (class 0 OID 0)
+-- TOC entry 5786 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.min; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5395,7 +5377,7 @@ COMMENT ON COLUMN spatial_metadata.property.min IS 'Expected minimum value for t
 
 
 --
--- TOC entry 5789 (class 0 OID 0)
+-- TOC entry 5787 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.max; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5404,7 +5386,7 @@ COMMENT ON COLUMN spatial_metadata.property.max IS 'Expected maximum value for t
 
 
 --
--- TOC entry 5790 (class 0 OID 0)
+-- TOC entry 5788 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.property_type; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5413,7 +5395,7 @@ COMMENT ON COLUMN spatial_metadata.property.property_type IS 'Type: quantitative
 
 
 --
--- TOC entry 5791 (class 0 OID 0)
+-- TOC entry 5789 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.num_intervals; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5422,7 +5404,7 @@ COMMENT ON COLUMN spatial_metadata.property.num_intervals IS 'Number of classifi
 
 
 --
--- TOC entry 5792 (class 0 OID 0)
+-- TOC entry 5790 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.start_color; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5431,7 +5413,7 @@ COMMENT ON COLUMN spatial_metadata.property.start_color IS 'Start color for grad
 
 
 --
--- TOC entry 5793 (class 0 OID 0)
+-- TOC entry 5791 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.end_color; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5440,7 +5422,7 @@ COMMENT ON COLUMN spatial_metadata.property.end_color IS 'End color for gradient
 
 
 --
--- TOC entry 5794 (class 0 OID 0)
+-- TOC entry 5792 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: COLUMN property.keyword_theme; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5449,7 +5431,7 @@ COMMENT ON COLUMN spatial_metadata.property.keyword_theme IS 'Array of thematic 
 
 
 --
--- TOC entry 310 (class 1259 OID 55588921)
+-- TOC entry 310 (class 1259 OID 55597431)
 -- Name: url; Type: TABLE; Schema: spatial_metadata; Owner: sis
 --
 
@@ -5466,7 +5448,7 @@ CREATE TABLE spatial_metadata.url (
 ALTER TABLE spatial_metadata.url OWNER TO sis;
 
 --
--- TOC entry 5796 (class 0 OID 0)
+-- TOC entry 5794 (class 0 OID 0)
 -- Dependencies: 310
 -- Name: TABLE url; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5475,7 +5457,7 @@ COMMENT ON TABLE spatial_metadata.url IS 'Online resource URLs for mapsets (down
 
 
 --
--- TOC entry 5797 (class 0 OID 0)
+-- TOC entry 5795 (class 0 OID 0)
 -- Dependencies: 310
 -- Name: COLUMN url.mapset_id; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5484,7 +5466,7 @@ COMMENT ON COLUMN spatial_metadata.url.mapset_id IS 'Reference to the mapset';
 
 
 --
--- TOC entry 5798 (class 0 OID 0)
+-- TOC entry 5796 (class 0 OID 0)
 -- Dependencies: 310
 -- Name: COLUMN url.protocol; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5493,7 +5475,7 @@ COMMENT ON COLUMN spatial_metadata.url.protocol IS 'OGC or WWW protocol identifi
 
 
 --
--- TOC entry 5799 (class 0 OID 0)
+-- TOC entry 5797 (class 0 OID 0)
 -- Dependencies: 310
 -- Name: COLUMN url.url; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5502,7 +5484,7 @@ COMMENT ON COLUMN spatial_metadata.url.url IS 'Full URL to the resource';
 
 
 --
--- TOC entry 5800 (class 0 OID 0)
+-- TOC entry 5798 (class 0 OID 0)
 -- Dependencies: 310
 -- Name: COLUMN url.url_name; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5511,7 +5493,7 @@ COMMENT ON COLUMN spatial_metadata.url.url_name IS 'Display name for the URL';
 
 
 --
--- TOC entry 5801 (class 0 OID 0)
+-- TOC entry 5799 (class 0 OID 0)
 -- Dependencies: 310
 -- Name: COLUMN url.url_description; Type: COMMENT; Schema: spatial_metadata; Owner: sis
 --
@@ -5520,7 +5502,7 @@ COMMENT ON COLUMN spatial_metadata.url.url_description IS 'Description of what t
 
 
 --
--- TOC entry 4827 (class 2604 OID 55588928)
+-- TOC entry 4827 (class 2604 OID 55597438)
 -- Name: uploaded_dataset_edit edit_id; Type: DEFAULT; Schema: api; Owner: sis
 --
 
@@ -5528,7 +5510,7 @@ ALTER TABLE ONLY api.uploaded_dataset_edit ALTER COLUMN edit_id SET DEFAULT next
 
 
 --
--- TOC entry 5270 (class 0 OID 55588439)
+-- TOC entry 5270 (class 0 OID 55596949)
 -- Dependencies: 226
 -- Data for Name: api_client; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5538,7 +5520,7 @@ COPY api.api_client (api_client_id, api_key, is_active, created_at, expires_at, 
 
 
 --
--- TOC entry 5271 (class 0 OID 55588448)
+-- TOC entry 5271 (class 0 OID 55596958)
 -- Dependencies: 227
 -- Data for Name: audit; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5548,7 +5530,7 @@ COPY api.audit (audit_id, user_id, api_client_id, action, details, ip_address, c
 
 
 --
--- TOC entry 5273 (class 0 OID 55588457)
+-- TOC entry 5273 (class 0 OID 55596967)
 -- Dependencies: 229
 -- Data for Name: layer; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5558,7 +5540,7 @@ COPY api.layer (project_id, project_name, layer_id, publish, is_default, propert
 
 
 --
--- TOC entry 5274 (class 0 OID 55588463)
+-- TOC entry 5274 (class 0 OID 55596973)
 -- Dependencies: 230
 -- Data for Name: setting; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5568,7 +5550,7 @@ COPY api.setting (key, value) FROM stdin;
 
 
 --
--- TOC entry 5275 (class 0 OID 55588469)
+-- TOC entry 5275 (class 0 OID 55596979)
 -- Dependencies: 231
 -- Data for Name: uploaded_dataset; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5578,7 +5560,7 @@ COPY api.uploaded_dataset (user_id, project_id, table_name, file_name, upload_da
 
 
 --
--- TOC entry 5276 (class 0 OID 55588478)
+-- TOC entry 5276 (class 0 OID 55596988)
 -- Dependencies: 232
 -- Data for Name: uploaded_dataset_column; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5588,7 +5570,7 @@ COPY api.uploaded_dataset_column (table_name, column_name, destination_table, de
 
 
 --
--- TOC entry 5277 (class 0 OID 55588485)
+-- TOC entry 5277 (class 0 OID 55596995)
 -- Dependencies: 233
 -- Data for Name: uploaded_dataset_edit; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5598,7 +5580,7 @@ COPY api.uploaded_dataset_edit (edit_id, table_name, row_id, column_name, old_va
 
 
 --
--- TOC entry 5279 (class 0 OID 55588494)
+-- TOC entry 5279 (class 0 OID 55597004)
 -- Dependencies: 235
 -- Data for Name: user; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5608,7 +5590,7 @@ COPY api."user" (user_id, password_hash, is_active, is_admin, created_at, update
 
 
 --
--- TOC entry 4819 (class 0 OID 55587010)
+-- TOC entry 4819 (class 0 OID 55595519)
 -- Dependencies: 212
 -- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: sis
 --
@@ -5618,7 +5600,7 @@ COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM
 
 
 --
--- TOC entry 5289 (class 0 OID 55588588)
+-- TOC entry 5289 (class 0 OID 55597098)
 -- Dependencies: 249
 -- Data for Name: category_desc; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6421,7 +6403,7 @@ voidsClassificationValueCode-V	V	Vughs	Mostly irregular, equidimensional voids o
 
 
 --
--- TOC entry 5280 (class 0 OID 55588506)
+-- TOC entry 5280 (class 0 OID 55597016)
 -- Dependencies: 236
 -- Data for Name: element; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6431,7 +6413,7 @@ COPY soil_data.element (element_id, profile_id, order_element, upper_depth, lowe
 
 
 --
--- TOC entry 5291 (class 0 OID 55588596)
+-- TOC entry 5291 (class 0 OID 55597106)
 -- Dependencies: 251
 -- Data for Name: individual; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6441,7 +6423,7 @@ COPY soil_data.individual (individual_id, email) FROM stdin;
 
 
 --
--- TOC entry 5292 (class 0 OID 55588602)
+-- TOC entry 5292 (class 0 OID 55597112)
 -- Dependencies: 252
 -- Data for Name: languages; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6451,7 +6433,7 @@ COPY soil_data.languages (language_code, language_name) FROM stdin;
 
 
 --
--- TOC entry 5293 (class 0 OID 55588608)
+-- TOC entry 5293 (class 0 OID 55597118)
 -- Dependencies: 253
 -- Data for Name: observation_desc; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6486,7 +6468,6 @@ FAO GfSD 2006	bleachedSandProperty	bleachedSandValueCode-0	\N	\N	t	\N	t
 FAO GfSD 2006	bleachedSandProperty	bleachedSandValueCode-1	\N	\N	t	\N	t
 FAO GfSD 2006	bleachedSandProperty	bleachedSandValueCode-2	\N	\N	t	\N	t
 FAO GfSD 2006	bleachedSandProperty	bleachedSandValueCode-3	\N	\N	t	\N	t
-FAO GfSD 2006	bleachedSandProperty	bleachedSandValueCode-4	\N	\N	t	\N	t
 FAO GfSD 2006	cracksDepthProperty	cracksDepthValueCode-D	\N	\N	t	\N	t
 FAO GfSD 2006	cracksDepthProperty	cracksDepthValueCode-M	\N	\N	t	\N	t
 FAO GfSD 2006	cracksDepthProperty	cracksDepthValueCode-S	\N	\N	t	\N	t
@@ -6499,7 +6480,6 @@ FAO GfSD 2006	cracksDistanceProperty	cracksDistanceValueCode-W	\N	\N	t	\N	t
 FAO GfSD 2006	cracksWidthProperty	cracksWidthValueCode-E	\N	\N	t	\N	t
 FAO GfSD 2006	cracksWidthProperty	cracksWidthValueCode-F	\N	\N	t	\N	t
 FAO GfSD 2006	cracksWidthProperty	cracksWidthValueCode-M	\N	\N	t	\N	t
-FAO GfSD 2006	cracksWidthProperty	cracksWidthValueCode-V	\N	\N	t	\N	t
 FAO GfSD 2006	cracksWidthProperty	cracksWidthValueCode-W	\N	\N	t	\N	t
 FAO GfSD 2006	fragmentCoverProperty	fragmentCoverValueCode-A	\N	\N	t	\N	t
 FAO GfSD 2006	fragmentCoverProperty	fragmentCoverValueCode-C	\N	\N	t	\N	t
@@ -6524,10 +6504,10 @@ FAO GfSD 2006	rockAbundanceProperty	rockAbundanceValueCode-S	\N	\N	t	\N	t
 FAO GfSD 2006	rockAbundanceProperty	rockAbundanceValueCode-V	\N	\N	t	\N	t
 FAO GfSD 2006	rockShapeProperty	rockShapeValueCode-A	\N	\N	t	\N	t
 FAO GfSD 2006	rockShapeProperty	rockShapeValueCode-F	\N	\N	t	\N	t
-FAO GfSD 2006	rockShapeProperty	rockShapeValueCode-R	\N	\N	t	\N	t
 FAO GfSD 2006	rockShapeProperty	rockShapeValueCode-S	\N	\N	t	\N	t
 FAO GfSD 2006	rockSizeProperty	rockSizeValueCode-A	\N	\N	t	\N	t
 FAO GfSD 2006	rockSizeProperty	rockSizeValueCode-AC	\N	\N	t	\N	t
+FAO GfSD 2006	rockSizeProperty	rockSizeValueCode-AF	\N	\N	t	\N	t
 FAO GfSD 2006	rockSizeProperty	rockSizeValueCode-AM	\N	\N	t	\N	t
 FAO GfSD 2006	rockSizeProperty	rockSizeValueCode-AV	\N	\N	t	\N	t
 FAO GfSD 2006	rockSizeProperty	rockSizeValueCode-BL	\N	\N	t	\N	t
@@ -6984,8 +6964,6 @@ FAO GfSD 2006	geologyProperty	lithologyValueCode-UG1	\N	t	\N	\N	\N
 FAO GfSD 2006	geologyProperty	lithologyValueCode-UG2	\N	t	\N	\N	\N
 FAO GfSD 2006	geologyProperty	lithologyValueCode-UG3	\N	t	\N	\N	\N
 FAO GfSD 2006	geologyProperty	lithologyValueCode-UK	\N	t	\N	\N	\N
-FAO GfSD 2006	weatheringFragmentsProperty	weatheringValueCode-S	\N	t	t	\N	t
-FAO GfSD 2006	weatheringFragmentsProperty	weatheringValueCode-W	\N	t	t	\N	t
 FAO GfSD 2006	geologyProperty	lithologyValueCode-UK1	\N	t	\N	\N	\N
 FAO GfSD 2006	geologyProperty	lithologyValueCode-UK2	\N	t	\N	\N	\N
 FAO GfSD 2006	geologyProperty	lithologyValueCode-UL	\N	t	\N	\N	\N
@@ -7146,7 +7124,9 @@ FAO GfSD 2006	profileDescriptionStatusProperty	profileDescriptionStatusValueCode
 FAO GfSD 2006	profileDescriptionStatusProperty	profileDescriptionStatusValueCode-1.1	\N	\N	\N	t	\N
 FAO GfSD 2006	profileDescriptionStatusProperty	profileDescriptionStatusValueCode-3	\N	\N	\N	t	\N
 FAO GfSD 2006	profileDescriptionStatusProperty	profileDescriptionStatusValueCode-1	\N	\N	\N	t	\N
-FAO GfSD 2006	rockSizeProperty	rockSizeValueCode-AF	\N	\N	t	\N	t
+FAO GfSD 2006	bleachedSandProperty	bleachedSandValueCode-4	\N	\N	t	\N	t
+FAO GfSD 2006	cracksWidthProperty	cracksWidthValueCode-V	\N	\N	t	\N	t
+FAO GfSD 2006	rockShapeProperty	rockShapeValueCode-R	\N	\N	t	\N	t
 FAO GfSD 2006	biologicalAbundanceProperty	biologicalAbundanceValueCode-C	\N	\N	\N	\N	t
 FAO GfSD 2006	biologicalAbundanceProperty	biologicalAbundanceValueCode-F	\N	\N	\N	\N	t
 FAO GfSD 2006	biologicalAbundanceProperty	biologicalAbundanceValueCode-M	\N	\N	\N	\N	t
@@ -7406,6 +7386,8 @@ FAO GfSD 2006	saltContentProperty	saltContentValueCode-SL	\N	\N	\N	\N	t
 FAO GfSD 2006	saltContentProperty	saltContentValueCode-ST	\N	\N	\N	\N	t
 FAO GfSD 2006	saltContentProperty	saltContentValueCode-VST	\N	\N	\N	\N	t
 FAO GfSD 2006	weatheringFragmentsProperty	weatheringValueCode-F	\N	t	t	\N	t
+FAO GfSD 2006	weatheringFragmentsProperty	weatheringValueCode-S	\N	t	t	\N	t
+FAO GfSD 2006	weatheringFragmentsProperty	weatheringValueCode-W	\N	t	t	\N	t
 FAO GfSD 2006	poresSizeProperty	voidsDiameterValueCode-C	\N	\N	\N	\N	t
 FAO GfSD 2006	poresSizeProperty	voidsDiameterValueCode-F	\N	\N	\N	\N	t
 FAO GfSD 2006	poresSizeProperty	voidsDiameterValueCode-FF	\N	\N	\N	\N	t
@@ -7468,7 +7450,7 @@ ISRIC Report 2019/01	fragmentsClassProperty	fragmentsClassValueCode-FVT	\N	\N	\N
 
 
 --
--- TOC entry 5281 (class 0 OID 55588517)
+-- TOC entry 5281 (class 0 OID 55597027)
 -- Dependencies: 237
 -- Data for Name: observation_num; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8395,7 +8377,7 @@ COPY soil_data.observation_num (observation_num_id, property_num_id, procedure_n
 
 
 --
--- TOC entry 5295 (class 0 OID 55588616)
+-- TOC entry 5295 (class 0 OID 55597126)
 -- Dependencies: 255
 -- Data for Name: organisation; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8405,7 +8387,7 @@ COPY soil_data.organisation (organisation_id, url, email, country, city, postal_
 
 
 --
--- TOC entry 5282 (class 0 OID 55588524)
+-- TOC entry 5282 (class 0 OID 55597034)
 -- Dependencies: 238
 -- Data for Name: plot; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8415,7 +8397,7 @@ COPY soil_data.plot (plot_id, site_id, plot_code, parent_plot_id, type, altitude
 
 
 --
--- TOC entry 5297 (class 0 OID 55588624)
+-- TOC entry 5297 (class 0 OID 55597134)
 -- Dependencies: 257
 -- Data for Name: procedure_desc; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8432,7 +8414,7 @@ WRB fourth edition 2022	WRB fourth edition 2022	https://www.fao.org/soils-portal
 
 
 --
--- TOC entry 5298 (class 0 OID 55588630)
+-- TOC entry 5298 (class 0 OID 55597140)
 -- Dependencies: 258
 -- Data for Name: procedure_model; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8442,7 +8424,7 @@ COPY soil_data.procedure_model (procedure_model_id, procedure_name) FROM stdin;
 
 
 --
--- TOC entry 5299 (class 0 OID 55588636)
+-- TOC entry 5299 (class 0 OID 55597146)
 -- Dependencies: 259
 -- Data for Name: procedure_model_def; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8452,7 +8434,7 @@ COPY soil_data.procedure_model_def (procedure_model_id, key, value) FROM stdin;
 
 
 --
--- TOC entry 5301 (class 0 OID 55588644)
+-- TOC entry 5301 (class 0 OID 55597154)
 -- Dependencies: 261
 -- Data for Name: procedure_num; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8737,7 +8719,7 @@ TOTALN_H2SO4	\N	H2SO4			http://w3id.org/glosis/model/procedure/nitrogenTotalProc
 
 
 --
--- TOC entry 5302 (class 0 OID 55588650)
+-- TOC entry 5302 (class 0 OID 55597160)
 -- Dependencies: 262
 -- Data for Name: procedure_spectrometer; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8747,7 +8729,7 @@ COPY soil_data.procedure_spectrometer (procedure_spectrometer_id, procedure_name
 
 
 --
--- TOC entry 5303 (class 0 OID 55588656)
+-- TOC entry 5303 (class 0 OID 55597166)
 -- Dependencies: 263
 -- Data for Name: procedure_spectrometer_def; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8757,7 +8739,7 @@ COPY soil_data.procedure_spectrometer_def (procedure_spectrometer_id, key, value
 
 
 --
--- TOC entry 5283 (class 0 OID 55588532)
+-- TOC entry 5283 (class 0 OID 55597042)
 -- Dependencies: 239
 -- Data for Name: profile; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8767,7 +8749,7 @@ COPY soil_data.profile (profile_id, plot_id, profile_code) FROM stdin;
 
 
 --
--- TOC entry 5306 (class 0 OID 55588666)
+-- TOC entry 5306 (class 0 OID 55597176)
 -- Dependencies: 266
 -- Data for Name: proj_x_org_x_ind; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8777,7 +8759,7 @@ COPY soil_data.proj_x_org_x_ind (project_id, organisation_id, individual_id, "po
 
 
 --
--- TOC entry 5284 (class 0 OID 55588538)
+-- TOC entry 5284 (class 0 OID 55597048)
 -- Dependencies: 240
 -- Data for Name: project; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8787,7 +8769,7 @@ COPY soil_data.project (project_id, name, license, abstract, is_published, profi
 
 
 --
--- TOC entry 5285 (class 0 OID 55588548)
+-- TOC entry 5285 (class 0 OID 55597058)
 -- Dependencies: 241
 -- Data for Name: project_site; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8797,7 +8779,7 @@ COPY soil_data.project_site (project_id, site_id) FROM stdin;
 
 
 --
--- TOC entry 5307 (class 0 OID 55588674)
+-- TOC entry 5307 (class 0 OID 55597184)
 -- Dependencies: 267
 -- Data for Name: project_soil_map; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8807,7 +8789,7 @@ COPY soil_data.project_soil_map (project_id, soil_map_id, remarks) FROM stdin;
 
 
 --
--- TOC entry 5308 (class 0 OID 55588680)
+-- TOC entry 5308 (class 0 OID 55597190)
 -- Dependencies: 268
 -- Data for Name: property_desc; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8910,7 +8892,7 @@ voidsDiameterProperty	Voids Diameter	Voids include all empty spaces in the soil.
 
 
 --
--- TOC entry 5309 (class 0 OID 55588686)
+-- TOC entry 5309 (class 0 OID 55597196)
 -- Dependencies: 269
 -- Data for Name: property_num; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8975,7 +8957,7 @@ BULDWHOLE	Bulk Density whole soil	\N	http://w3id.org/glosis/model/layerhorizon/b
 
 
 --
--- TOC entry 5310 (class 0 OID 55588692)
+-- TOC entry 5310 (class 0 OID 55597202)
 -- Dependencies: 270
 -- Data for Name: result_desc_element; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8985,7 +8967,7 @@ COPY soil_data.result_desc_element (element_id, property_desc_id, category_desc_
 
 
 --
--- TOC entry 5311 (class 0 OID 55588698)
+-- TOC entry 5311 (class 0 OID 55597208)
 -- Dependencies: 271
 -- Data for Name: result_desc_plot; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8995,7 +8977,7 @@ COPY soil_data.result_desc_plot (plot_id, property_desc_id, category_desc_id) FR
 
 
 --
--- TOC entry 5312 (class 0 OID 55588704)
+-- TOC entry 5312 (class 0 OID 55597214)
 -- Dependencies: 272
 -- Data for Name: result_desc_profile; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9005,7 +8987,7 @@ COPY soil_data.result_desc_profile (profile_id, property_desc_id, category_desc_
 
 
 --
--- TOC entry 5313 (class 0 OID 55588710)
+-- TOC entry 5313 (class 0 OID 55597220)
 -- Dependencies: 273
 -- Data for Name: result_desc_surface; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9015,7 +8997,7 @@ COPY soil_data.result_desc_surface (surface_id, property_desc_id, category_desc_
 
 
 --
--- TOC entry 5286 (class 0 OID 55588554)
+-- TOC entry 5286 (class 0 OID 55597064)
 -- Dependencies: 242
 -- Data for Name: result_num; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9025,7 +9007,7 @@ COPY soil_data.result_num (observation_num_id, specimen_id, value) FROM stdin;
 
 
 --
--- TOC entry 5314 (class 0 OID 55588716)
+-- TOC entry 5314 (class 0 OID 55597226)
 -- Dependencies: 274
 -- Data for Name: result_spectral; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9035,7 +9017,7 @@ COPY soil_data.result_spectral (result_spectral_id, observation_num_id, procedur
 
 
 --
--- TOC entry 5287 (class 0 OID 55588557)
+-- TOC entry 5287 (class 0 OID 55597067)
 -- Dependencies: 243
 -- Data for Name: site; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9045,7 +9027,7 @@ COPY soil_data.site (site_id, geom) FROM stdin;
 
 
 --
--- TOC entry 5316 (class 0 OID 55588721)
+-- TOC entry 5316 (class 0 OID 55597231)
 -- Dependencies: 276
 -- Data for Name: soil_map; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9055,7 +9037,7 @@ COPY soil_data.soil_map (soil_map_id, name, description, scale_denominator, spat
 
 
 --
--- TOC entry 5318 (class 0 OID 55588729)
+-- TOC entry 5318 (class 0 OID 55597239)
 -- Dependencies: 278
 -- Data for Name: soil_mapping_unit; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9065,7 +9047,7 @@ COPY soil_data.soil_mapping_unit (mapping_unit_id, category_id, explanation, rem
 
 
 --
--- TOC entry 5319 (class 0 OID 55588735)
+-- TOC entry 5319 (class 0 OID 55597245)
 -- Dependencies: 279
 -- Data for Name: soil_mapping_unit_category; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9075,7 +9057,7 @@ COPY soil_data.soil_mapping_unit_category (category_id, soil_map_id, parent_cate
 
 
 --
--- TOC entry 5322 (class 0 OID 55588745)
+-- TOC entry 5322 (class 0 OID 55597255)
 -- Dependencies: 282
 -- Data for Name: soil_mapping_unit_profile; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9085,7 +9067,7 @@ COPY soil_data.soil_mapping_unit_profile (mapping_unit_id, profile_id, is_repres
 
 
 --
--- TOC entry 5323 (class 0 OID 55588752)
+-- TOC entry 5323 (class 0 OID 55597262)
 -- Dependencies: 283
 -- Data for Name: soil_typological_unit; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9095,7 +9077,7 @@ COPY soil_data.soil_typological_unit (typological_unit_id, name, classification_
 
 
 --
--- TOC entry 5324 (class 0 OID 55588758)
+-- TOC entry 5324 (class 0 OID 55597268)
 -- Dependencies: 284
 -- Data for Name: soil_typological_unit_mapping_unit; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9105,7 +9087,7 @@ COPY soil_data.soil_typological_unit_mapping_unit (typological_unit_id, mapping_
 
 
 --
--- TOC entry 5325 (class 0 OID 55588765)
+-- TOC entry 5325 (class 0 OID 55597275)
 -- Dependencies: 285
 -- Data for Name: soil_typological_unit_profile; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9115,7 +9097,7 @@ COPY soil_data.soil_typological_unit_profile (typological_unit_id, profile_id, i
 
 
 --
--- TOC entry 5288 (class 0 OID 55588563)
+-- TOC entry 5288 (class 0 OID 55597073)
 -- Dependencies: 244
 -- Data for Name: specimen; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9125,7 +9107,7 @@ COPY soil_data.specimen (specimen_id, element_id, specimen_prep_process_id, code
 
 
 --
--- TOC entry 5327 (class 0 OID 55588774)
+-- TOC entry 5327 (class 0 OID 55597284)
 -- Dependencies: 287
 -- Data for Name: specimen_prep_process; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9135,7 +9117,7 @@ COPY soil_data.specimen_prep_process (specimen_prep_process_id, specimen_transpo
 
 
 --
--- TOC entry 5330 (class 0 OID 55588784)
+-- TOC entry 5330 (class 0 OID 55597294)
 -- Dependencies: 290
 -- Data for Name: specimen_storage; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9145,7 +9127,7 @@ COPY soil_data.specimen_storage (specimen_storage_id, label, definition) FROM st
 
 
 --
--- TOC entry 5332 (class 0 OID 55588792)
+-- TOC entry 5332 (class 0 OID 55597302)
 -- Dependencies: 292
 -- Data for Name: specimen_transport; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9155,7 +9137,7 @@ COPY soil_data.specimen_transport (specimen_transport_id, label, definition) FRO
 
 
 --
--- TOC entry 5334 (class 0 OID 55588800)
+-- TOC entry 5334 (class 0 OID 55597310)
 -- Dependencies: 294
 -- Data for Name: spectral_sample; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9165,7 +9147,7 @@ COPY soil_data.spectral_sample (spectral_sample_id, specimen_id) FROM stdin;
 
 
 --
--- TOC entry 5335 (class 0 OID 55588806)
+-- TOC entry 5335 (class 0 OID 55597316)
 -- Dependencies: 295
 -- Data for Name: spectrum; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9175,7 +9157,7 @@ COPY soil_data.spectrum (spectrum_id, spectral_sample_id, procedure_spectrometer
 
 
 --
--- TOC entry 5337 (class 0 OID 55588814)
+-- TOC entry 5337 (class 0 OID 55597324)
 -- Dependencies: 297
 -- Data for Name: spectrum_x_result_spectral; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9185,7 +9167,7 @@ COPY soil_data.spectrum_x_result_spectral (result_spectral_id, spectrum_id) FROM
 
 
 --
--- TOC entry 5338 (class 0 OID 55588817)
+-- TOC entry 5338 (class 0 OID 55597327)
 -- Dependencies: 298
 -- Data for Name: translate; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9195,7 +9177,7 @@ COPY soil_data.translate (table_name, column_name, language_code, string, transl
 
 
 --
--- TOC entry 5339 (class 0 OID 55588823)
+-- TOC entry 5339 (class 0 OID 55597333)
 -- Dependencies: 299
 -- Data for Name: unit_conversion; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9243,7 +9225,7 @@ in/h	*	2.54	cm/h
 
 
 --
--- TOC entry 5340 (class 0 OID 55588831)
+-- TOC entry 5340 (class 0 OID 55597341)
 -- Dependencies: 300
 -- Data for Name: unit_of_measure; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9293,7 +9275,7 @@ in/h	Inch per hour	Rate	http://qudt.org/vocab/unit/IN-PER-HR
 
 
 --
--- TOC entry 5341 (class 0 OID 55588837)
+-- TOC entry 5341 (class 0 OID 55597347)
 -- Dependencies: 301
 -- Data for Name: class; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9303,276 +9285,276 @@ COPY spatial_metadata.class (mapset_id, value, code, label, color, opacity, publ
 
 
 --
--- TOC entry 5342 (class 0 OID 55588843)
+-- TOC entry 5342 (class 0 OID 55597353)
 -- Dependencies: 302
 -- Data for Name: country; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
 
-COPY spatial_metadata.country (country_id, iso3_code, gaul_code, color_code, ar, en, es, fr, pt, ru, zh, status, disp_area, capital, continent, un_reg, unreg_note, continent_custom) FROM stdin;
-IN	IND	115	IND	الهند	India	India	Inde	Índia	Индия	印 度	Member State	NO	New Delhi	Asia	Southern Asia		Asia
-CU	CUB	63	CUB	كوبا	Cuba	Cuba	Cuba	Cuba	Куба	古 巴	Member State	NO	Havana	Americas	Caribbean		Northern America
-ZM	ZMB	270	ZMB	زامبيا	Zambia	Zambia	Zambie	Zâmbia	Замбия	赞比亚	Member State	NO	Lusaka	Africa	Eastern Africa		Africa
-KE	KEN	133	KEN	كينيا	Kenya	Kenya	Kenya	Quênia	Кения	肯尼亚	Member State	NO	Nairobi	Africa	Eastern Africa		Africa
-MG	MDG	150	MDG	مدغشقر	Madagascar	Madagascar	Madagascar	Madagáscar	Мадагаскар	马达加斯加	Member State	NO	Antananarivo	Africa	Eastern Africa		Africa
-SD	SDN	6	   	السودان	Sudan	Sudán	Soudan	Sudão	Судан	苏 丹	Member State	NO	Khartoum	Africa	Northern Africa		Africa
-KP	PRK	67	PRK	جمهورية كوريا الديمقراطية الشعبية	Democratic People's Republic of Korea	República Popular Democrática de Corea	République populaire démocratique de Corée	Coreia do Norte	Корейская Народно-Демократическая Республика	朝鲜民主主义人民共和国	Member State	NO	Pyongyang	Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-RW	RWA	205	RWA	رواندا	Rwanda	Rwanda	Rwanda	Ruanda	Руанда	卢旺达	Member State	NO	Kigali	Africa	Eastern Africa		Africa
-SO	SOM	226	SOM	الصومال	Somalia	Somalia	Somalie	Somália	Сомали	索马里	Member State	NO	Mogadishu	Africa	Eastern Africa		Africa
-SC	SYC	220	SYC	سيشيل	Seychelles	Seychelles	Seychelles	Seychelles	Сейшельские Острова	塞舌尔	Member State	NO	Victoria	Africa	Eastern Africa		Africa
-TZ	TZA	257	TZA	جمهورية تنزانيا المتحدة	United Republic of Tanzania	República Unida de Tanzanía	République-Unie de Tanzanie	Tanzânia	Объединенная Республика Танзания	坦桑尼亚联合共和国	Member State	NO	Dodoma	Africa	Eastern Africa		Africa
-UG	UGA	253	UGA	أوغندا	Uganda	Uganda	Ouganda	Uganda	Уганда	乌干达	Member State	NO	Kampala	Africa	Eastern Africa		Africa
-ZW	ZWE	271	ZWE	زمبابوي	Zimbabwe	Zimbabwe	Zimbabwe	Zimbabwe	Зимбабве	津巴布韦	Member State	NO	Harare	Africa	Eastern Africa		Africa
-LU	LUX	148	LUX	لكسمبرغ	Luxembourg	Luxemburgo	Luxembourg	Luxemburgo	Люксембург	卢森堡	Member State	NO	Luxembourg	Europe	Western Europe		Europe
-GL	GRL	98	DNK	غرينلاند	Greenland	Groenlandia	Groenland	Gronelândia	Гренландия	格陵兰	DK Self-Governing Territory	NO	Nuuk	Americas	Northern America	Not classified in the UN classification 2005	Northern America
-MQ	MTQ	158	FRA	مارتينيك	Martinique	Martinica	Martinique	Martinica	Мартиника	马提尼克	FR Territory	NO	Fort-de-France	Americas	Caribbean		Northern America
-JM	JAM	123	JAM	جامايكا	Jamaica	Jamaica	Jamaïque	Jamaica	Ямайка	牙买加	Member State	NO	Kingston	Americas	Caribbean		Northern America
-VE	VEN	263	VEN	فنزويلا (جمهورية .. البوليفارية)	Venezuela (Bolivarian Republic of)	Venezuela (República Bolivariana de)	Venezuela (République bolivarienne du)	Venezuela	Венесуэла (Боливарианская Республика)	委内瑞拉 (玻利瓦尔共和国)	Member State	NO	Caracas	Americas	South America		South America
-NE	NER	181	NER	النيجر	Niger	Níger	Niger	Níger	Нигер	尼日尔	Member State	NO	Niamey	Africa	Western Africa		Africa
-IR	IRN	117	IRN	إيران	Iran (Islamic Republic of)	Irán (República Islámica del)	Iran (République islamique d')	Irã	Иран (Исламская Республика)	伊 朗(伊斯兰共和国)	Member State	NO	Tehran	Asia	Southern Asia		Asia
-GW	GNB	105	GNB	غينيا - بيساو	Guinea-Bissau	Guinea-Bissau	Guinée-Bissau	Guiné-Bissau	Гвинея-Бисау	几内亚比绍	Member State	NO	Bissau	Africa	Western Africa		Africa
-GM	GMB	90	GMB	غامبيا	Gambia	Gambia	Gambie	Gâmbia	Гамбия	冈比亚	Member State	NO	Banjul	Africa	Western Africa		Africa
-ET	ETH	79	ETH	إثيوبيا	Ethiopia	Etiopía	Éthiopie	Etiópia	Эфиопия	埃塞俄比亚	Member State	NO	Addis-Ababa	Africa	Eastern Africa		Africa
-ER	ERI	77	ERI	إريتريا	Eritrea	Eritrea	Érythrée	Eritreia	Эритрея	厄立特里亚	Member State	NO	Asmara	Africa	Eastern Africa		Africa
-DJ	DJI	70	DJI	جيبوتي	Djibouti	Djibouti	Djibouti	Djibouti	Джибути	吉布提	Member State	NO	Djibouti	Africa	Eastern Africa		Africa
-KM	COM	58	COM	جزر القمر	Comoros	Comoras	Comores	Comores	Коморские Острова	科摩罗	Member State	NO	Moroni	Africa	Eastern Africa		Africa
-IO	IOT	38	GBR	المناطق البريطانية في المحيط الهندي	British Indian Ocean Territory	Territorio Británico del Océano Indico	Territoire britanique de l'Océan Indien	Território Britânico do Oceano Índico	Британская Территория в Индийском Океане	英辖印度洋海域	UK Territory	NO		Africa	Eastern Africa		Africa
-NA	NAM	172	NAM	ناميبيا	Namibia	Namibia	Namibie	Namíbia	Намибия	纳米比亚	Member State	NO	Windhoek	Africa	Southern Africa		Africa
-MR	MRT	159	MRT	موريتانيا	Mauritania	Mauritania	Mauritanie	Mauritânia	Мавритания	毛里塔尼亚	Member State	NO	Nouakchott	Africa	Western Africa		Africa
-LR	LBR	144	LBR	ليبريا	Liberia	Liberia	Libéria	Libéria	Либерия	利比里亚	Member State	NO	Monrovia	Africa	Western Africa		Africa
-TJ	TJK	239	TJK	طاجيكستان	Tajikistan	Tayikistán	Tadjikistan	Tajiquistão	Таджикистан	塔吉克斯坦	Member State	NO	Dushanbe	Asia	Central Asia		Asia
-LS	LSO	142	LSO	ليسوتو	Lesotho	Lesotho	Lesotho	Lesoto	Лесото	莱索托	Member State	NO	Maseru	Africa	Southern Africa		Africa
-ZA	ZAF	227	ZAF	جنوب أفريقيا	South Africa	Sudáfrica	Afrique du Sud	África do Sul	Южная Африка	南 非	Member State	NO	Pretoria (Adm.)	Africa	Southern Africa		Africa
-SE	SWE	236	SWE	السويد	Sweden	Suecia	Suède	Suécia	Швеция	瑞 典	Member State	NO	Stockholm	Europe	Northern Europe		Europe
-UZ	UZB	261	UZB	أوزبكستان	Uzbekistan	Uzbekistán	Ouzbékistan	Uzbequistão	Узбекистан	乌兹别克斯坦	Member State	NO	Tashkent	Asia	Central Asia		Asia
-GE	GEO	92	GEO	جورجيا	Georgia	Georgia	Géorgie	Geórgia	Грузия	格鲁吉亚	Member State	NO	Tbilisi	Asia	Western Asia		Asia
-CY	CYP	64	CYP	قبرص	Cyprus	Chipre	Chypre	Chipre	Кипр	塞浦路斯	Member State	NO	Nicosia	Asia	Western Asia		Asia
-NP	NPL	175	NPL	نيبال	Nepal	Nepal	Népal	Nepal	Непал	尼泊尔	Member State	NO	Kathmandu	Asia	Southern Asia		Asia
-NG	NGA	182	NGA	نيجيريا	Nigeria	Nigeria	Nigéria	Nigéria	Нигерия	尼日利亚	Member State	NO	Abuja	Africa	Western Africa		Africa
-FO	FRO	82	DNK	جزر فيرويه	Faroe Islands	Islas Feroe	Îles Féroé	Ilhas Feroé	Фарерские острова	法罗群岛	DK Territory	NO	Tórshavn	Europe	Northern Europe		Europe
-SN	SEN	217	SEN	السنغال	Senegal	Senegal	Sénégal	Senegal	Сенегал	塞内加尔	Member State	NO	Dakar	Africa	Western Africa		Africa
-VA	VAT	110	VAT	الكرسي الرسولي	Holy See	Santa Sede	Saint-Siège	Vaticano	Святой Престол	教廷	The City of Vatican	NO		Europe	Southern Europe		Europe
-HR	HRV	62	HRV	كرواتيا	Croatia	Croacia	Croatie	Croácia	Хорватия	克罗地亚	Member State	NO	Zagreb	Europe	Southern Europe		Europe
-MT	MLT	156	MLT	مالطة	Malta	Malta	Malte	Malta	Мальта	马耳他	Member State	NO	Valletta	Europe	Southern Europe		Europe
-ME	MNE	2647	MNE	الجبل الأسود	Montenegro	Montenegro	Monténégro	Montenegro	Черногория	黑山	Member State	NO	Podgorica	Europe	Southern Europe		Europe
-EE	EST	78	EST	إستونيا	Estonia	Estonia	Estonie	Estónia	Эстония	爱沙尼亚	Member State	NO	Tallinn	Europe	Northern Europe		Europe
-MK	MKD	241	MKD	جمهورية مقدونيا اليوغوسلافية السابقة	The former Yugoslav Republic of Macedonia	la ex República Yugoslava de Macedonia	l'ex-République yougoslave de Macédoine	Macedónia	бывшая югославская Республика Македония	前南斯拉夫的马其顿共和国	Member State	NO	Skopje	Europe	Southern Europe		Europe
-GR	GRC	97	GRC	اليونان	Greece	Grecia	Grèce	Grécia	Греция	希 腊	Member State	NO	Athens	Europe	Southern Europe		Europe
-BY	BLR	26	BLR	بيلاروس	Belarus	Belarús	Bélarus	Bielorrússia	Беларусь	白俄罗斯	Member State	NO	Minsk	Europe	Eastern Europe		Europe
-PT	PRT	199	PRT	البرتغال	Portugal	Portugal	Portugal	Portugal	Португалия	葡萄牙	Member State	NO	Lisbon	Europe	Southern Europe		Europe
-MW	MWI	152	MWI	ملاوي	Malawi	Malawi	Malawi	Malawi	Малави	马拉维	Member State	NO	Lilongwe	Africa	Eastern Africa		Africa
-BN	BRN	40	BRN	برونى دار السلام	Brunei Darussalam	Brunei Darussalam	Brunéi Darussalam	Brunei	Бруней-Даруссалам	文莱达鲁萨兰国	Member State	NO	Bandar Seri Begawan	Asia	South-Eastern Asia		Asia
-PH	PHL	196	PHL	الفلبين	Philippines	Filipinas	Philippines	Filipinas	Филиппины	菲律宾	Member State	NO	Manila	Asia	South-Eastern Asia		Asia
-ID	IDN	116	IDN	إندونيسيا	Indonesia	Indonesia	Indonésie	Indonésia	Индонезия	印度尼西亚	Member State	NO	Jakarta	Asia	South-Eastern Asia		Asia
-LT	LTU	147	LTU	ليتوانيا	Lithuania	Lituania	Lituanie	Lituânia	Литва	立陶宛	Member State	NO	Vilnius	Europe	Northern Europe		Europe
-LV	LVA	140	LVA	لاتفيا	Latvia	Letonia	Lettonie	Letônia	Латвия	拉脱维亚	Member State	NO	Riga	Europe	Northern Europe		Europe
-IS	ISL	114	ISL	آيسلندا	Iceland	Islandia	Islande	Islândia	Исландия	冰 岛	Member State	NO	Reykjavík	Europe	Northern Europe		Europe
-GB	GBR	256	GBR	المملكة المتحدة	United Kingdom	Reino Unido	Royaume-Uni	Reino Unido	Соединенное Королевство	联合王国	Member State	NO	London	Europe	Northern Europe		Europe
-FI	FIN	84	FIN	فنلندا	Finland	Finlandia	Finlande	Finlândia	Финляндия	芬 兰	Member State	NO	Helsinki	Europe	Northern Europe		Europe
-SM	SMR	213	SMR	سان مارينو	San Marino	San Marino	Saint-Marin	São Marino	Сан-Марино	圣马力诺	Member State	NO	San Marino	Europe	Southern Europe		Europe
-IT	ITA	122	ITA	إيطاليا	Italy	Italia	Italie	Itália	Италия	意大利	Member State	NO	Rome	Europe	Southern Europe		Europe
-RS	SRB	2648	SRB	صربيا	Serbia	Serbia	Serbie 	Sérvia	Сербия	塞尔维亚	Member State	NO	Belgrade	Europe	Southern Europe		Europe
-AD	AND	7	AND	أندورا	Andorra	Andorra	Andorre	Andorra	Андорра	安道尔	Member State	NO	Andorra la Vella	Europe	Southern Europe		Europe
-MC	MCO	166	MCO	موناكو	Monaco	Mónaco	Monaco	Mónaco	Монако	摩纳哥	Member State	NO	Monaco	Europe	Western Europe		Europe
-RU	RUS	204	RUS	الاتحاد الروسي	Russian Federation	Federación de Rusia	Fédération de Russie	Rússia	Российская Федерация	俄罗斯联邦	Member State	NO	Moskva	Europe	Eastern Europe		Europe
-CL	CHL	51	CHL	شيلى	Chile	Chile	Chili	Chile	Чили	智 利	Member State	NO	Santiago	Americas	South America		South America
-TM	TKM	250	TKM	تركمانستان	Turkmenistan	Turkmenistán	Turkménistan	Turquemenistão	Туркменистан	土库曼斯坦	Member State	NO	Ashgabat	Asia	Central Asia		Asia
-NO	NOR	186	NOR	النرويج	Norway	Noruega	Norvège	Noruega	Норвегия	挪 威	Member State	NO	Oslo	Europe	Northern Europe		Europe
-IM	IMN	120	GBR	جزيرة مان	Isle of Man	Isla de Man	Île de Man	Ilha de Man	Остров Мэн	Isle of Man	UK territory	NO		Europe	Northern Europe		Europe
-NR	NRU	173	NRU	ناورو	Nauru	Nauru	Nauru	Nauru	Науру	瑙 鲁	Member State	NO		Oceania	Micronesia		Oceania
-FM	FSM	163	FSM	ميكرونيزيا	Micronesia (Federated States of)	Micronesia (Estados Federados de)	Micronésie (États fédérés de)	Estados Federados da Micronésia	Микронезия (Федеративные Штаты)	密克罗尼西亚(联邦)	Member State	NO	Palikir	Oceania	Micronesia		Oceania
-KI	KIR	135	KIR	كيريباس	Kiribati	Kiribati	Kiribati	Kiribati	Кирибати	基里巴斯	Member State	NO	Tarawa	Oceania	Micronesia		Oceania
-WS	WSM	212	WSM	ساموا	Samoa	Samoa	Samoa	Samoa	Самоа	萨摩亚	Member State	NO	Apia	Oceania	Polynesia		Oceania
-LK	LKA	231	LKA	سري لانكا	Sri Lanka	Sri Lanka	Sri Lanka	Sri Lanka	Шри-Ланка	斯里兰卡	Member State	NO	Sri Jayewardenepura Ko	Asia	Southern Asia		Asia
-BT	BTN	31	BTN	بوتان	Bhutan	Bhután	Bhoutan	Butão	Бутан	不 丹	Member State	NO	Thimphu	Asia	Southern Asia		Asia
-BD	BGD	23	BGD	بنغلاديش	Bangladesh	Bangladesh	Bangladesh	Bangladesh	Бангладеш	孟加拉国	Member State	NO	Dhaka	Asia	Southern Asia		Asia
-TR	TUR	249	TUR	تركيا	Turkey	Turquía	Turquie	Turquia	Турция	土耳其	Member State	NO	Ankara	Asia	Western Asia		Asia
-GI	GIB	95	GBR	جبل طارق	Gibraltar	Gibraltar	Gibraltar	Gibraltar	Гибралтар	直布罗陀	UK Non-Self-Governing Territory	NO	Gibraltar	Europe	Southern Europe		Europe
-ES	ESP	229	ESP	إسبانيا	Spain	España	Espagne	Espanha	Испания	西班牙	Member State	NO	Madrid	Europe	Southern Europe		Europe
-BA	BIH	34	BIH	البوسنة والهرسك	Bosnia and Herzegovina	Bosnia y Herzegovina	Bosnie-Herzégovine	Bósnia e Herzegovina	Босния и Герцеговина	波斯尼亚－黑塞哥维那	Member State	NO	Sarajevo	Europe	Southern Europe		Europe
-SK	SVK	223	SVK	سلوفاكيا	Slovakia	Eslovaquia	Slovaquie	Eslováquia	Словакия	斯洛伐克	Member State	NO	Bratislava	Europe	Eastern Europe		Europe
-CZ	CZE	65	CZE	الجمهورية التشيكية	Czech Republic	República Checa	République tchèque	República Checa	Чешская республика	捷克共和国	Member State	NO	Prague	Europe	Eastern Europe		Europe
-TO	TON	245	TON	تونغا	Tonga	Tonga	Tonga	Tonga	Тонга	汤 加	Member State	NO	Nuku'alofa	Oceania	Polynesia		Oceania
-CK	COK	60	NZL	جزر كوك	Cook Islands	Islas Cook	Îles Cook	Ilhas Cook	Острова Кука	库克群岛	NZ Territory	NO	Avarua	Oceania	Polynesia		Oceania
-PN	PCN	197	GBR	جزر بيتكيرن	Pitcairn Islands	Islas Pitcairn	Îles Pitcairn	Pitcairn	Острова Питкэрн	皮特克恩岛	UK Non-Self-Governing Territory	NO	Adamstown	Oceania	Polynesia		Oceania
-SZ	SWZ	235	SWZ	سوازيلند	Swaziland	Swazilandia	Swaziland	Suazilândia	Свазиленд	斯威士兰	Member State	NO	Mbabane (adm.)	Africa	Southern Africa		Africa
-BW	BWA	35	BWA	بوتسوانا	Botswana	Botswana	Botswana	Botswana	Ботсвана	博茨瓦纳	Member State	NO	Gaborone	Africa	Southern Africa		Africa
-SH	SHN	207	GBR	سانت هيلينا	Saint Helena, Ascension and Tristan da Cunha	Santa Elena, Ascension y Tristan da Cunha	Sainte-Hélène, Ascension et Tristan de Cunha	Santa Helena, Ascensão e Tristão da Cunha	острова Святой Елены Вознесения и Тристан-да-Кунья	圣赫勒拿	UK Non-Self-Governing Territory	NO		Africa	Western Africa		Africa
-TG	TGO	243	TGO	توغو	Togo	Togo	Togo	Togo	Того	多 哥	Member State	NO	Lomé	Africa	Western Africa		Africa
-WF	WLF	266	FRA	جزر واليس وفوتونا	Wallis and Futuna Islands	Islas Wallis y Futuna	Îles Wallis et Futuna	Wallis e Futuna	острова Уоллис и Футуна	瓦利斯和富图纳群岛	FR Territory	NO	Mata-Utu	Oceania	Polynesia		Oceania
-SG	SGP	222	SGP	سنغافورة	Singapore	Singapur	Singapour	Singapura	Сингапур	新加坡	Member State	NO	Singapore	Asia	South-Eastern Asia		Asia
-BG	BGR	41	BGR	بلغاريا	Bulgaria	Bulgaria	Bulgarie	Bulgária	Болгария	保加利亚	Member State	NO	Sofia	Europe	Eastern Europe		Europe
-TV	TUV	252	TUV	توفالو	Tuvalu	Tuvalu	Tuvalu	Tuvalu	Тувалу	图瓦卢	Member State	NO	Funafuti	Oceania	Polynesia		Oceania
-13	KEN	61013	KEN		Ilemi triangle						Sovereignty unsettled	YES		Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-AF	AFG	1	AFG	أفغانستان	Afghanistan	Afganistán	Afghanistan	Afeganistão	Афганистан	阿富汗	Member State	NO	Kabul	Asia	Southern Asia		Asia
-MY	MYS	153	MYS	ماليزيا	Malaysia	Malasia	Malaisie	Malásia	Малайзия	马来西亚	Member State	NO	Kuala Lumpur	Asia	South-Eastern Asia		Asia
-KW	KWT	137	KWT	الكويت	Kuwait	Kuwait	Koweït	Kuwait	Кувейт	科威特	Member State	NO	Kuwait	Asia	Western Asia		Asia
-BH	BHR	21	BHR	البحرين	Bahrain	Bahrein	Bahreïn	Bahrein	Бахрейн	巴 林	Member State	NO	Manama	Asia	Western Asia		Asia
-AZ	AZE	19	AZE	أذربيجان	Azerbaijan	Azerbaiyán	Azerbaïdjan	Azerbaijão	Азербайджан	阿塞拜疆	Member State	NO	Baku	Asia	Western Asia		Asia
-AM	ARM	13	ARM	أرمينيا	Armenia	Armenia	Arménie	Arménia	Армения	亚美尼亚	Member State	NO	Yerevan	Asia	Western Asia		Asia
-AE	ARE	255	ARE	الإمارات العربية المتحدة	United Arab Emirates	Emiratos Árabes Unidos	Émirats arabes unis	Emirados Árabes Unidos	Объединенные Арабские Эмираты	阿拉伯联合酋长国	Member State	NO	Abu Dhabi	Asia	Western Asia		Asia
-MD	MDA	165	MDA	جمهورية مولدوفا	Republic of Moldova	República de Moldova	République de Moldova	Moldávia	Республика Молдова	摩尔多瓦共和国	Member State	NO	Chisinau	Europe	Eastern Europe		Europe
-PL	POL	198	POL	بولندا	Poland	Polonia	Pologne	Polónia	Польша	波 兰	Member State	NO	Warsaw	Europe	Eastern Europe		Europe
-RO	ROU	203	ROU	رومانيا	Romania	Rumania	Roumanie	Roménia	Румыния	罗马尼亚	Member State	NO	Bucharest	Europe	Eastern Europe		Europe
-UA	UKR	254	UKR	أوكرانيا	Ukraine	Ucrania	Ukraine	Ucrânia	Украина	乌克兰	Member State	NO	Kyïv	Europe	Eastern Europe		Europe
-NU	NIU	183	NZL	نيوى	Niue	Niue	Nioué	Niue	Ниуэ	纽 埃	NZ Territory	NO	Alofi	Oceania	Polynesia		Oceania
-GQ	GNQ	76	GNQ	غينيا الاستوائية	Equatorial Guinea	Guinea Ecuatorial	Guinée équatoriale	Guiné Equatorial	Экваториальная Гвинея	赤道几内亚	Member State	NO	Malabo	Africa	Middle Africa		Africa
-CX	CXR	54	AUS	جزر كريسماس	Christmas Island	Isla Christmas	Île Christmas	Ilha do Natal	остров Рождества	圣诞岛	AU Territory	NO	The Settlement	Asia	South-Eastern Asia		Asia
-MH	MHL	157	MHL	جزر مارشال	Marshall Islands	Islas Marshall	Îles Marshall	Ilhas Marshall	Маршалловы Острова	马绍尔群岛	Member State	NO	Majuro	Oceania	Micronesia		Oceania
-WK	WAK	265	USA	جزيرة ويك	Wake Island	Isla Wake	Îles Wake	País de Gales	остров Уэйк	威克岛（美国）	US Territory	NO		Oceania	Micronesia		Oceania
-AS	ASM	5	USA	ساموا الأمريكية	American Samoa	Samoa Americana	Samoa américaines	Samoa Americana	Американское Самоа	美属萨摩亚	US Non-Self-Governing Territory	NO	Pago Pago	Oceania	Polynesia		Oceania
-PF	PYF	87	FRA	بولينيزيا الفرنسية	French Polynesia	Polinesia Francesa	Polynésie française	Polinésia Francesa	Французская Полинезия	法属波利尼西亚	FR Territory	NO	Papeete	Oceania	Polynesia		Oceania
-TK	TKL	244	GBR	جزر توكيلاو	Tokelau	Tokelau	Tokélaou	Toquelau	Токелау	托克劳	NZ Non-Self-Governing Territory	NO		Oceania	Polynesia		Oceania
-OM	OMN	187	OMN	عمان	Oman	Omán	Oman	Omã	Оман	阿 曼	Member State	NO	Muscat	Asia	Western Asia		Asia
-HM	HMD	109	HMD		Heard Island and McDonald Islands						AU Territory	NO		Antarctica	Antarctica		Antarctica
-BV	BVT	36	NOR		Bouvet Island						NO Territory	NO		Antarctica	Antarctica		Antarctica
-AQ	ATA	10	ATA	أنتارتيكا	Antarctica	Antártida	Antarctique	Antártida	Антарктика	南极洲		NO		Antarctica	Antarctica		Antarctica
-SJ	SJM	234	NOR	جزر سفالبارد وجان مايين	Svalbard and Jan Mayen Islands	Islas Svalbard y Jan Mayen	Îles Svalbard et Jan Mayen	Svalbard e Jan Mayen	Острова Свальбард и Ян-Майен	斯瓦尔巴特群岛	NO Territory	NO	Longyearbyen	Europe	Northern Europe		Europe
-10	XXX	40760	SDN		Hala'ib triangle						Sovereignty unsettled	YES		Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-09	XXX	230	XXX		Spratly Islands						Sovereignty unsettled	YES		Asia	South-Eastern Asia		Asia
-CG	COG	59	COG	الكونغو	Congo	Congo	Congo	República do Congo	Конго	刚 果	Member State	NO	Brazzaville	Africa	Middle Africa		Africa
-BI	BDI	43	BDI	بوروندي	Burundi	Burundi	Burundi	Burundi	Бурунди	布隆迪	Member State	NO	Bujumbura	Africa	Eastern Africa		Africa
-DZ	DZA	4	DZA	الجزائر	Algeria	Argelia	Algérie	Argélia	Алжир	阿尔及利亚	Member State	NO	Algiers	Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-MM	MMR	171	MMR	ميانمار	Myanmar	Myanmar	Myanmar	Myanmar	Мьянма	缅 甸	Member State	NO	Yangon	Asia	South-Eastern Asia		Asia
-KH	KHM	44	KHM	كمبوديا	Cambodia	Camboya	Cambodge	Camboja	Камбоджа	柬埔寨	Member State	NO	Phnom Penh	Asia	South-Eastern Asia		Asia
-MP	MNP	185	USA	جزر ماريانا الشمالية	Northern Mariana Islands	Islas Marianas septentrionales	Îles Mariannes du Nord	Marianas Setentrionais	Содружество Северных Марианских островов	北马里亚纳群岛	US Territory	NO	Saipan	Oceania	Micronesia		Oceania
-YT	MYT	161	FRA	مايوت	Mayotte	Mayotte	Mayotte	Mayotte	Майотта	Mayotte	FR Territory	NO	Mamoudzou	Africa	Eastern Africa		Africa
-SY	SYR	238	SYR	الجمهورية العربية السورية	Syrian Arab Republic	República Árabe Siria	République arabe syrienne	Síria	Сирийская Арабская Республика	阿拉伯叙利亚共和国	Member State	NO	Damascus	Asia	Western Asia		Asia
-TD	TCD	50	TCD	تشاد	Chad	Chad	Tchad	Chade	Чад	乍 得	Member State	NO	N'Djamena	Africa	Middle Africa		Africa
-MZ	MOZ	170	MOZ	موزامبيق	Mozambique	Mozambique	Mozambique	Moçambique	Мозамбик	莫桑比克	Member State	NO	Maputo	Africa	Eastern Africa		Africa
-MO	MAC	149	CHN		Macau						CN Special Administrative Region	NO	Macau	Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-LB	LBN	141	LBN	لبنان	Lebanon	Líbano	Liban	Líbano	Ливан	黎巴嫩	Member State	NO	Beirut	Asia	Western Asia		Asia
-HK	HKG	33364	CHN		Hong Kong						CN Special Administrative Region	NO	Hong Kong	Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-MU	MUS	160	MUS	موريشيوس	Mauritius	Mauricio	Maurice	Maurícia	Маврикий	毛里求斯	Member State	NO	Port Louis	Africa	Eastern Africa		Africa
-ST	STP	214	STP	سان تومي وبرنسيبي	Sao Tome and Principe	Santo Tomé y Príncipe	Sao Tomé-et-Principe	São Tomé e Príncipe	Сан-Томе и Принсипи	圣多美和普林西比	Member State	NO	S?o Tomé	Africa	Middle Africa		Africa
-EH	ESH	268	XXX	الصحراء الغربية	Western Sahara	Sáhara occidental	Sahara occidental	Saara Ocidental	Западная Сахара	西撒哈拉	Non-Self-Governing Territory	NO		Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-IE	IRL	119	IRL	آيرلندا	Ireland	Irlanda	Irlande	Irlanda	Ирландия	爱尔兰	Member State	NO	Dublin	Europe	Northern Europe		Europe
-QA	QAT	201	QAT	قطر	Qatar	Qatar	Qatar	Catar	Катар	卡塔尔	Member State	NO	Doha	Asia	Western Asia		Asia
-TH	THA	240	THA	تايلند	Thailand	Tailandia	Thaïlande	Tailândia	Таиланд	泰 国	Member State	NO	Bangkok	Asia	South-Eastern Asia		Asia
-JO	JOR	130	JOR	الأردن	Jordan	Jordania	Jordanie	Jordânia	Иордания	约 旦	Member State	NO	Amman	Asia	Western Asia		Asia
-GA	GAB	89	GAB	غابون	Gabon	Gabón	Gabon	Gabão	Габон	加 蓬	Member State	NO	Libreville	Africa	Middle Africa		Africa
-ML	MLI	155	MLI	مالي	Mali	Malí	Mali	Mali	Мали	马 里	Member State	NO	Bamako	Africa	Western Africa		Africa
-YE	YEM	269	YEM	اليمن	Yemen	Yemen	Yémen	Iémen/Iêmen	Йемен	也 门	Member State	NO	Sanaa	Asia	Western Asia		Asia
-JP	JPN	126	JPN	اليابان	Japan	Japón	Japon	Japão	Япония	日 本	Member State	NO	Tokyo	Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-CC	CCK	56	AUS	جزر كوكوس (كيلنغ)	Cocos (Keeling) Islands	Islas Cocos (Keeling)	Îles des Cocos (Keeling)	Ilhas Cocos (Keeling)	Кокосовые острова (Килинг)	可可群岛	AU Territory	NO	West Island	Asia	South-Eastern Asia		Asia
-NZ	NZL	179	NZL	نيوزيلندا	New Zealand	Nueva Zelandia	Nouvelle-Zélande	Nova Zelândia	Новая Зеландия	新西兰	Member State	NO	Wellington	Oceania	Australia and New Zealand		Oceania
-DK	DNK	69	DNK	الدانمرك	Denmark	Dinamarca	Danemark	Dinamarca	Дания	丹 麦	Member State	NO	Copenhagen	Europe	Northern Europe		Europe
-JE	JEY	128	GBR		Jersey						UK Territory	NO	St. Helier	Europe	Northern Europe		Europe
-SB	SLB	225	SLB	جزر سليمان	Solomon Islands	Islas Salomón	Îles Salomon	Ilhas Salomão	Соломоновы Острова	所罗门群岛	Member State	NO	Honiara	Oceania	Melanesia		Oceania
-NC	NCL	178	FRA	كاليدونيا الجديدة	New Caledonia	Nueva Caledonia	Nouvelle-Calédonie	Nova Caledônia	Новая Каледония	新喀里多尼亚	FR Non-Self-Governing Territory	NO	Nouméa	Oceania	Melanesia		Oceania
-FJ	FJI	83	FJI	فيجي	Fiji	Fiji	Fidji	Fiji	Фиджи	斐 济	Member State	NO	Suva	Oceania	Melanesia		Oceania
-SA	SAU	215	SAU	المملكة العربية السعودية	Saudi Arabia	Arabia Saudita	Arabie saoudite	Arábia Saudita	Саудовская Аравия	沙特阿拉伯	Member State	NO	Riyadh	Asia	Western Asia		Asia
-GU	GUM	101	USA	جوام	Guam	Guam	Guam	Guam	Гуам	关岛	US Non-Self-Governing Territory	NO	Agana	Oceania	Micronesia		Oceania
-LY	LBY	145	LBY	الجماهيرية العربية الليبية	Libya	Libia	Libye	Líbia	Ливия	阿拉伯利比亚民众国	Member State	NO	Tripoli	Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-EG	EGY	40765	EGY	مصر	Egypt	Egipto	Égypte	Egito	Египет	埃 及	Member State	NO	Cairo	Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-TN	TUN	248	TUN	تونس	Tunisia	Túnez	Tunisie	Tunísia	Тунис	突尼斯	Member State	NO	Tunis	Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-AU	AUS	17	AUS	أستراليا	Australia	Australia	Australie	Austrália	Австралия	澳大利亚	Member State	NO	Canberra	Oceania	Australia and New Zealand		Oceania
-MA	MAR	169	MAR	المغرب	Morocco	Marruecos	Maroc	Marrocos	Марокко	摩洛哥	Member State	NO	Rabat	Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-FR	FRA	85	FRA	فرنسا	France	Francia	France	França	Франция	法 国	Member State	NO	Paris	Europe	Western Europe		Europe
-RE	REU	206	FRA	رييونيون	Réunion	Reunión	Réunion	Reunião	Реюньон	留尼汪	FR Territory	NO	Saint-Denis	Africa	Eastern Africa		Africa
-BJ	BEN	29	BEN	بنن	Benin	Benin	Bénin	Benim	Бенин	贝 宁	Member State	NO	Porto-Novo (constituti	Africa	Western Africa		Africa
-SI	SVN	224	SVN	سلوفينيا	Slovenia	Eslovenia	Slovénie	Eslovênia	Словения	斯洛文尼亚	Member State	NO	Ljubljana	Europe	Southern Europe		Europe
-LI	LIE	146	LIE	لختنشتاين	Liechtenstein	Liechtenstein	Liechtenstein	Liechtenstein	Лихтенштейн	列支敦士登	Member State	NO	Vaduz	Europe	Western Europe		Europe
-DE	DEU	93	DEU	ألمانيا	Germany	Alemania	Allemagne	Alemanha	Германия	德 国	Member State	NO	Berlin	Europe	Western Europe		Europe
-CH	CHE	237	CHE	سويسرا	Switzerland	Suiza	Suisse	Suíça	Швейцария	瑞 士	Member State	NO	Bern	Europe	Western Europe		Europe
-BE	BEL	27	BEL	بلجيكا	Belgium	Bélgica	Belgique	Bélgica	Бельгия	比利时	Member State	NO	Brussels	Europe	Western Europe		Europe
-AT	AUT	18	AUT	النمسا	Austria	Austria	Autriche	Áustria	Австрия	奥地利	Member State	NO	Vienna	Europe	Western Europe		Europe
-NF	NFK	184	AUS	جزيرة نورفولك، مناطق تابعة لجزيرة لنورفولك	Norfolk Island	Isla Norfolk	Île Norfolk	Ilha Norfolk	Остров Норфолк	诺福克岛	AU Territory	NO	Kingston	Oceania	Australia and New Zealand		Oceania
-CV	CPV	47	CPV	الرأس الأخضر	Cape Verde	Cabo Verde	Cap-Vert	abo Verde Cabo Verde	Кабо-Верде	佛得角	Member State	NO	Praia	Africa	Western Africa		Africa
-PG	PNG	192	PNG	بابوا غينيا الجديدة	Papua New Guinea	Papua Nueva Guinea	Papouasie-Nouvelle-Guinée	Papua-Nova Guiné	Папуа-Новая Гвинея	巴布亚新几内亚	Member State	NO	Port Moresby	Oceania	Melanesia		Oceania
-VU	VUT	262	VUT	فانواتو	Vanuatu	Vanuatu	Vanuatu	Vanuatu	Вануату	瓦努阿图	Member State	NO	Port-Vila	Oceania	Melanesia		Oceania
-HU	HUN	113	HUN	هنغاريا	Hungary	Hungría	Hongrie	Hungria	Венгрия	匈牙利	Member State	NO	Budapest	Europe	Eastern Europe		Europe
-CD	COD	68	COD	جمهورية الكونغو الديمقراطية	Democratic Republic of the Congo	República Democrática del Congo	République démocratique du Congo	República Democrática do Congo	Демократическая Республика Конго	刚果民主共和国	Member State	NO	Kinshasa	Africa	Middle Africa		Africa
-CM	CMR	45	CMR	الكاميرون	Cameroon	Camerún	Cameroun	Camarões	Камерун	喀麦隆	Member State	NO	Yaoundé	Africa	Middle Africa		Africa
-CF	CAF	49	CAF	جمهورية أفريقيا الوسطى	Central African Republic	República Centroafricana	République centrafricaine	República Centro-Africana	Центральноафриканская Республика	中非共和国	Member State	NO	Bangui	Africa	Middle Africa		Africa
-AO	AGO	8	AGO	أنغولا	Angola	Angola	Angola	Angola	Ангола	安哥拉	Member State	NO	Luanda	Africa	Middle Africa		Africa
-CN	CHN	147295	CHN		China						Member State	NO	Beijing	Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-GN	GIN	106	GIN	غينيا	Guinea	Guinea	Guinée	Guiné	Гвинея	几内亚	Member State	NO	Conakry	Africa	Western Africa		Africa
-GH	GHA	94	GHA	غانا	Ghana	Ghana	Ghana	Gana	Гана	加 纳	Member State	NO	Accra	Africa	Western Africa		Africa
-CI	CIV	66	CIV	كوت ديفوار	Côte d'Ivoire	Côte d'Ivoire	Côte d'Ivoire	Costa do Marfim	Кот-д`Ивуар	科特迪瓦	Member State	NO	Yamoussoukro	Africa	Western Africa		Africa
-BF	BFA	42	BFA	بوركينا فاسو	Burkina Faso	Burkina Faso	Burkina Faso	Burkina Faso	Буркина-Фасо	布基纳法索	Member State	NO	Ouagadougou	Africa	Western Africa		Africa
-GG	GGY	104	GBR		Guernsey						UK Territory	NO		Europe	Northern Europe		Europe
-IQ	IRQ	118	IRQ	العراق	Iraq	Iraq	Iraq	Iraque	Ирак	伊拉克	Member State	NO	Baghdad	Asia	Western Asia		Asia
-KZ	KAZ	132	KAZ	كازاخستان	Kazakhstan	Kazajstán	Kazakhstan	Cazaquistão	Казахстан	哈萨克斯坦	Member State	NO	Astana	Asia	Central Asia		Asia
-MN	MNG	167	MNG	منغوليا	Mongolia	Mongolia	Mongolie	Mongólia	Монголия	蒙 古	Member State	NO	Ulaanbaatar	Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-KR	KOR	202	KOR	جمهورية كوريا	Republic of Korea	República de Corea	République de Corée	Coreia do Sul	Республика Корея	大韩民国	Member State	NO	Seoul	Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-IL	ISR	121	ISR	إسرائيل	Israel	Israel	Israël	Israel	Израиль	以色列	Member State	NO		Asia	Western Asia		Asia
-SL	SLE	221	SLE	سيراليون	Sierra Leone	Sierra Leona	Sierra Leone	Serra Leoa	Сьерра-Леоне	塞拉利昂	Member State	NO	Freetown	Africa	Western Africa		Africa
-AL	ALB	3	ALB	ألبانيا	Albania	Albania	Albanie	Albânia	Албания	阿尔巴尼亚	Member State	NO	Tirana	Europe	Southern Europe		Europe
-NL	NLD	177	NLD	هولندا	Netherlands	Países Bajos	Pays-Bas	Países Baixos	Нидерланды	荷 兰	Member State	NO	Amsterdam	Europe	Western Europe		Europe
-TL	TLS	242	TLS	تيمور- ليشتى	Timor-Leste	Timor-Leste	Timor-Leste	Timor-Leste	Тимор-Лешти	东帝汶	Member State	NO	Dili	Asia	South-Eastern Asia		Asia
-MV	MDV	154	MDV	ملديف	Maldives	Maldivas	Maldives	Maldivas	Мальдивы	马尔代夫	Member State	NO	Male	Asia	Southern Asia		Asia
-PK	PAK	188	PAK	باكستان	Pakistan	Pakistán	Pakistan	Paquistão	Пакистан	巴基斯坦	Member State	NO	Islamabad	Asia	Southern Asia		Asia
-PW	PLW	189	PLW	بالاو	Palau	Palau	Palaos	Palau	Палау	帕 劳	Member State	NO	Koror	Oceania	Micronesia		Oceania
-SS	SSD	74	   		South Sudan	Sudán del Sur	Soudan du Sud	Sudão do Sul	Южный Судан		Member State	NO	Juba	Africa	Eastern Africa		Africa
-06	XXX	193	XXX		Paracel Islands						Sovereignty unsettled	YES		Asia	South-Eastern Asia		Asia
-KG	KGZ	138	KGZ	قيرغيزستان	Kyrgyzstan	Kirguistán	Kirghizistan	Quirguistão	Кыргызстан	吉尔吉斯斯坦	Member State	NO	Bishkek	Asia	Central Asia		Asia
-TW	CHN	147296	CHN		Taiwan						CN Province	NO	Beijing	Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-PS	XXX	267	XXX		Occupied Palestinan Territory			Território Palestino Ocupado			Occupied Palestinian Territory	NO		Asia	Western Asia		Asia
-GS	SGS	228	GBR		South Georgia and the South Sandwich Islands						UK Territory	NO		Antarctica	Antarctica		Antarctica
-04	   	102	   		Abyei						Sovereignty unsettled	YES		Africa			Africa
-11	XXX	40762	EGY		Ma'tan al-Sarra						Sovereignty unsettled	YES		Africa	Northern Africa	Not classified in the UN classification 2005	Africa
-TF	ATF	88	FRA	أراضى جنوبى فرنسا	French Southern and Antarctic Territories	Tierras Australes y Antárticas Francesas	Terres australes et antarctiques françaises	Terras Austrais e Antárticas Francesas	Французские южные и антарктические территории	法国南部领	FR Territory	NO		Antarctica	Antarctica		Antarctica
-12	XXX	40781	XXX		Jammu and Kashmir						Sovereignty unsettled	YES		Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-03	XXX	52	XXX		China/India						Sovereignty unsettled	YES		Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-05	RUS	136	RUS		Kuril islands						Sovereignty unsettled	YES		Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-07	XXX	216	XXX		Scarborough Reef						Sovereignty unsettled	YES		Asia	South-Eastern Asia		Asia
-08	XXX	218	XXX		Senkaku Islands						Sovereignty unsettled	YES		Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-01	XXX	2	XXX		Aksai Chin						Sovereignty unsettled	YES		Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-02	IND	15	IND		Arunachal Pradesh						Sovereignty unsettled	YES		Asia	Eastern Asia	Not classified in the UN classification 2005	Asia
-PM	SPM	210	FRA	سان بيير ومكويلون	Saint Pierre and Miquelon	Saint-Pierre y Miquelon	Saint-Pierre-et-Miquelon	Saint-Pierre e Miquelon	Сен-Пьер и Микелон	圣皮埃尔和密克隆	FR Territory	NO	Saint-Pierre	Americas	Northern America	Not classified in the UN classification 2005	Northern America
-BM	BMU	30	GBR	برمودا	Bermuda	Bermudas	Bermudes	Bermudas	Бермуды	百慕大	UK Non-Self-Governing Territory	NO	Hamilton	Americas	Northern America	Not classified in the UN classification 2005	Northern America
-CA	CAN	46	CAN	كندا	Canada	Canadá	Canada	Canadá	Канада	加拿大	Member State	NO	Ottawa	Americas	Northern America	Not classified in the UN classification 2005	Northern America
-US	USA	259	USA	الولايات المتحدة الأمريكية	United States of America	Estados Unidos de América	États-Unis d'Amérique	Estados Unidos	Соединенные Штаты Америки	美 国	Member State	NO	Washington, D.C.	Americas	Northern America	Not classified in the UN classification 2005	Northern America
-UM	MID	164	USA		United States Minor Outlying Islands			Ilhas Menores Distantes dos Estados Unidos			US Territory	NO		Americas	Northern America	Not classified in the UN classification 2005	Northern America
-CR	CRI	61	CRI	كوستاريكا	Costa Rica	Costa Rica	Costa Rica	Costa Rica	Коста-Рика	哥斯达黎加	Member State	NO	San José	Americas	Central America		Northern America
-HN	HND	111	HND	هندوراس	Honduras	Honduras	Honduras	Honduras	Гондурас	洪都拉斯	Member State	NO	Tegucigalpa	Americas	Central America		Northern America
-GT	GTM	103	GTM	غواتيمالا	Guatemala	Guatemala	Guatemala	Guatemala	Гватемала	危地马拉	Member State	NO	Guatemala	Americas	Central America		Northern America
-NI	NIC	180	NIC	نيكاراغوا	Nicaragua	Nicaragua	Nicaragua	Nicarágua	Никарагуа	尼加拉瓜	Member State	NO	Managua	Americas	Central America		Northern America
-MX	MEX	162	MEX	المكسيك	Mexico	México	Mexique	México	Мексика	墨西哥	Member State	NO	México	Americas	Central America		Northern America
-PA	PAN	191	PAN	بنما	Panama	Panamá	Panama	Panamá	Панама	巴拿马	Member State	NO	Panamá	Americas	Central America		Northern America
-SV	SLV	75	SLV	السلفادور	El Salvador	El Salvador	El Salvador	El Salvador	Сальвадор	萨尔瓦多	Member State	NO	San Salvador	Americas	Central America		Northern America
-BZ	BLZ	28	BLZ	بليز	Belize	Belice	Belize	Belize	Белиз	伯利兹	Member State	NO	Belmopan	Americas	Central America		Northern America
-CP	FRA	55	FRA		Clipperton Island						FR Territory	NO		Americas	Central America		Northern America
-KN	KNA	208	KNA	سانت كيتس ونيفيس	Saint Kitts and Nevis	Saint Kitts y Nevis	Saint-Kitts-et-Nevis	São Cristóvão e Nevis	Сент-Китс и Невис	圣基茨和尼维斯	Member State	NO	Basseterre	Americas	Caribbean		Northern America
-DM	DMA	71	DMA	دومينيكا	Dominica	Dominica	Dominique	Dominica	Доминика	多米尼克	Member State	NO	Roseau	Americas	Caribbean		Northern America
-DO	DOM	72	DOM	الجمهورية الدومينيكية	Dominican Republic	República Dominicana	République dominicaine	República Dominicana	Доминиканская Республика	多米尼加共和国	Member State	NO	Santo Domingo	Americas	Caribbean		Northern America
-VC	VCT	211	VCT	سانت فنسنت وجزر غرينادين	Saint Vincent and the Grenadines	San Vicente y las Granadinas	Saint-Vincent-et-les Grenadines	São Vicente e Granadinas	Сент-Винсент и Гренадины	圣文森特和格林纳丁斯	Member State	NO	Kingstown	Americas	Caribbean		Northern America
-VG	VGB	39	GBR	جزر فيرجين البريطانية	British Virgin Islands	Islas Vírgenes Británicas	Îles Vierges britanniques	Ilhas Virgens Britânicas	Британские Виргинские острова	英属维尔京群岛	UK Non-Self-Governing Territory	NO	Road Town	Americas	Caribbean		Northern America
-BB	BRB	24	BRB	بربادوس	Barbados	Barbados	Barbade	Barbados	Барбадос	巴巴多斯	Member State	NO	Bridgetown	Americas	Caribbean		Northern America
-PR	PRI	200	USA	بورتوريكو	Puerto Rico	Puerto Rico	Porto Rico	Porto Rico	Пуэрто-Рико	波多黎各	US Territory	NO	San Juan	Americas	Caribbean		Northern America
-VI	VIR	258	USA	جزر فيرجين التابعة للولايات المتحدة	United States Virgin Islands	Islas Vírgenes (EE.UU.)	Îles Vierges américaines	Ilhas Virgens Americanas	Виргинские острова США	美属维尔京群岛	US Non-Self-Governing Territory	NO	Charlotte Amalie	Americas	Caribbean		Northern America
-AW	ABW	14	NLD	أروبا	Aruba	Aruba	Aruba	Aruba	Аруба	阿鲁巴岛	NL Self-Governing Territory	NO	Oranjestad	Americas	Caribbean		Northern America
-AI	AIA	9	GBR	أنغويلا	Anguilla	Anguila	Anguilla	Anguilla	Ангилья	安圭拉	UK Non-Self-Governing Territory	NO	The Valley	Americas	Caribbean		Northern America
-HT	HTI	108	HTI	هايتي	Haiti	Haití	Haïti	Haiti	Гаити	海 地	Member State	NO	Port-au-Prince	Americas	Caribbean		Northern America
-MS	MSR	168	GBR	مونسراط	Montserrat	Montserrat	Montserrat	Montserrat	Монтсеррат	蒙特塞拉	UK Non-Self-Governing Territory	NO	Plymouth	Americas	Caribbean		Northern America
-GD	GRD	99	GRD	غرينادا	Grenada	Granada	Grenade	Granada	Гренада	格林纳达	Member State	NO	Saint George's	Americas	Caribbean		Northern America
-KY	CYM	48	GBR	جزر كايمان	Cayman Islands	Islas Caimán	Îles Caïmanes	Ilhas Cayman	Каймановы острова	开曼群岛	UK Non-Self-Governing Territory	NO	George Town	Americas	Caribbean		Northern America
-AN	ANT	176	NLD	جزر الأنتيل الهولندية	Netherlands Antilles	Antillas Neerlandesas	Antilles néerlandaises	Antilhas Holandesas	Голландские Антиллы	荷属安的列斯	NL Territory	NO	Willemstad	Americas	Caribbean		Northern America
-BS	BHS	20	BHS	جزر البهاما	Bahamas	Bahamas	Bahamas	Bahamas	Багамские Острова	巴哈马	Member State	NO	Nassau	Americas	Caribbean		Northern America
-TT	TTO	246	TTO	ترينيداد وتوباغو	Trinidad and Tobago	Trinidad y Tabago	Trinité-et-Tobago	Trinidad e Tobago	Тринидад и Тобаго	特立尼达和多巴哥	Member State	NO	Port of Spain	Americas	Caribbean		Northern America
-LC	LCA	209	LCA	سانت لوسيا	Saint Lucia	Santa Lucía	Sainte-Lucie	Santa Lúcia	Сент-Люсия	圣卢西亚	Member State	NO	Castries	Americas	Caribbean		Northern America
-AG	ATG	11	ATG	أنتيغوا وباربودا	Antigua and Barbuda	Antigua y Barbuda	Antigua-et-Barbuda	Antígua e Barbuda	Антигуа и Барбуда	安提瓜和巴布达	Member State	NO	St John's	Americas	Caribbean		Northern America
-TC	TCA	251	GBR	جزر تركس وكايكوس	Turks and Caicos Islands	Islas Turcas y Caicos	Îles Turques et Caïques	Turcas e Caicos	острова Тёркс и Кайкос	特克斯和凯科斯群岛	UK Non-Self-Governing Territory	NO	Cockburn Town	Americas	Caribbean		Northern America
-GP	GLP	100	FRA	غوادالوب	Guadeloupe	Guadalupe	Guadeloupe	Guadalupe	Гваделупа	瓜德罗普	FR Territory	NO	Basse-Terre	Americas	Caribbean		Northern America
-AR	ARG	12	ARG	الأرجنتين	Argentina	Argentina	Argentine	Argentina	Аргентина	阿根廷	Member State	NO	Buenos Aires	Americas	South America		South America
-SR	SUR	233	SUR	سورينام	Suriname	Suriname	Suriname	Suriname	Суринам	苏里南	Member State	NO	Paramaribo	Americas	South America		South America
-UY	URY	260	URY	أوروغواي	Uruguay	Uruguay	Uruguay	Uruguai	Уругвай	乌拉圭	Member State	NO	Montevideo	Americas	South America		South America
-FK	FLK	81	GBR	جزر فوكلاند (مالفيناس)	Falkland Islands (Malvinas)	Islas Malvinas	Îles Falkland	Ilhas Malvinas	Фолклендские острова	福克兰群岛	UK Non-Self-Governing Territory	NO	Stanley	Americas	South America		South America
-BR	BRA	37	BRA	البرازيل	Brazil	Brasil	Brésil	Brasil	Бразилия	巴 西	Member State	NO	Brasília	Americas	South America		South America
-BO	BOL	33	BOL	بوليفيا (دولة - المتعددة القوميات)	Bolivia (Plurinational State of)	Bolivia (Estado Plurinacional de)	Bolivie (État plurinational de)	Bolívia	Боливия (Многонациогнальное Государство)	玻利维亚多民族国	Member State	NO	La Paz  (adm.)	Americas	South America		South America
-PE	PER	195	PER	بيرو	Peru	Perú	Pérou	Peru	Перу	秘 鲁	Member State	NO	Lima	Americas	South America		South America
-CO	COL	57	COL	كولومبيا	Colombia	Colombia	Colombie	Colômbia	Колумбия	哥伦比亚	Member State	NO	Bogotá	Americas	South America		South America
-GY	GUY	107	GUY	غيانا	Guyana	Guyana	Guyana	Guiana	Гайана	圭亚那	Member State	NO	Georgetown	Americas	South America		South America
-EC	ECU	73	ECU	إكوادور	Ecuador	Ecuador	Équateur	Equador	Эквадор	厄瓜多尔	Member State	NO	Quito	Americas	South America		South America
-GF	GUF	86	FRA	غوايانا الفرنسية	French Guiana	Guayana francesa	Guyane française	Guiana Francesa	Французская Гвиана	法属圭亚那	Member State	NO	Cayenne	Americas	South America		South America
-PY	PRY	194	PRY	باراغواي	Paraguay	Paraguay	Paraguay	Paraguai	Парагвай	巴拉圭	Member State	NO	Asunción	Americas	South America		South America
-VN	VNM	264	VNM	فييت نام	Vietnam	Viet Nam	Viet Nam	Vietname	Вьетнам	越 南	Member State	NO	Hanoi	Asia	South-Eastern Asia		Asia
-LA	LAO	139	LAO	جمهورية لاو الديمقراطية الشعبية	Laos	República Democrática Popular Lao	République démocratique populaire lao	Laos	Лаосская Народно-Демократическая Республика	老挝人民民主共和国	Member State	NO	Vientiane	Asia	South-Eastern Asia		Asia
+COPY spatial_metadata.country (country_id, iso3_code, gaul_code, color_code, ar, en, es, fr, pt, ru, zh, status, disp_area, capital, continent, un_reg, geom_centroid, geom_convexhull) FROM stdin;
+13	KEN	61013	KEN		Ilemi triangle						Sovereignty unsettled	YES		Africa	Northern Africa	0101000020E6100000CDD90268D18441401EAFC4C34C0A1340	0106000020E6100000010000000103000000010000000D000000186C956071304140C014AE47E17A12402012F758FA3C414080FA0AD28CE51240E8461B5EC83F41404043BD2F1AF312400800000000404140C08A71FE26F4124010E6E8F17B934140C05D85949FF413408809DCBA9BA74140C03715A930161440784C4F58E2A9414040B1506B9A17144028BB335CE2A94140C0FF9F5D9A171440B0C5A70018AB414000E370E657131440A0B7239C16BC41404013B87537AF13402012F758FABC414040F0332E1CA81340D09717601FC14140C014AE47E17A1240186C956071304140C014AE47E17A1240
+GI	GIB	95	GBR	جبل طارق	Gibraltar	Gibraltar	Gibraltar	Gibraltar	Гибралтар	直布罗陀	UK Non-Self-Governing Territory	NO	Gibraltar	Europe	Southern Europe	0101000020E6100000A0B5F335E76315C036212220C9114240	0106000020E6100000010000000103000000010000000A00000040700A60076015C008CC0040630E424000B80DA0686515C020930060F50E4240C0B203C00E6C15C0A085FF3FD1104240805AFF3F326D15C0E8B201E0B1114240001AFABFD46D15C01835FF1FCF12424000AAFAFFB26915C0882A01407414424040200900305C15C03828FF9F7214424080B7FB1FD75B15C0F8CA00E0B0114240403C09C0CD5B15C0884100E0C00E424040700A60076015C008CC0040630E4240
+04	   	102	   		Abyei						Sovereignty unsettled	YES		Africa		0101000020E6100000226DDE83F3653C40C1B000EB0A892340	0106000020E6100000010000000103000000010000000A000000309CFF1FF3093C400054F63FBBAF224040C1F99F3FE83B40A086FDBF66382340706B2CB76DD03B40E0D0D626ED992340E066EDCDA7D03B4060A0137F6A49244080D0FD53ACF93C4000FC9A33423C2440603A43641DFA3C40208886884548234030AAFFFFC1C43C4080E601E063B22240E0E0F1ABC1C43C40602826D763B222403019FF5F71C23C40A077FD7F25B22240309CFF1FF3093C400054F63FBBAF2240
+KP	PRK	67	PRK	جمهورية كوريا الديمقراطية الشعبية	Democratic People's Republic of Korea	República Popular Democrática de Corea	République populaire démocratique de Corée	Coreia do Norte	Корейская Народно-Демократическая Республика	朝鲜民主主义人民共和国	Member State	NO	Pyongyang	Asia	Eastern Asia	0101000020E61000006654103189CB5F40574F9C23B4124440	0106000020E61000000100000001030000000100000047000000889C2481D9555F4018739FD52FD64240C0F7783ABA455F40581A675C43D64240785776C1E0295F40901D123305104340B8BD82D9C9295F4040591FE67D104340088F9B263B145F4060E0919CFFF24340E8724D6537145F4048F28883A4F343405075C8CD70155F40E80720B58907444038E50AEF72155F40187F4DD6A8074440482B306475155F40803BC269C107444058B77A4E7A155F407850C24CDB07444080AEB6627F155F40E8310395F1074440D862DB9582155F4028B54B79FF07444058D4601A86155F4048A4DFBE0E08444000B936548C155F40908A71FE26084440A8BE654E97155F40E81934F44F084440C8B12E6EA3155F40301DACFF7308444028624A24D1155F40003C1405FA08444090E07F2BD9155F4090F337A110094440903BA583F5155F40D84D62105809444008CFBD874B165F4020E76F42210A444090C3995FCD195F40F02B483316114440702F698CD6195F40705721E527114440F0FA05BB61215F40608121AB5B1D4440E8C281902CAC5F405072F90FE9DF444060ACA8C134AC5F401008E6E8F1DF4440940F7A36AB3C6040C87D1D386780454068B3EA73B53C604050CEC29E7680454010D6FF39CC3C6040109E7B0F9780454048551344DD3C604058840D4FAF80454028BD6F7CED3C6040F060FD9FC3804540A04E9881F13C60407004F710C880454050327216F63C6040F8A2AF20CD804540FC5C6DC5FE3C6040B8389CF9D580454078E5B33C0F3D6040B030B610E48045408CEFC4AC173D6040C0973446EB804540943A5DBD1A3D60407087A019ED804540D09717601F3D6040B04D9CDCEF80454094ED7C3F353D604018ED2AA4FC804540FC7E6ABC743E604090F84ECC7A814540E06C73637A3E6040007BF7C77B8145406C43C5387F3E6040007BF7C77B81454040C6DCB5843E6040B8CE31207B8145409CF04BFDBC43604028BAA0BE657E4540CC2DAD86C4436040102E56D4607E4540A0CBEE78CC4360406845125F5B7E4540B8C0BEA0CC4360407879B9435B7E4540BC61DBA2CC436040B8F545425B7E454014751F80D4436040D0897615527E4540A08026C28644604048EDF0D7647D4540A4A17F828B446040F0D9ACFA5C7D4540888F8829914460408015527E527D4540D851D5045148604068C47762D67345404052448655486040282098A3C77345401032C9C859486040A0CFF23CB8734540986588635D486040A8D7D825AA7345401C9947FE604860406833F9669B734540148DEE2076506040B8FA5C6DC54E45402819390B7B506040483EE8D9AC4E45401CCFA0A17F506040C8F5285C8F4E4540945CFE43FA546040309B72857731454038F7466303556040D8AE787303314540E488B5F814556040282D95B72330454094AF697D9855604010AAC4774D244540786AF7431D09604010BF6733AD374340901586DFE5066040D8F6118D282F434020A56B5618056040B03FE33E892B4340B8EC6C6F7704604058EBC59C5C2A43409817A03AC4A95F40B8B47538C6E442403886E34022A65F40D8AF723D91E2424040C7C5C076A55F40787582FB56E24240889C2481D9555F4018739FD52FD64240
+DK	DNK	69	DNK	الدانمرك	Denmark	Dinamarca	Danemark	Dinamarca	Дания	丹 麦	Member State	NO	Copenhagen	Europe	Northern Europe	0101000020E6100000B81FD18A45B722408856B994D3214C40	0106000020E610000001000000010300000001000000240000002002FEDFC7F12740802CFF1FFC474B408053FC7F9FFF2640780C01C0714C4B40E0C2CFD30E9722401805FA449E664B40600A9E42AE74214070A71FD445724B40001ADBA8A44D2140F0B3F1CA6F744B4020E5FDBFB7FA2040D8A5FF7F38894B40007703C009F02040400901A05A8C4B40A039018075272040A8340060E4C74B40E013FF7FB526204040CF00607AC84B4020410120963D2040B87E0040383E4C40403902C0CA40204038FA0060D9454C40C05801606A462040C8EDFF9FA74A4C40605301802E5320402044FF5F50524C40E0E4FBDF9A7B2040884100E0C0664C40802DFD9F51832040883BFF5FFD694C40E0E20200628920402044FF5FD06B4C40A0ECFD5FD89D204040BAFF9FF5714C40E0B900E04AB02040183B00A092764C40000A024022BD2040488FFF9F56794C4080AB0140D1F5204018B8FFDF10854C4080460100D22D21406848FFDF598D4C40E05703E0143F214030850080668F4C40406AFE3F1EE8234018D5FFFF60CB4C40002E0340A8222540F8AD00C020DF4C40E0020160AC2C2540A8F4FE9FC0DF4C40A0C50000352F254088C400A0C2DF4C40208F02C0883B2540F87BFFDFCBDF4C40406001008B52254038ABFF5FB4DE4C4080511F88F9612E40C0FF3D825FA94B40605DBD801A632E40105DB0BEFBA84B40809D016002512E405847FF7F678A4B40806C00E01F3E2E4070F7FFFFEC814B408001FD3F002B2E40107500E0727E4B4060CBFDBFFE252E4010A9FF9F0F7E4B40E039FE5F03F427404063FF3F05484B402002FEDFC7F12740802CFF1FFC474B40
+SI	SVN	224	SVN	سلوفينيا	Slovenia	Eslovenia	Slovénie	Eslovênia	Словения	斯洛文尼亚	Member State	NO	Ljubljana	Europe	Southern Europe	0101000020E61000004DEBF9C765A92D4021BEC31BE20F4740	0106000020E61000000100000001030000000100000019000000A0A1B94E235D2E402898A3C7EFB5464020E4A08499C62B40D858349D9DB8464060DF4F8D975E2B40B820CD5834B9464020E544BB0A392B4048A9F6E978BC4640208B481CCB2C2B402825C0FA89BD4640606EFCDFCA2C2B40487800008ABD4640800DFF3F07242B40E8A6FFDF6AC24640E04A01809B222B40D8D70060CDC34640A01BF0F961C42A408896E7C1DD254740602844C021C42A40104B3CA06C264740E0FEB27BF2E02A40B8D85F764F2E4740205B25581C6E2B40E8AB5626FC424740F0BFB2D2A41C30409011C2A38D6F474070381092053C30409840BCAE5F70474050C9AB730C48304058401361C36F47403069A9BC1D493040902EA86F996F4740F0FDF15EB54A3040086A6AD95A6F4740E00E7F4DD6503040F82076A6D06D474050809A5AB656304080978BF84E6C474040EF3845479A304078AC8BDB683C474060499D8026C22E40084356B77ABE4640E037DBDC98AE2E40603ECBF3E0BA4640602B306475AB2E4068419AB168BA464040FE9AAC516F2E40E8FDF15EB5B64640A0A1B94E235D2E402898A3C7EFB54640
+CZ	CZE	65	CZE	الجمهورية التشيكية	Czech Republic	República Checa	République tchèque	República Checa	Чешская республика	捷克共和国	Member State	NO	Prague	Europe	Eastern Europe	0101000020E61000001E6DBBD179AA2E4040E7973BA6DE4840	0106000020E6100000010000000103000000010000001D000000805B94D920A32C40182C0E677E454840E09DD2C1FA2F2C4080060DFD134C484040868F8829212C4090B18520074D4840005B423EE8192C4060DDEA39E94D4840E03D963E74912940A8586E6935AC4840E0D32B651952294008C11C3D7EB7484020FBE8D495CF284028ACFF7398DF4840A067D0D03F312840285A643BDF1F4940A08D5DA27A3B2840F05BE6745928494060BCAE5FB09B2C4038FE7DC68587494000C381902CA02C40E80720B589874940C020CD58340D2E40687AC2120F844940A09F71E140582E4040DF4F8D978249407058C51B99AF31403049D74CBE294940A0588B4F01B83140E09DB5DB2E284940A0368E588BBF314040DF4F8D97264940E0D556EC2F933240009DF4BEF1F5484000FED478E9CE3240A03446EBA8D64840E060419779CF3240805F34E244D648401000000000D03240B0AE7C96E7D54840304A7B832FDC3240082159C004C64840F0B06D5166DB3240B85A99F04BC54840406C5B94D9D83240302367614FC3484030F5108DEE10324020ADA3AA098648406007EBFF1CDE3140C0A0BE654E774840406A300DC3AF3140A8CDAACFD56E4840300AF4893C91314090DB68006F694840904963B48EF2304038EC6987BF4E4840805B94D920A32C40182C0E677E454840
+PN	PCN	197	GBR	جزر بيتكيرن	Pitcairn Islands	Islas Pitcairn	Îles Pitcairn	Pitcairn	Острова Питкэрн	皮特克恩岛	UK Non-Self-Governing Territory	NO	Adamstown	Oceania	Polynesia	0101000020E61000004E106D26550A60C0AA03B234776038C0	0106000020E610000001000000010300000001000000160000004E221D793B4360C05070896D9C1439C0663BF07B654360C060E55E60561439C04AE18B40C64360C0A06103D8361339C094F59B89E94360C0404233993B1239C0B88B3045F94360C0C04C0E44BB1139C06E795160265860C0509AA5AEC6EF37C0442C071F2F5860C0403DE9E9C8EE37C0489B4FC2315860C040029B73F0EC37C0360C8BF61D5860C04055682096E937C0C80050C50D5860C0C0AB014A43E937C0CC8CC8C1F65760C0106030C912E937C05EF7B1DDD85760C0F0C36EE9E2E837C0ECBDF8A2BD315FC0F02C5DC136AC38C030FB2B1AA1315FC0C0DAA6785CAC38C04096AA598C315FC040ECB886BEAC38C004AF5DDA70315FC0D050BF0B5BAD38C00C1F7D386D315FC0F08E5EC3C2AD38C028B693D27D315FC00013680B63AE38C030B44B659B315FC040E9279CDDAE38C09433805C07325FC0D013A1C7DEAF38C050C9A59652325FC020A605D440B038C04E221D793B4360C05070896D9C1439C0
+SN	SEN	217	SEN	السنغال	Senegal	Senegal	Sénégal	Senegal	Сенегал	塞内加尔	Member State	NO	Dakar	Africa	Western Africa	0101000020E61000001A1D1F0449E62CC0E6EE86EF14B82C40	0106000020E6100000010000000103000000010000002000000000967840D9B428C0206EDDCD539D284040BEA08504B630C080A5AABF14AC284030A66BDC51B630C00094D11275AC2840A0F0A0D975B730C0400E3AD7E6AD2840203DD34B8CB730C0E04FC76306AE284040032E7E09BB30C0C0AB6E9AE3B5284060F2A501CDC530C0E04A051555CF2840509D2ADF33C830C0206F70D86CDB2840903F6D54A78731C000FE13B7657B2D40C0C32055B98731C00085FE53BB7C2D4020D120054F8731C080CB36267A7F2D40405F4DA0334830C000010F3F11833040E01C9615A94530C0A033A6232A85304040EAFE30904330C0707BCF763C863040D02E61C50D2530C0F0E155ED528D3040C0060148591E30C05081BF7E598E304000D18A568BF82DC0B0548F2255B13040201CAFA31ED62CC020C289391FA73040401B84C808AC2CC0E0D5FC7C84A430400007117B31F92AC010A3B66D1526304040C974393CF52AC02026938DE6243040402EF68CB4C02AC0F0ABE71B060F304000BAB9353F5228C0E043183F8D602D40805768BF6C5128C020C2C49B0C5F2D40A02805D3ECB626C0008B7675C4F62940E014E0F830B126C020055BB503E3294000F32E95B9B326C020CC29BF14EE2840E05B91BE67BC26C0A026854956D7284080B6CFF540C026C0209B0479BAD42840A047C49448C226C040DEE522BED3284040D97745F0AF28C0C0777FBC579D284000967840D9B428C0206EDDCD539D2840
+KR	KOR	202	KOR	جمهورية كوريا	Republic of Korea	República de Corea	République de Corée	Coreia do Sul	Республика Корея	大韩民国	Member State	NO	Seoul	Asia	Eastern Asia	0101000020E61000008180EA4D1AF75F40DCA986FADB394240	0106000020E61000000100000001030000000100000010000000C8FCFFDF08915F40B8B2FFFF948D404028680060B6455F40E08000009D084140D04500608A455F40A80001A007094140B084A1BAEB265F40C082984470FB424090F2263BED265F40C89A2C8324FC42405059B3B91D275F40B0E9749FAAFC4240A0F9A9E58F0B60409824CEABB64E4340383D0060375D604058E7FF5F79C542401C2D00C0635D604060A500C04DC44240E0C3FFFF8A5D6040B812FF1F83BD4240F80D00E09E2B604088DBFF3F4FAD4140B41800A03627604010F2FF1FF1964140040000002023604000F70040C2854140A84300A0B5126040404C00A078514140882400C070B55F40600B0160BFA64040C8FCFFDF08915F40B8B2FFFF948D4040
+VE	VEN	263	VEN	فنزويلا (جمهورية .. البوليفارية)	Venezuela (Bolivarian Republic of)	Venezuela (República Bolivariana de)	Venezuela (République bolivarienne du)	Venezuela	Венесуэла (Боливарианская Республика)	委内瑞拉 (玻利瓦尔共和国)	Member State	NO	Caracas	Americas	South America	0101000020E6100000354AEA19158A50C04DAC0F0FB1791C40	0106000020E6100000010000000103000000010000002400000070B0FECF616250C000D6F19881CAE43F64E89FE0629350C000D873D2FBC6E73F84E63A8DB49450C0003C3B191C25E83F18C5724BABB750C0007BA52C439CF33F0C846401131C52C0C081CAF8F7991D409CB9C9A0611C52C0C046AB25E09F1D4060450DA6611C52C000B3EF8AE09F1D409C89B0E1E95752C0A0319413ED5A22403424EEB1F45752C02025CCB4FD5B2240EC6DFAB31F5752C060D0ED258D712240002B8716D95652C0C011A5BDC1772240700CC85EEF3852C0200742B280E9244048809A5AB63452C020FD30427824254010F241CF662952C04025AFCE31C0254088101E6D1C2952C0C03B889D29C4254050AEF02E171F52C0C00EB9196E302640706B51EDD3FD51C060912749D74C2740B871E6B22CBB51C060EF8D2100FC28408CF870242BBB51C020C8427408FC2840888DE5023CCF4FC020A9256772572F40205426EB26CF4FC0C0257E7B8D572F40A810566309CF4FC0C0FA9BAB41572F40E061A1D634E74DC0205A8121AB9B2040E0965643E2E64DC060C824236791204048E449D2354B4EC040C616821CB41340E06BCF2C09544EC040F19D98F5621340F0B56796045C4EC00099D87C5C1B134048452A8C2D5C4EC040950ED6FF191340508CF337A15C4EC0005DC4776216134078785DBF60B34FC080B13385CE2B014070FE2614221650C00070F085C9D4F53F304278B4715C50C000B047E17A14E63FC041C984C25D50C000C20E9E34ADE53FE4DEC325C75D50C000500647C9ABE53FA42215C6166050C0001EEBE2361AE53F70B0FECF616250C000D6F19881CAE43F
+MH	MHL	157	MHL	جزر مارشال	Marshall Islands	Islas Marshall	Îles Marshall	Ilhas Marshall	Маршалловы Острова	马绍尔群岛	Member State	NO	Majuro	Oceania	Micronesia	0101000020E61000003877C9C28F03654056DAE51DF4771640	0106000020E61000000100000001030000000100000020000000380EAB2E9616654000DE2BA9C94A1240302E443D33166540003710DC924E1240D4FA4AD617166540C04D9CDCEF50124054B010670F16654040D8A83DDB51124004E08E264D156540C03DAF1D316F1240D0D1E3F7361565404097F441E072124088B13B93AC146540807CE992168B1240546BF530CFB26440A059A148F717224030AE96E0B9B06440402F0ACC546E2240345871AAB5B06440E0F46D1C0C702240A444A6D701A76440E062DA92B02627405C8748F201A764408043A3E0CE26274024D1048A18A86440A0DEC0898D5E27402421808A19A8644060C054D8B15E2740D8613BCE23A8644000A88878905F27402C4EB51626A86440807FA0DCB65F2740A85D96C037206540A00E1B1B70582D408CE43D6440206540C027A902A4582D4054AA33AD43206540A0A180ED60582D40607A8F8E8620654080BA490C02532D401CD69EA39F44654020A7B052418128402CBD25EF125C654000BDBBDFB298244018139B8FEB7D65404040E2B2657C1C4010CFA67E79856540C0BA25DEA6941740F4BA8FED86856540C01CE90C8C841740989B4DEC8685654040D63E7848841740A4FF8AA181856540002A1E17D5821740C084AF547C8565404066F7E4618117403C9B33477B8565408049360D40811740D4E16B193A176540402D9B94DD4F12406875ABE7A416654080181D35CB4A1240380EAB2E9616654000DE2BA9C94A1240
+BV	BVT	36	NOR		Bouvet Island						NO Territory	NO		Antarctica	Antarctica	0101000020E61000003D99CD5D66E80A40F397F3C7E6354BC0	0106000020E610000001000000010300000001000000140000008014FC8051A30A40F0C87AC5AE394BC000DDB8C5FC8C0A4070B3F5C253394BC0805F97E13F7D0A40206E707DB3384BC000EFF8403C6C0A4028211FF46C374BC080B35F77BA630A40D80D0E9B6D364BC00038D7D589600A40A0F4E04966354BC080A826778E670A40089BC8CC05344BC080AF09698D710A4050FD5B131C334BC08032ACE28DFC0A406872F8A413324BC080BD35B055120B40F807477F1E324BC080BBAAFDE74A0B40880E0F61FC324BC080A96A82A86B0B4028B3CF6394344BC00014CBD2F3730B404025AE635C354BC080360F1604750B4008EE073C30364BC0007B489D256D0B40A02391C71D374BC08039C082EA650B4098289DA3E9374BC080AC1BEF8E5C0B40C0FA9A406C384BC000B0CC5B754D0B40587EB8F5E4384BC00080113466420B40F0216FB9FA384BC08014FC8051A30A40F0C87AC5AE394BC0
+AU	AUS	17	AUS	أستراليا	Australia	Australia	Australie	Austrália	Австралия	澳大利亚	Member State	NO	Canberra	Oceania	Australia and New Zealand	0101000020E6100000CAF835AF57CB604041B4D592B59239C0	0106000020E6100000010000000103000000010000002D000000BCD158DFE64B624020A1C704C9DE45C02413BE31E34B62408037221AC8DE45C0587AB3C11A1F5D40A8A4616D568441C0C8B2AD2739025D4070A316EAF36E41C038C76806B9FF5C4040B2FED1E26C41C0C08E042997CB5C4028951E506D3641C078FAE75A95CB5C40180D81056B3641C0C0B64D77F2C35C40A04E626BD12A41C02890D09EE4C15C40A0287501A32741C0D02C1932E4C15C4078ABE27EA12741C0A8571FE9B5C05C4010B08DE0D52241C028062D96B5C05C40A89EBE5ED42241C0103B21AE7B3B5C40B0FC42B35EA439C0D041087C093B5C401094CEF2029C39C0B0EEEE87F33A5C40F01839BFEC9639C0004036B2F33A5C405086609E939639C030423806673B5C40B0CF76544E8739C0B88BAE7ADC695C4090BA90792A9436C0E051A8162D6A5C406096892A159036C0C8DAF2733E6A5C4020A22E6B458F36C020332B09C07B5C40608C0B4425F935C0F09F3C667F7C5C405037F29463F435C098826976AF7F5C40B0FE64591EE035C040480504A9BD5E4060D4FE18847B28C0E0286849B6BD5E40C0B86A436A7B28C088194F41D4C46140607A3E6DCE7122C05094E2B5DBC46140A09922B1BE7122C04850C8DD06FC6140C0FB264ACB4822C0603D91A10FFC6140C0B76F55DC4822C04C2100A0797B6340408D01C04E6631C04C2100A0897B634050A500C04D6731C0C86EDCB87EE3634010D71435098A3FC0489A3BA45FE36340C0AB2E3867903FC0C00EF03230E3634000CBB879C8923FC02C4098043D8062403857D577309F45C018F590C33C80624048684D84319F45C0301130393C806240E8D37162339F45C080150B3C2A806240986DBEDC6A9F45C050B1582D2A80624080C3CB066B9F45C0ACBEFDFD85696240C050E988C5C345C0B8340A8B82696240602E4AB2C9C345C00882330ADF5B624088892C83BED145C0F476009BDE5B6240880984DFBED145C074DDE8F1E84B6240206AF919C8DE45C0BCD158DFE64B624020A1C704C9DE45C0
+QA	QAT	201	QAT	قطر	Qatar	Qatar	Qatar	Catar	Катар	卡塔尔	Member State	NO	Doha	Asia	Western Asia	0101000020E610000043976B205B9949402581E583C9473940	0106000020E61000000100000001030000000100000012000000580306499F8C494040C901BB9A78384008000000008049401000000000803840E028B0D5E5764940803AC956978B3840086B8CD85268494000F49EB14CBD3840C078FFBF746349400099FFFF1B1C394070F7FFFFEC604940F0F1FD3F946A394028A200A0B661494040B100E0B77F394088A70080726649401068FE7FB998394088A70080727F4940E0C001C040FA3940186700006485494090F60180970A3A40D86BFF3F189C4940B0D40040762D3A4040FDFE9F13A0494040200040672D3A4018B8FFDF10364A40402E002036AD3940586A0020BB364A40802CFF1FFCAA394090500020C2B04940000501201194384048A15E231BA74940A099ADEA9C81384040FC473C9FA64940002A87B666813840580306499F8C494040C901BB9A783840
+KH	KHM	44	KHM	كمبوديا	Cambodia	Camboya	Cambodge	Camboja	Камбоджа	柬埔寨	Member State	NO	Phnom Penh	Asia	South-Eastern Asia	0101000020E610000016542710103B5A4077EA6DD95B6C2940	0106000020E61000000100000001030000000100000021000000F4624BA38AB95940403F64FCC1D32340F45E2FF971B959406088F7BEE6D32340B03CBB5B5DB959406046AE4552D42340946B349A8BB8594020F32CDB63D92340845E37F36BB85940A00FDB5F3BDA2340E43AB7EA49B85940C012BDDDA9DC2340647B664980965940E075374F75982A40F8285C8FC29559400043908312162B40685DDC460396594020168733BF1A2B405CD4601A86BD5940A0AD122C0E672C40ECA90EB919C45940209E7B0F978C2C40307DE882FAC45940A04AEA0434912C40A8AA09A2EEC5594040A86F99D3952C4068AA605452C75940C0412619399B2C40B0FA5C6DC5C85940808CF337A1A02C403C3BA5C571C9594020CA842AF8A22C40C0F770C971C9594040A2B437F8A22C40209430D3F6CB5940C08F6B43C5A82C407C58A835CDE3594040095053CBD62C40E853008C67EA5940C087687407E12C403C605C4C61E25A4040D2525374612D409085FBAA97E35A4080C5AB448A5F2D4040FC777535E85A40600BD0B69AF72A405463576770E85A4020F43E6567CA2A4018BBD15567E85A40A0C2388FF5BA2A403800F146C8E55A40E050BBE33D1E2940BC3F9B451DE55A408038819D26F8284020BE7F0586E35A4080B8D3F997C128403020D6E3EAE25A40A020607077B428408C9AD7C7998C5A40003692DE198F2540E4851F2FD3BB5940A0B057AE70D42340E00D49FD9ABB5940A00094B70AD42340F4624BA38AB95940403F64FCC1D32340
+MZ	MOZ	170	MOZ	موزامبيق	Mozambique	Mozambique	Mozambique	Moçambique	Мозамбик	莫桑比克	Member State	NO	Maputo	Africa	Eastern Africa	0101000020E61000005FC91D84C8C641401FF23AC5AA4231C0	0106000020E6100000010000000103000000010000003400000010C85EEFFE684040E064FACF61DE3AC010944DB9C2174040F0A57EDE54DC3AC0C047819B8B174040602692274ADC3AC0C0D573D2FB16404090F1EF332EDC3AC0687138F3AB154040A0BDC11726DB3AC0100DFD135C14404080FD65F7E4D93AC0506458C51B11404060D0D03FC1D53AC040842A357BF03F407018213CDAD839C0E0C342AD694E3F4090367172BF6B36C0F0016553AE383E40C0D1C6116B312EC0D0F99B5088383E40802232ACE22D2EC050C49448A2373E40002E39EE94FE2DC00094A84C6E4E4140A053C54A882527C0903710374C394440605B3E9292F224C030CA00AB7E39444080F474649BF224C058E09D7C7A424440807FB50F1EF624C0207EBACB8F42444060C4EE963FF624C0C05164ADA14344402001ECEDE0F924C020E7B9CF3B44444000429B77F7FB24C040AA78C83951444000FACCFEE55B25C000F0FACC5951444040CCA7D8E25C25C0E866028FB9514440201790076C6025C0E00D36D0D751444080BB8564B76125C08899000D80574440C020A4B8F4B125C0803705E8AD5B44400044EE33780126C0F80BE014B35B444060CC9C68360226C0D0E93587B55B4440C0797654900226C0D8B689496E6B4440402CF015DD162DC068CB3C03346B4440E0956DF13A802DC0B01ACE46F86A4440A0A18F430E972DC078DA4246F66A4440205F251FBB972DC04096B036C66A44408046E867EAA12DC0D015399F956A4440A023D5777EA92DC060E6F747296A4440A0563728ABB32DC0384CC862F66444404019D709791A2EC0B81E413BF164444020CB76CFCB1A2EC050E141B3EB644440204F20EC141B2EC0E8B54B1B0E63444000FAD2DB9F2B2EC060703FE08148444040E0D6DD3CFD2EC0A086E12362484440A0F1272A1BFE2EC0A0EA24B616BC4140B0114F76332B38C028D60A896AB44140D0550F98874038C00010E9B7AF99414060241AEE6D8638C000274D83A2994140E0388FD48C8638C088BDD3AE53934140E086342A709438C0C03CE66E1D724040708AED9FBBDB3AC060E15D2EE26F40406037F69639DD3AC090B43EF97C6F4040B0A1813C61DD3AC058BD35B0556E4040B000FBE8D4DD3AC018D6969FF36C40405078853B20DE3AC0E068006F816C404060FF548638DE3AC010C85EEFFE684040E064FACF61DE3AC0
+EE	EST	78	EST	إستونيا	Estonia	Estonia	Estonie	Estónia	Эстония	爱沙尼亚	Member State	NO	Tallinn	Europe	Northern Europe	0101000020E61000005D0896D540D73940EE067E9A75574D40	0106000020E61000000100000001030000000100000029000000F0C1DD59BB853A40E042908312C24C4010A178DF42A23640F8790FE1A9E64C4010CCC694590A364078D2FBC6D7F14C4060C631923D0A364098B3E908E0F14C4080C06499340A3640C0F81400E3F14C40C09FFEB3E60136401822BEB8F9F54C40C0CAA72270FB354030AB8EC12FF94C40E0249A9BCAC33540B8DF4C4C17294D40C0F880E5ADC335405801309E41294D40406E8CF8A9C33540F0B68EBB52294D403067BC08AEC3354088785DBF60294D40007718EEB7C33540D873C1CF6E294D402038013C58D5354068D916AFC33D4D40E032CF00CD0A364090E365F272784D4080EC6D8ECE0A36401865147074784D40C0C189E8D70A3640C8CADAA678784D40C0DE6FB4E30A3640D870CADC7C784D4020A2FF2FE80A3640A8E6F5717E784D40B0956A55010B3640784A79AD84784D40605051F52B953640D00B9F63F68B4D4040EDBD535C5C3740C8DF1E3AF3A64D4030E0E8746A8238400041F2CEA1CD4D4070914E136C823840006A15FDA1CD4D40C061E17F8604394000E61604A0D94D40D03E5CCD95043940B01ABD1AA0D94D40C0692222EBC93940F816B435C7D74D40E0392E9919CC3940E03A8265B6D74D4010B37BF2B0103C40385A475513BC4D40902C7DE8821A3C40F85A423EE8B94D4080C18BBE82343C40B8EA73B515B34D40E09855B446353C4080750B8098B24D40604C6C3EAE353C40A069FB5756B24D4050C587C5E7353C40108F1FF2E2B14D4060E2016553363C4038BB270F0BB14D4020018750A5363C4058EE77280AB04D40D0D573D2FB363C4010A7052FFAAE4D4080B75D68AED33B40C0F81400E3ED4C40C0463D44A3CB3B40200E846401EB4C404063D17476523B4010BABDA431C64C40009A25016A3A3B40E862450DA6C54C40F0C1DD59BB853A40E042908312C24C40
+TD	TCD	50	TCD	تشاد	Chad	Chad	Tchad	Chade	Чад	乍 得	Member State	NO	N'Djamena	Africa	Middle Africa	0101000020E610000087FA6F444EA9324040064B5630AE2E40	0106000020E6100000010000000103000000010000001E000000A0A5E794829E2F400059C7DAA7C31D400042CF66D5172F4080DC4603780B1E4060CBD6FA22112F4000397F130A111E4060C3B666A7072F40C011C236F1181E40A0BF266BD4032F40407C7E18211C1E40206F8104C51F2C40E0F3E0EEAC2D2340207250C24C0B2C40402367614F4B234020F9A067B30A2C4020B2D7BB3F4E234020679B1BD3F32A4040BB44F5D6D02C40E09E76F86BF22A4020AF08FEB7E22C40405019FF3EF32A4020EECEDA6DE72C4000235BC330FF2D4070E0156847FF36402069F7FFFFFF2F40706CE8667F70374010F800A0B42F3340E06BD8C1D1DE35401000000000003840100000000080334090B4FBFFFFFF374080362A05176C2F40403ECDA8FDFC3640A0B2BCBA4971264090FF9635EEFC364060302E5FDB70264030C5E1E884FC364040DD4C3BEB6D264000CB92F97AE13640402510F8C1E22540E0BBD8B11AE136402089E7581DE12540D0B9388A29E036402084F1CEFFDC254060E9BE6E21E03640E09EC363DCDC254000001DE6CBD33440C0169F0260DC2240B00018CFA0713440C01DFE9AAC512240004B5986389E3240E00A0C59DD1A2040200A1170089D324000E7A90EB919204020462575029A3240A0D4264EEE172040D0BAB88D06D8304000FE0E45811E1E40A0A5E794829E2F400059C7DAA7C31D40
+VN	VNM	264	VNM	فييت نام	Vietnam	Viet Nam	Viet Nam	Vietname	Вьетнам	越 南	Member State	NO	Hanoi	Asia	South-Eastern Asia	0101000020E610000010DA4ADDBB935A40121DE53484A23040	0106000020E610000001000000010300000001000000230000000C2438607D365A40605422355FD22040A0169E9271365A40202678827ED22040645E34EFCE345A40A046B84FE2D6204090850D8E73DE59400089B4AE4D922240D0E8D82550DE5940E04518464793224094CA054863DD5940609D2248249B2240B89DCDE259DD59404059307FF29B2240E469ED0E0D8959409071554BCD6836406449702526895940F0CAE3AD166B36405CAC9594D1895940307280212A713640AC7E3B0FE29D5940006D51C4F4C63640788CB9D8C59E5940F0A7C36DE1C73640F85C77A4AE545A40E03051318C643740C82E5F9EFBA55A4060E2C5B89EEE364054FC620032AD5A4050D2CD1C97E33640588E800CE8B45A40E0EF8BE3F1D03640FCA226C232025B40E095D7D0218B3540F0B6D1214C025B40C094AAEFA78A3540F8E9092F67045B40E0E42DAD3F7E35403CE3F9E187045B4090CA2CA0227D3540E4EA317895045B4070B11DF1837C35404843853EA6495B4040080DB386C22E4014924A20615D5B406045EF7015D329400C9D683B6C5D5B4060FD07812AC329402C2E943AAB5D5B40E00DE485E64B294014D25D5604525B400042814401C22740ACA051A3F84E5B4060E6084EBA732740C4691FFD3F415B4000D3026567B826409859EA44F5B45A4040BE852E0E452140941F7DD5A2B25A40A0CF5088F23A21401CF0A4180FB25A40A0ED22175F3921407804BFF9CCAC5A4080BB35F5292F2140A00717F540A95A40607D94CFFA282140146C3EA934A95A4080746BFFEE2821400C2438607D365A40605422355FD22040
+NF	NFK	184	AUS	جزيرة نورفولك، مناطق تابعة لجزيرة لنورفولك	Norfolk Island	Isla Norfolk	Île Norfolk	Ilha Norfolk	Остров Норфолк	诺福克岛	AU Territory	NO	Kingston	Oceania	Australia and New Zealand	0101000020E6100000C2F5B09A79FE6440ACA691CB56083DC0	0106000020E61000000100000001030000000100000017000000905951DE62FE644080C1B28817223DC004A3810E29FE6440006DC7D45D1F3DC044E1B37570FD6440D0B15538380D3DC004929F434FFD6440A043577D09023DC084E04CA750FD644000DA8937D7013DC08C097B246FFD644020349E08E2FE3CC0F4AB394070FD644060A53220D6FE3CC01485F12E72FD64403075BD7ED2FE3CC0242C19B69CFD644090F1FA82CCFE3CC0C88A64D99DFD644040070D58CDFE3CC02C30AE0246FE6440F0AF62A70E003DC018067646A5FE6440902B5B3519013DC0483D8E30D6FF6440E05196C6D4063DC07C53910AE3FF6440D0D3C4F132073DC02CA5B107E4FF644050EB30CB43073DC09CC40F84DAFF644010C253234F0B3DC0A031CC09DAFF6440D0B1E9526D0B3DC0D8BDBACFD6FF644020D4BC3ECE0B3DC0BC5B4876DBFE6440A0EA6866771E3DC0C4583A7AD7FE6440A0C909C9B81E3DC09C18CBF4CBFE64406094788A661F3DC090A7E5076EFE6440D09C22D115223DC0905951DE62FE644080C1B28817223DC0
+11	XXX	40762	EGY		Ma'tan al-Sarra						Sovereignty unsettled	YES		Africa	Northern Africa	0101000020E61000008072E59C11D8404062B279A26CE33540	0106000020E61000000100000001030000000100000008000000F82900C633C8404080D8B628B3B9354058E5DD2616C84040C0E3E708DEB9354080D07E67A5974040A0159D7BFBFF3540104D428460974040D0CF82C76C0036401035EE60130B4140009D2465A4003640C8222B64130B4140009D2465A400364060CEA5B8AA00414050B83B6BB7C53540F82900C633C8404080D8B628B3B93540
+KW	KWT	137	KWT	الكويت	Kuwait	Kuwait	Koweït	Kuwait	Кувейт	科威特	Member State	NO	Kuwait	Asia	Western Asia	0101000020E6100000E309CC5C24CA474001B9DEF317543D40	0106000020E6100000010000000103000000010000001400000080B3CB8C7EDA4740B054C2137A853C40F0ABA901CA464740B03AA24AE6193D40301B0FB6D8914740702B2FF99FFC3D40F87682D21796474010BA68C878043E40787493ED43984740905182FE42073E4000C879D45FAB4740908043A852173E4088677BF486AF4740D0A085048C1A3E407888B83995DA4740D0A085048C1A3E40701400207D144840801500806F023E40F01B00C0DD14484070B6FEDFD6013E4070F7FFFF6C234840C055FE1F21E73D4060790060BC25484050B200402AE23D40C89C00C03A2F4840702200004CCC3D4058ADFF1F19304840B083016049CA3D40602200004C30484070D3FEFF66C93D4040A30000E93048404017018029C23D40A8E30080F7334840E05400A0CB673D4070964B7D753748406037841B0A883C40804F8E6A67374840C01B2C8508883C4080B3CB8C7EDA4740B054C2137A853C40
+AR	ARG	12	ARG	الأرجنتين	Argentina	Argentina	Argentine	Argentina	Аргентина	阿根廷	Member State	NO	Buenos Aires	Americas	South America	0101000020E61000008AD8C74C734950C0C05AE751249941C0	0106000020E610000001000000010300000001000000280000000C48783103A350C09026A5A0DB874BC0B4E9CF7EA42651C0E04FC01B77724BC05009E704E12651C04818D4845B724BC02C3C825D050052C0282D39DAF0FD49C05096218E751B52C0B0CD8DE909CB49C0AC4CF8A57E4A52C09052D0ED256149C00412143FC66252C0000473F4F82949C06C3D0AD7A36452C0F08381E7DE2349C0002B8716D96452C0807CD0B3592149C0242367614F6552C0E0ED08A705C348C0D8DC989EB0A051C0900D32C9C8293FC008F4893C498051C0F0E21934F4573DC0E01934F44F2451C0D08BA19C68BF38C0CCDF8442042451C0408E3BA583BD38C074374F75C81951C0F0DA334B027C38C0008D7BEE22C250C050CC086F8F8836C044E7501455AF50C0C0CF1608693C36C07C3A1B7B618F50C030AF6B2DACC935C010A8D5C2328E50C0708C2C78D5C735C0D85618FA5E674FC0E01FCDB6A5FF35C0B87DB1525C0C4BC0E0014E4A1C7F39C0D8C8162B25F24AC0D0EEAADC4B9F39C020B9548918F24AC0D0681A56699F39C0904BF242CBF14AC030CD05A51DA039C0F87F226A70EE4AC00073E1F181A839C028C14B9EE2EB4AC0103E1E37D2AF39C09849A4658BCC4AC07014A51F35423AC038D072EF4DCC4AC060597FCA7F433AC0A82740688BD44AC0601B036EBADB3AC020948D20F8D54AC0D040E1563BF13AC0E81F555E3C554CC048289F79947042C0401630815B554CC018E516A9E67042C05868F86063E64FC078CE38680A604BC0701085E002EC4FC060B3452D28654BC008DB166536EC4FC048E0D6DD3C654BC0301290E5130B50C0C0EE8513E2704BC030D582CD6F2750C008E5338FB2754BC050908E61849C50C008D99B734B874BC0B0D59B07E6A250C0700E4350DA874BC00C48783103A350C09026A5A0DB874BC0
+MG	MDG	150	MDG	مدغشقر	Madagascar	Madagascar	Madagascar	Madagáscar	Мадагаскар	马达加斯加	Member State	NO	Antananarivo	Africa	Eastern Africa	0101000020E61000004F8C9E216A5947402340A1F0C96533C0	0106000020E61000000100000001030000000100000033000000D013083BC5964640106530EB6A9B39C04811F7FD40954640903FDF162C9B39C0687193AC1E954640A022484A1F9B39C02053E9279C944640B0ABA11EEC9A39C000D776C9EE934640E0D6FF94859A39C0C0AD88F5A11B464060FEA902FF3939C038F488D1731B4640B0E60B10BB3939C0D84C41C8C3034640B03176C24B1039C0C04F9F2E9C034640702ED0A4031039C0806DCA709703464070602239F40F39C0687DE13A6BD7454060930DB5B75F38C090B1F105D2D545409028E730045538C0A0F6DE292E9D4540D00F069E7B5336C06831D92E23984540306C55B71F1936C0F045ED7E15984540F031E0D16B1636C0F8BB557CE8994540A05F556243F435C050F4215E8DE14540301460B3B77D31C040A28C028E384640F0634392B43230C0289441FF4E394640B0EFBD64883030C050B7144669394640D0A52FDF553030C050AE51C543514840C0F511537D8628C078862C1C529F484060EBF6FEABE727C0D06361E3559F48404066DE05A5E727C0085DFB027A9F48408097248568E727C008625CBBFEA04840A0B085C54DE627C0C0F9DA8E04A2484040D7F6764BE627C008B8921D1BA24840203AE1CA7EE627C0407F4C6BD3A248408017E30D7AE827C008E0C7878FA54840C0DB9F8B86F027C0B8602C1DBDA54840A0289C3814F127C0C8A04CA3C9A54840400DA0843EF127C07891E79F85EF4840C00688388C9C29C0F80291EAE011494060A43E7F90972BC0B89602D2FE3E4940C0CA51DBE1862EC03861D971683C494080E60C7B90E02EC06032B6C6563C494020C0609225E22EC0809862B3C8CB47400049884DBFC937C088FD5AA846CB4740501DC70F95CC37C0308815C9B29A474000CFD90242C738C0A8C36B4DA99A4740500097B66EC738C000E9C36977914740B0F7A92A34EE38C06097642EBA8C4740D02AC1E270FE38C0C0C5B24FB68C474060705B5B78FE38C0683F694D988C474060AC1FF69DFE38C07096CB46E77A47402012EB9E861339C018EF004F5A5C4740E02A27EB812E39C068A4CD27E1C24640C0E8A27C9C9239C0F8C7FEC3A7C146406034362A269339C088AE3374A2C04640F0F3EAD2759339C0289E80817BBD4640F066AC472B9439C0D013083BC5964640106530EB6A9B39C0
+BR	BRA	37	BRA	البرازيل	Brazil	Brasil	Brésil	Brasil	Бразилия	巴 西	Member State	NO	Brasília	Americas	South America	0101000020E61000001F98A306898B4AC05C6095A7D68A25C0	0106000020E61000000100000001030000000100000022000000C856A3C660B04AC00043EF1D0DE040C078D0B359F5B14AC0E8B5679604E040C04012BD8C62B54AC0C076BE9F1ADF40C0A058BFB0B4B54AC048F24CFDF6DE40C0E85A423EE8B54AC03068E89FE0DE40C0B0075A8121C34AC038FB912232D840C060A032FE7DC64CC0D0BA9BA73A443EC0C8967329AECE4CC0E0ED08A7052F3EC0ECF0D7648D4C52C0801A2FDD24D622C0D49E5912A04C52C040158C4AEAD422C0F0C308E1D17E52C000CF83BBB3361EC02CBB270F0B7F52C000BE13B35E2C1EC084CE6BEC127F52C000CD1E6805261EC0643A3B191C7D52C00066BD18CA691DC08CF7AA95097D52C0C004FA449E641DC0682F5D19187651C0006C90988C6AFB3F8089958A137651C00009CB245F6BFB3F1C2D590BAF7551C000E8B1AA817DFB3FA0AF20CD583250C0409B8F6B43251140986D6E4C4F584EC04081785DBFE01440B024404D2D1B4EC0C0B515FBCB0E1540D826A93A8E1A4EC0C029F896070F15403041D47D001A4EC08075E5B33C0F1540E0FED94587C349C08097F26B35C5114080539C5901C349C0C0BC68D9A4C41140388A2947B7C249C0C07B702D49C41140500F4EFA31583DC000BADB9A1962ED3F004F1B7A30583DC0001CF2CF0C62ED3F7086FE092E583DC000D2EF56F161ED3F9095CBEB2D583DC000505656E461ED3FC0D45DD905D93CC040A4B789A47934C0D0EAABAB02D93CC0B0E3ECE75E7F34C040D9C1D20AD93CC0006DDEDD6F7F34C0C856A3C660B04AC00043EF1D0DE040C0
+RW	RWA	205	RWA	رواندا	Rwanda	Rwanda	Rwanda	Ruanda	Руанда	卢旺达	Member State	NO	Kigali	Africa	Eastern Africa	0101000020E61000002B2D409353EC3D4006E69F0F3DFFFFBF	0106000020E6100000010000000103000000010000002600000000BAA8BDD85E3D4080177CC513B806C040515E7A670A3D40801B549964F305C0602A16FC0CEB3C4000F3EA14927105C0E0492357CBE53C40805E7A5E9E4805C0607C09A3C6DC3C4000917148474204C080AEE474A3DC3C4080C4AFCFD13B04C030F3C768A8DC3C4080F00D55967C03C0500AD7A370DD3C4000A46B26DF3C03C0502FA3586EDF3C40001503840C1503C070D9EAE41F243D4000B91457951DFDBF10910B5C0B263D40009C984E1BE8FCBF904F6836E83D3D4000CDD9CD4FB3FABF20CCF1A7995C3D4000839E7C6318F8BFA0AE4F5C358E3D40007C73FE744BF6BF20E4E8A3EC5A3E40003B7CED2708F1BF40C75D4AFE5B3E40005A23734603F1BF4037806089703E4000FE52251BC6F0BFF080ECAE99713E400033DAEC40C4F0BF40B4877E6C733E4000BB3F6C56C6F0BF50E6C09B83753E40000D795C38CEF0BFE08989D5B8773E4000AB60DA8BD6F0BF008507C875783E4000F7187CFFDEF0BFA06E364938793E4000217E8E27EBF0BFF06915D75ABD3E4000D83194642CF7BFC0A681A58ED83E400030858D0686FABFF0837A744FE63E4000EC31757D9D00C070B6BCC384DB3E4000D7F774848202C0F0D4DE1246DA3E40806B62D7AF9102C0101B307833D63E408021F03910BF02C0903A4F23CAD33E40004F813B6CD802C0F0611A531ED13E40009CD37B16EB02C0E080ABB6C7C63E40000397F7D31B03C0700744710FD53D4000739E494C4006C0F0C306BADFC03D4080561C69D17C06C0F09AAD4F48B93D400082ADDA818B06C0B066E03150B53D4080098250A98D06C080A3DD88F18A3D4000B3EA94C3A206C000BAA8BDD85E3D4080177CC513B806C0
+NA	NAM	172	NAM	ناميبيا	Namibia	Namibia	Namibie	Namíbia	Намибия	纳米比亚	Member State	NO	Windhoek	Africa	Southern Africa	0101000020E61000006C310458E0383140571D7058472336C0	0106000020E6100000010000000103000000010000003E000000202005AD121F3340F03167C21EF83CC0D0ADB777D41A3340E02CD21503F83CC08027FFFD2331324070BFC5AEE0EA3CC030D13379A72F3240D067C740B0EA3CC00063E677A4743040B0E0561E7DA23CC010C60B337E713040608DD541B9A03CC000D02E3AB4653040E07310CF6D993CC07082531F485C304010AA07718A933CC0C0100CD6EE553040800F7A36AB8E3CC0302F10A90E543040302CB242368D3CC020697C15CF9F2F4020E7BE4120183CC080B7088CF5812F40D00D25A47F093CC0A07A4496167B2F40F0761211FE053CC0C06EF59CF46E2F40F0798CF2CCFF3BC0E0DFF604896D2F40604B1DE4F5FE3BC0A0CFBA46CB612F4070D32D3BC4F73BC0C0328CBB415C2F40A01188D7F5F33BC060337106DA182F40100B7668FDC03BC0A0D7D3B3C5962E408007832161523BC060927538BA962E40609DA7F056523BC08012503CC2942E40D03D8A8400503BC0808BA4DDE8AB274020F9D85DA01832C0A05E7F129FAB2740E0340BB43B1832C020F4C29D0BAB274050AC6F60721732C0A04E7ADFF8AA2740E06A80D2501732C0404B08B18E9E27404098B38872FF31C0E070F8EEA09B2740B0A2224E27F931C080146A978089274050FB35FEE9C731C080E3FA777D7E2740901727BEDAA531C0E0E7DCED7A792740D04C8578249631C0E06D6DE179792740802441B8029631C000EFACDD7679274030A33B889D9531C060D9E907757927409014E63DCE9031C0404339D1AE7A2740702C0B26FE7431C02069A44A39802740000DA25AE94031C0806F2F7D7080274090B078E2A04031C0C04DEE47EFE127407073CD84A92E31C060DF3A1814E5274050AEBE1A1D2E31C04066EE0844ED2740A02467CBB32C31C0A0418887D7112840D004B1FC912631C0A06AA82310292840B072E67F3B2431C040DFE2CAA1F7294050F02C5862FB30C040D64FF02E0E2A402005AA0011FA30C0C0DD220FC8202A40D0ACF27E08F930C04082D55108492A4060CDE150FBF630C000FAE7BDBF562A40D09334D093F630C0907437A37463384060C808400D7831C080AE30964CB43840F0B82528347F31C0101A4F4B46C7384030CCB36C0F8231C0F0050CF02FE13840D08CFDD9CD8631C0007FB0B455FA384090C28DD8CA8D31C0007B95C140FB3840E06B2F32198E31C0B0904C03160C3940E0B86868069731C020AFB82647433940B09C326798CA31C0D05BD2B100003440E0BD0A86796D3CC0A02C44AD8749334000268ED42CE83CC070E272963B4833401094B009C5E83CC090873ECC9C303340B026ABEF6AF33CC01002F400382E3340900B09D640F43CC0F048346FBF2D3340A05FEDEB6AF43CC0904C425427263340F053BCBA78F63CC0202005AD121F3340F03167C21EF83CC0
+PL	POL	198	POL	بولندا	Poland	Polonia	Pologne	Polónia	Польша	波 兰	Member State	NO	Warsaw	Europe	Eastern Europe	0101000020E61000009FC2625709683340F57C0DC29F0F4A40	0106000020E6100000010000000103000000010000002700000050D47D0052E3364080D66EBBD0804840106D3997E2CA3340185CACA8C19848406089247A19FD3240F8647094BCB24840402E1C08C9A23040100C59DDEA0D494080520ABABDA42D40E84EE960FD6F494080179AEB34A22D406884F068E37049408078978BF83E2C403855302AA96B4A4020C58F31775D2C4090101E6D1CF54A4020A126E1DF722C40D83E43C398F64A40606201C0EF3C314030FCFE3FA15D4B40E082FEDF6447314038DD0040C95E4B4090D300E0035D3140A0EBFFDF42604B40D00201602CE33140C80A00C037694B40508DF74D5BEC3140A814614EC6694B40603000E01AFB31407074FF3FAB6A4B40A0B9FEFF2D0C324000F1FFBFFE6A4B4080BB01E084483240D0FCFFDF686B4B4020B000804550324068B400004F6B4B403059C0046EDD364070A032FE7D364B40707FC0A0D8DF3640F0651B8552364B40B0F9D51C20E03640E0D30E7F4D364B4030D1CB2896FB3640A09EB0C403324B40C0510FD1E8FE364070E89FE062314B4040164D67275B3740B0A9656B7D1D4B40F01FEF552B633740482B3064751B4B406089247A197D3740807077D66E134B40404030478F7F3740386EA301BC114B401020B58993EB3740A875543541944A40003AE97DE3EB37409011C2A38D934A4080B988EFC4F437401093A98251794A405029E8F692263840681EF983816F494000338AE5962638409093FB1D8A6E4940C0D7BB3FDE1B3840D0457C27665149404046EBA86A123840D04109336D3F494080D8FDFD3E113840988D3794023E494020677E3507103840387C444C893C494040211FF46C0E384000CCEEC9C33A4940E0E6C6F484E5364058E8BCC62E81484050D47D0052E3364080D66EBBD0804840
+VU	VUT	262	VUT	فانواتو	Vanuatu	Vanuatu	Vanuatu	Vanuatu	Вануату	瓦努阿图	Member State	NO	Port-Vila	Oceania	Melanesia	0101000020E6100000ECF210AFEFDB6440B1D8E33E9C7B2EC0	0106000020E61000000100000001030000000100000018000000A80BA0CE4B3B6540505F13888D4034C0BC1DBEA59C38654000CF3A996E4034C038177FDB9338654020E4DE57404034C078DDA51E3329654030F669CB6F9333C06C053C1F14286540F087AA4EBD8633C074416C9FC4D8644020DDCEBEF24C2FC078875E90BED46440C097B6C9F2CB2EC004CCC69459D164408057E13BD6B12DC0B8DF7FD05FD16440E08CB62A89482AC038AC980072D16440C09B734B06272AC0709CA80073D1644060C1E09A3B262AC0A4FC492175D16440A09097DAF7252AC08814F2F781D16440E04718062C252AC080F8E8C3A9F464406018DD8B79832AC010ADBAB39B47654070CB4175188233C0A4FEC412A0476540C0D743A09F8233C044D1860DA0476540307F3562C18233C0B8D4415E8F476540E0F0AF2F238A33C03CAE9003C03C65403028EFE3683634C0C840D7BE803C654090702CDE7E3934C0D827B9C3663C6540C0177B2FBE3A34C090DB1E73143C6540308AF0E5F43D34C0546D2695DF3B6540D0686852763F34C0A80BA0CE4B3B6540505F13888D4034C0
+MC	MCO	166	MCO	موناكو	Monaco	Mónaco	Monaco	Mónaco	Монако	摩纳哥	Member State	NO	Monaco	Europe	Western Europe	0101000020E610000077804B4BFAAF1D401543C8EB5BE04540	0106000020E61000000100000001030000000100000010000000C03BF87F91A01D40F8CA00E0B0DD454040AC1C5A649B1D40A09EB0C403DE4540C0C0CAA145961D40F8815660C8DE45408066F67E45961D4008AFC071C8DE45408091ED7C3F951D408019C5724BDF4540C0EACA67799E1D40A0C420B072E0454040D0323C0AA61D4050A0087C1AE14540004F0647C9AB1D40C86F7CED99E1454000B73DBB28B21D405072ACCAFFE1454040D7C05609B61D4038AD86C43DE2454040309E4143BF1D4020CFA0A17FE24540806D34BD1AC51D408854F5B850E24540405A9E0777C71D4038AD86C43DE24540C076F81F24CF1D4020B0008085E1454040D6FD7F76C91D40A86000C0F5E04540C03BF87F91A01D40F8CA00E0B0DD4540
+ST	STP	214	STP	سان تومي وبرنسيبي	Sao Tome and Principe	Santo Tomé y Príncipe	Sao Tomé-et-Principe	São Tomé e Príncipe	Сан-Томе и Принсипи	圣多美和普林西比	Member State	NO	S?o Tomé	Africa	Middle Africa	0101000020E61000001F78E2E595681A40FCDEE3C6C8A6CE3F	0106000020E6100000010000000103000000010000001600000080A92F4B3B151A4000000650429F8EBFC0ACF078A4131A400000D69B621F8EBF40E85E7182101A4000000F37F11F8CBF800917F2080E1A4000807E91860989BF8023CD69600D1A400080859CAD7287BFC0BE2CEDD40C1A400000C101881684BFC009B9F715D819400090E06EFF80C93FC07538BA4AD7194000C06C2A4135CF3F80799109F8DD194000E8C3EC65DBD03F40FE18294AF81940002CE208AD62D43F40DE7AA8C8841D4000B3AC45559DFB3F8094128255851D4000820AA2499DFB3F80C7B8E2E2E01D4000F9D39002F5FA3F40BA90FDE2E01D4000AA3121E6F2FA3F80C604EBEED81D40009FE9CA0C00FA3F805DD7D41EBB1D4000746AC2512DF83F00EA29CD410B1B4000484C67CCC9CE3FC095534CEF9C1A40002031A2A30BBC3F40966137C79C1A40006069FD2D01BC3F0056E7621D181A400000710404CE8DBF000CF43FAF161A400000D5AD9E938EBF80A92F4B3B151A4000000650429F8EBF
+VC	VCT	211	VCT	سانت فنسنت وجزر غرينادين	Saint Vincent and the Grenadines	San Vicente y las Granadinas	Saint-Vincent-et-les Grenadines	São Vicente e Granadinas	Сент-Винсент и Гренадины	圣文森特和格林纳丁斯	Member State	NO	Kingstown	Americas	Caribbean	0101000020E6100000A70B103D33984EC061651F36C5802A40	0106000020E610000001000000010300000001000000210000008060C1A2C7BF4EC0408BF5B292C7284058A15923CCBF4EC08083ADC89EC7284040C42863D7BF4EC040109EBFBFC72840E8F5A402DDBF4EC0E0A4D6A0D4C72840606787AEFABF4EC0007872970EDF284058C47762D6BF4EC0200BD28C45F32840B09F9D1DBAA34EC080866B5ACE7A2A4008BF40B566A14EC0A06363B900932A407867B455499A4EC0605F0839EFBB2A40206C50453B9A4EC0A022F4D83BBC2A40509C6A2DCC994EC0E058BD6834BE2A4078CEA44DD5974EC060B874CC79C22A407811120E62964EC0A09D2397A4C32A406857433DD8954EC0A05EA74709C42A407803F0D522954EC0C0CB0D863AC42A4088CBA77D29924EC0008822EEFBC12A40F00588DDD2914EC04088765FDFC02A40F04F81DDFA904EC040C78157CBBD2A40F86A589DE6904EC060F0FED368BD2A40D0F50B76C3904EC020BB3F83F2BB2A40D03FE31D3B8F4EC000AA1496D3A92A40A82BC13D2A8F4EC00062F6B2EDA82A40288B89CDC78E4EC0C0ACACC8439A2A404020031EBD8E4EC080964E35C4962A409822D115B68E4EC0802F979EFA852A40C051CAB5B28E4EC00009E066F17A2A40202A0AAAFC8F4EC0A0512745D0ED2940F8E6A331FF8F4EC0E08564B785ED2940806A3986B6914EC060955BFF53D62940F0BB445090B04EC0A0B3B684D705294018A11CBBFABC4EC0E0F693313ED02840183B6F63B3BF4EC0A021D390A7C728408060C1A2C7BF4EC0408BF5B292C72840
+EG	EGY	40765	EGY	مصر	Egypt	Egipto	Égypte	Egito	Египет	埃 及	Member State	NO	Cairo	Africa	Northern Africa	0101000020E61000007A725FF13EC63D400B6F3CE36A933A40	0106000020E6100000010000000103000000010000001D0000001000000000003940100000000000364080567DAEB6B238404056D4601A263E40701E6F48DCDB384040BFDFD764653F40404278B471DC3840A01EBFB7E9673F40B01DFE9AAC213940002BA4FCA4AA3F40E063149EAC213940A000DCFCA4AA3F40C024404D2D23394010168733BFAA3F40000960C386233940C095562AC5AA3F40C08A37328F243940105053CBD6AA3F4020451559C6193F40E082E4F8FC993F4000E85894C81C3F40E07256FABF993F40C8F01C5AFC1B4140805B5199CE523F4080D6B4D9F81E414070745AD3164B3F40B0BDC2612D404140E01538E8B1AC3E40C03AFB28B56C41401071ACF8F7C23D40D08FE632AF7041402081454653A43D4098C90457D41F4240804CF49E6F90374068737A83D41F424020B435C75E9037402056A7B9CB1F4240B0B01FBD3C903740A03F3AD09E1F4240505A1943EF8F3740F811312592584140D0266BD4434C3640C8222B64130B4140009D2465A4003640104D428460974040D0CF82C76C003640481756EFC534404050C044633D003640601CA1E8FF843F40208612770600364060F7F9D6246A3F401053EB0200003640C08B17A8186A3F4090407E0100003640C0973446EB503F40100000000000364010000000000039401000000000003640
+09	XXX	230	XXX		Spratly Islands						Sovereignty unsettled	YES		Asia	South-Eastern Asia	0101000020E6100000DB56AD593B925C40F2AA40CCD41A2640	0106000020E6100000010000000103000000010000000E000000808B4E965AE15C4040B5A50EF2C2234038F279C553E15C40E06DDFA3FEC22340F89095044D975C4040506F46CD5B2440184130A2C8915C40C024FC9CCC192640E0F923B1C9915C40A0128E0F691A264050D0042F1F925C40006CE058611C2640400213132F925C40A0CC62BDAC1C264080DF9D2141925C40A053D5BAC31C2640B0C8320EBFC15C408039D620272B2640D814C8ECACF45C4060D34B8C65A2254038875A89AFF45C40A0305CC246A22540C0CCC17DAEF45C40E0C63F7D15A22540806EFCE483F35C40A0B3E908E0762540808B4E965AE15C4040B5A50EF2C22340
+TT	TTO	246	TTO	ترينيداد وتوباغو	Trinidad and Tobago	Trinidad y Tabago	Trinité-et-Tobago	Trinidad e Tobago	Тринидад и Тобаго	特立尼达和多巴哥	Member State	NO	Port of Spain	Americas	Caribbean	0101000020E61000004B36BB69F7A54EC02EE76148A3D82440	0106000020E6100000010000000103000000010000001600000098195822ABF34EC000635C16B8152440A06F99D365F54EC0C01A2FDD24162440782766BD18F64EC0403B1FF9DE1624408049134ABAF64EC0E0AAECBB22182440D0FD19941FF74EC040F763496F1A2440E0AB3F1DEAF64EC0A0C2D3D0AB1E2440A0629CBF09E14EC0400ADD802A652540E060FD9FC3E04EC00009C4EBFA65254078D5CA845F524EC0E027F224E9AA264038CC971760434EC0C094826E2FB92640B0E23D624F434EC0C094826E2FB92640E8A353573E434EC0203CF71E2EB9264058C8EA56CF414EC020406A1327B7264028DF8ECB133F4EC0E04E177321982640F0E571BD123F4EC0C0A8FA95CE972640601F1ACC153F4EC060EA5FED83972640889BE1067C7E4EC0E0F2599E07472440F8C33B65DA7E4EC0806435029645244028431CEBE27E4EC040C03E3A7545244018221395B2944EC020ADBAB31B262440402EFF21FD9A4EC0C020D335EE24244098195822ABF34EC000635C16B8152440
+10	XXX	40760	SDN		Hala'ib triangle						Sovereignty unsettled	YES		Africa	Northern Africa	0101000020E6100000AF04DCFCE9C04140F89ECD834C5D3640	0106000020E61000000100000001030000000100000013000000C8222B64130B4140009D2465A400364040293D1A21104140D00A0378861C3640B0656B7D9114414070006F8104353640608638D6C5794140F00720B589DB3640C04EB3D897CF4140006C755041253740407AFCDEA6CF4140A007228B34253740005B971AA11D4240A0AD9A8CCFC93640204119993672424000F6EE8FF7103640589E8A6544724240D09E9E2DD6103640E88F47156A724240D0A2D8C00C103640F8FCFDBD6F72424050CF0B1C750F3640380B372A81724240D000D3B36A0D364040257BDF53724240501581FB4B06364060CA7C51CC71424080BD4571D80336403074A8F0B17142402014179172033640C8F3305981714240D0F34185D9023640084C9AB8F570424010E5916D50013640A0C7E1668D704240D03C6C3B50013640C8222B64130B4140009D2465A4003640
+03	XXX	52	XXX		China/India						Sovereignty unsettled	YES		Asia	Eastern Asia	0101000020E610000066DB450BE0D55340B06FB1ADEC6D4040	0106000020E610000001000000010300000001000000170000002CBD6F7CED0D544050963E7441953E40E8A59BC420C6534050C49448A2FF3E4064C3D32B65C5534030965B5A0D013F40ECAE25E483C05340F0291DACFF0B3F40FC88981249C0534040F5F3A6220D3F4078D2FBC6D7B8534050B83B6BB7453F406CC6A2E9EC9C534048E7357689124040740D6C95609B5340D0EEC9C342194040CC40485D659B5340384195193D1A404008A8A9656B9B5340D05EEFFE781B40406CE89FE062C95340B8683A3B19984040B829577897CD5340D8484BE5ED984040B485200725D8534080978BF84E98404050C3F01131D95340E09DB5DB2E9840404C8AC8B08AD9534008E31934F4974040F0258DD13ADA5340C8C073EFE19640407C7FBC57ADDA534008491119569540400CB64AB038105440F0B8533A58BF3E4030043928611054406062105839BC3E40D8CF9B8A5410544010FBE8D495B73E40ACD0798D5D0E5440F0B4E0455F993E4010CB167EED0D5440906EC38341953E402CBD6F7CED0D544050963E7441953E40
+MU	MUS	160	MUS	موريشيوس	Mauritius	Mauricio	Maurice	Maurícia	Маврикий	毛里求斯	Member State	NO	Port Louis	Africa	Eastern Africa	0101000020E6100000A7AED9FC39C94C403A6E1BCB934834C0	0106000020E6100000010000000103000000010000001B000000D0D70A3FDDC34C4070B9DDCB7D8634C0A8BC37A2D5C34C406041140B7D8634C0E09D93837EC34C40B066B96C748634C070AE1DD665B54C40805154EC1E8334C070813D2652B54C40A06E72AE178334C00051A2258FAD4C40D0A0CE26D17C34C0103065E080A74C4040F8C7D68E7734C08017940E7BA74C4030B72B4F7B7734C0E028A1AAF84A4C408026553607B324C0400E5075234B4C4040913DE713AE24C020426216354B4C40E055DBA8A9AC24C0302FAD11774B4C40E0F9505898AC24C01012143FC64B4C408025D93400AD24C0F88E7BA98E4C4C40608099EFE0AF24C000FBEEB14F594C40A0BAFDA83CEC24C0581D50DB2BC04F40A08C79C2B7AF33C0288A7F8E45C04F404031E5E896B033C0685C717154C04F4060BBE765B9B533C030AE19CF56C04F40503C28CD8BB633C040950C0055C04F406007D968EFB633C0E000A5A146C04F40C0C5072C6FB733C0F05828E329C04F40B09FD0A1C2B733C0B8098BE5F1BF4F40703661B13CB833C03856E58C72B74F40A05027EA16C933C0708187B36CB74F40C0D050ED1DC933C0F80071B268B74F4030C879FF1FC933C0D0D70A3FDDC34C4070B9DDCB7D8634C0
+HU	HUN	113	HUN	هنغاريا	Hungary	Hungría	Hongrie	Hungria	Венгрия	匈牙利	Member State	NO	Budapest	Europe	Eastern Europe	0101000020E61000009A23EE7EFC6A33403C378C4A44954740	0106000020E6100000010000000103000000010000002400000080A25D859467324028A7E8482EDF4640A0442FA358DE3140800F971C77E2464070EF4A9A58DE314018CF6D1D77E2464090A757CA32DC3140980F7A36ABE24640F03CD5213763314038A2B437F8F6464030F224E99A59314048912749D7F84640208464011358314050A60A4625F946407014CB2DAD863040E8A59BC420404740F0BFB2D2A41C30409011C2A38D6F4740F0137992746D3040684A24D1CBD4474090B8E4B853723040687AC2120FD8474040F9669B1B73304070C18BBE82D8474080EFE192E38E304050205ED72FE04740C0679604A829314010E544BB0A01484040C824236731314048FF04172B024840E08BA19C68A73440001A170E84484840C0A5D590B8D7344008486DE2E44A4840803D0AD7A3703540B04929E8F64A484080C5FEB27B723540B876DB85E64A48404055302AA973354028DC9DB5DB4A484010922232AC3A3640D87476323836484000726DA81847364058158C4AEA344840001F2E39EED43640108A1F63EE0E484000DCD78173D636404046EBA86A0E4840801EDC9DB5E3364008DA8F1491054840D080ECF5EEE73640509D8026C2FA474060452A8C2DDC364080F35487DCF44740E0751A69A94C3540E85D2EE23B35474060CD1E68052E3540F81ABB44F5264740E0AACFD5562C35403863D17476264740006059695212354090855AD3BC1F4740E0484BE5ED103540D866D5E76A1F4740207EA99F37A53440082C2B4D4A11474030D82AC1E27032407026DF6C73DF464030402364626E324028A3FAD660DF464080A25D859467324028A7E8482EDF4640
+NU	NIU	183	NZL	نيوى	Niue	Niue	Nioué	Niue	Ниуэ	纽 埃	NZ Territory	NO	Alofi	Oceania	Polynesia	0101000020E6100000AD9BC66C773B65C0A0EA365B470D33C0	0106000020E6100000010000000103000000010000002B000000CE4B0C9C183C65C090C026CBC62733C02378E860223C65C0F068160DBE2733C0F5FE507A303C65C0D03D624F962733C01DDC42FC683D65C0D08002942B2333C020E28B9B7F3D65C0A0E9FD90C82233C0E6C8CA2F833D65C0F00F1C3CB82233C052DD6D28863D65C050D81D9C992233C0FE356ACF763E65C0F08FB86C191333C06007848C763E65C0405150E50F1333C0027B4CA4743E65C0B07CC96BCA1233C0BB749318843D65C090CCF56C0C0233C0A8F7544E7B3D65C0700877C2A60133C07BA7B8609F3C65C0E0548DB9C6F832C0A7F45D5B893C65C0508143030CF832C089271653443C65C05099B7EA3AF632C0F565C460193C65C060A6D65647F532C06E43311E0A3B65C040DD5CFC6DF332C02E0B372A013B65C0301C4C7963F332C00147020DF63A65C0301DC87A6AF332C0336D5A843D3A65C0E0E786A6ECF432C0E83B09B61B3A65C0A09D616A4BF532C0AD77C949F23965C0B0770DFAD2F532C05DE68585E43965C0501A2BD615F632C0D179E816D53965C06007342262F632C0956FC7E5C93965C0D068119BD9F632C03E29498DBF3965C000675CDD56F732C01CD2037ABC3965C0D0F73CDA93F732C0E3AA6862B03965C00009073186F832C03331B841C83865C0708EA042BF0E33C0BE7FF3E2C43865C0E037B819130F33C0E9A8B40FC33865C0B02C488ECF0F33C07B9BFEECC73865C0A0DCD26A481033C0FDEB81FBE63865C0201F27F15E1233C0A7131AD2323965C01063601DC71533C090DE26925E3965C0604AC33A9F1733C0D3BB783F6E3965C08062145F481833C0360F71BD773965C0C0187A1FA21833C0C635994CF03A65C0709E2864422533C04158326CF93A65C0E014F5937B2533C01F7D93A6013B65C050C8563C9A2533C094CF9783053C65C0500828C3A72733C0B3B2D8810E3C65C070ACB882B72733C0CE4B0C9C183C65C090C026CBC62733C0
+FI	FIN	84	FIN	فنلندا	Finland	Finlandia	Finlande	Finlândia	Финляндия	芬 兰	Member State	NO	Helsinki	Europe	Northern Europe	0101000020E61000003EB9ACB9044A3A40636018315D215040	0106000020E61000000100000001030000000100000026000000B0AF01C09AF336400800000040E24D402024010086973540009100A050E94D40C095FFDFC4313440E09D00202DFD4D40F0180280E3063440E0370080BB004E404011000026FF3340B8CFFF1F65014E4040C2FEFF40593340088300C041184E40F083FE3FD7513340087DFF3FFE194E40103201E054513340C0610020281A4E4030680586AC8E3440040000000044514090766297279334406C55257367445140F070E65773B83440D02DAD86C447514030FC523F6F0A35400CA7052FFA4E5140401E16B1A2183540B0B9C00B3950514010556AF6401B35401CB2BAD573505140D0C62E51BD2D35406C7E35070852514060B3075A814935407C1EDC9DB5535140705721E527953B40F09E3C2CD4845140309C16BCE89B3B4064BA490C0285514050DF4F8D97F63B40FC31E6AE25865140205B087250FA3B402CBD6F7CED85514050041C4295223D4038BA83D8996C5140402FC03E3A553D405458E201655F514030EC17F6F8553D407C01EA5E0B5F514080E5B33C0F563D40E4CCAFE6005F514030BB44F5D6083E400C5053CBD6EA504040F0DC7BB8943F40C0E4B8533A744F4070062AE3DF5F3F409887855AD3544F40105053CBD63A3F40188E9257E7404F40C0679604A8293F40D0A145B6F3394F40A08BF84ECCF23E40D0BAB88D06284F40D0C073EFE1A23D40E080CF0F23C04E40C0342905DD3E3D404809336DFFA24E40D0DD59BBEDAA3C40C0ED42739D7A4E40D07601E0ECBF3B40A085FF3F513E4E40605C0040EC523B40107500E032244E40E0EC012012503B40583000E09A234E4070AEFF7F0B9237407057FF1F5BE94D40B0AF01C09AF336400800000040E24D40
+NR	NRU	173	NRU	ناورو	Nauru	Nauru	Nauru	Nauru	Науру	瑙 鲁	Member State	NO		Oceania	Micronesia	0101000020E6100000CEEAE6ADE4DD6440CD77550879E9E0BF	0106000020E6100000010000000103000000010000002A00000050E08C50A2DD6440001058946DBBE1BFD82478439ADD64400014E52DB2B8E1BF0C3CE6F255DD644000961E03688AE1BFB4823A404BDD644000DC173CF181E1BFBCABB24A44DD6440004EC6F8307BE1BFEC8596D038DD644000625012B76FE1BFC47BFDFF2EDD644000FCADAE5461E1BF54B6926728DD6440008826AB7D55E1BF30EA93DC21DD64400094F2107C42E1BFD0CB61F71DDD6440001EED7F8035E1BF50A665FF17DD6440008014E1CBE9E0BF740278B02ADD6440000E666E19CBE0BF80BC468134DD644000E05D2EE2BBE0BF909C3BB0D2DD6440000A642C8922E0BF40654689E7DD644000F0F917F715E0BF9CC6E52EF8DD644000B2A8F4B814E0BF00E92F4F02DE6440003ABA111615E0BF3CD7416F3BDE644000E25993B818E0BF08BFC3A343DE6440009A5C42F41AE0BFA00EAECA4FDE64400028ACF9961EE0BFBCF3B3475EDE64400084121C4D24E0BF08464DAA6CDE644000CA660E492DE0BFBC9F9D1D7ADE64400086EB62E436E0BF8409922D81DE644000BC981C2D3DE0BFC4F28C2290DE6440008C44C3BD4DE0BFE09513A39DDE644000B810F5CC5CE0BFE4D3ADE8A0DE644000C0CEA85464E0BF545D0A59A7DE6440001A4AED4574E0BF98EF6316ABDE644000CAA9AE8D82E0BFC8A00216AFDE644000CE42024697E0BFB8FB5580AFDE644000E269543B9EE0BFC8A00216AFDE644000F84E2734A4E0BF64658FAB6CDE64400018796A3F63E1BFAC8BCA3C68DE644000220B98C06DE1BFEC22E06B63DE644000A2E8DC4874E1BF2479F87C5EDE644000B88B304579E1BF4CA7093649DE644000BAF5F5D786E1BFA0397F6E43DE644000E4176F758AE1BFB8A79A0FFEDD644000946945E5B0E1BF480B75FDE7DD64400098F7938CB7E1BF5C3FA2AEDADD644000844F841EBBE1BF50E08C50A2DD6440001058946DBBE1BF
+WF	WLF	266	FRA	جزر واليس وفوتونا	Wallis and Futuna Islands	Islas Wallis y Futuna	Îles Wallis et Futuna	Wallis e Futuna	острова Уоллис и Футуна	瓦利斯和富图纳群岛	FR Territory	NO	Mata-Utu	Oceania	Polynesia	0101000020E6100000A80395B4890666C01DC3E39603922AC0	0106000020E61000000100000001030000000100000019000000942DED2F564166C0E044042D6EB92CC048D4B0845A4166C0C06932E36DB92CC036F11F1C7D4166C0C0E68D93C2B82CC0E2440598834166C060FC2257A0B82CC091A8BCC2274266C0A0D1BC2DA2B32CC07BD7A02FFD4466C0C0709CCA589B2CC0056A8C310B4566C06017AB178D9A2CC0DC7C23BA674566C04070E4260F942CC02FB95164AD4566C0402816AEFD8B2CC036C2A222CE4566C000A2A9E859822CC0C4E00621C54566C0A08CA1F7217E2CC03732EAB5B44566C0E061C32EE57B2CC0B2DF2417AD4566C020D7A205687B2CC0A7C64B37890666C0E0FA7612115E2AC03F6C6599800666C0803017A7105E2AC09A931799800666C0803017A7105E2AC0678302A5570666C0A0A492F0735E2AC0BEA552A29B0566C0004DBC033C692AC0FFDDA74F970566C060B3A5587F692AC072BB97FB240466C02065F1ACEE8A2AC04DAAED8EFB0366C0C0AF743E3C932AC08202A557F90366C080EB014E4A942AC06255CE28670566C0C02AAAD95EC62AC0A7E8A3E7710566C0809BD54C08C72AC0942DED2F564166C0E044042D6EB92CC0
+EC	ECU	73	ECU	إكوادور	Ecuador	Ecuador	Équateur	Equador	Эквадор	厄瓜多尔	Member State	NO	Quito	Americas	South America	0101000020E61000008938C8C36E9753C03FB4406EA73BF7BF	0106000020E61000000100000001030000000100000022000000D0CB28965BC253C0C05C8AABCAFE13C0DCE00B93A9D053C040D5AD9E93DE13C0A8436E861B9D56C00010C1DDFEC1F5BFAC5582C5E1DA56C000A4DAA7E331F0BFC42E51BD35DC56C00045EBA86A02F0BF1C63EE5A42DC56C0005E3C8386FEEFBFF4673F5244DC56C000E24EE960FDEFBF804C327216E056C0003E1D8F19A8EDBF08BABDA431E056C00016096D3997EDBF24AAB706B6E056C000965643E21EEDBF7CDE54A4C2E056C0006E4221020EEDBF689A779CA2E956C000B8DA8AFD65D9BFC0CE143AAFE956C0003033333333D9BF7C43A852B3E956C0004CAA7D3A1ED9BF6CE2E47E870057C00043B28009DCFA3F6CE2E47E870057C0001E5A643BDFFA3FD022DBF97E0057C0004AF4328AE5FA3F10AE47E17A0057C00044908312E6FA3FD4F0F44A590057C000EF5A423EE8FA3FB0DCD26A480057C000EF5A423EE8FA3FF46C8B6FDEB753C000478A123E45F73FECB60BCD750853C00078BA2C2636D93FB8D05CA7910253C000404ED1915CD63F40AD69DE71D252C00040F65D11FCB7BFB8DFA128D0CB52C000BA9179E40FEFBF70C971A774E252C00001BC051294F8BFE84317D4B7E252C000A3FCA4DAA7F8BF6488635DDC0253C08079AA436E0601C074A6D0798DBF53C0C068006F81E413C00C9E27A3ACBF53C0C0A36ECF42E613C04CD1915CFEBF53C0800A0C59DDEA13C0741F80D426C253C08094658863FD13C078200F0331C253C0404073D8A8FD13C0D0CB28965BC253C0C05C8AABCAFE13C0
+KG	KGZ	138	KGZ	قيرغيزستان	Kyrgyzstan	Kirguistán	Kirghizistan	Quirguistão	Кыргызстан	吉尔吉斯斯坦	Member State	NO	Bishkek	Asia	Central Asia	0101000020E61000002D6D389597A3524004C40BB574BB4440	0106000020E61000000100000001030000000100000026000000D8390664AF0F524070B8019F1F9643402C61A6ED5F575140C08993FB1DC24340A8B08DA312565140E0B6F00863C44340B0CFD556EC55514050425BCEA5C443405C8638D6C5555140202FDD2406C54340DC5A5F24B4515140407172BF43E54340849D0B8BC0515140182A711DA3E543407C9274CDE4515140D8B359F5B9E643407C1EDC9DB5535140701D554D10F143406CDAFE959556514020359886E1FF4340B8F79DB7F5565140288B84EEC60144402C5C8FC2F5565140F0DEC325C7014440F89CF4BEF18B5140D024236761CB444094F2936A9FC05140186BF129004A4540C8E31768DBC05140B0C0871A5E4A4540C417265305C15140B8C876BE9F4A4540D0BE2B82FFC15140B0605452274C454068AF777FBCD1514038E6AE25E46345400474982F2F8A5240F000C11C3D9E454030CF83BBB38A5240E832A7CB629E4540883DEDF0D78A524038211FF46C9E4540A4CDAACFD5925240907615527E9E4540D483BBB3769F5340988D40BCAE734540501AA37554CB534060035B2558644540584D10751FFC5340A811A5BDC137454024F98381E7FC5340C0D573D2FB364540AC3AE466B80F5440C0019F1F461C45406C8CD651D5105440C08993FB1D1A454074253B3602115440F0482EFF211945406CB8019F1F12544098976E128308454044C1C58A1A125440A0BF09850808454074E1404816125440709A779CA2074540B8DB2E34D71154403082FFAD64074540880D4FAF948B53408032384A5E8944404C1B47ACC51553409861156F642E4440C85F9335EA75524088785DBF60BB4340087D224F92745240C869C18BBEBA4340D8390664AF0F524070B8019F1F964340
+AO	AGO	8	AGO	أنغولا	Angola	Angola	Angola	Angola	Ангола	安哥拉	Member State	NO	Luanda	Africa	Middle Africa	0101000020E61000003F542A75FE933140FAD3FA2FB8AC28C0	0106000020E61000000100000001030000000100000022000000C0C5689C54D334407055E17BF10932C0D036B223BCCE3440709ACDC2A20932C0C0D5681641CD3440B0E29965890932C0801FB5A02F97274020DF03D90A4631C0E01CC6023195274010767A06D64531C0806F2F7D7080274090B078E2A04031C0A0834BC79C572740602D05A4FD8F30C0404833164D572740A0B69BE09B8E30C0408BFB8F4C572740401EDD088B8E30C0E02D1F4949572740A0041901158E30C020BDFE243E572740E0073C30808C30C0C01C5A643B572740908636001B8C30C040FB05537EFA2740C02F2E134DFF13C0A03E8EDC566E28408011E323CC0413C04085DD7052C9284080C5A221976F12C0A0B8E2705371294000BFFC09BF9811C08035F169A9852940C0BD7DB80C8F11C0406156CA6088294080C2D6672C8E11C0E0F18930D6892940409152F4B38D11C020BD629940CA3540807EF81545211DC060DAE41BCAD3354040444ACFCE591DC040242311E1FF374020D13C8045C625C020EF22A78A053840207E0BCCB9E525C0D05DB4CFFC153840E0FABF5564CF26C0B07F5E32BA13384000A9C664D4C328C0B0E18F6DDC0B3840E09C9C2AAAFA29C0F01324B6BB0B3840005454FD4AFF29C0B071A06E3D6E3740104A6253ABA131C0B0E062450D6E374010A7AFE76BA231C00092182DD56D37401004BBCC76A231C0505D33B2917F3640B04CC547BDD031C0C08BC717FDC2354030B875835DF531C09054861BB76C3540B00303081F0632C0C0C5689C54D334407055E17BF10932C0
+IE	IRL	119	IRL	آيرلندا	Ireland	Irlanda	Irlande	Irlanda	Ирландия	爱尔兰	Member State	NO	Dublin	Europe	Northern Europe	0101000020E6100000FC923DAB134920C0511025EEE7964A40	0106000020E6100000010000000103000000010000001A000000C0C7FBBF8A0823C0C8D0FF7F57B6494080CA0300E3A523C028B9FF3F03BA4940C0F40080DD7824C0D0F6FE5FA5CA4940C04104A07A3C25C0B06F000037064A4080B0FF3FF07B24C040CF0060FA0D4B40A0910320357B24C038110000660E4B40A0CB0360556D24C060790060FC124B4020270120DD2B24C0E8C3FFFF3A234B40C0090240222624C02859002055244B400064FDBF1A8320C0705D00A05EA34B40409008C051EE1CC080F8FF5FDFB74B400039FDBF3BE21CC05847FF7FA7B74B40C09C07A0E6BE1BC01852FF3F9F9F4B400019FA5F62B11BC0888A0060629E4B4080B8F99F2C7118C000D4FF9FEE004B404055FA5F676E18C0D805FF9F26004B4000C80660700218C0A008000053BF4A4000630620710218C0A0080000D37B4A400022F91FA00218C0105800C0627B4A404083FA7F9D4519C02836FF7F811E4A400080FA5F466419C0E014FFDF27184A40C0E7F91FD57019C0389400C0A7164A40C07AFF7F997619C058FEFEFF05164A4020100280D01021C058FEFEFF05CE4940A0EDFF9F676E21C080E100C052C94940C0C7FBBF8A0823C0C8D0FF7F57B64940
+MR	MRT	159	MRT	موريتانيا	Mauritania	Mauritania	Mauritanie	Mauritânia	Мавритания	毛里塔尼亚	Member State	NO	Nouakchott	Africa	Western Africa	0101000020E61000001453F09B5BA924C060C068BA7B423440	0106000020E61000000100000001030000000100000017000000C06514CB2D1D28C0604ED1915C6E2D406052EDD3F17828C040772D211F842D40707C15883A8230C09038915EA90E3040A0876874071131C030335019FFD63440706FD39FFD1031C050355EBA49EC34404066834C320A31C05056B77A4E0A354050B9A5D590F030C080E40F069E53354080E8482EFF0128C0407AFCDEA6FF3940003C8D60555521C0202FC1A90F503B40004A09C1AAAA1EC0C058518369B83A40C0FFFFFFFFFF1AC04083F8C08E2B3A40C0FFFFFFFFFF16C010EBFF1CE68F394040640582AABA16C050FAC06A3985394080FBA97F7D6313C0A051FAE98F01394080B5F63E555513C0E0E15AED61FF384000C780ECF54E15C060FDBCA94855304000B7B41A129715C01000000000003040C0400E4A98C915C000B8AF03E78C2F404099F04BFDFC15C02076C3B645192F4000E229E1920616C020E5D6D414042F400029E8F6920616C0E0B2D2A414042F4080EA56CF490F16C0C06A82A8FB002F40C06514CB2D1D28C0604ED1915C6E2D40
+WK	WAK	265	USA	جزيرة ويك	Wake Island	Isla Wake	Îles Wake	País de Gales	остров Уэйк	威克岛（美国）	US Territory	NO		Oceania	Micronesia	0101000020E61000003404340366D464406D15D425144A3340	0106000020E610000001000000010300000001000000160000005C1CBC19FFD4644050AB933314453340387C1C17DFD36440C04F00C5C84833409C45CDFCCFD364402079268F0249334064EF6A5E3AD36440E04C1F70134C3340D4EDDBFF36D3644010FC091D2A4C3340ECD1F99533D36440B096ADF5454C33409CDC39DE2ED36440303F1BB96E4C3340E81BD13D2BD36440D062C3899E4C334048C3BD8D28D36440D0131F44D74C33401C72C7F635D3644030C852358B4D3340D099B76139D36440B0842DD1B44D33409480E211A6D36440E0743DD175513340D01EC3BEB8D36440A01A248E865133400847C9ABB3D464406001309E414F3340E44735ECB7D4644060A786472C4F334030D67091BBD4644000885572044F3340D4DDBFC3BED4644090969D34C34E3340B0B607C6E6D4644030C10AA6504A3340D446BFC7EAD46440003C4D66BC49334090A4935B09D56440C045B0164445334054BAF42F09D564400088D283274533405C1CBC19FFD4644050AB933314453340
+DJ	DJI	70	DJI	جيبوتي	Djibouti	Djibouti	Djibouti	Djibouti	Джибути	吉布提	Member State	NO	Djibouti	Africa	Eastern Africa	0101000020E6100000765D0153434A4540318C32E6E3772740	0106000020E6100000010000000103000000010000001C00000070C717318FF9444020C4C33238D42540B0C8D80B30F94440A0C3A9415ED425405055D4DF59E94440204973B274EE254028DB30DFC1E5444060F67F43E5F52540401B0822BBE24440E0991C8D2FFD264068BE9CA975E74440E06BBFFEE9502740188092E4B4EA444020EE5B3BBE762740805BCB5FBF33454020C7BB6FF1EF28409862D9FC1A3B4540C0D4EC81560C2940A08B9D9559914540806B22D85D6D2940A00CA32D62914540C04BE3175E6D29409881F22D62914540C04BE3175E6D2940100A83328D91454000168E7B4E6D2940B8E012DB38B74540E0D655DC13F32840A887461C57B7454060E5547C8DF2284030CAB61D64B74540E0748D3B4AF2284010F67013FFB9454060A1BAB9F8E3284060CA219859B5454000CA46318A2F2840D0C86A042CB54540A0915385502B284018E22593AEB44540E061C499BA222840A0EED00B52A14540E0F2C583D2EB2640583358FCDC994540A04663068DBC264010B44784937F4540E019D713EB15264060DDEA39E97B4540A008AA46AFFE2540702A7E982C754540E0B11A8ABCF32540F0C49F5A5D71454040F6EE6EE9F02540C01BDF3F9FFB4440A0C3A9415ED4254070C717318FF9444020C4C33238D42540
+AQ	ATA	10	ATA	أنتارتيكا	Antarctica	Antártida	Antarctique	Antártida	Антарктика	南极洲		NO		Antarctica	Antarctica	0101000020E61000001F949DCBD1793540167A33AC2C1A54C0	0106000020E61000000100000001030000000100000013000000FFFFFFFFFF7F66C0482100A0997956C0FFFFFFFFFF7F66C088B0FF3F701B55C0A07D00E0656F64C0AC3500C096B253C02D11000086BE63C05C9FFF3FAA4953C042F5FF3FF8BB63C090BFFF7F714853C0E006FFFFD8A54BC0881600E021804EC0C888FF5F28A44BC0C096FF3FF77F4EC050C200E0DDF646C0E8F8FE1F0A424EC0F8FFFFFF7FD746C0F06DFFFFFC414EC070230060BEDB6040ACB2FFFF945150C0103B00A0A2466440EC7BFFDF4B9150C0842400C01047644040F5FF3F889150C020F3FF7FE39464404881FFBFE7D650C0103B00A0C2956440188DFFDF11D850C094420040534D6540349DFF7F25DD51C0EC1B00C08D5D654010010060F2F751C0040000000080664014E4FF3F421B55C00400000000806640482100A0997956C0FFFFFFFFFF7F66C0482100A0997956C0
+BD	BGD	23	BGD	بنغلاديش	Bangladesh	Bangladesh	Bangladesh	Bangladesh	Бангладеш	孟加拉国	Member State	NO	Dhaka	Asia	Southern Asia	0101000020E6100000415F732F657F5640AC27459174253840	0106000020E61000000100000001030000000100000021000000B82968A4EF155740A04451FB08BF34404CA5338BAB1557403025654117BF3440E40D0171AB155740F05A074917BF3440245F420587155740B054B1E721BF3440DC220E7E874D564020FE8F5DB3A63540807E62AED6465640D03A66EABFB8354060E15D2EE242564090C30B2252C93540D04A9352D00156406087DC0C37B03840ACC64B3789055640C02F12DA72EE3940B841261939155640C05B3D27BD7F3A40E87E87A240195640304CC3F011A13A40684EDE9A501956408022AB6F21A13A40F87684D382195640603F6F2A52A13A40AC0018CFA0195640A0DB68006FA13A4028456458C5195640B0C64B3789A13A40B81122F5EB195640A09D2397A4A13A406072DC291D1A564020B5A679C7A13A4004309E41433D5640700FB40243763A40602A6F47386B5640604EB4AB903A3A404C33164D67155740A09A3DD00A1439409857E71890195740B0FEEC478A0839406C791EDC9D195740C0D4EC815608394050D235936F1A574050963E74410539404C85B185201F57403003B2D7BBEF384050546F0D6C1F5740509FC893A4EB3840D0EE2FA68C1F5740203A18DF07E83840F4ACDD76A11F574020BD8C62B9E538400810BB12882B5740A0A60A71254C354030372ACD8C2B5740E06F7358514A35404C6FC201902B5740D09DBF0114493540684BA0D252165740602D115E71BF34403C1C9606FE155740A04451FB08BF3440B82968A4EF155740A04451FB08BF3440
+ES	ESP	229	ESP	إسبانيا	Spain	España	Espagne	Espanha	Испания	西班牙	Member State	NO	Madrid	Europe	Southern Europe	0101000020E6100000177E1DB6B4690CC0252D703B52324440	0106000020E610000001000000010300000001000000210000002013FEDFEDFC31C0C0AA00A089A33B408018FEBFA9FE31C090FE00E0E2A33B40F04AFE5FA92832C0C0FBFF7F36B53B40200BFF7FA22A32C010C6FFBF5FB63B40D02BFE7F342B32C0505201203CB73B40E0C4FF5F6D2B32C0501801E01BB93B40D07801A0D12A32C070FFFE5FB8BF3B40208EFF3FA42A32C090E4FEFF8CC13B4070FAFD3FA70032C0A0A800E024C23C4050D3FEFFE6FF31C0900D0120A4C43C40600C01C031FB31C02078FE1FEDCD3C40C07AFF7F999322C038EEFE5F92864540C0AB00007C6922C0F8AD00C02094454040A2FD7F045422C0404C00A0F8974540C0C2FF9F88CF21C00800000080A94540C057FEDF851B20C04872FF7F06DB4540C06307C038931FC0600DFF3F87E245408076FAFF406E1FC098E2002045E34540C0EC012012B51EC04003002057E5454000B0E31FB3ACFCBF700EFF9F79B2454000F185C95441084050B0389CF93D454080F709008B510940D88E00E06B38454000A7F43F05830A40A8B1FF9F222A45408017F8BF60850A40D0FCFFDFE829454000BDF91FF6421140581300C0CAF04340004EF8DF2930114070FD0080B0EA4340C00E0180961E1140C8EDFF9FE7E8434080ADF6BF425F03C0D096FF3FB79741404033FE1F55E22BC020B00080C5393C40207E01800DA62CC0A01FFF9F1F0B3C4020EA02A0822C2FC0609EFFDF57BB3B4000B8FFDF10302FC0A008000013BB3B402013FEDFEDFC31C0C0AA00A089A33B40
+BA	BIH	34	BIH	البوسنة والهرسك	Bosnia and Herzegovina	Bosnia y Herzegovina	Bosnie-Herzégovine	Bósnia e Herzegovina	Босния и Герцеговина	波斯尼亚－黑塞哥维那	Member State	NO	Sarajevo	Europe	Southern Europe	0101000020E610000048535687D4C83140DE7AA964F4154640	0106000020E61000000100000001030000000100000026000000B0586E6935743240C0FC87F4DB47454050D3D9C9E0483240F88FF7AA954D4540C0FF73982F47324080D0B359F54D4540F0B6AD352DA6314038451BA895714540D0B5008B81903140402D396D94764540B00D23C4E28E314060B4F0F736774540D0E78711C23B3040507155D977194640005114E813892F40C0F2599E075F464020ECA353577E2F40301E5036E5624640C0A206D3307C2F40884C3272167A4640C026A5A0DB7B2F4040BEF6CC9288464000B728B341862F4060B2632310934640602B3064758B2F40989BE1067C96464080DE718A8E942F40F8328AE5969A4640C0607138F3AB2F400805172B6A9C4640E09942E735EE30400028B85851A34640B0AA09A2EE433240905FEAE74D914640A0E86514CBAD32401845813E918B4640A00F7A36AB4E3340D0681D554D744640607DAEB6624F3340A0F1EF332E74464000412B30645D334048DD0720B5714640603807D7755D3340083B396EB1714640F0305F5E805D3340C8CE143AAF714640B0F831E6AE5D334080E09C11A5714640C0B6627FD95D3340880D4FAF9471464030E1B4E0455F334020B1169F02704640D066F2CD369F3340D805F52D73064640C0C5A700189F334088A8FB00A4024640D07DEB90099F3340E874B5BC82024640504BE5ED089F3340D0FD0E4581024640A08C9C853D853340B8C090D5ADCA45409072A25D85843340683C8386FEC9454020DA722EC58D3240A069FB57564A4540D0E270E6578B32400873F4F8BD49454060BA80D9358B324020B5E6BAB5494540D04CDBBFB28A32401866DAFE9549454090B3CD8DE9893240703F524486494540B0586E6935743240C0FC87F4DB474540
+TH	THA	240	THA	تايلند	Thailand	Tailandia	Thaïlande	Tailândia	Таиланд	泰 国	Member State	NO	Bangkok	Asia	South-Eastern Asia	0101000020E61000008FD442634C4159409214D2AE04432E40	0106000020E610000001000000010300000001000000240000009816E5D47949594000A4469AD8731640981145B831495940400CF542A17416409CC0FE02B9485940805A2425F175164060093AE02ECA5840C0401F6C7E161A40D0CF1F3015CA58400034851AFA171A402073A36A89935840C03DA64113D91D403C2E79C2E668584040B1A248EFF720409C2CD3A1A6685840C0BEBA97EC032140BC978DFE726858404027345857252140A81A085FFE555840800E8E9458933240A0C38F13A1775840D0639F6A6E9333408CBE921634825840B010D29781CF334010F937CDBA8258406085CD6DB3D03340E8AFC863D1DD584060B39303EE643440CC0D7B7E31FD5840200A25C10B773440A8D6F78B80FD5840D0B7EC870D77344018F578DD1F145940808A7DB81A673440E47E60913615594050C132BA2C663440603E0E5A9AFE5940E0E2F4444355324008A2467210FF594000545C22855332401076E10C002E5A401077B7EA6E8231402825899A92315A40B0B191DF336E3140D4D70B8904335A4000C0FD62B1653140849800D334685A40A0187A1AE9592F40E80061AA50685A40603CF646BC572F40D02543F8B1685A40C00E473122502F40D02543F8B1685A40E0627D6B76432F40DCFCCDCB2E685A40A0AF05509BF22D40805C72E182625A40406FBBFBDC1B2D4080EE4E88EA855940002C6215C5941840A4DAD119477C5940C01EA919AD7817402CE84D4A037C594000B43F7BEE71174008700C31F9745940C0B22A0EDCED1640B8948227DA745940804503E85FED1640C4A491CC73745940C0853F7CC6EB16409816E5D47949594000A4469AD8731640
+IL	ISR	121	ISR	إسرائيل	Israel	Israel	Israël	Israel	Израиль	以色列	Member State	NO		Asia	Western Asia	0101000020E6100000F668E60FF47B4140C8D1A115745B3F40	0106000020E61000000100000001030000000100000013000000E84C64FDDE734140F04079062A7E3D40F880DBA88871414060AAAD0698853D40104DDAA0AB454140B01EB36A12693E402842465469224140600A46FA74383F4080729EC88B7B4140A0FDE754E5694040F86F398CB98E4140E87DF5BBE78B404060B3CEF8BEC8414028C4CE143AA54040987DB37415D7414058918E9BAF9F4040086553AE70D74140C009B13F789F40409001C105A1D7414078F6D790179F4040703B1EB450D64140F0856F52B2574040884FAA527ABA414040363B527D1B3F40704291C327B54140D093A46B26F33E40F868E388B592414040198EE733103E40685E807D74824140C08AFED0CCA73D40C85772EACA81414020F0DDE68DA33D40F0F68854357D414080193EEFB48A3D404089B1B4A274414040A9F90E247F3D40E84C64FDDE734140F04079062A7E3D40
+TN	TUN	248	TUN	تونس	Tunisia	Túnez	Tunisie	Tunísia	Тунис	突尼斯	Member State	NO	Tunis	Africa	Northern Africa	0101000020E6100000DEC98803422423406D2CDBB22A0E4140	0106000020E6100000010000000103000000010000002600000020E8A0B31B27234030CF1AFB933D3E400031274785262340C0706AB1A53D3E40603C438C651A234040312427133F3E4000E98024EC3B1F40A090D618749A4040005DE0F258831E4020A5846055C94040C0DE784473691E40A8206FC12BD0404080D6ED5BC95E1E40D8FD9C82FCD2404080F24B6C5A191E404806F2ECF2E54040C0EDB5A0F7161E409027BB99D1F340404001E90AD21C1E4000A7E9B30308414040F88A6EBD4E204090F4DBD7813F42400029571DDEBC2140D8BB56E7BDBF4240609479F53BBE2140380BDC700EC04240A06242716CD22140E8A74F17CEC3424080FC3F3D6CE8214020833DDCC4C74240C05552D3A0E82140C0473657CDC74240002C20FEABE82140E08EF348CDC74240004681994A422440D066FD1CD5AD424060C5217601122640D07FCBAD5A8B424040E659492B12264050B20E47578B42400029BD25EF162640F019C231CB8A4240A06D6FB724172640A0A9108FC48A4240E0D49C178217264098AE997CB38A4240A0EB2983B41C264090AC6EF59C894240601CACA4BA1D2640A88F430E5B89424000E9F75855262640C0FAFBD698864240C030896995272640A86B15B31486424000A92CAF01462640E85BA2C4F86F4240002AB67FEE2027400032A74A22954040405B08725032274018E9B7AF03434040C00D15E3FC0D2740404030478F334040605C72DC296D2440F0CB0BB08FB63E40C045B6F3FDE42340205CACA8C1643E4040D49AE61DC7234030170E8464593E40E083BBB3763B234000D34D6210403E40A01C46C7293A2340A0C09542D93F3E40C06EF59CF42E23405066A032FE3D3E4020E8A0B31B27234030CF1AFB933D3E40
+AL	ALB	3	ALB	ألبانيا	Albania	Albania	Albanie	Albânia	Албания	阿尔巴尼亚	Member State	NO	Tirana	Europe	Southern Europe	0101000020E610000004E37B7BF51034401DECB21CDD914440	0106000020E61000000100000001030000000100000036000000907901F6D1313440907615527ED243408047382D78313440B0272CF180D2434010271422E030344020EC866D8BD24340F08E705AF0223440E056EC2FBBD34340805166834C2234408058A835CDD3434070739CDB84FB33409008FF2268D8434060969350FAFA3340B037A3E6ABD84340E0F9298E0363334018048F6FEF244440D08FF8156B603340C8C2499A3F26444010C7D79E595E33409015359886274440D0AC50A4FB4933404097E2AAB235444030F224E99A49334098CA14731036444050E0810184433340C024CE8AA83F444090CBF10A44433340683596B03640444000F0332E1C483340B083F57F0E174540103411363C6D3340A8A5F276842F454010A3923A019D334080C8CD70034A4540502575029AA033405897C5C4E64B4540F00B93A982A933400805172B6A50454010145CACA8A93340A806D3307C504540807AA52C43B43340E0291DACFF5345409000529B38B933401805FA449E544540D020B07268B9334068D68BA19C544540508B6CE7FBB93340586F0D6C95544540709335EA21BA3340886ABC7493544540C037F8C264BA334078033E3F8C54454000C6504EB413344080DFF8DA3347454090F9F202EC13344058C763062A474540D0F459A541143440580FFE691647454000221ADD411434400097395D1647454000683F524416344090B0E1E9954645403070EB6E9E2A34409887855AD340454010E9D495CF2A3440A08F6B43C5404540905704FF5B793440B06F99D36521454050E466B8017F3440D827F224E91E454020C1FF56B283344010D847A7AE1C45406007EBFF1C863440A0395D16131B454050C780ECF58E344000E9D495CF1245401035B56CAD9F3440C8823463D1FC444010B7EEE6A90E3540A867B3EA7355444070834C32720E354010A7052FFA4E444040E6AE25E40B354080BE9F1A2F49444040ACE28DCC0B3540F8332E1C08494440F037BEF6CC0A3540D866D5E76A47444060546F0D6CAD3440B8DCD26A480C4440302D95B72364344018D044D8F0E4434090855AD3BC433440C04FC76306D6434080A301BC053A3440F0B33C0FEED243408024C0EBDE39344080D5D2F5E7D24340A06CE7FBA9393440D0E53FA4DFD24340201AFA27B8383440A06E1283C0D24340002A00C633383440C84CDBBFB2D2434050963E7441353440B061F88898D24340907901F6D1313440907615527ED24340
+GS	SGS	228	GBR		South Georgia and the South Sandwich Islands						UK Territory	NO		Antarctica	Antarctica	0101000020E6100000BC3FD413E45642C02E19803E72304BC0	0106000020E6100000010000000103000000010000001C00000040D30C4EE9293BC098D035DDFCBD4DC090133895E9293BC0E81D34DCFCBD4DC060EC2301B42B3BC0B0CEBF5DF6BD4DC0A0B50EB33C2E3BC0E0B97482ECBD4DC0A0142AEE2E503BC0F0925A8352BD4DC0E0F677BB80583BC0E0F6CB272BBD4DC050548B8862623BC05892A8BCC2BB4DC0D8A936EE83E644C06027614B34D34AC0D8F75E32440445C0581A097E65C64AC08098F0F0430445C060F6D44565C64AC010F7B3B3430445C058BEE43565C64AC080DF8618AFBE42C0307ADA86F6FB4AC0686C76A4FA7E42C06009E8740F074BC0207F52488D5542C04808C2BA960E4BC0001CF807808C3BC020CCB4FD2B234CC0C013AD8152A93AC0A8D760866B884CC0D051521674A73AC018170E8464894CC080329CE427A73AC05070A87A9A894CC03016911788A63AC0F8EED3A70B8A4CC0D038DF3E61A53AC0A0B5C425228B4CC0700CDD8C1D5A3AC01078EE3D5CE54CC0208ECA4DD43C3AC0B0E1557B7D344DC0A004D550B43A3AC09032045B803D4DC010CCCB063E3B3AC0F8FAC67CE53E4DC090EC7D4F513C3AC0A097079F9C404DC02088A3062E823AC000DEB87B6F864DC070250D24DE143BC010CEC9E605B84DC040D30C4EE9293BC098D035DDFCBD4DC0
+AN	ANT	176	NLD	جزر الأنتيل الهولندية	Netherlands Antilles	Antillas Neerlandesas	Antilles néerlandaises	Antilhas Holandesas	Голландские Антиллы	荷属安的列斯	NL Territory	NO	Willemstad	Americas	Caribbean	0101000020E6100000111F7849373E51C0364C060A0B632840	0106000020E610000001000000010300000001000000230000009C79EF5E24DC50C060E22428D9E12740BC5653A3212951C0800E21F829F42740A478019B983451C0E085860F361628408C221054B23451C0A02870FC9A162840B4EEE6A90E3D51C02027E19DD7372840F06E87E17E3D51C0007B1FFDE5392840ACB2B6299E3F51C0A03D3D5BAC4528401464CBF2F54451C00075BAE298632840001B7C06794551C0A00607205A68284084E574FE924951C040E016878E9028409C75D7239E4951C0A0EF5EA406912840D092C7D3F24951C0608B55DEE9952840AC07DD6FFE4951C00039A000E5962840B4DAD48A004A51C0807F958D1897284084BDF506044A51C060113BAEA197284040560108694A51C0C0B0A71DFEC2284088A77922634A51C000FF12A749C328401855F256024A51C08022FAB5F5C7284048779E78CE924FC0506469F1730F3240C063DC60EA874FC050B992EFE2113240387A6F7ED6864FC0109F5D600412324048992260B7814FC0A0EAC81F790F324020FF93BF7B814FC00020AA3AF50E324028D7A20568814FC020C6D2D1BB0E324000232F6B62814FC080A61A07A80E3240C063BC9CC87F4FC08051AA33AD05324058FBB8ECC67F4FC0C00FE5B0A0053240A880E7830A794FC0B032E774B47B314068BC749318794FC0004F99F6287B314038878D0D38794FC0B007D220607A3140D8AA35DE67794FC0D06FD1C952793140382B306475794FC0303251291B793140606C32F499794FC0B02A3AED84783140880FA26B95DA50C0C06E0CA606E327409C79EF5E24DC50C060E22428D9E12740
+UG	UGA	253	UGA	أوغندا	Uganda	Uganda	Ouganda	Uganda	Уганда	乌干达	Member State	NO	Kampala	Africa	Eastern Africa	0101000020E610000028E129E30A3240406EC872F71179F43F	0106000020E6100000010000000103000000010000001A00000070B6DCAD6DEC3D400011E16976B0F7BF40B6C70DEA963D400063F32C992FF6BFE0B72659DE923D4000FFE3ECECFFF2BFF047AE68E1953D4000D0D041C210EDBF6007B3E821B83D4000D0DE38544CB23F90EE068F3EDC3E400054F3312C1E0C401039667BA2F43E40800C5924C0590D409018DE6824F93E40807F871496870D40A00739272AFA3E4080F6BCA144910D4090E6ECFD43FA3E4080BEDE4E39920D40B0B5F6CCFFFA3E40002D3DF85B970D4000C8A6C2C3293F4000DD6DD2C5520E40207136C7802C3F4080BB7EC16E580E408019C5724BFF40404020B58993DB1040A8B94E232D0541404042B28009BC1040C8A94885B10541408094F6065FB810400037C277623A414080DBBFB2D2640D4030431CEBE23A4140007120240B580D4048FF04172B7A414000C45F9335AA0340B08251499D8441400086251E50B6FE3F90AAF5049D84414000EF296E19B6FE3F907A211AE67F41400048D9D992F0FA3F68062AE3DF7F414000DC6D179AEBFA3F801EDC9DB57F414000E6B8533AD8FA3F609E669F8CF74040000E453F22FFEFBF70B6DCAD6DEC3D400011E16976B0F7BF
+RU	RUS	204	RUS	الاتحاد الروسي	Russian Federation	Federación de Rusia	Fédération de Russie	Rússia	Российская Федерация	俄罗斯联邦	Member State	NO	Moskva	Europe	Eastern Europe	0101000020E6100000459DBB6F50C15840D89790546FCF4E40	0106000020E61000000100000001030000000100000028000000C058518369E04740109964E42C98444010B08F4E5DC54740903C49BA669A44400AF8C53DB7A365C008A21381AB0F5040FFFFFFFFFF7F66C074F8EEA0C3415040FFFFFFFFFF7F66C074DE2646D0E15140543D339DCA7F66C004777886EBE151409027199EC67F66C030D89582EDE151405DF333C0A87B66C03C8E799978E35140CA036D7FF27766C0284BE3A0AFE45140BA15E0C0867766C0A4C5D85DCEE451401DCB8340836B66C0F420CCA6E9E651403FF28F3D796966C09469007E2CE7514008AB8872A01B4D40FCBEC2C658755440F07DFFC0BE6C4D406C9C4B46D5765440000C277D628C4D40785F2725DF765440D0780D5A05ED57406C812AF9EE505440701760408BF25740100FDC79C9505440C84287A27BF857409C7F8D2169505440C4FFF63FF7956340B003167C3740534054568A1FFE97634020266EA3AE3F534074AC1E3F7AC46340BC3CC9624A2E5340E8220AA2687F664044AAF623C4E251403CAF23A16C7F66408CD8A4FEC1E251409480E881A37F6640B087D1A1A3E251400400000000806640C4BB097CCDE151400400000000806640B41CE49FC041504004F8B47E1B74664018CC3C7F3B574F400C5988A1D4736640C8001486B5534F40883A217E12736640B8F080A8774F4F407893F43DFE726640208FAE79254F4F4020AA729FE1726640788CA963B14E4F4028B95942D2646640C825672B66244F40E0C3E6623A046540989A0A4CC23E4B40B07CC620E8B56240483836A03DCF4640B40045E31BB46240B0295C9EEDCB46401485242087B16240586D6AB2DCC84640104364BE67B16240600FF943C0C846402014D4BDFCA4604000123AE0E157454094AF697D9855604010AAC4774D244540C058518369E04740109964E42C984440
+FK	FLK	81	GBR	جزر فوكلاند (مالفيناس)	Falkland Islands (Malvinas)	Islas Malvinas	Îles Falkland	Ilhas Malvinas	Фолклендские острова	福克兰群岛	UK Non-Self-Governing Territory	NO	Stanley	Americas	South America	0101000020E6100000CB9712CB69604DC00990B792DEDE49C0	0106000020E61000000100000001030000000100000015000000503541D47D984DC0C0B12E6EA3754AC028A4FCA4DA774EC0400F2153E3154AC0A84B21EB04784EC0C008E1D1C6154AC070D98DE32CAC4EC0C01759D70DEB49C028BE463767AC4EC060F7E461A1EA49C0E0913F1878BA4EC0C8F753E3A57F49C008B287516BBA4EC030384A5E9D7F49C0084AD3CB28BA4EC08895F320987F49C0E0141DC9E5A74EC0D029EA27F77F49C0D073D2FBC67B4DC068ABB420EF9D49C0807F6CEDD8F84CC0300C1F1153AE49C030E8A628F2F44CC028ACAF09C4AF49C0A8169F0260F44CC098BF098508B049C0B06BD67498F34CC070D1579066B049C01053550D67F24CC0A0C9E77008B149C0D8557B7D52ED4CC090B7239C16B449C0D097B6C9F2DB4CC050C3239639C249C068EB6E9EEAD74CC088DBE51192D649C070AF5A99F0974DC07891D09673754AC020E3ACE353984DC058545227A0754AC0503541D47D984DC0C0B12E6EA3754AC0
+BS	BHS	20	BHS	جزر البهاما	Bahamas	Bahamas	Bahamas	Bahamas	Багамские Острова	巴哈马	Member State	NO	Nassau	Americas	Caribbean	0101000020E6100000B1E0606A338353C03B606FFCB2AF3840	0106000020E6100000010000000103000000010000002C0000007C34E6BF516952C0D026327381E93440905CFE437A6952C0D0F7EDDA94E934402C7205CADC6952C040F22F3839EA344044990D32C97253C050053D8A29913740A0E5E555C2C953C0409496DB074639409CA52BD8C6C953C070A32FCE294639404C9B16612FD153C0904F62C6CA82394008CD64EE90D353C09046C19D5596394008979F65A7D353C0305D9FDE31973940C0DABD81EED353C0C06CE690D49A39405C36A6CCF2D353C0705738EE399B39409897796121D453C0D0D8AE754EA03940C07A489D25D453C050D9C7AFC4A03940CC02A3818ED353C0C07D5C76E3B23940B8E23D624FD353C060815A0C1EB83940104DA08845D353C0A08B0F58DEB83940D07135B22BC153C0409FCE705ECD3A40B039BD41EA9A53C01008E6E8F1453B40D08DC1D4E09A53C000E0BC38F1453B400C1FC7C5879653C06062AFC10C433B4058057B5D507153C0903E1416260B3B402CEDE588466353C0B0629CBF09F53A40CC41E1FD826153C0F0C95D3A9CF13A40E4AE25E4834253C0A0B96B09F9A03A408C7B5F01714153C090630223D49D3A4038ABBB687E3E53C0A0C7670D39933A4044DD99CC429D52C0700910AA79213840585D9896A22D52C0308B23C5B65336404CAD19749D2D52C070C367469A533640B4F4C3639A2D52C0807CFEC57D533640F0B3ECA4992D52C0907A55C26E533640A809FDA7763A52C0D01E35817D7F3540C45CBE9AA83A52C000FE518A0C7D354000FF4A9D364152C0E0978345EA3035401C617369D74152C060E641D5432B3540C010EFEFA24252C0903F790E1B2535402451E56A1A4A52C0E0BAA184F4F734402C3A596A3D4A52C05042171E45F734408C017E326B4A52C010862F5DD2F63440108CEF30924E52C0000D2B2680F434404CC763062A5952C0B00DE25EF4EE344038793650855A52C020E0826C59EE344090DA1F83705F52C0F02527C929EC34407C34E6BF516952C0D026327381E93440
+GF	GUF	86	FRA	غوايانا الفرنسية	French Guiana	Guayana francesa	Guyane française	Guiana Francesa	Французская Гвиана	法属圭亚那	Member State	NO	Cayenne	Americas	South America	0101000020E6100000C306F14C239E4AC05AD86D04EF680F40	0106000020E6100000010000000103000000010000002F000000880F7A36AB0E4BC000310DC347040140F8907EFB3A284BC000F0C4AC1743014008E4A084992A4BC080C1C58A1A4C0140E82900C6333C4BC080166A4DF3CE0140A0923A014D444BC000AFD3484B2502408884B69C4B454BC000FB3F87F932024058E0B9F770454BC080F20703CF3D0240D0C6367BB0454BC080CD354697A9024030EC547F583D4BC0C031E15896981340800BC5923C384BC040AD850821221440A8C69FC97A354BC080D2153CEA51144058A500C00DFA4AC00030FA3FC4F816407019B8B5E5F94AC0003BBD5A07FA164070AB313212F94AC000B3AFE18EFC164090804EF7F0F84AC0806529A3DBFC1640D85CB2E034F34AC0C05A7D755500174060E014B1E3F24AC080B5B5CF740017409803BAE5D9F14AC040FA1C69BA001740D84625D0BBF14AC080A3D414B700174080844AB780F14AC0803B18B14F00174070DF313CF6F04AC08033D13131FF1640F8B7EDD68DA24AC0001FC99BB241164088A0F831E67C4AC0005241EA1BCD154078EC2E50524A4AC000D09B8A54301540387859B8514A4AC0804069A851301540200B98C0ADF749C040CD64EE104D1340607E350708E649C080008C67D0701240286EA301BCE549C0C0F6065F986C124068C971A774D849C00023090CA392114030960BF038D149C080FC1301F3CD1040F0E3DA7638D149C040FBDD85F7CA1040C06A984638D149C040B5A679C7C9104070B05E424ED349C000C5E90806441040A06B26DF6CD349C080B3075A81411040A8DCD26A48D449C08063D17476321040F037A11001474AC080A94D9CDC2F0440304F75C8CD544AC0007AC7293A120340486E7314F4544AC080605870D20F0340D09FFD4811554AC0000E15E3FC0D0340304EE9E475554AC08022A4ABCA070340D05F764F1E564AC080A8A9656BFD0240E0F21FD26F734AC08093A98251890140682048D1CF734AC0006499A90985014058E15D2EE2734AC0000A85083884014090B67F65A5794AC0802B3064756B01409086E123627E4AC000F853E3A55B0140880F7A36AB0E4BC000310DC347040140
+VA	VAT	110	VAT	الكرسي الرسولي	Holy See	Santa Sede	Saint-Siège	Vaticano	Святой Престол	教廷	The City of Vatican	NO		Europe	Southern Europe	0101000020E61000001431FCE58DE72840097D4E76A1F34440	0106000020E6100000010000000103000000010000000A0000000069E388B5E82840489AB1683AF34440E0DEFDF15EE52840D80F238447F34440801327F73BE42840E8CD531D72F344406063B48EAAE62840E86BCF2C09F444404079501126E72840E06B2EC20AF4444000D34D6210E82840E02137C30DF44440A0B8E4B853EA284080AF5A99F0F344404088BA0F40EA2840C06B09F9A0F34440E0B3F410A9E92840607B14B879F344400069E388B5E82840489AB1683AF34440
+MM	MMR	171	MMR	ميانمار	Myanmar	Myanmar	Myanmar	Myanmar	Мьянма	缅 甸	Member State	NO	Yangon	Asia	South-Eastern Asia	0101000020E610000015E7FE131E215840CED952EF75313540	0106000020E6100000010000000103000000010000001F000000C4DA519C237E5840C0B83B4F62332340D850EA65B04E5740C035E9907DF22B4064366C21894E5740E021E47AE3F32B40F4E14D0F0E0B5740605EF363792B35408034844C1A0B5740F0A5B6626C2D35407461C6DCE10C5740E0881F248A5335408404C58F31555740C03385CE6B143840D0D1E3F736C95740003F00A94D9C3A4098438B6CE7C9574020069E7B0F9F3A40506463813664584030610B86E28B3C402433521A2A655840A0E230EC3E8C3C40E03757CABB6958409078D986BC8A3C40A457DBCB786A5840C06F2A5CD3893C4014E6742E2C7A584040500263495E3C40E07A1163757D584060ADD9C512533C4038982EE0BF85584030CD3CDFED323C4044126DFC26AD5840A0FA5CB41A903B405823F9EC4EAD5840604C9CE4E08E3B409C3A6D32CF47594050BC947848C635405C06B6F9484A594070521FC224A53540CC3951156A4A5940F04D82FA40A33540EC8430B4E34A594000B566A5759A3540C0F7E7D7734A59400013C83181873540246DE40658EA584080110B9B529B2740243E0B9DD2E85840E0198F87FB752740D830AC7D22A3584080B8484EE4E32340B49A44437AA25840E020FBDCADDD234040613106B0A15840802B226201D92340F0E6C81B7786584060DE42BC4D46234000C06E01B67E5840C0D0CF8D16342340C4DA519C237E5840C0B83B4F62332340
+PY	PRY	194	PRY	باراغواي	Paraguay	Paraguay	Paraguay	Paraguai	Парагвай	巴拉圭	Member State	NO	Asunción	Americas	South America	0101000020E6100000A7625D20A1324DC0DBAD4CA5823B37C0	0106000020E6100000010000000103000000010000002100000070E30DCBC7354CC000C307A96D963BC0985333E5AF4D4DC0F05F3CF0224C3BC0E0304979EE514FC00010F89B074C36C098EA75FD95524FC0702493901E4036C0705179B00F224FC0B07D67C5818F34C0D80584B575DD4EC080B0F7CEA7A433C0986B897604FD4DC000CC54D2D44A33C0304FAE2990884DC05032665C824933C0C0220BA071884DC0A081DE02A64933C0A847E17A141E4DC0208095E8D1C533C06065A38FD3144DC090AC9AE587D333C06826DF6C73DF4BC05050DF32A76336C038C6DCB584284BC0005A8121AB0338C01057957D57244BC0A05CE15D2E1238C058B0EB7C57244BC0C08A47602E1238C0F839CC9717244BC0F096395D161338C010F8E32605244BC0C0971A18AE1338C00025CCB4FD234BC0304D2D5BEB1338C018DD41EC4C214BC0003B53E8BC5638C090C4B2C93C214BC0608CECC9CA5838C0D81B7C6132214BC0B08993FB1D5A38C070F86BB246214BC0B0F6CC92005D38C000C4ECB1294F4BC040CCD5EA86363AC0E03BFEF9604F4BC0D0FABA501C383AC06020D12F4A534BC0D01438D44D513AC09048BB34B2594BC0A00BA4D0A16F3AC0F80DEC8E0B654BC020E83DFB35A23AC0E08B5AED23684BC0402D6DCE47AB3AC0A0F16668D7914BC0E0E052FB98F33AC088230DD60ECD4BC00044F20F07573BC0085EEF5C2ADE4BC0D060248BE6713BC0D010E65ADA314CC0D0EB1D3B16963BC070E30DCBC7354CC000C307A96D963BC0
+YE	YEM	269	YEM	اليمن	Yemen	Yemen	Yémen	Iémen/Iêmen	Йемен	也 门	Member State	NO	Sanaa	Asia	Western Asia	0101000020E610000082092C72FDC54740DC893EC771DE2F40	0106000020E61000000100000001030000000100000021000000B0E7A1AC9BA54A406071CD31E138284098DE300492244A40000E3ED483502840D0C0C0C7AEF945402001EF7AEF2E2940B0DD17E670B64540203BFA9C11432940005E6243AFB3454060EC5BCC20482940904802E4B6B24540E018F4BF0B4A2940B8F1B08895B14540A0901D35D54D2940485C76DE3F554540803A0D74944D2B40B8A333FBBF544540C0DDEF1D23512B4010512B3D74E84440A0B2157391162F40906D044268FA4440A0B230A4C0503040A8C31094B6FA4440301E6E8CBF523040D01B5EE5D09E454000D00CE2037B3140F04691B586A44540C0F0BC546C8431402035FDB187A44540206E777E6D8431408041C8A2BEA64540505D06310A87314008594FADBEA64540E0A3703D0A873140D020B07268AD4540B0DA6E826F8E3140289DB8F1EE8E4840D08575E3DD9D32400800000000004A40100000000000334038D1C60200004A40F01C4AF4FFFF3240203A744F1E644A401055151A88593140680CACE3F8674A4090FE428F18493140D0D04A57F9674A40E09F1DA0164931407072DF07B38D4A40707BDDEA85A73040B8B14F56C5434B40C0450E627E1A294088D308BEE8434B40404E643C0318294008A722A8A9434B406065AF2380162940D8AFA0753C364B40E04D07C481F42840801FBD37FF334B40003A7F737CEF284068E45823AA334B40C01B21C9CDEE2840E8D222BC2C114B40E0F7936BE9B22840B0E7A1AC9BA54A406071CD31E1382840
+LY	LBY	145	LBY	الجماهيرية العربية الليبية	Libya	Libia	Libye	Líbia	Ливия	阿拉伯利比亚民众国	Member State	NO	Tripoli	Africa	Northern Africa	0101000020E6100000F539592D04093240DA6CEF6D17063B40	0106000020E6100000010000000103000000010000001C0000001000000000003840100000000080334040F5108DEE602C4020ED2AA4FCA43640C01C5A643BFF274050CA880B4083374000DB36702DD82440B065F8DD617A3840A0A1B94E23812440B05AB6D6179B384040DB101BE01B244020406BCA8AD638408016E5F507CB2240902CAF22C4333A4080B3FAE8A9C7224040F2FA45692A3E40E0533A58FF472440F01DA7E8487E3F40A0CE6BEC12952440D0504EB4ABB03F40002AB67FEE2027400032A74A229540408015585B0C212740408419092395404020D951E630253640A01AFC581C7840403092B5E10B263640480F6BE0FD774040402020048980364070E0A2EE5E6B4040A0D948C8F61A374078862C1C52514040D0B46FEEAFFA38407042AACDA4F83F4080B0202812FD3840C0EC93ED8DF73F40D08B529D69FF384090CAC57311F63F4060A3FC492109394000A44D7A84EF3F40809DFCCC0F0A3940C0D128136DED3F40707EA7C98C213940309419CAE4B73F40F0BB5B59A2253940C0B321FFCCAC3F40F05CEB41F7253940809961A3ACAB3F40B05D74684726394030CACD2676A93F406078753348263940009C56653AA93F4090B4FBFFFFFF384030EDB8E177FF334010000000000038401000000000803340
+NZ	NZL	179	NZL	نيوزيلندا	New Zealand	Nueva Zelandia	Nouvelle-Zélande	Nova Zelândia	Новая Зеландия	新西兰	Member State	NO	Wellington	Oceania	Australia and New Zealand	0101000020E610000048B3F5D8374F6540BD0160155DFE45C0	0106000020E6100000010000000103000000010000001E00000018E4FF3F42246540C030FF9FC54D4AC066140020CD0766C0F850FFDF6C3846C0F7F0FFBFFE0766C0A86F0000373846C01FD6FF5FC31D66C0A8B80080D8F045C0DEC3FFFFCA1D66C068EF00A0A1F045C0ECFEFF9F0D5266C050D9FF7F6A8B3EC042F5FF3F085266C0800AFEDF5A8A3EC029C8FF7F144E66C06025FE3F063A3EC0333D0060373F66C060D4FE5F593E3DC0633100400D3F66C080CB0180B83D3DC0AF3500C0763E66C040F30160C03D3DC074E9FF1F7E846540C0DFFFBF581141C0B41800A0A6846540C09C00C07A1141C0D83700806BA0654060E00060E03141C01C2D00C0A3A06540086FFF5F2F3241C0C4D0FF7F37A1654008A10040843341C0082C0060A1516640C0E500405CD742C0B43500C0B6516640609700E0FED842C0B43500C046636640008CFF7F7FDB47C0A4FAFF1F245B664078F2FEDF1BD148C014010060D25A66401044FF5F90D748C0C00A00C0C75A6640B8530040D9D748C0DC1A00606B5A6640188DFFDFF1D948C0D40B00203A5A66409811FFBFD0DA48C0243C0000255A6640A05AFF3FF2DA48C0E0C3FFFF9A596640B88D0080B9DB48C0E42900A09C266540B821FF5FC44C4AC0DCFDFF3F7B266540D00301C0DE4C4AC0D0C2FF9F18256540C8A5FF7F784D4AC018E4FF3F42246540C030FF9FC54D4AC0
+02	IND	15	IND		Arunachal Pradesh						Sovereignty unsettled	YES		Asia	Eastern Asia	0101000020E6100000000BC51F0C965740DA2A123E99203C40	0106000020E610000001000000010300000001000000230000007C103B53E806574060232D95B7DB3A40ECD9ACFA5CE5564080B2463D448B3B403473BA2C26E45640E04E0647C9933B409428332C26E4564000902D54C9933B403C7F130A11E45640C0B6627FD9953B407048DC63E9E35640D07762D68BA13B40A4C37C7901E456408062D68BA1A43B40B871C45A7CE456401018CFA0A1A73B408CAC6EF59CE85640508AC8B08ABF3B4094DAE01ECDE85640B09E03A091C03B40B0C5A70018E9564010533F6F2AC23B40087D224F9254574050FC3559A3A63C404C85B185209B57406004FF5BC9363D408CDC0C37E0A7574010EEEBC0394B3D40A88D23D6E2A95740A0B3B0A71D4E3D40AC0018CFA0AB5740D063062AE34F3D403C3CBD5296055840105F984C15743D40D06C90494606584000679B1BD3733D408C7B2C7DE80658404080B74082723D40D0DB114E0B185840F08DCC237F483D40D0A8F2701457584020592AC346343C40787632384A5A584010FA449E24053C40181DC9E53F5A584060AA7D3A1E033C402047ACC5A758584090A757CA32E43B409074EDA89D585840603E9926BCE33B408851499D80585840E0E80E6267E23B40CC1C96C95A58584050F85C15C4E13B40BCE4B8533A58584040548CF337E13B403C234A7B8357584050382D78D1DF3B4038C9C859D8455840608B4F0130BE3B4064EAE74D45645740A0101E6D1CF13A40A8C7EF6DFA615740B0853DEDF0EF3A40DCA3703D0A47574020213CDA38E23A40E4455F419A455740B0AE7C96E7E13A407C103B53E806574060232D95B7DB3A40
+GU	GUM	101	USA	جوام	Guam	Guam	Guam	Guam	Гуам	关岛	US Non-Self-Governing Territory	NO	Agana	Oceania	Micronesia	0101000020E610000017227A6DE2186240D35B303429E32A40	0106000020E6100000010000000103000000010000002800000058B5A4A39C146240E071F101CB772A40FCFBC56CC9136240C016BCE82BE42A40FCD04F82C81362406039872128E52A4028726660C9136240008311A04BE52A40F495E590F9136240C0C233FC02E92A40E83F49260C14624080854A123AEA2A40A0A3E9475E1B624060D3FB21914D2B40783282D7781B6240C00B5641B14E2B40F83878CB7A1B6240C05813B0C24E2B4078B1C45E831B6240C03830140B4F2B406054E641951B624000AF6422004F2B40BC5C5892971B624080C84BEDFB4E2B40B877B240A01B624040C3A7EFEB4E2B400C54104DAA1B624020FCC56CC94E2B40CCA942A8B71B62404090B1248A4E2B4060B8BDEEBE1B6240A0EC9458634E2B40C0D0B760C41B624080489E90424E2B40982D48E9C81B6240E02BDDB8204E2B40ECDB93D1D21B6240E0F5EFFACC4D2B4048F5D6C0961E62402071299DFE322B400CCB44B6981E6240808F4A56EA322B40308CE3769E1E62400089320A38322B40D829A09A9C1E6240E0F3B8B942312B40D81533C29B1E624020DB38BDE6302B40CCA99D616A1E62408075CD3F55282B40642827DA151E6240A0A41C27E01A2B401CB61C9E141E6240C0D4AEAEAF1A2B40486E3C8ED51D6240A03B2E4F8C112B40A01E8079AD1D6240809A99F4520C2B4064F26151AC1D6240000E47FC2F0C2B4080DE4378AA1D6240006AD729FB0B2B40445BBD79A01D6240007A8780E80A2B40A8924B2D65186240E03A771618912A4048AEF60B51186240C02A734E478F2A405825DB0A6B176240207E7CF8E87F2A406CA972904617624020751431367E2A40D840988044176240A0BCDA9B297E2A4014A15BF93617624000AE1BA5017E2A40880D60DBAC166240E094E70B6B7C2A4058B5A4A39C146240E071F101CB772A40
+DM	DMA	71	DMA	دومينيكا	Dominica	Dominica	Dominique	Dominica	Доминика	多米尼克	Member State	NO	Roseau	Americas	Caribbean	0101000020E61000004871CBB1D4AC4EC0649ABE4794DE2E40	0106000020E6100000010000000103000000010000002E00000020942AF63CAD4EC060190BF9566A2E40F098A322A9AD4EC000824534706A2E40C00457D4BBAD4EC060A583F57F6A2E40C8BBA074D8AD4EC08025C401996A2E4090BE219E36AE4EC040B9C903EC6A2E40609BF97A63AE4EC0407CE992166B2E40108964236BAE4EC04082058B1E6B2E403041C351A8AE4EC0C0563D05656B2E40800C50BFB0AF4EC0005C1FD61B6D2E40F08777CAB4AF4EC0E0842689256D2E4040263B91BBAF4EC000B0C33D3B6D2E4018966137C7AF4EC0A0B9933E636D2E40206A7A9ADDAF4EC0A0BD9470D76D2E40C0B23E8ADFAF4EC040CB715DE76D2E4030DA4F6B3FBC4EC0204763A362FE2E40700E1B1B70BD4EC0405A14D10A132F4080B14CBF44BD4EC0E094C5B3BA2B2F4010984EEB36BD4EC0800394861A2D2F40601976734CBB4EC0E0E5289BCD422F40D848FB7A19BB4EC0003F28DEB7442F4070EF9705C9BA4EC08025DB0AAB462F40204B9CCBC3BA4EC0E0AF9701C2462F40704B72C0AEBA4EC0C0B2D30FEA462F4068A6E7829FBA4EC000B63412FC462F40083D1867C2B74EC08049D57613482F405854F76D2DB64EC000A47B8CA8472F408842A38515B64EC0A05F950B95472F40F00714FB15A74EC0A0B234A6162C2F40D0808B5FC2A64EC080648ADE4E2B2F40181D5723BBA64EC0E080B3942C2B2F404863E712B3A04EC0405D9FDE31092F40F059547A5C9F4EC060FDB15AAAFC2E4050200E6D5B9F4EC0601B97169AFC2E40485D43BAE99E4EC060D972D30BEF2E4008418B5BBB9E4EC040461F9848CA2E4070A565A4DE9E4EC0607B174A81A82E4018BE4C14219F4EC040E8E5666E982E4000048420519F4EC0A0596EC4EE922E4030CF11F92EA14EC0605E2BA1BB802E408017E9EA33A14EC0404C84B295802E40C050F3FA38A14EC0A000193A76802E40E86316EB65A24EC000FC9EA2347D2E40701FCA6141AA4EC0402FA4C3436C2E40583E480504AB4EC000D43B269C6B2E4010A06D35EBAB4EC08000F26FE16A2E4020942AF63CAD4EC060190BF9566A2E40
+CN	CHN	147295	CHN		China						Member State	NO	Beijing	Asia	Eastern Asia	0101000020E610000055E757E3ECF85940AC45CECF76504240	0106000020E61000000100000001030000000100000033000000B8245EA3A7645B40001F4DB3482932406C6D553DB95E5B40F0BEE3AE3A3032404C8E55F9074B5B4010F29F1A214A3240A4E642B7C70A59404025F059677C35403C1092054C48544020799274CD043E40944946CEC2B2534070D0D03FC14D3F40C80DF8FC30B25340E01C2098A34F3F4094C70C54C6B15340F0D6DD3CD5513F406080B6D5AC9F524040C5E3A25A88424010F53A30809D5240C0E7C07284904240BC533A58FF71524058BD35B0554E4340F8285C8FC26352408848BF7D1DA0434018BD8C62B963524038D3F6AFACA043403497855DB16352405088685D2BA14340B03E575BB1635240F88AE07F2BA143403C97E2AAB269524080029A081BBA4340404ED1915C7C5240886E2F698C02444044A9F6E9787C524040C780ECF5024440C0AE5FB01BF6534058C763062A7346402C361FD786F65340F841CF66D573464074861BF0F9C15440F06987BF269B474070567DAEB6C2544038207BBDFB9B4740E8B8533A58B75540D0C342AD698E4840503CA06CCAB75540483EE8D9AC8E484060B1BFEC9EC85540581E166A4D9348403005DD5ED2945E40E0390664AFBF4A40F038454772955E40700E10CCD1BF4A40683BDF4F8DD15E40C81C3D7E6FC74A40E05F764F1ED25E40786891ED7CC74A4088949F54FBE05E40204850FC18C74A407025347CFDE15E40886981D8FAC64A40F8B9DA8AFDE15E405853CBD6FAC64A4048D3D9C9E0E65E40608B4F0130C64A40788577B988E75E40E008C4EBFAC54A404015A930B64A5F40081C42959A994A40C01E790B174C5F40080B93BBE5984A40D0F8F719174C5F40605F24B4E5984A4008CFBD874B665F40F87C3F355E8A4A40183FC6DCB5665F4060518369188A4A4080BC57AD4CD6604058CC7A3194334840D489281975D66040685597352C334840BCA5D590B8D66040B84CF8A57E32484048B1DCD26AD76040D0850321593048408CB5F81400D96040480FEECEDADD4740046553AEF0D860401012143FC6DC4740682783A3E4BC6040A88D23D6E21F47409085BFFE228F5E40F003B7C567DC3C4008490080C12E5D40B0F4FE9FC0B2344018A0C9A5A16D5B40307AA8B9D13232406C39527BA6675B4030D88E35652C3240B8245EA3A7645B40001F4DB348293240
+IN	IND	115	IND	الهند	India	India	Inde	Índia	Индия	印 度	Member State	NO	New Delhi	Asia	Southern Asia	0101000020E61000008A069DACE1DE53407E6D058708563640	0106000020E61000000100000001030000000100000027000000ECD73109F2745740007C911A24061B40EC82ED6C372B5240808429CAA52D2040F02928FB1D2B5240E0DB2E34D72D2040A4687979152B5240A0BFBA85092E2040BC4780E4670B5140007185C1469F37407C3815046A0B5140E0E95102AC9F374020FE2EC7860C514040093F2773BA3740C07EC16ED8605140A048A29751043B40B081AD122C645140307A19C572233B408CB5F81400655140B0D0798D5D2A3B40C87762D68B655140A057E718902D3B40E04603780B8A5140A03A014D84D53B4098A98251498D514060888043A8E23B404CBA66F2CDA252404080B74082D23F40B494658863AD5240103411363CF53F40883DEDF0D7F65240888B1535987240405458E20165F75240705B94D920734040F80703CFBD1D534050813E9127954040F4164850FC1E53408096E7C1DD9540407C23F3C81F205340F06F422102964040D4DF8442042453402898A3C7EF9540405C2F8672A2255340C0BE4868CB9540402CFC523F6F26534018BD8C62B99540408CBF266BD4315340D84334BA8394404084785DBF60715340782A52616C7D4040E076A1B94E115840C0BAD573D23B3C40E4DBF4673F1C58407084F068E3283C40A0CE4E06471D5840A02C6002B7263C403C4F75C8CD425840002BA4FCA4D23B4080A52C431C4358405031EBC550CE3B408487A2409F4A5840E03FC1C58A223B40141E6D1CB14A5840D0681D554D203B4034D8C34D7C7C5740402510655ED51B4070510BCA597A57408050FC1873571B40C8D1B073AE7957408068869EDE3E1B40FCF829334A79574080FA70DA9D371B40B821A413AE7857404013ACBBC32F1B402C9E0EBF76755740403D3ABF72061B40ECD73109F2745740007C911A24061B40
+NE	NER	181	NER	النيجر	Niger	Níger	Niger	Níger	Нигер	尼日尔	Member State	NO	Niamey	Africa	Western Africa	0101000020E610000006894CBCFDCC224024A6757DA56B3140	0106000020E610000001000000010300000001000000170000000054AEF02ED70C4020967840D964274000560CFC4D450340007B58F10BCC27400019EB71983D0340804EC5FDAFCC274000C4411F85EBEF3FC07BFB1FD2FF29400034FE7DC685D93F601405FA440E2C400000753C66A0C63F8072DC291DFC2C400038DD240681C53F40B9FC87F40B2D4000A01566AE47C53FA0F8D2041F112D4000E87A14AE47C53FC0C1340C1F112D4000889ECDAACFC93F4063EE5A42AE2D400040AB3E575BCD3F40AAB706B6FA2D4040005C4FC8F81040601176108F233340C01C5A643BFF274050CA880B40833740800B410E4A282840F0BD6A65C27F3740A02232ACE2FD2D409030F0DC7B00374000B43C0FEEFE2D4040D1AE42CAFF3640E02DAD86C4FD2F4030A375543559344060FC1873D7022F40500FEECEDAE53040A05AD3BCE3442B40C0D7BB3FDE6B2B4060F80C8528F528402009D4D244202A404014E8C7EAF328406002DC45FB1F2A40C0BE38F3D6F22840E0CF5A6CBB1F2A400054AEF02ED70C4020967840D9642740
+BN	BRN	40	BRN	برونى دار السلام	Brunei Darussalam	Brunei Darussalam	Brunéi Darussalam	Brunei	Бруней-Даруссалам	文莱达鲁萨兰国	Member State	NO	Bandar Seri Begawan	Asia	South-Eastern Asia	0101000020E6100000D9F0191C3FA85C40BD6031A156FD1140	0106000020E61000000100000001030000000100000018000000A879CE50FBA75C4040215E53F7011040786AFAFB2BA75C40C0666A21E702104078D41790BD945C4080B29DEFA706114000922232AC845C40C053573ECB531240A0CEFFBF92845C408001FD3F005B1240F88AFF1F6DB65C4000B5FDDF9CE1134030E5FF9F54B95C404023FC9F84F4134040C9FFDF96BB5C40803CFBFF7502144000B7FF7F9EC15C4000E2FD9F60261440287FFFFF82C35C408027FC1F4E30144040E6FFFFE6C65C404012FE7F7B2E1440A8DDFFFF53C75C40806900C0C82D1440E07AFF7F79C75C408034FC9FAA2B1440406453793ECF5C40C0BB32AFF036134020364E33B2D05C408097F01E7CE9124078302DAD50D75C4080D28F957E5D11409801B26D37D75C4080C93C434F5811405876240BD6D65C40804C6FD0754B114030DDE5A1FDD55C40004792FA943C114000D9BC5B6DD55C4080BDFBB83D341140A8D8484736AC5C40008A253BEF1610405050B9453DAA5C400077ED68A20910400860DA0F4FA95C40405A3D9711051040A879CE50FBA75C4040215E53F7011040
+ME	MNE	2647	MNE	الجبل الأسود	Montenegro	Montenegro	Monténégro	Montenegro	Черногория	黑山	Member State	NO	Podgorica	Europe	Southern Europe	0101000020E6100000669568FE613F3340AF679BC7D2644540	0106000020E6100000010000000103000000010000001A00000030FAE79C315F3340E82F144D33ED444080A2EA78483E33408822466A02F44440905ED0C6BA2F3340105D8AF758F74440001D646E4B2D334028C6E122F0F744401001FCCA382A33405819D2BDDBF844403028906FF5273340C0327BB5B0F94440501E3350196F32406802B7EEE63D454030240B98C075324050813E9127694540F0166536C87C324068A27A6B607B4540C0394030477F324088FA96395D7E454000F0332E1C803240B05626FC527F4540A0E9094B3CB032400879AF5A99A04540906D8B321BEC3240A05FCD0182C14540408B89CDC7FD32406043E21E4BC74540406F47382D00334040234A7B83C74540A05FCD018201334030BCCB457CC745406066834C32023340400664AF77C74540D0E270E657333340E068006F81C44540001C5F7B66393340D831207BBDC3454030D1CB28963B3340C8E270E657C345409052EDD3F1583440C0E82B4833764540F0E995B20C5934408869183E2276454020C1FF56B25B34405029E8F6926A454010FFA556A95B3440B82693768A6A4540A09526A5A05B34403880B740826A454030FAE79C315F3340E82F144D33ED4440
+ET	ETH	79	ETH	إثيوبيا	Ethiopia	Etiopía	Éthiopie	Etiópia	Эфиопия	埃塞俄比亚	Member State	NO	Addis-Ababa	Africa	Eastern Africa	0101000020E6100000FE63226363D143401B6BA0FDA5422140	0106000020E61000000100000001030000000100000023000000E83553E7B2C543408016DF7B78350B40088C7544DAC3434000F9F19F87390B4058931E286510434000AC6A93D4DB0C4000717FE48C064240C0E489ABC0D01140206E725857FA4140C03E45522E241240F889FA2C68F8414040660FF165311240A081CAF8F785404080BCCB457C271F40A0F35E45DE80404040D50FE2B16E1F4038A453EF1A80404080B0AB3BA97E1F40F020B108FE7F4040C05E6397A8BE1F408831CF08FE7F4040C09404A6A8BE1F4058D9C08803804040405A9F513EC11F40D0BAB88D06804040400F1D93A9C21F4038A049281E984040C0A40B4716CD2040087036678E264140E0C96760812E2540607C67A72B4742406042766C71912C40701EC022BFF44240C051BAF42FC92D40A0ECA7184AF54240000EB1E0CFC92D4070FF842CEB0E4440002FE848241F2D4068A1D43384674440A08C800A47582C40A0C8CA04C36F4440E0703C9F01452C40B009A0ED9878444020284696CC292C4018FC6F253BFE47402000000000002040D0BBD16492C74740C035A5BA553F1E40800438091A43474000E28423F7FF1940001C6310E0D546400068A7C3637F164008926C526A8A4640C0527EC9FB131440F073B515FB8746404000000000001440C0590B9F6C8346400032F5D499DA1340C0D2B48928804640C06BB360CBBF13400800000000804640004DF8A57EBE1340709604A8A97D4640007CF2B050AB134088D0502FFAEC4440807AA18D17970F40D8294FC0F9C64340005AD55D9C360B40E83553E7B2C543408016DF7B78350B40
+MY	MYS	153	MYS	ماليزيا	Malaysia	Malasia	Malaisie	Malásia	Малайзия	马来西亚	Member State	NO	Kuala Lumpur	Asia	South-Eastern Asia	0101000020E610000043936C8A1EAE5C4011D4724DC1DE0C40	0106000020E610000001000000010300000001000000220000005C90662C9AA45B4000545C55F65DEB3F543000E03AE1594000D00C40752CF43F187EFF9FB0E0594000C1E2BF2C34F43F90B0FF3F10DB594000811860A0DDF43FC4530040F97659400022F19F2C3C0340187EFF9FF05E594000C8F2FFC18B0540383D00605753594000BD064086B5064084DBFF3F8F4F594000DEEE1FEA3E0740347700A0D7BB5840806008E036BA164084BEFF1FDFBB584000DCF71FCEBC1640E8EFFF5F4CE95840C0E4F71F61BA194010D5FFFF80E9584080F8F87F33BD1940C80C06374F0C5940C01479C2ADE11A404C3362DBAC0C5940802F063C54E21A40485B00E079405D40403108608E6E1D4028850080A64E5D4040D5FFFF20741D40402F0080084F5D40C037FE9F1E741D4000570060D0515D4000F3FBBF696A1D4018C7FF1FF2515D4040AE02A07D691D40E82900A00C525D4000C6FDDFC2681D40609FFF3FCACD5D4000B6FD3F0FAA1540408600E038CF5D408027FC1F4E901540A034006024D05D40C089000030751540C070006049D05D404042FF9FEB70154070DAFFDFDCD05D40C0A800E02444154000F1FFBF1ED15D40800DF85F5BEF144068140020DDD05D40803601601ED71440E04600C05CB85D4000EE0680133E1140303AFEB04AA55C4000AA329BE60EF73FF8CA5127D0A45C40008C67C65E04F73F606A4B8A60A35C40002BECBB85EAF63F1098E3BC4F6A5C4000B65532C879F33F9CC36DBBD0E25B4000A2ABADD85FEE3F5C90662C9AA45B4000545C55F65DEB3F
+MV	MDV	154	MDV	ملديف	Maldives	Maldivas	Maldives	Maldivas	Мальдивы	马尔代夫	Member State	NO	Male	Asia	Southern Asia	0101000020E610000005F050A0A06252400D3F151DE5A0FE3F	0106000020E6100000010000000103000000010000002A000000FCE52730F8495240002231F77F84E6BF844177EEE2495240004AD98E4E82E6BFE4163D015E48524000A89DBC23FEE5BF90952C825A485240004A9BBBA7FCE5BF94D7DE02E447524000CA33E5F9C2E5BF3C6DC6690847524000A275543501E5BFD0DA5CEBC145524000E25D3F0ED4E3BFF09D769DB245524000BA6E5BA5C5E3BFD4860D60DB44524000A23F34F3E4E2BF70D73A272C2D524080C3013E89790D409CF03AD1E4285240407547B53E431940E8D29DCCE428524080C2853C824319406C24F8953D295240009D6C5E30A31940FC916CBFC6335240400742B280491C4020F44AFECC335240004AFBD5D24A1C4038EB8CEF0B3452400082D94EA5501C40CCF438971834524000220AD5E9501C40181F8E644539524000CE8C7E346C1C40C0BC94159E395240806167AFE36C1C4030742502D5395240C07DEC89096D1C4048F23A87D74D524040351603DADC1B400CAAA168F94D5240C0B72F568ADB1B40F07772970E4E5240C001614C9FDA1B40748BF9B9214E5240C01BBC0A84D81B404C66F50E374E524080B3DF2417D51B402C67CD34064F5240409F86B9EEAF1B40C889AF769469524000CAF89C609C15406C296A7A1A6A52408048F949B57715408C22EEFB016E524040D9525106D01140781B8DA9FF70524080596144EC6D0B40D40836AEFF70524000B263C8566C0B40A892F073B264524000E8935F5070DA3FE4AD3DFDB164524000CC13F70E6DDA3F98ECC7DCEB4D5240001658117F1EE5BFBCE287EFE94D524000F061516C20E5BFB88FCB6E1C4C52400036EAD78C02E6BF886055BDFC4B524000269E584C11E6BFCCC26BF2EF4B52400038D78BFC15E6BFDC427F57BA4B524000884D1A5928E6BF3CCDF1C0B64B524000CE55044929E6BFC00622307B4A524000009D499B6AE6BFFCE52730F8495240002231F77F84E6BF
+PT	PRT	199	PRT	البرتغال	Portugal	Portugal	Portugal	Portugal	Португалия	葡萄牙	Member State	NO	Lisbon	Europe	Southern Europe	0101000020E610000085B8002CE4D61FC0912454709FD74340	0106000020E61000000100000001030000000100000020000000C04BDCCFCE0A30C0B0B17389D9073E40508F673CB60E30C0004D405DEE073E40909FAFB4E73F3FC0909B9D561BB0434040EFE2FDB8413FC0608AD3FF28B14340708890042B423FC070EF8CB62AB243402061455733423FC0601146FD3FB24340907950F5D0433FC0E80918B897B64340806E298CD2443FC0403487FFCFB9434010797B6BBB443FC0E8A35934F8B94340D01F949CB8413FC088E84999D4BE43400003BE912F1F3FC038410DDFC2DC43400062B6BD8D1E3FC0C8AC50A4FBDC4340101ADD41EC1C3FC0B8C3E28112DD43404007EBFF1C6620C0D054C1A8A412454020EA211ADD6120C0E08173469412454000CD3B4ED1511AC028B9FC87F4FB444000B0989CD0511AC078A88985F4FB44408045990D32491AC040EE940ED6FB444080E5907989461AC0F8AAFB58A5FB4440C04603780B441AC0400664AF77FB4440404963B48ECA18C0A0E1067C7ECC444080506B9A77BC18C088E2C798BBCA444080395D1613BB18C09054185B08CA4440808DE9094BBC1BC0E8C83CF2071B4340C0CB0BB08FCE1BC050D74CBED912434080E82B4833F61BC008917EFB3A044340C08000009D9B1DC030E5FF9F5496424040C2FBDF4E9E1DC09893FF1FE0954240404B5645B8B52FC0400208C490233E402034E2B842B62FC0108F368E58233E405032665C820730C0D08E102F99083E40C04BDCCFCE0A30C0B0B17389D9073E40
+MQ	MTQ	158	FRA	مارتينيك	Martinique	Martinica	Martinique	Martinica	Мартиника	马提尼克	FR Territory	NO	Fort-de-France	Americas	Caribbean	0101000020E6100000D2A9D14A6C824EC0F6B5CFEE894E2D40	0106000020E6100000010000000103000000010000002C000000A80E91E4036F4EC040B5BC1704C72C4058A75835086F4EC04072F49D04C72C40A08D6D63FD844EC080419AB168E22C4038B71A2323854EC06048C6C5ACE22C40A0A31CCC26854EC0C0E19A96B3E22C40D83D8A8400884EC0805639FE55E92C4000718A332B884EC0405BC933D4E92C40001A6CEA3C8A4EC040437D810FF02C4048E9995E628A4EC00060048D99F02C4040F993426A8A4EC000D974A9B6F02C40C0983E856D8A4EC0C0DC11A9C4F02C40C0642772778A4EC080A6DC3301F12C40A89701C2E28C4EC080D17A53EC032D40408875F4099D4EC08048A9DFE09A2D400842E504129D4EC0A0A02067509B2D4050A703594F9D4EC0604B2F7B23A02D40284FE78A529D4EC0E010BC6B1AA52D40B0240F5D339D4EC0603B191C25AF2D401846ADD5C39A4EC00069C13005B82D4090F1B6D26B9A4EC0008FED6B13B92D4028F477A51B974EC0C000C3F2E7BF2D4038820AFD02974EC040634337FBBF2D4020265E5441954EC0603E5F0E16C12D40C088B08630954EC0001C655820C12D40D856B3CEF8924EC020DAA040E9C12D40D08F3CC6CB914EC0C065A4DE53C12D40F0FC0EEAC7914EC060BB213251C12D4098AFED4850904EC0C0F69FEBB1BF2D4008B19F6A998E4EC0E01BA4969CBD2D4060EE6B6E968E4EC020F467E498BD2D40D86D179AEB6F4EC0E0509841C68D2D4040D80121A36F4EC020A3923A018D2D4088E62384A26F4EC0C0CB46E7FC8C2D4068D96B8B7C6C4EC0E02FA017EE5C2D4090D7A5A1A1694EC060B08806CE222D40D03C47E4BB674EC08074571B08F62C40A071F26CA0674EC0E0063EAB71EB2C400821E7FD7F684EC020A90E5E60E32C40C0E4B27680684EC060BFAB2F5CE32C40E04515B47F6A4EC02095DAE621D22C400877D3D2816A4EC020334BA71AD22C40A0F50192FA6E4EC08009E8740FC72C40F8563552006F4EC060390A1005C72C40A80E91E4036F4EC040B5BC1704C72C40
+IT	ITA	122	ITA	إيطاليا	Italy	Italia	Italie	Itália	Италия	意大利	Member State	NO	Rome	Europe	Southern Europe	0101000020E610000067BAE3C8CE502840276FC07472C34540	0106000020E6100000010000000103000000010000001C000000407BFC5F27342940A8F4FE9F00BF41406065FD1F8D0929400860FF1F2EC24140609C010090CC204060A500C00D7C4340A01C0160657E204098A800E0A48E434000430400ED6F2040485B00E039934340C03463D174761A40309B7285778D4640003E7958A8751A4088A3E4D5398E46408078978BF82E1B40C07A4E7ADFE84640001C7C6132351B4020213CDA38EA46400014B35E0C251C40402861A6EDF74640C0B0A71DFE9A2040F03FA4DFBE36474080156F641EB92040507155D977394740A08D40BCAECF20407019E258173B474060F8C264AAF02440D0897615526E47408029AE2AFB9E2640F0C039234A7F4740201E8A027DF22640F8EBC03923824740E04FAA7D3A5E284050205ED72F8C4740E0F8F719176E2840581E166A4D8B4740205B25581C6E2B40E8AB5626FC424740105AFE9F6A6C324000B7FF7F1E254440909001E0257532404829FFFFA41D4440106600A07183324020FBFEDFAE104440305F01A018833240B0C0FFDFA30C4440A008000093633240208DFFDFF1E8434040B100E0B75E324050A40060DBE54340A010FF5F5E442E40A81700405455424040B4032081402940C8B3FF5F47BF4140407BFC5F27342940A8F4FE9F00BF4140
+IM	IMN	120	GBR	جزيرة مان	Isle of Man	Isla de Man	Île de Man	Ilha de Man	Остров Мэн	Isle of Man	UK territory	NO		Europe	Northern Europe	0101000020E61000006DEE0BC47D2612C0A9CFAFE0431D4B40	0106000020E61000000100000001030000000100000024000000808FBA42C45A13C020A2E826D6044B4080701BB2265B13C0C81B1C36DB044B40C0E6316F7A5413C0E8B01298F3064B408020A523CAE012C0A0D07F6A171B4B4000023B4899D612C010A8154B361C4B4000ECB9F1932F12C030F1B913EC2D4B40C0C0AA7AF92512C0806BE399E12E4B4040D6CEE6272312C05829C0C1282F4B40C0FE66182D1E12C0C06D84EA8B2F4B4080377BB141F011C0F8EB76AC08324B40401C34057CE811C0888D469968324B404050566710E211C0A0E65608AB324B4080B0BDBB3ADC11C0B80DCB55E2324B404017E9EA33D411C0D8446C0B2A334B4080BCA0CF91CE11C0B85C91F359334B40C045BF6CF17711C090CA3CA87A354B4040A69D88E87711C098AB24C17A354B4000B8C4364E7711C070A66A717C354B404082024A9E7611C050BBD1C77C354B40C07519FED37511C08850CD9B79354B4080887E6DFD7411C0A02FC3DA73354B4000DDF75E327411C0C0AE3D586B354B40003B585AA17311C02004EA2862354B40C0E830BA177311C0E8CD099057354B40C01DE626C57211C0B007BB174E354B4080EE4163817211C0B0A21DDC42354B4040D47146DE3B11C0B0F6FAA424264B40C0D6F3DA113B11C0B8E5A617C6254B4080765897098D11C0C8D89D49F6184B4080F2261AFF9111C020C9D4134C184B40C0CE577F3A9C11C0F8D7D07245174B408095422097E011C050F93889F7114B4000FCCF5092E411C03044D14DAC114B40007381CB637D12C0C04E7EE607074B4080E86FF8937F12C078AF2715E8064B40808FBA42C45A13C020A2E826D6044B40
+VG	VGB	39	GBR	جزر فيرجين البريطانية	British Virgin Islands	Islas Vírgenes Británicas	Îles Vierges britanniques	Ilhas Virgens Britânicas	Британские Виргинские острова	英属维尔京群岛	UK Non-Self-Governing Territory	NO	Road Town	Americas	Caribbean	0101000020E6100000224DAEDE1E2850C0492D621E546C3240	0106000020E6100000010000000103000000010000002D000000EC9C9302BE2750C0E05C1377614E324018A50172F82750C0F018C91EA14E324060ECA85D382850C0A0838F77FD4E324040EA1B3D233050C060F5E10FF56132408470CCB2273050C050A2E7BB006232407C1DEED9293050C0109ED6C809623240683C6C7DEC3150C010D3FDF73B713240B8348F0DEE3150C0A033805C87713240A020D335EE3150C0101346B3B27132402C8C4F5CE93150C0B0D16751E9713240807BF9F8DF3150C0D052245F09723240BCF9C385721A50C090A5811FD5BE324084402E71641A50C090043175FCBE3240B0846BA45B1A50C0E0B2EE1F0BBF3240E434FA87E31850C0F062C21EC9BF324064529ED4721550C0C0BFDB72E4BF3240BCB9BF7A5C1550C0603B8A73D4BF3240488D2B89471550C0E061F71DC3BF32400488DDD2C51450C00041AE1E41BF32407012EFA5151450C03058FA754CBE324024D2A2E38F1350C0A0E6C8CA2FBD324000290C25EE1250C05016B36F38BB3240F8DFA52FDF1250C0B089FA6E04BB3240888ADDE3711250C0F0CAC80F4BB93240DCCD531DF21150C0F0E60AA5E5B6324030EFDD8BD41150C0706F62484EB63240985C8C81751150C01055B4835BB432409455D80C701150C07020ADD62EB43240901ADA006C1150C0506B8F28FEB33240F0A908DC5F1150C0C0C8AF1F62B3324084A5811F551150C00099261186B23240E83B646F4E1150C0C0C6455ACFB13240B463A021521150C0506172FE81B132403442AB387A1450C08094394CEA803240F8BEC9807D1450C0901FA22CD78032402C1C08C9821450C0805567B5C0803240A0575E4DF91450C080DD83C6027F3240BCA7284D391E50C0400708E6E86132408CF57931391F50C0B056C0F3415F3240085D78141D2450C0F0C589AF765432402C551FFED02550C0E061BEBC0051324078713D65102750C0202DE521F84E324038BA1116152750C0F0ACBB1EF14E324018F6C5EFB72750C0906D3656624E3240EC9C9302BE2750C0E05C1377614E3240
+SE	SWE	236	SWE	السويد	Sweden	Suecia	Suède	Suécia	Швеция	瑞 典	Member State	NO	Stockholm	Europe	Northern Europe	0101000020E61000000346FBD9DABE30401C01788A416B4F40	0106000020E610000001000000010300000001000000260000008042FE5F96B32A40B85200E026AB4B4000D60280059B2A408875FF9F9DAB4B40E0E500409CA029406073FFDF78B04B4060D4FC7F3C6F2640D07F00A0EA294D40E00CFE9F3F6D2640385A0080072B4D4020E60220B9FB254090B600C0B3714D4000C7FD3F35F92540E889FFBF9A734D40803F524486F52740D01AF5108DA24F4000919BE1064C2840682827DA55CC4F40E0484BE5ED082D40F815A4198B8850407085949F542B304050A60A4625E15040801A69A9BCBD3040780CC85EEFFA5040C009A2EE032032401CB2BAD573225140C088EFC4AC0F344028624A24D1435140805D9EBF6A8E34407454BBE7FF4351408083FF7FAC8E344044DAFDFFFF43514030680586AC8E34400400000000445140D0E78711C2C3344054F701486D425140C0019D8B37C83440406042F81C4251404046EBA86ACA344080D0B359F5415140B0A17F828BD5364070AD2F12DA185140F0AE25E4830E3740647138F3AB1351402010CCD1E3A737403C5D16139BFD5040708907944DA93740544EB4AB90FC5040B0C7EF6DFA033840001E8A027DB4504060910A630B293840706E4C4F58765040A057A6B321293840985AE1C31076504030ED0DBE30293840B0B2EF8AE0755040303EFEDFCC293840FCD3FF9F6E6D5040F05B0180C15C33405864FF9FF7F94C40E0170220710033406073FFDFB8B74C40A09CFEDF9D6A3240A8DDFFFFB37E4C4090640180D4533240B00F01E088774C4080E3FE9F1A4E324000BD000062764C40900700A0206A3040603F0020DC184C40C003FFDF01602C4070F1FE7FA9B04B40407BFC5F27592C40C8B900E04AB04B408042FE5F96B32A40B85200E026AB4B40
+SB	SLB	225	SLB	جزر سليمان	Solomon Islands	Islas Salomón	Îles Salomon	Ilhas Salomão	Соломоновы Острова	所罗门群岛	Member State	NO	Honiara	Oceania	Melanesia	0101000020E6100000BBD492E92505644060D6ADC8FD3E23C0	0106000020E6100000010000000103000000010000001C00000050380543271A6540003F106AD09D28C068E88EB4CA116440E05F6A95AAC227C040F482F4B90F64408079B18BFDB427C08CFA6E04330E644000FD1EAB4AA927C068A428E113016440C07C0162B73C27C0E4C391AC28006440E09DDCA5C33127C0D804076A67716340403403A61DB01DC050F0A88C9A70634000A891F1838E1DC0E0AAEB508D70634040463EAF788A1DC098E12EB16870634080DFC38080781DC084FCC79D6D70634080C7EE0225751DC0242E94A74774634040F2B1BB40411CC0184031B2E4756340C03AE2900DF41BC054B81E85EB7563400033333333F31BC0B45BBA38E076634040E679CB30D91BC04878C79E47836340806DDFA3FE921AC0D8C1C1DEC4EB6340C097AF8163C515C0A0C2A5BE07F663404053D5BAC3B415C0AC15A6EF35E2644080D38789618623C00C044BBFCEE264402007C9A76C8D23C0308672A21DE6644000929ED8F9BD23C044B8A750021B6540A0029E0F2A9428C0A0C9FE791A1B6540C0152DE5219828C03C72EEC0CA1A6540E0A2320FAA9A28C0EC6BF184B91A6540A056F8E92E9B28C0C09B6ED9A11A65404072B4F4B29B28C09CAAC5F14D1A6540E0C3AD275F9D28C050380543271A6540003F106AD09D28C0
+GH	GHA	94	GHA	غانا	Ghana	Ghana	Ghana	Gana	Гана	加 纳	Member State	NO	Accra	Africa	Western Africa	0101000020E6100000398AB995B94BF3BF557166225DDD1F40	0106000020E61000000100000001030000000100000023000000005775560BBC00C0801BD65416F5124000050A73BDD808C0408292580B5D1440006AD939510B0AC0006385284D791A4000BC053D940B0AC000EB1F49EB7B1A4080931257D58407C000D8DE9A806C254000E0C6473A8407C0201B77E0226D254080C13C1A3D8107C000FCF8A44370254080E7556F9D7F07C040991EA5F67125400062CDAACAAC06C0A064B6619DFF25400098E8E16E2AD2BF40864C229054264000D85ABADD26D2BF800DBFDD8A5426400038DA38622DC2BFC098F562284726400000184CC3F061BFC04FE449D23526400080B1F9B836843F400395F1EF3326400080B56CAD2F923F80BA2C26362F2640007CFB695F5DD93FE037409BE29F244000AC66EDEE75D93F40034A61E39C244000B3BA4C8234F33F80E053C998AC184000D626889931F33F40EEA2571F73184000F6D901D715EF3F40C78157CB4D17400052C58D5BCCEE3F40EA060ABC431740006CD619DF97EE3F80423EE8D93C174000FC5FAE458BEE3F4049490F433B174000A029745E63EE3F40FC6F253B361740009C75C6F745EE3F00CA6FD1C932174000D2CABDC02CEE3F4057B2632330174000201494A215EE3FC00227DBC02D1740002C1DACFFF3ED3F40F6EE8FF72A1740000007EDD5C7ED3F800F26C5C727174000EA60FD9FC3ED3F40F1F3DF8327174000947A4FE5B4ED3F80FA0967B7261740003C94A12AA6ED3F80E23B31EB25174000E65608ABB1FFBF80CC5D4BC80713408092718C646F00C040C495B377F61240005775560BBC00C0801BD65416F51240
+CH	CHE	237	CHE	سويسرا	Switzerland	Suiza	Suisse	Suíça	Швейцария	瑞 士	Member State	NO	Bern	Europe	Western Europe	0101000020E610000039DD4A540074204055A1B90131674740	0106000020E61000000100000001030000000100000022000000C0C2D842900322405827A089B0E94640804D4A41B7771C40F0797077D6EE4640801A868F88691C40A0FF907EFBEE4640C0DC291DACDF174068BF60376C134740408A1D62C3DA1740E03BD89F9A134740807C2766BDD81740280B98C0AD134740C0E9EC6470D41740D81DC4CE141A4740C00569C6A2691840F842739D464A47400030D80DDBB61940D01F0C3CF776474040E84D452AEC1B406065DF15C1BF47404092189F2AEC1B4000362820C1BF474040B37BF2B0F01B40A02BBCCB45C04740001BD82AC1021C40F868E388B5C0474080962044AE091C40E0EFA011E0C04740400A4B3CA00C1C40A828D027F2C04740401B6492912321409814916115E74740E08A1A4CC330214060B2632310E74740C0779CA223392140706B7D91D0E64740206B0E10CC512140F80390DAC4E5474020FA449E248D2240C01E85EB51D44740001EA7E848CE2240E09942E735CE4740202E73BA2CD6224078F085C954CD4740A0C7293A92EB2240384B02D4D4CA4740C076F86BB2162340180F289B72C5474040EEB1F4A1FB244008AE64C746784740E00E7F4DD6F82440800F971C774E4740408716D9CEF7244018AFEB17EC4A4740E0F3E0EEACED244088A3E4D539464740E0E3F736FDE92440883A1E335045474080A27A6B604B2440E815C1FF561E47404057957D57442440C02DCA6C901D4740C0946588630D224040A06CCA15EA464060B1DCD26A082240B85FB01BB6E94640C0C2D842900322405827A089B0E94640
+BT	BTN	31	BTN	بوتان	Bhutan	Bhután	Bhoutan	Butão	Бутан	不 丹	Member State	NO	Thimphu	Asia	Southern Asia	0101000020E6100000D49E8D59B09C5640A0B6348ED5633B40	0106000020E610000001000000010300000001000000220000003CC30DF8FC76564030AB5B3D27B53A40F49881CAF871564010392861A6B53A401C34F44F70695640D0DCB5847CB83A405C17B7D1006856405012BD8C62B93A40B0FA5C6DC5485640A0FCC1C073CF3A4038EF3845473856406014E81379F23A40CCF484251E385640A0FF907EFBF23A40342AA913D030564090687407B11B3B408487A2409F3056409042041C421D3B40F824E99AC93356403015C61682343B40C46ED8B6284F5640406475ABE7CC3B40509352D0ED5F564070EB8B84B6143C40A8CC069964605640E02AC1E270163C4014018750A566564030DF6C73632A3C4004D061BEBC66564090B0E1E9952A3C40F0647094BC72564090ECF5EE8F3F3C40CCFD8BC340735640802C12BA9B3F3C40FCE978CC407356409009DCBA9B3F3C405C9A94826ED55640605227A089103C4070B75D68AEDD5640E0DEE00B93013C4088CE6BEC12E7564010172B6A30E53B40885AD3BCE3005740900A80F10C7A3B40403B191C2501574070BEBC00FB783B4000459E245D0357405039D1AE426A3B40A072EF5B9903574080D8FA45B0683B4044D9942BBC035740302098A3C7673B40B039403047075740F0263108AC4C3B4058F65D11FC075740A0662C9ACE463B40B0CFD556EC07574010F52D73BAF43A4018D4B682E20757405063784F12F23A4084B74082E2075740C06CAD2F12F23A407C103B53E806574060232D95B7DB3A4078CDE49B6DFA5640C0D3484BE5CD3A403CC30DF8FC76564030AB5B3D27B53A40
+PW	PLW	189	PLW	بالاو	Palau	Palau	Palaos	Palau	Палау	帕 劳	Member State	NO	Koror	Oceania	Micronesia	0101000020E61000003E6E7B1E1BD260405E821C64E4FF1D40	0106000020E61000000100000001030000000100000015000000F827A72CF963604000B9C7D287FE0740781F251BF463604080B27A2C22FF074074DB1901F06360400012514CDE000840004A3261EA636040806C6D2B07040840E4BA18B9DD63604080309E41430F0840EC3F21F1E163604000B3A5FDC5120840341A9E0330876040400AFA66F66C1540107ADBF18BD4604000D9525106582040889BF80F8ED460406071112917582040042F336C94D4604040CDCF6806582040AC20AB0004D7604000D87047EE2F20401821E12006D760408047D224672F2040ECA4AD0015D760408032CC64932B2040784600DC11D76040A07B760A03282040A4C5635077D4604040A2AFC513F61D4020D198A40DD36040406C1DC132731D401C48ABB50BD3604080CE6DC2BD721D4020E49AA7DFD2604040A9D66773691D4070D74B53048A604040364DE9AA3A11407CF7B64FFD63604000CA8CB795FE0740F827A72CF963604000B9C7D287FE0740
+PK	PAK	188	PAK	باكستان	Pakistan	Pakistán	Pakistan	Paquistão	Пакистан	巴基斯坦	Member State	NO	Islamabad	Asia	Southern Asia	0101000020E61000008D8176EBC6335140C164F60150663D40	0106000020E61000000100000001030000000100000024000000A02C2734B80551400086240E34B4374098E755F88E0551401049C78B3BB43740D86D0C4B4DDE4E40D01A344F09053940705133FF43DE4E4030F58D9E11053940000C2C369CDD4E40F00DB3E1FA053940B05599CEF3DC4E4020C1EE2A5A073940F88C0C2B42CD4E4000B4126C3C2D3940B803E58BBD6F4E4030882CD2C4DB3D409045D3D9C9E8514000DE74CB0E3D4240F09BFBABC70F5240A82AA6D24F604240EC90D442C925524078A3C85A436B42407804EF32C329524030CAA5F10B6D4240883C019B73495240C07F2C448772424058362B2977665240E81934F44F744240D89425B9EA6852405033D7E8A3734240F49881CAF8715240884C3272166A4240B87BF2B050755240F8940ED6FF6542401C0AE28099755240E89B81BF8F654240A41518B2BA755240D003CAA65C654240D873D2FBC6755240C07F65A549654240588CF337A1765240B0A8C1340C63424080A52C431C775240F8164850FC6042405CFFE7305FD85240C85F9335EA214040B854DE8E70D8524050546F0D6C21404058F65D11FCD7524060EB8B84B61C4040D8E76A2BF6C75140B0F6E978CC683840F88E537424C75140E04290831266384048EFE8DA72B95140B0C4D0459E413840E81F11AE5BB95140E0EFC2D66C413840D8CA187A1FB95140805809CCF94038403C4C344841B85140508A4B9F673F3840CCDA4BBFE9B4514000ECA930113A384090333CACA6B35140105ED89AAD383840B457A2FDD9095140804FFCBDB9B437408852C59E87095140504668BA8DB43740A02C2734B80551400086240E34B43740
+BO	BOL	33	BOL	بوليفيا (دولة - المتعددة القوميات)	Bolivia (Plurinational State of)	Bolivia (Estado Plurinacional de)	Bolivie (État plurinational de)	Bolívia	Боливия (Многонациогнальное Государство)	玻利维亚多民族国	Member State	NO	La Paz  (adm.)	Americas	South America	0101000020E61000007BD98C1F902A50C0D8736C0095B530C0	0106000020E61000000100000001030000000100000020000000ECD00DD3521550C0C0CBAC3B9CEA36C07C87A2409FE450C0E0F692C668E536C0B4C3243128E550C030EEC8B65EE536C000C11C3D7EE550C0F023456458E536C07C828B1535EC50C0700F971C77E236C0D412F241CFF250C0F017CFA0A1DF36C01418B2BAD5F750C0002AE3DF67D436C0E46F422102F850C06009F9A067D336C034CD3B4ED12F51C000DCBA9BA76A34C080FA96395D3051C0D04B1AA3756434C06C253B36026951C050D17476324831C058C98E8D406451C040C8EA56CFE925C01C0C3CF71E6451C0E0BF95ECD8E825C060E0B9F770A750C0C0307C444CC923C0C8897615528A50C060693524EE9123C0E0A08499B67150C0202592E8657423C07016F6B4C35B50C0E046C9AB735C23C054091687335B50C00015C616825C23C060CC5D4BC85950C060EFE192E35E23C0E4C6F484255850C040AED3484B6523C0B0D7BB3FDE3B4EC0E0CEDA6D179A2BC018ACFF7398274DC020BB270F0B4530C010265305A3BA4CC0E09925016A3A32C0580CE544BBBA4CC0D09387855A3B32C0E01E4B1FBAEC4CC08037328FFCF933C0406DE2E47EEF4CC0904C158C4A0234C0805E152EBFF04CC0D0458709E80534C0605C381092F14CC0105F7B66490834C08007944DB9F24CC05024B4E55C0A34C098EA75FD95524FC0702493901E4036C038C3380BBD534FC0B0C801B1284136C0ECD00DD3521550C0C0CBAC3B9CEA36C0
+LU	LUX	148	LUX	لكسمبرغ	Luxembourg	Luxemburgo	Luxembourg	Luxemburgo	Люксембург	卢森堡	Member State	NO	Luxembourg	Europe	Western Europe	0101000020E6100000E6A66427146118406AA90EE487E34840	0106000020E6100000010000000103000000010000001900000080B26323102F184020868F8829B9484000FB22A12D07184068E5D022DBB9484000AD174339F1174070BD18CA89BA48404035D252797B1740A026A5A0DBBF484000BD6124797B1740A0CAD7A2DBBF48400057EC50C9741740885F4EC92CC0484080DBDC989E701740706AD95A5FC048400025068195431740E0FE959526C5484080791EDC9DF51640E82CEC6987EB4840C01B0DE02DF01640C86ED8B628F34840806AF6402B70174020F5108DEE0849400030D80DDB96174008098A1F630E4940003B8DB4549E174098C2F5285C0F49404049D74CBED91740C04FC76306164940C07984514BE6174058DF0CE0A8164940807B832F4CE61740A03446EBA816494000FA7E6ABC141840E01C2098A317494040BABDA4311A1840A0B20C71AC174940C04677103B731840C8B645990D16494040E275FD827D1840501AA3755415494000F853E3A51B1A4038EBC5504EE8484040FA449E241D1A40F017EC866DE7484040ED478AC8101A401047C9AB73DC4840C0A25D85947F1940680CE544BBBA484080B26323102F184020868F8829B94840
+FM	FSM	163	FSM	ميكرونيزيا	Micronesia (Federated States of)	Micronesia (Estados Federados de)	Micronésie (États fédérés de)	Estados Federados da Micronésia	Микронезия (Федеративные Штаты)	密克罗尼西亚(联邦)	Member State	NO	Palikir	Oceania	Micronesia	0101000020E6100000BD3782E046C763401D2AC5C3E9861B40	0106000020E6100000010000000103000000010000002C000000D8C9F67AF758634000F6A6D8876BF03F70F8CC48F358634000C10644886BF03F6C616067942F614060BAB07FE8972040E04EC7088D2F6140205DB1755F982040E82730F88F2D6140406437D840C72040640CECFE8F2D6140E0B4BF5884C72040402F151B73426140C04D8061F90B23403072F49DC442614080C1A8A44E14234010CBB09BA3446140206D61CC4C432340342D5679A74461408083ADC89E4323402C4BBE23B4446140006AFF5E65442340D46A37B0CB446140807C15CF8F452340D8C21B88DB446140408BC80B444623401038A682E5446140A0275A03A5462340203D8F9BEB44614000838362D046234084A7EBE4A7766140408EE733A02E24400417091240466440404A26A7765A27402019F55ADA4664404089867B1B5927404044A33BC8476440805287CBE0562740A423A8D02F4A6440C0643909A53F27409C063E396C4A6440C0F1D24D623C2740D096AC8A704A6440204FB5711F3C2740BC742733794A6440E0DF90FC773B27406CB8B711854C644080901C9F7FF52640709DC948874C644000C793EEF8F4264000F8F1E123616440C0A180ED60441540044EA555236164400039B709F7421540D071C9CC20616440404CF10236411540FC5CB75219616440406AA8AC013D1540F84C2F311661644080B0C7444A3B154040236CD3F360644040CDC5843D2A1540208E5319EB606440C057D7570D2815400CCB8E43B360644040806F89121B1540DCC93BE2AB606440409FE17261191540A01CF45BAA606440403E23111A1915405036D4DE56606440C002D369DD0E1540D4B2EE1F4B6064400023BF7E880D154018BCE82B4860644040FFFFA4460D154080E1F0DD4160644000BC07E8BE0C154038925F9A3D606440003B55BE670C1540D4393FC53160644000C7832D760B1540A404FD851E60644040A6D3BA0D0A1540C49F2B5B7559634000EBEE95D484F03FD8C9F67AF758634000F6A6D8876BF03F
+ML	MLI	155	MLI	مالي	Mali	Malí	Mali	Mali	Мали	马 里	Member State	NO	Bamako	Africa	Western Africa	0101000020E61000009CB52DEB492C0CC04D598DE2E75A3140	0106000020E6100000010000000103000000010000002400000000D027F224291CC040C5724BAB512440408D40BCAEBF1FC060598638D65524400043FF0417CB1FC020312592E85524408000DE0209EA1FC0E0679604A8592440608A8EE4F29F26C0A014AE47E10A2840207E6FD39FED26C060D6A887684428408050DA110AF026C0E00D34A9E5462840E056B26323F026C080DF15C1FF46284060BE9F1A2FFD26C080A27A6B605B2840E0904E9C5D1328C00049C940D83F2B40006325BBD92528C040BC10F415712B40E077C6BC637128C0E00BD5E662FC2C4060D447C9737A28C0C0F6E978CC842D400073D712F2411AC01000000000003940C0FFFFFFFFFF13C0100000000000394080B5F63E555513C0E0E15AED61FF3840006BED7DAAAA0EC0D0D2F9F02C5D384000F03482555507C07088D51F61C8374080FFFFFFFFFF01C02007978E395B374000F1D8CF62090A4050506EDBF7D4334040005C4FC8F81040601176108F233340C0E882FA96F9104050191C25AF16334040016A6AD9FA1040E06EBBD05CCF3240809FE57970F7104020799274CD043140C01DCECE32F710406067F6258D003140802EFF21FDF6104070423EE8D9FC30400069006F810410404005DD5ED2F82F4000399CF9D51C0F4020D9EBDD1F6F2F4080C898BB96100F40C0559FABAD682F400003DBDA25FA0E4080E22E793E622F4000454C8924FA0E40608369183E622F408081B22957380C4080D2FBC6D7AE2E4000F6B4C35F1316C020ADC090D5DD244000D9942BBC0B18C00064CC5D4B682440004D4A41B71718C020F758FAD065244000D027F224291CC040C5724BAB512440
+WS	WSM	212	WSM	ساموا	Samoa	Samoa	Samoa	Samoa	Самоа	萨摩亚	Member State	NO	Apia	Oceania	Polynesia	0101000020E610000029E3D2FB4F8E65C072622AFED53D2BC0	0106000020E61000000100000001030000000100000025000000AED23376FF6C65C0C083AA871E272CC06B5B94D9607865C080EF9C77AD162CC0B2E501D1787865C020F64D5079162CC0658E9BD05A7D65C0208C7C0338022CC02B4F7BA5079165C060934039C09A2BC09856540E379165C02026EC91BC992BC0B4160BE86A9165C020F394302E982BC01C76DF317C9165C040909F8D5C972BC0FB5B5DA9829165C080116C5CFF962BC007910C39769265C06026EABB11882BC01106AFA7279965C040CB42E0ED162BC0B8CD0AFB2C9965C02081B63066162BC094394CEABA9965C020CCD07822082BC0F7109E1AB99965C080379E74C7072BC07E092648B69965C0008705AD76072BC0B2F4FCC45C9965C000EAFA4F48002BC05B2A25BA1D9965C020CEC29E76FC2AC0D6E7209E1B9965C000D1048A58FC2AC051A51C82199965C0A0BBC8A942FC2AC032593739179965C020ECC44032FC2AC092E00D69149965C020563A692BFC2AC0953D096C4E8B65C0609AAA20ABE02AC08D89DEF34D8B65C0206D437BABE02AC0922E47D9AC8A65C0C01DE626C5E22AC0D9458776848A65C04077E805E9E32AC0B4FF5C8F1D8A65C0E0CA000638E72AC0C895D5CF767265C0C00BFA1C69C22BC0894D75121B6E65C04071D2EA9AF32BC09B48D51B1A6E65C0A0E88601A6F32BC09ADBCE08C06C65C08063DF5F4E062CC05BE333D9BF6C65C000CEA78E55062CC08534CFB6BF6C65C0406A8A5B60062CC0764A07EBBF6C65C040E48D8296082CC0B443B236FC6C65C080245D33F9262CC0DD1E8480FC6C65C080B4E21B0A272CC0EBD1657BFE6C65C0C0D53FE31D272CC0AED23376FF6C65C0C083AA871E272CC0
+LV	LVA	140	LVA	لاتفيا	Latvia	Letonia	Lettonie	Letônia	Латвия	拉脱维亚	Member State	NO	Riga	Europe	Northern Europe	0101000020E6100000B52F2ADF6EEE384058936EC1556D4C40	0106000020E61000000100000001030000000100000025000000306BD443348A3A4028CD58349DD54B402009EE26491235408043AB771E084C40F07AFF7F19FB344018670000241D4C4080F1FE7F69F934401818FFFF3E2F4C40B0EEFD1FBDFE344000B7FF7F1E414C40A044FE1FFB003540B0A9004097474C4070F7FFFFEC0E3540D0C800200C684C40B03A01E0E7103540C0610020A86A4C40E09FFEFFF46D35404829FFFF64A54C404017018029B23540F0BB00A0EFC74C40403D0060F7B53540888A006022C94C40E02800407AC2354090D300E083CA4C40E048FE9F44853640F09E0080DFDF4C40102EFE3F19973640087DFF3F7EE14C40902F4CA60A1E3940383E05C0780A4D40F05D2EE23B21394028115322890A4D40509AB1683A4B3940E0EBDD1FEF094D40703A3B191C8D3B4098B96B09F9C44C4050F4328AE5D63B40B04885B185A84C409096E7C1DDD93B40C817265305A74C4050CF66D5E7DA3B403839EE940EA64C402005FA449EDC3B40B8506B9A77A44C40300B98C0AD233C40603541D47D484C40C0FF73982F2F3C400822FDF675384C40801A69A9BC3D3C40389413ED2A244C4070BE46A9BC3D3C40C8396BD62A244C40600BEF56BC3D3C4010CA4CEDF5234C40406EA301BC3D3C4088608E1EBF234C40B01518B2BA3D3C40E034EF3845234C4060D1915CFE333C40A8B5DB2E341B4C4070C6A2E9EC2C3C4000D7C05609164C402078EE3D5C9A3B40A87A6B60ABE44B40C0D222DDFA993B4088FD59F1A2E44B40F0E3DA5031963B4080978BF84EE44B40F0A08499B6C73A40C8E78711C2D74B40806C04E2759D3A40887901F6D1D54B40306BD443348A3A4028CD58349DD54B40
+FJ	FJI	83	FJI	فيجي	Fiji	Fiji	Fidji	Fiji	Фиджи	斐 济	Member State	NO	Suva	Oceania	Melanesia	0101000020E61000002E554432EA3E66406C5BD38340D531C0	0106000020E610000001000000010300000001000000150000004FCAFF3FC95666C0A01502600CAD34C05D0500E02B5766C0203401A039AC34C0F7F0FFBF6E5766C0E00FFEBF16AB34C092BFFF7FF17B66C0E032FF5FAA0133C08EF9FFBF017C66C070CCFFFF8D0033C0FFFFFFFFFF7F66C03072FF7F06F930C0FFFFFFFFFF7F66C0B087FFFF752530C0A3DDFFFFC37F66C0208EFF3FA46E2FC0333D0060B77F66C0A0F8FC3F6D6D2FC070400080FE216640004504C0D1F528C060220000AC23664020D2FE9F74F828C03CE6FFFFF6236640C0DB030009FD28C04C2100A0F97F664060FD0080702530C0040000000080664000240100862B30C00400000000806640D0EC012092F930C0804100E0B07E6640D074FEFF159032C008C6FFBF4F79664000C0FE3FDC2C33C0AC2600801579664050C80160E12F33C05C3F0020FC786640E04D01A0F23033C0E8EFFF5F6C7866403072FF7F863333C04FCAFF3FC95666C0A01502600CAD34C0
+PG	PNG	192	PNG	بابوا غينيا الجديدة	Papua New Guinea	Papua Nueva Guinea	Papouasie-Nouvelle-Guinée	Papua-Nova Guiné	Папуа-Новая Гвинея	巴布亚新几内亚	Member State	NO	Port Moresby	Oceania	Melanesia	0101000020E61000007E3231FF62086240240FA9EAD7741AC0	0106000020E610000001000000010300000001000000190000005CBCFF5F9A316340A047FE3FD25027C07C1500802FA461402054FFFF837822C0C4360020E9A36140E04D01A0F27522C0F4A3C33E9FA06140206E6A335D4222C0C8FE5E7C149B6140007DC07357E11AC0FC5E18F0EF9A61400060B8BC37711AC09076FFFFFF9F61400052EB199CDE04C0702300606EE1614000031E80235DF7BF94BFFF7FD10C624000B60160BB4AF1BF30110000E631624000CA04001D1FECBF9CEBFFDF12326240000021E0B017ECBFC4D0FF7F97B162400080E01F2619F5BFDCFDFF3F6BB262400033F3DFE128F5BFB0CFFF1F85EE634080BD0380863212C07C150080DFEE6340C04607A0284712C0F4C4FF5F4DEF634000CAFD5F8C6812C0E0C3FFFF4AEF634080B50420BB6D12C0243C000045EF63400051FCBFBA7112C070400080FE486340C011FC9F5ECA26C078CCFFFFBD486340E036FDFF56CF26C01C1000A003486340E03D03E05BD626C0F4C4FF5F3D386340E0020340C94127C008C6FFBF6F35634080810380814827C010D5FFFF4035634080B0FF3FF04827C05CBCFF5F9A316340A047FE3FD25027C0
+MD	MDA	165	MDA	جمهورية مولدوفا	Republic of Moldova	República de Moldova	République de Moldova	Moldávia	Республика Молдова	摩尔多瓦共和国	Member State	NO	Chisinau	Europe	Eastern Europe	0101000020E610000032516108FE783C4027025C9A009A4740	0106000020E6100000010000000103000000010000001F00000090785DBF60373C40208C4AEA04BC4640707B664980323C40006CB2463DBC464060CA3DED88313C40781ACB8970BC4640E073D2FBC62F3C40404F75C8CDBC4640609B38B9DF113C4050205ED72FCC46407075ABE7A49F3A40F8D24D621020484060D235936F9E3A4008E78C28ED214840B033A2B437A03A40F87684D382234840307233DC80B73A40A83B889D29344840E0A414747BB93A40603D27BD6F344840F09B6D6E4CDF3A40E84F8D976E364840E09E5912A0963B4000753C66A03E484040C68C9205983B40102C7C27AD3E484060CBD6FA22993B40B8024356B73E484050AD69DE719A3B4080BDFBE3BD3E48403097FF907EC33B40A876F86BB23A4840002E73BA2CC63B4088FA96395D3A484000F4A62215D63C4020747B4963104840705D2FFCC9D83C40C8ED8F4BEA0F4840D069C18BBEDA3C40C873EFE1920F48405058FFE7302F3D40A8DFBE0E9CFF474040A913D044303D40D8F23CB83BFF4740F074594C6C463D40B8DD76A1B9F24740306EC0E787F93D4008F775E09C694740200C59DDEA293E40403602F1BA36474080E5B33C0F263E40A8AA09A2EE334740F015C1FF56823C406038109205C0464040F180B2297F3C40E0A8876874BF4640F0D26A48DC733C4010BFD4CF9BBE4640506DE2E47E6F3C40187008556ABE464090785DBF60373C40208C4AEA04BC4640
+CP	FRA	55	FRA		Clipperton Island						FR Territory	NO		Americas	Central America	0101000020E610000030320E76E64D5BC0A7407CD5559B2440	0106000020E61000000100000001030000000100000032000000F8F32334B84D5BC040D8A7D205932440544BDF10CF4D5BC0A08A27710C93244074949405DD4D5BC0A0694BC22A932440543E703AEE4D5BC0E0132A937593244044E3AB78FE4D5BC0A045A055C19324409C35D318084E5BC0E0C4967906942440C814BD9D8E4E5BC08056C73BD19724401802DB1CC24E5BC0C076B4BB51992440E8526D81CE4E5BC0E02FA589D299244024F61ACCF04E5BC0602A42A0E99B244070A197F6F24E5BC040643C4A259C244050A7F22CF74E5BC0E0B3F3ECA89C24405CF92CCF034F5BC0409A95ED439E244020F88491034F5BC040253D0CAD9E2440D44C0867014F5BC0E0141857019F244048A4C8B5FC4E5BC0A06C53E1749F2440444AC4A5F44E5BC08052D158FB9F2440D44E8358EC4E5BC0E069166877A02440F409A018D94E5BC0201714611EA12440343A9D1A9E4E5BC0E0BD65F3DDA22440CC6ADCF6984E5BC0E055FFD604A32440B06ECD678A4E5BC0A08252B472A32440381279DC814E5BC080C16F438CA3244048C741AE794E5BC0408E03AF96A32440C872B7906C4E5BC0003FDE509DA32440A876A8015E4E5BC0A0CEF9298EA3244050286618524E5BC0A0C4ED2B6AA3244088C866FD1C4D5BC060C77A0F3C9F2440687FB1080F4D5BC080A9392F049F244060CF8D9FFC4C5BC060160E29AB9E24407CDF1A33E44C5BC000AE1BA5019E24407482ECABE14C5BC0A063192CE69D2440FC8A9015D74C5BC0603DA539689D2440C0DA73F4D34C5BC0C0738FB63B9D244024885F56CD4C5BC0C09C4022B79C2440B833C97ECC4C5BC0E0F58E64A09C2440783606F8C94C5BC040E0D16B589C244048E3175EC94C5BC0204DA665FF9B244084E4BF9BC94C5BC040B8D562A69B2440F43471BCCC4C5BC0C084F46FF29A2440B0DF13EBD44C5BC0C052EC681C9A2440182B20A3F24C5BC0C02E7A5D7597244014DA9486F54C5BC0C0D8C6E93597244064D421DC094D5BC0803E7B890C96244050233EC10F4D5BC000B7007ED7952440F869920E454D5BC0A05EBE501B9424405412D907594D5BC08029E78BBD93244040B00518714D5BC0407F08BB7293244070B0EDA3894D5BC06061C7DA3A932440F8F32334B84D5BC040D8A7D205932440
+RO	ROU	203	ROU	رومانيا	Romania	Rumania	Roumanie	Roménia	Румыния	罗马尼亚	Member State	NO	Bucharest	Europe	Eastern Europe	0101000020E6100000B02A1B50DDFC38408AAF7AA504EC4640	0106000020E6100000010000000103000000010000003400000000DE1FEF55633940D88DE9094BD0454050BD5296212E3840680B410E4AD8454070B3EA73B50D3740F83CB83B6BE745404063D17476023740C895ECD808E8454020E42976F7013740687D599314E84540D04D7FF623FD364018CB2DAD86E84540C0B0A71DFEE2364048DEAB5626EC454060F65D11FCDF3640C8BC00FBE8EC454040D80DDB16653540C0C2BB5CC463464000FC3FA01665354080409979C46346407025581CCE643540E8EF5014E86346408062D88CCC64354058D110DCE8634640F085E63A8D643540A0BF098508644640103C00475A643540E039C5912464464070E674594C643540C8EC9E3C2C644640905FEAE74DC53440585C55F65DBD4640C028B34126593440484D2D5BEBFF46407077F35487443440D028965B5A0D47409033BF9A0344344000295C8FC20D4740002DCF83BB433440F8940ED6FF0D47400010E9B7AF43344078DDCD531D0E47400010E9B7AF4334400895F1EF330E47402066DAFE9545344090DB68006F114740205839B4C846344010A2EE0390124740C03B6BB75D483640E89C11A5BDDD47403066BD18CA493640E07C5C1B2ADE4740D0BC00FBE8543640684F3BFC35E14740F0361AC05BF0364040DA38622D024840F0CD531D722B374068D218ADA30E4840E032C4B12E2E3740C0D573D2FB0E484090ED4325C82F374048BDD05E280F484070CC5D4BC82F3740A898F562280F484010A8A9656BB53A4048FF04172B224840406744696FD03A4058C6BFCFB8204840A09C853DEDD03A40F0263108AC20484070E3CD8959D13A403841C207A12048402098C0ADBBD13A40109E7B0F97204840F062450DA6F13A40C83AC780EC194840C00F2B3C65F33A40001DAE8E8919484090DC0C37E0F33A40502FA3586E19484010F01648500C3B40D8E49B6D6E104840401092054CA83D40B82E6EA301AC464000E04A766CAC3D40F85EB532E1A74640406EA301BCAD3D4058E8BCC62EA54640E0CEF753E3AD3D408887A2409FA44640B0C37C7901AE3D4098CC237F30A44640A0DB4182E8B03D40F84B4E04E994464090776BF9FEA13D40E0C2B7A63C6F4640A0240F11A5A13D40A8141677646E464090C4BE16D49E3D400892A0FA726B4640C0B79D1B72953C40B032F69F61DE454000DE1FEF55633940D88DE9094BD04540
+ID	IDN	116	IDN	إندونيسيا	Indonesia	Indonesia	Indonésie	Indonésia	Индонезия	印度尼西亚	Member State	NO	Jakarta	Asia	South-Eastern Asia	0101000020E61000005AB2ECBFA7805C40D349554637B4C8BF	0106000020E6100000010000000103000000010000001C000000583000E0FAB75E40006CFC1FE60326C0E0E0FF1FEBB75E40605D00A0DE0326C0A0EBFFDFE2B75E40E0B401A0D60326C0E04603780BF65A40008DB454DEEE1EC0C4ADBB79AAA35A4040D1579066AC1DC07C7AA52C439A5A40C05D11FC6F851DC0E0406522439A5A4000FB58C16F851DC0D83E1D8F199A5A40C068006F81841DC0D8BCE3141D615A40C094F1EF330E1CC04430478FDF91594080A2E9EC641016C03000C63368905940C0476DE2E4FE15C03CD6C56D34865940409A94826E6F15C0CC93A46B26B75840001890BDDEFDFABFF004341136B458400090B8C7D207FABF207233DC80D95740007FA4880CAB0740F4A7C64B37D9574080C347C494C80740CC37DBDC98C05740C0177D0569E61640883DEDF0D7C0574000E59B6D6EEC164078711B0DE0C1574080FFE7305FFE164028456458C5CD5740C0B3B0A71D9E1740C0FC87F4DBA55F4040DF89592F4616409076FFFFFF9F61400052EB199CDE04C0E8C2DC499FA061408060460425911BC0E8C2DC499FA0614040E7FC6055CA20C07439DC499FA061406089C278174122C0B8C9C53E9FA06140408C04F75C4222C0F4A3C33E9FA06140206E6A335D4222C0583000E0FAB75E40006CFC1FE60326C0
+TZ	TZA	257	TZA	جمهورية تنزانيا المتحدة	United Republic of Tanzania	República Unida de Tanzanía	République-Unie de Tanzanie	Tanzânia	Объединенная Республика Танзания	坦桑尼亚联合共和国	Member State	NO	Dodoma	Africa	Eastern Africa	0101000020E61000004DA4CD5165664140288C8891200E19C0	0106000020E6100000010000000103000000010000003A00000058F732386742424080C5458DC08527C050130D57E9414240A0347EE1958527C0701EE331D37A414080872CA28B2527C000AC394030073F4000A7E8482E2F21C0D04CDBBFB2023F40A0490C022B2721C0C037F8C264FA3E40C041EC4CA11321C0100F45813EE93E40C0DD3CD521E720C000C095ECD8E03E4060B6B9313DD120C090BDFBE3BDD23E40802F2FC03EAA20C0B076F86BB2CE3E4020014D840D9F20C0203E5D0832B43D40C02E808B76581AC0B0A66A7635913D40807D3B42335319C03031410DDF8C3D4080AE3F7F5D2E19C000F33802748A3D40C06787975E0D19C0C0C72BAD927F3D4040E9BF2ABE3918C0703E95DD10593D4080CAD859BFB813C0F015F08189573D4040F80B401A8913C06039F65165573D404027B4DFEC3013C0209D22B007593D40C0FDF385A70D13C0A01E2D9E5F6C3D4000FAD99A3DCA11C02098AE5DE3733E4000E6D53B074FF1BF5065B928D7773E4000809FDBC5F8F0BFA06E364938793E4000217E8E27EBF0BF100E396758C43E400038BAA07780EFBFB09BF0EA930341400085C30F2400F0BF18FE6E4F4A0A4140006A28802561F0BFA8C05A06730A414000E2E91BEC63F0BF580D58F84E0B414000C0FDE8EA72F0BF78460502A80B414000430CEDFC78F0BF90B0E1E9950C414000B3E7323589F0BF20D9CCF6E8534140002266F6798CF5BF70FD2D01F8C1424080E10511A9A907C038F9D7A67CC24240801BE5FB0AAF07C0D8AECE73BCC94240800C94C058FA07C0004DF6CFD3CC424080F9D346751A08C03086C959BAD1424080808AF4EC4F08C09065FA25E2D54240008A1D8D437D08C08068A219D5EE4340000A7CEAFD8B13C0F0D3E06C29EF4340803DF7D4A08E13C068120C8C61F0434040871F52C29A13C0F8051CF807394440001CCAF55BB424C090A5924B2D374440001043064DEE24C0809B81DB2437444040E3288AA1EE24C05077C6AD38364440C02A6C06B8F424C0F07A93C0552E444080E21E9C662325C0B8B9D73A122E4440E08A89EED52425C0981267B7E92D4440003B7865982525C05046B32453004440802B519DDE9D25C0200EEA468BFF43400098A1C6C49F25C05069B055B49F43408000C6AA765826C0008EA9CD559F43408020654FF85826C040B5D9495E3E4340C098B46F0FD726C0A037AC7B34B54240A0FEF4DE995E27C0103841577FB4424080061E4F335F27C0F8316C5511B14240C00B4CD4F66127C06068EAECD9B04240206A0067106227C0E0255C289642424080C5458DC08527C058F732386742424080C5458DC08527C0
+BI	BDI	43	BDI	بوروندي	Burundi	Burundi	Burundi	Burundi	Бурунди	布隆迪	Member State	NO	Bujumbura	Africa	Eastern Africa	0101000020E61000002CFB40C3F6E33D40419FF4D091EE0AC0	0106000020E6100000010000000103000000010000001700000010F6EEB5BEBF3D40800A241953E111C0A01E2D9E5F6C3D4000FAD99A3DCA11C0F0C3498D153D3D4000405CCADD5D0FC01002A4709C003D4080B868634D7A06C0806FA1D258003D4000045CCAD86406C0302FB63963003D4080EFE0C4E34806C060B5D248A40D3D4000BC54F004F404C0F098F7FBEF0F3D4000E551A8A9D004C0C08B9E984B163D40005F469A40BD04C060592D1372F53D40809C9070369E02C02085F278B9683E400067E8F8987A02C010931B4556753E4000E364EF808B02C0D0F496085A763E4000274BD8779002C08025F3A9128B3E4000BBBE0C4F4E03C0309FF93790D83E408054F931F5D507C0D04FD3FCEBD83E40005860167AA709C00027FF604ED63E40003DF9D012070AC0A001CD783FD63E40804D908F18080AC0205A3526C9D53E400012071F36100AC090344431D30A3E40402DB616541A11C040A5E6F9F3C23D40801F41E238DD11C0708CE3E8F3C13D4040C4B7EFD2DF11C010F6EEB5BEBF3D40800A241953E111C0
+SO	SOM	226	SOM	الصومال	Somalia	Somalia	Somalie	Somália	Сомали	索马里	Member State	NO	Mogadishu	Africa	Eastern Africa	0101000020E610000056F8066F19EF4640C9085B599F401840	0106000020E61000000100000001030000000100000040000000882D0A16E2C94440004F029B7390FABFE864E25641C8444000E61E42F77DFABFE0FB8B75717F444000E87420EBA9EABFF04788C7457F4440005D8C81751CFF3FB04E1C4D697F4440803D869946430540C83346906F7F44400035C441DA440640A0218E75717F4440809AEB34D2920640B06B26DF6C574540002BC1E27036254018AD21E06C5745400079BDEF70362540988D40BCAE5745404083A3E4D539254008606502B857454080D833140F3A2540D8B7CCE9B258454040EBE2361A402540A0EED00B52A14540E0F2C583D2EB2640C0C590F705A44540C09D3935E1F82640B041F39430A44540C02AD95658F9264090BDBCA541A44540E01BD8857AF92640A8A932E774A4454060CD2445BFF9264078CF3D35A8A44540E059773DE2F9264058F0CAE48ABB4540409A07B0C807274040CA9F1452634940007A54FCDFF927405807002E4B64494000834A010EFA2740A85104824A654940405FB939F0F92740C010E4A084654940A03B2872D2F92740A057F844E865494000541C075EF927405831BDB32CA349408010FD7F41AF274058E850E163A3494040A9E628F6AE2740F00CC51D6FA34940205E6CB5E2AE2740606EC4EE96A34940E0916D2A9CAE2740F0F1310EE4A34940600103F7F2AD2740401499147AA44940607A072E45AC274060A41D92B5A44940208459B274AB2740E8ABC20BC7A44940E056CAD70AAB2740C81DE1B4E0A44940006565451EAA2740385E3D38E9A44940A06AC7C331A92740B8A041542BB549404058440367E32440D046318A2FB549404081FB4B9CE2244000F33B4D66B44940C0FD5F1A2BDA24403804DE6EEEB349404059C6E127D5244030099AE0E5B34940E00B885AE4D42440A0A14CFE82B249400056A3B2BCCA2440B0A487A1D575484040A4DBB7FFBD1740902870FC9A75484080F90A77D3BA17407002D94697744840803E65EBCFAC1740F8B5453E54744840806B84D95FA91740C02A2E3311744840C09BEDC0EFA5174028245525DB724840C08CECEF11961740F0FC80AC4C72484080B78608EE8E1740202F9397EB52484000C7D8092F0116409830FB2B1AFE47408028D2FD9C0A1240C8AB79E981FD4740C017C7928303124030099AE0E5FA4740C02710768AE51140D0CCF40137F94740C051D7DAFBD411408896091A8EF84740405B75C2F0CE114088BB911E2BBC4740007C1CBC655D0F40A00DD70F56B94740805E937F772C0F40C032970AE0B8474080918F2793240F40F0208DAFE257474000CAAA0837A9084010346CEFAE5547408088A9E3E785084038D593F9470D4740004B7842AF1F044070E5F27A8B024740807EC7F0D87F034068B5D72725CA44400019506F468DFABFA0A432C51CCA444000C1F462CD8DFABF68CFE858EFC94440006218665790FABF882D0A16E2C94440004F029B7390FABF
+MO	MAC	149	CHN		Macau						CN Special Administrative Region	NO	Macau	Asia	Eastern Asia	0101000020E610000010D2C4E3FC625C40752D5AB989323640	0106000020E61000000100000001030000000100000010000000B025E08148635C40108E2528551C3640C0F1C6002B635C409061BC23B91D364078634161F0615C403033BDB52D2E36402823FAC4E0615C4080CC26EB302F3640F891A0670F625C403081AF503A353640A0370CEE20625C40F0D46B067A363640F8108DEE20625C40D096900F7A36364078CA6D724D625C40001BA7608E363640D8ED258DD1625C40F05C8AABCA363640B8258DCC41635C40A0CA32C9EA36364088BFA4A017645C40606B61165A323640D084CC8636645C4070420B8A983136405861F1A3D3655C40B0293D6B6821364050087BE5CA655C407052F189B92036408087CDC09B645C40F030C4F6021D3640B025E08148635C40108E2528551C3640
+ZW	ZWE	271	ZWE	زمبابوي	Zimbabwe	Zimbabwe	Zimbabwe	Zimbabwe	Зимбабве	津巴布韦	Member State	NO	Harare	Africa	Eastern Africa	0101000020E61000004299EC2367DE3D40B1A52653120033C0	0106000020E61000000100000001030000000100000027000000E0390664AF4F3F40203B3602F16A36C0D008E1D1C6493E40409B38B9DF5936C0100DFD135C5C3D409069FB57563236C0C09E93DE37063C40801BF0F9619435C0E03637A627043C4000336DFFCA9235C0A07615527E2A3A409053573ECB8B33C0D05565DF15293A40400ABABDA48933C0C01F2922C34A3940C098BB96900732C03042959A3D4839404019FF3EE30232C0F04317D4B73C3940B0DD59BBEDEA31C030895E46B13C3940C0AC174339E931C0D02B82FFAD3C3940D0B5847CD0E331C0D0823463D13C3940A04885B185E031C000244564583D3940A0A3AA09A2DE31C0F09387855A43394040840D4FAFCC31C050FF04172B3A3D4000CCD1E3F7862FC0B0081B9E5E593D4040349D9D0C6E2FC0C0FECF61BE5C3D40C083BBB3766B2FC090F4DBD7818B3D40A0E55C8AAB4A2FC05072F90FE98F3D40205A2A6F47482FC0504D2D5BEBCB3D40005778978B382FC0304EEE7728D23D40A0A5D590B8372FC0A0395D16136B3E4020FB9122323C2FC020C05B20417D404020BB270F0BB530C098E86514CB85404060B1A206D35831C0285036E50A87404060183E22A65C32C0F061A1D634874040D0A2CC0699CC33C0A898F5622883404090CDAACFD5F633C020ADA3AA0982404000C347C4940034C088A1C554E5814040C0270609D00134C0388B89CDC781404030959A3DD00234C050BFBE826681404000B52A45CF0434C0F81B5F7B66814040E07DE36BCF0434C088B69C4B713D4040907D5704FF5335C0A06CE7FBA9613F40D0FA22A12D5F36C06039B4C8765E3F4080F84ECC7A6136C0D026465768593F40E0CE4107C56436C070A6ED5F59593F4090D11DC4CE6436C0E0390664AF4F3F40203B3602F16A36C0
+ER	ERI	77	ERI	إريتريا	Eritrea	Eritrea	Érythrée	Eritreia	Эритрея	厄立特里亚	Member State	NO	Asmara	Africa	Eastern Africa	0101000020E61000002E562E9AA26943406B575FFC44C22E40	0106000020E61000000100000001030000000100000019000000E0F78667AE5945400086E63A8DB42840C069C76838474240A0B9DF3945842C40E897842255464240C0F9F44FA5882C40489A4B863046424060FA82BD59892C40D8B7DCCB03464240E03D7A56E18A2C40605058AFD0454240C08EE9D1A08C2C40F88FF7AA9545424080AD4CF8A58E2C40784BAB2171434240809CBF0985A82C408873145AF5424240C0F66F1F38B72C40801132D243414240401A0C9ED7EE2C40E07BDB60293842408060EC4332502E40D0EAACCF42804240109D5833741131405093AC3F998142402000A76DFF15314060A8F668B882424050EBCC9D96183140A0E5FE5F3F484340709FFF3FCA00324058F3E90CE7484340D098C1734A013240D052DAD1EE16444090C96BCABA8C3040E823511ECC50454000BB01B04B162B40A8CAC4083C944540A0ECDEE57D6F294028DFEF614094454040B5CD435C6F2940487D152A4994454040235635F76E294078C6E6994D94454040C5A5CFB36E2940C0D6D5EC5A684540E081C86922D828404059742FD3664540A0E459261CD42840E0F78667AE5945400086E63A8DB42840
+CG	COG	59	COG	الكونغو	Congo	Congo	Congo	República do Congo	Конго	刚 果	Member State	NO	Brazzaville	Africa	Middle Africa	0101000020E610000021A12C2B877B2E4031A30A388D85EABF	0106000020E6100000010000000103000000010000002600000040FB05537EFA2740C02F2E134DFF13C0603575C35BF8274000DFF94509FA13C0000314D9BDCB27408005EB49AA8813C00058BD0D7BCB274040E8F92E008813C080ECD293ED662640805F39F1BEEE0FC0E06262F3717D264000F3AB3940F00DC000980BA6AB7D264080643ACA7AEB0DC08035B02A027E2640802DB03E53E40DC00006D847A77E264080BB3FDEABD60DC0C07823F3C87F264080FA5C6DC5BE0DC0E07EC16ED836274080E6A90EB99902C080253B3602512A4000CF8DE9094BFE3F6019FF3EE3522A400088F9F2026CFE3F2024456458952A4080E5ED08A745014080F8889812992A40000CB08F4E5D01401042B28009AC3040002B357BA0550C40905704FF5B79314080C63368E89F0D405000A94D9C7C324000AA2B9FE5390D40509B559FAB7D3240000B293FA9360D40006EFAB31F89324080B3075A81E10C4010404B7305A0324000110CD6EEC50B4020EE97E772A132400002654EF59E0B40D0C0A07069A232400067B988C97D0B4010F3DF02D7A2324000E24EC1986B0B40F0EFA9CCAFA5324000CECA8E3E2A0A40B07FB9EBACA5324000F7C4D529F00940C032C48B67F631400028DD390EC8D83F000644C055B4314000BE4BD6CC8DE2BF60EA9AE2D4B13140003C9CC52D34E3BF0026C1E6DFCF2F4000829860456D0FC06085BBD1CCC92F4080786D390E910FC040738B1710C32F4080A89A74E9A80FC0C0590D7A50AA2D40C023F365F54C13C08026D16546A52D400068764AF85313C0A0C304D509602D4080010E76CAA613C040443CE9AF512D4080452AB7ADAE13C0C071873E394B2D4080D6245936B013C040FB05537EFA2740C02F2E134DFF13C0
+LC	LCA	209	LCA	سانت لوسيا	Saint Lucia	Santa Lucía	Sainte-Lucie	Santa Lúcia	Сент-Люсия	圣卢西亚	Member State	NO	Castries	Americas	Caribbean	0101000020E610000000FFC2E2CF7B4EC08ECBD97802CC2B40	0106000020E6100000010000000103000000010000002400000078E6AC4F39794EC08009AF134D6A2B4028EA494F477A4EC020248337FF6A2B407816DFABB1844EC080DE495524842B40A0F7F99408864EC0C0529CFE47892B40F0FFBB4F9F884EC0407D602239942B40C059C7A7B6884EC0E0C8C5BD9E942B40D863D817BF884EC0606F5287CB942B4068F8718F008A4EC0400A229C609D2B4038390A10058A4EC0C00BF5AA849D2B40100A1170088A4EC0406AB3FB9F9D2B40801E9D5F398A4EC0E041A89C40BA2B40600A7B7F288A4EC040DE5C5727C22B4020754C27238A4EC0405F420587C32B40584DE83FB5884EC0C05B15F252D32B4070D65D8F78874EC0209508F945DE2B40E0E7BF07AF7B4EC020D53F8864302C40A0F66C67A97B4EC0C05082A389302C4088F678211D7B4EC000FB1175D5322C40485A4CC7F7784EC0A0F01E566E382C40205A97BFE7784EC0A022EEFB81382C40903CF94F92774EC02032906797372C40D06295777A764EC0208A141450362C40700360973C764EC0E02FD39BF6352C40B82B82FFAD754EC0605B45DA21352C4060A60FB809714EC04094C4ED2B1A2C40F8604C9FC26F4EC06023F433F5F22B40E87E15E0BB6F4EC0A05DA27A6BE82B40B8676ECF3D704EC060CC368133BA2B40E820D15F43714EC06050F1C9D4A22B40786DB36785724EC0804E9DA27E922B4000E10A28D4724EC0C0438B6CE78F2B4008CE0248C8734EC080CE8360FA872B4070B867A730784EC040F697DD936B2B40183F9EA74B784EC0205273034F6B2B4090264AE768784EC0C03B5519216B2B4078E6AC4F39794EC08009AF134D6A2B40
+FO	FRO	82	DNK	جزر فيرويه	Faroe Islands	Islas Feroe	Îles Féroé	Ilhas Feroé	Фарерские острова	法罗群岛	DK Territory	NO	Tórshavn	Europe	Northern Europe	0101000020E61000007D5C7278F50E1CC04647877944114F40	0106000020E6100000010000000103000000010000001B000000001B9DF353C41AC0B009EC7B1EB24E40C0D1EDDBFFFE1AC018BF40B566B44E40C0059FE6E46D1BC0E086F656C9BB4E4080A34EE559761BC060FCF03D6DBC4E40007C6B161E7A1BC0605B1DA5B7BC4E400025BA1DD0C01EC0206FBFD76B0C4F40007BEAA232BF1EC0202752F5860C4F4000DCB35318E01CC0D8B25A05D6264F40C0CD8B135FDD1CC000B7990AF1264F4080D2985A00DC1CC0A0C349F5F8264F40407BBB2539401BC020B90265AE2F4F40003CFB253D4F1AC090E29F6351324F4000C1AFECDD4A1AC0F8B089CC5C324F400010C589543D1AC0907258D06A324F404023EE563B3719C080EF6FD05E2D4F4080386F52870B19C04032A0281A2C4F40C088D6E5EF0919C0F827BE350B2C4F40C082763D870819C09077B988EF2B4F4040302AA9130819C0C89B9031D22B4F400071F5AD200719C0409F4B82812B4F40C0D3D4B2B50619C000622937F62A4F40C0EB38D9610719C0780EF9C2BF2A4F40409F6692A2AF1AC078D64C6320B34E40809F6A99B1B51AC0B0AA1ACE46B24E4000C4B6A052B81AC070F805AA35B24E40408E90813CC31AC060F6DA221FB24E40001B9DF353C41AC0B009EC7B1EB24E40
+GA	GAB	89	GAB	غابون	Gabon	Gabón	Gabon	Gabão	Габон	加 蓬	Member State	NO	Libreville	Africa	Middle Africa	0101000020E6100000601372080B952740EF88E9B4B1FAE3BF	0106000020E6100000010000000103000000010000003400000080ECD293ED662640800317F1BEEE0FC020E9BD8CBD66264080FC7F4177EE0FC0A0BD3F941E44264080B420EFB0940FC00030606E9C39264000EB0896D9760FC0400F8EA38333264080E3A1EF6E650FC000C6DE8B2F2A26408035936FB6490FC040E10F9AB81C264000D0DCF9341D0FC040FE7DC685172640000FDBCCD70B0FC040D0A403480B264080109436B0E00EC0A00F5EBBB4C923400041B04FA59B05C000323619FAC42340002F76B11F8805C0208C39BEAC432340809D7B0F974C03C040027A861543234000C18476F34903C0402C90EA85402340008E0244C13C03C0A05DC4D21B3D234080A23957392903C080153CE01594224000DED8582EA0FEBF40323A200993224000B1135E8293FEBF80A1BF2BDD882240004A541454F9FDBFA060E9D731B1214000C0C99129FAEFBFE09A255C2369214000F49F353FFEE5BF404388D0AD68214000BA4E3459EDE5BFC01AC3F759682140009C4DFD72DCE5BFC01C716D4D672140005463096BA3E5BF80BF16AA5166214000721E04D35FE5BF4039EE940E66214000C2DDB47420E5BFC0A9B5D55166214000F869DC9B9FE4BF60B984E8B5662140001699DB1856E4BF008A4226747A2140001C43C70E2ADFBFA0E244AADEC022400000C4A74AE5E93F00C20B6CDF29234000907C14641AF03FC0656B7D91C0264080176536C8640240E0C7D2872EC8264080B324404D6D0240602844C021542740004777103B93024060B4AB90F263274000E73A8DB494024040D9CEF753532A408021938C9C450240A09D29745E632A4080E8305F5E40024060742497FF802A400083C5E1CC2F024040D4B7CCE9922A4000126BF12900024080D2FBC6D78E2C40008F3BA58375F53FC0169F02609C2C400027A5A0DBCBF43F8078978BF8FE2C4000C86D3480B7ED3FA04AEA0434012D40004A2EFF21FDEC3FE0C4E6E3DA002D400048BA66F2CDF6BF401DACFF73F82C4000A1629CBF89F8BF604BE5ED08E72C40004ECC7A3114FBBFC0E600C11CCD2C4000CAA145B6F3FDBF60328FFCC1702C408047E17A146E02C0403CDA38626D2C40008AE596568302C0E02B82FFAD342C4080478AC8B0CA03C0400DC347C4C4274080DBBA9BA7FA0DC080033E3F8CC02740805817B7D1000EC080ECD293ED662640800317F1BEEE0FC0
+MN	MNG	167	MNG	منغوليا	Mongolia	Mongolia	Mongolie	Mongólia	Монголия	蒙 古	Member State	NO	Ulaanbaatar	Asia	Eastern Asia	0101000020E6100000AA16F23198C45940D0271BD98F6B4740	0106000020E6100000010000000103000000010000002400000078C851A9073F5A40F06C7D6811CB44406C4D4A469019584008CC945A185E4540804C6F422BB9564028024CBBC699464080926133C5FD554060B4A5B3784B4840F466576BD2EF5540707749E8A37248409424E547CCF45540F834C5287797484084F62345640C5640E0C4C9FD0EBD484028AFCE31200D5640D067791EDCBD4840F8D409B9090E564098B0548985BE4840205F7B66490E564038CF83BBB3BE484020B62DCA6CF0564018DB1665365C4940FCCC920035155740D8E3F736FD714940BC44750D6F155740B85DFAC71D724940E0989EB0C415574000AAF1D24D72494008172B6A30B95840D8B8702024134A40C4BC00FBE8BA584040B4C876BE134A404839D1AE42BC5840307A19C572134A40C0DEFDF15EAD5C40A8AF20CD58204940480DA661F80E5D400032E6AE25044940108E9257E7105D40C88BBE8234034940F09E3C2CD4265D4058B9C2BB5CF84840B09ABDBF03275D40B862D48F2FF848406853AEF02E275D40D0BAB88D06F84840C09315E4232E5D40A8F697E7C5EC4840A8DD662C65ED5D4018448B769997474090BB3B4419F15D4000C85256598E474068CD33BC9AF85D4068673CD7987A474058F425F3C6FA5D40D065AF537974474038F8AB3591FB5D40C817E436736647401861FB7DAAFB5D40C0D0D1B4C85B474070A7F99F66FB5D40A0654D01305B47406059EFF815FA5D4040D277893A58474000A9F0E15EEB5D4080835982FB4B474040A6174A20875B40A8DBD7C3CF514540E89F536FF1615B407080ED5B4B3B454078C851A9073F5A40F06C7D6811CB4440
+GB	GBR	256	GBR	المملكة المتحدة	United Kingdom	Reino Unido	Royaume-Uni	Reino Unido	Соединенное Королевство	联合王国	Member State	NO	London	Europe	Northern Europe	0101000020E6100000A5FB3AAE5F3504C0E74A24E2F3F84A40	0106000020E6100000010000000103000000010000001800000000DC00E0966119C0C05BFF9F64F1484080FBF89F8A6419C078A6002080F14840C0F40260FA6E19C030E5FF9F14F24840200EA1BC225D20C0B87F6D83AE3B4B40804300A0254D21C06865FFFF29EA4C40208302A09E4C21C0B85200E066EA4C4000950520A99A18C0389400C0E78C4D4000B6F07FF1C3ECBF5038FF3FA66B4E4000C63C20403EECBFB812FF1F436C4E40005836A0C9E1EABF081D0020D06B4E400094DBDFA1B4E8BF106FFF5F2F6A4E40005A1440A860E8BFD822FFBFB6684E40005E0E6036D6FB3F70FD0080F0504A4000552260DF24FC3F50ED00E0BC3D4A4000431080B563F63F20E4FF3F6296494000AD03806047F63F380BFF7FA294494000C7FFBFDFF7F53F68B400004F9249400086DFFF270CEF3F28EDFEFF5F754940001CEA1F60D7EE3F88BEFF1FFF7449400068F9FFE05FD03F1818FFFFBE5E49400060BD005169CE3F00BD0000625E4940401DFADF2BCF14C0480CFFDF14FB484080A0F77F3BD414C0985F006003FB484000DC00E0966119C0C05BFF9F64F14840
+GY	GUY	107	GUY	غيانا	Guyana	Guyana	Guyana	Guiana	Гайана	圭亚那	Member State	NO	Georgetown	Americas	South America	0101000020E610000097D600E7B37C4DC0F9ED431B37301340	0106000020E6100000010000000103000000010000003500000078319413ED664DC000F1A2AF20CDF23F607FD93D79684DC000C12154A9D9F23F102BD3CAE5684DC00079DD8812E0F23F48F701486D6A4DC00005C58F31F7F23F7007B133859A4DC000B0B14B54EFF53FE8A353573E9F4DC00000AE64C746F63F2808AC1C5AA04DC0005B8121AB5BF63F183D7E6FD3D34DC0007789EAAD01FC3FB86F7CED99D54DC0007F00529B38FC3FD073D2FBC6DF4DC000ACE7A4F78DFD3F283A92CB7FE04DC0000D76C3B6C5FD3F883C49BA66B24EC040098A1F63CE1740D0DC61ABB5B24EC04055EE081ED81740C0F281F9B8B24EC0004F745386D817406031B1F9B8B24EC040F54A5986D81740585E807D74B24EC08005A3923AE11740B8E270E6579B4EC000857CD0B3591A4010FBCBEEC9974EC0C061156F649E1A402088BA0F40964EC0803BDF4F8DB71A4030D769A4A55A4EC0C023AEF4BE311E40D87BB8E4B8434EC040AAB706B64A1F40D80534255AFF4DC060C40B317D112140D862EA5333FF4DC04000F9B770112140080BB5A679DB4DC040A7CB6262C3204098DDC60B8EBA4DC0C052B9E413792040009C001EAC9B4DC080BA2C26362F20408862B9A5D5944DC0C069DE718A1E204088D9ED0E84904DC0803772384E112040F00FE9B7AF8F4DC0A0177728AF0E2040B0D2A414748F4DC0E0845FEAE70D20406899D365318D4DC0A081E7DEC305204010C7ED3C96564DC0C0D634EF38651E4008C85EEFFE9C4CC0C0693524EEB1184070AF5A99F09B4CC0405C8FC2F5A8184008363CBD529A4CC0C0055D0C2F9A1840485E9D6340984CC0800D5CD4DD831840E82FBB270F974CC080E3C116BB7518403827BD6F7C964CC0C0B0F215EE6E1840903160240F964CC0C0AE0B3F38671840B05D68AED3954CC040613B736A621840F08F2A2F9E954CC0007961C66F5D184000D2FE0758954CC0C0F57F0EF3551840785578E118954CC080D5FE733D4E184098890B9B5C924CC0C0D640A9ACF41740F890655E1A3D4CC000A10E849422FF3F90A5A70CBF3F4CC000197531F6EBFE3FA0367172BF3F4CC000FF43FAEDEBFE3F20D53E1D8F414CC000E8DEC325C7FE3FE022BE13B3424CC0006731B1F9B8FE3F50A31EA2D1414DC000DA3D795828F43F5802B7EEE6654DC000865FEAE7CDF23FB06AE1F6E7664DC0009A309224CDF23F78319413ED664DC000F1A2AF20CDF23F
+LB	LBN	141	LBN	لبنان	Lebanon	Líbano	Liban	Líbano	Ливан	黎巴嫩	Member State	NO	Beirut	Asia	Western Asia	0101000020E61000008A66AE0EE0F24140CB17FBAC0CF64040	0106000020E6100000010000000103000000010000002500000058D6A88768B04140B8CD8DE90987404020B2E49EECAD414020CB5FE7478740407050340F60AD4140D0073D9B55874040D875E107E7934140B09A594B018B4040F86F398CB98E4140E87DF5BBE78B404098928468A08E414040D869DE908C40405008F662DF8E414050CB6D3A038E4040A04CA738388F4140180CBC9AC98E4040F848D7DAA8BC4140681FF20308F34040D813FC5A0AD5414028977FC78C244140E818EFE503D7414020BB0F03472741400821C1A339D8414030163EA9D628414028EA3E00A9FD414018B402435653414060A31EA2D1FD414018EECEDA6D53414078693524EEFD4140808D5DA27A53414058672783A3284240B021718FA55741408892DC43BD284240D06B5A66A7574140A8EE0390DA284240602B137EA9574140F08EC27E1A2942403880F158A85741403027DA55482942408826C286A7574140E0817346942A424040234A7B8357414068C47762D62B424088AD122C0E574140B0394030473B4240C09C4B71555141408810A6814F3B4240783CBD574F514140E051D504513B4240B035CD3B4E5141404005C330553B4240D8A9A2AD47514140C0BDA4315A3B42409067D0D03F51414068F415A41947424088C685032135414070E388B5F84C4240F81ABB44F5264140701D554D104D4240181E6D1CB1264140081DE6CB0B504240400708E6E819414060BB1D7C09504240B87DDC3FD519414018677E3507504240B87C96E7C11941406802B7EEE631424018AAD4EC81EA40406039B4C876C04140A0B9F946748B4040B0AAD0402CB74140C0BC72BD6D88404058D6A88768B04140B8CD8DE909874040
+PA	PAN	191	PAN	بنما	Panama	Panamá	Panama	Panamá	Панама	巴拿马	Member State	NO	Panamá	Americas	Central America	0101000020E6100000E0DFFA95EE0554C0E5ADF8CF8B0A2140	0106000020E6100000010000000103000000010000001E00000028F686B13B7354C0C0DA368C82D01C407CAEB6627F8F54C0C0223E6656DD1D40E4B63302609054C0C01A2FDD24E61D40F47AF7C77BB854C080DEE929CD092040C86F7610A0B954C0E05EF7DC5D1420403CAD51F854C354C0209181D990A82040909513785DC354C080EA89020BAB2040984287C3E9BB54C0002AD58CACF322405C695A0E26B854C0E08ECCA4FF2E23406832C46007B754C08094A97AE03A23408C1F32FEA0B654C020715F46323E234094DC1786FEE353C0E05CA791964A2340BC9DFAF6E4E353C060041C42954A2340D0623ABE87B153C040E9A0A6F1322340A0EF7F9161B153C080904946CE322340286E371CF1AC53C080197096922D234090C8F43A18AB53C0C0394030472B234014F19D98F5AA53C060EC4CA1F32A23406804E275FD8A53C0C00C71AC8BAB2240BC2B82FFAD8653C0E0AF03E78C98224094E8876CFB8153C060FC4685FB7E22409C03CB11327153C0A074D3C1551D2240200F33EA905753C0E020AA95AE5921408438CE54855753C040D3E7847F582140BC1E230B7E4A53C0C08888B9A9DF1F40A00B29C0694B53C040B8A26C48BA1F403CA5CECC815F53C04064492899441E4090B184FC267953C040395C9C12E31C407080608E1E3354C0C0DB74BAE2D01C4028F686B13B7354C0C0DA368C82D01C40
+HM	HMD	109	HMD		Heard Island and McDonald Islands						AU Territory	NO		Antarctica	Antarctica	0101000020E61000002DEC6B65D7605240520E70FD228D4AC0	0106000020E61000000100000001030000000100000014000000BCADE3AE945E524018F8510DFB9B4AC0B8E611ED745C524008A4E6069E9B4AC04C731A58FD255240D8712FD571864AC0EC9DAFFEF425524010BDAEBA69864AC07C008BFC7A25524078304B96EE854AC0DC38F647732552404029C69EE2854AC060C4776256255240E8408CC690854AC004A4DBB7FF2452402063C625D8824AC0288ED02A0E2552401074E72E2E824AC0FC9DBA4D132552403058CC6328824AC0D89E37BA6F535240F84AF8EF0B7B4AC02415FF77C4535240684EDB75257B4AC004BE254A8C645240901B560273824AC0ECAA2F012E785240C029F004B18D4AC0442FDCB930785240587E3BE4C18D4AC05017BDAEBA655240B0D7385101994AC038FDC8633C60524008A4E6069E9B4AC0606919A9775F5240E8EE6D9FFA9B4AC0802B2BB0945E524018F8510DFB9B4AC0BCADE3AE945E524018F8510DFB9B4AC0
+TO	TON	245	TON	تونغا	Tonga	Tonga	Tonga	Tonga	Тонга	汤 加	Member State	NO	Nuku'alofa	Oceania	Polynesia	0101000020E6100000B1A7A5641AE665C0AFAC5B3ED52C35C0	0106000020E61000000100000001030000000100000023000000469792409E0666C01026F84B305936C0C9AC399BA90666C0400A1577175936C07FA6142AAE0666C080CACAE5F55836C0BE034D95F90666C020BEDA519C5536C0D0402C9BF90666C0F01444937A5536C0F0129CFAC0F565C0800B0165F8342FC014353DCDAEF565C040993AD917322FC07084567174F565C080D46F70332A2FC0C3EDD0B018F565C0E0E8DA7289262FC0BC31A946D4F465C0801CE32FD2242FC08B61F31674F465C0003240FDC2222FC07EA081FD3CF465C000DC7B5D2B222FC001BFA14B13F465C0C0F3F11A05222FC09A9F2CC60AB865C08074A5AF31AD2FC064FACA28FBB765C0A02ABC708CAD2FC093CD661FF5B765C06076F3F9CDAD2FC012DF3FCCD4B765C0A02A3F5F69AF2FC03430A825CCB765C000B01D8CD8AF2FC0FF54DCB8C5B765C0A09EE2DD36B02FC0A6C41AD3B8B765C0604D15E703B12FC0892540A8A6B765C060702D4954B22FC09C4B715599B765C020A69E605AB32FC0E842514596B765C060A35698BEB32FC0510B259393B765C0002FD2D567B42FC09C0D9EAE93B765C040D1CF2FA5B52FC017BD0974DCBC65C04094957032A132C03ECE8F1AEEBC65C0B0359F292AA332C0F48079C894BD65C0305464BECDB432C06D8F392AD2C865C060AFBB2F1DBB33C0080B3895D6DC65C060BCBE20337335C016AC8262F5DC65C0F02D7E09CB7435C0737401D4F9DC65C0B0202235ED7435C04E71C1BE02DD65C0F0EC58B6207535C047FAB48A7E0666C0504DC6E7045936C0469792409E0666C01026F84B305936C0
+UM	MID	164	USA		United States Minor Outlying Islands			Ilhas Menores Distantes dos Estados Unidos			US Territory	NO		Americas	Northern America	0101000020E61000001EAF2F66CA5064C074E30F042AC21940	0106000020E6100000010000000103000000010000001B000000EFA5FA121D0064C0003817EBC05ED8BF7077D66E7B0F66C000F0AF0DCB55C83F08E8740F7F0F66C000E8A4E66157C83F26C929F0840F66C000807FDEAF5DC83F2B0DFCA8860F66C00000DD09F65FC83F902BF52C880F66C000B0EB9ADA63C83FF96F6FC8900F66C000B815A0127CC83F11818F66910F66C000C0ACC26680C83FA4EFDA4A940F66C00048373465A7C83F77921914F21366C000C65565DF15EA3F1A907351E34A66C0D054B07C4C643C405507E522E34A66C0009B24F14D643C4079A29009DD4A66C02062A06B5F643C4057C1A7ED3A4966C0A09B093CE6663C4068E11FA7394966C0A09B093CE6663C40F95DA3A8FD2A66C0A0A36C36FB443C403BAF67BEF92A66C0206426ACE8443C401BA0EA46CE2A66C020ED4CFCAC433C40B29CDF8B8A2A66C0C017659181413C40FBB03962882A66C000F500CC6B413C40DB2E34D7694964C040E8305F5E40194000F8A754494164C0404F498C54861740B1DBC24E8CFF63C000AC92EA9678D7BFBEE25FBA7FFF63C000F89EECC1FFD7BF9E8F32E282FF63C000BCE94C9047D8BF093609398AFF63C00000AA245756D8BFEFA5FA121D0064C0003817EBC05ED8BF
+CC	CCK	56	AUS	جزر كوكوس (كيلنغ)	Cocos (Keeling) Islands	Islas Cocos (Keeling)	Îles des Cocos (Keeling)	Ilhas Cocos (Keeling)	Кокосовые острова (Килинг)	可可群岛	AU Territory	NO	West Island	Asia	South-Eastern Asia	0101000020E610000098B49ADC32355840DA598771CE5828C0	0106000020E6100000010000000103000000010000001D0000000404AC553B39584000383F0FFF6A28C0048E87084936584040648B49246A28C0805226353436584060802D0A166A28C0FC16C5611F365840C0AFFC9EFD6928C0E06EDD280D36584000F64201DB6928C050AFCDC6CA35584040057B5DD06828C014CD8646C1355840009062258B6828C01088FF2A76345840806BBAF9A15D28C008323B8B5E34584020FF4355A75A28C0A0A15D2A5B3458408074AB8CEB5828C08844C99A4734584080C52AEFF44828C0C8E8031349345840401F37B2E1AB27C05CAA0B7899345840605F2926CAA527C0C89E8724C434584080739B70AFA427C0444283031035584040B9F53F65A527C0B83511EC2E355840205BDFD110A727C0F03DA6FFF63A5840A0C799266C4B28C0DCC00C7C7B3B5840C05DD905835B28C0A80337F77C3B5840A0095DD3CD5B28C0903496557D3B584080C00298325C28C0883243997C3B5840C069F981AB5C28C0C49B7F057A3B5840209496DB075E28C0C06BBF6B063B5840A0CEF8BEB86428C078874D64E63A584040F8D802E76528C0F83BF2ACC93A5840800650429F6628C088BDE4DAAB3A58408037763F5D6728C0348095E8D1395840609CF7FF716A28C050AFCDC64A395840A080D07AF86A28C00404AC553B39584000383F0FFF6A28C0
+NG	NGA	182	NGA	نيجيريا	Nigeria	Nigeria	Nigéria	Nigéria	Нигерия	尼日利亚	Member State	NO	Abuja	Africa	Western Africa	0101000020E6100000BCB3A257D23420401FA0EFB609332340	0106000020E6100000010000000103000000010000002B0000008088484DBB581840C06C59BE2E13114040A81B28F0EE1740C0BCC804FC3A11400086ADD9CAEB1740800E492D943C114080C7FA40D1AC054000856C3AB1801940808DEE2076A6054040679B1BD3B319400053EDD3F1580540408A027D228F1F408055302AA993054020E9B7AF03B7204000A3409FC8D30540008C84B69C8B214000AA2B9FE5390640C00C71AC8B1B2240005726FC523F06402066F7E4612122408059D6E97F420D40401F8F67370A2940800FFA8D078910404092DA5EE7F12A40C0C5FAD6ECDA1140C067BA11F55A2B40C0B18520074512402006BB61DB722B40C05BD56456631240E0BB9CDF1E762B40803F6F2A5281124080A6ED5F59792B4040A96A82A87B1340608CF337A1902B40C00CEC4A2E19164000562A3653CD2B40A05AD3BCE3442B40C0D7BB3FDE6B2B40601D8F19A86C2B402088D7F50B362B40E031207BBD2B2C408040F67AF7272A400058A92994552D40A03F63BC6C602840A06B08AA205A2D4000FCC94858582840202BE8D2CC5A2D40A0F27A3A9B552840C09182C02D5B2D40003C468610542840E0C65CAF6F4C2D4020B4FF64003A274020B8FC27824B2D40401EB43DCB2C27408002F977554A2D4080FAF73C2628274000EDC398F9462D40808B8285382127408099D6F7F8382D406003504356042740000D151BA7BB274040B129ED934D1C40E0F711C7D31B2740009754898CAA1A404050DD2CC31B274040F6135961AA1A40E04A1B8DCA1A274000215D97DAA71A40E009F237CA032740C026BAEF97711A40A0D4AFD2AFDA264040DB2A90F2201A4000ED647094AC20400068EBE0601F1240C07F2E1A32CE1C40C07747C66A831140C0B6D4415E871A4000BE27203745114000C5909C4CDC184080D47D00521B1140C0AA5FE97C68184080B7D0950814114080EFFFE3845918404008AD872F1311408088484DBB581840C06C59BE2E131140
+GP	GLP	100	FRA	غوادالوب	Guadeloupe	Guadalupe	Guadeloupe	Guadalupe	Гваделупа	瓜德罗普	FR Territory	NO	Basse-Terre	Americas	Caribbean	0101000020E6100000359BF99801D74EC04751D532D5283040	0106000020E61000000100000001030000000100000036000000D09AF749FFCA4EC000FDA204FDA92F4078981826AECD4EC0C06934B918AB2F4008B963FBDACD4EC0A0FCC79D2DAB2F4040EE8E311CD14EC040B68883DFAD2F40E8ADDC6685D14EC0405E10919AAE2F4028D4E47338D34EC0607754EBB3B12F40601635F33FD34EC0C0979BB9D1B12F40D8FE12A749D34EC020146DD800B22F405069D5F896934FC05031C390E60F324038CA993798934FC0201148D3EA0F3240A84C423399934FC030E05A37EF0F3240500141CA99934FC0C08D89DEF30F324090F0CEEB99934FC0C00029FBF80F32400812B3A899934FC0201B3DC8FC0F3240D8D0DE2A99934FC0605F6E4100103240D8770C8FFD924FC0C049568F45123240E8C1A4F8F8924FC0F091C2065512324078992842EA924FC01014FB157C12324078CD72D9E8924FC0908A822A7F1232403068E89FE0924FC0B0DE0F898C123240384AECDADE924FC06087ED388F1232409074EF3C4C874FC0108B790C451E324048E141B3EB844FC060C8F033891F324030AE7FD767834FC0007795FFDA1F3240E058839C9C7C4FC090472C730420324078E72851407C4FC000FE1E0604203240889F8D5C377C4FC0B0724C16F71F324090BD1182FA804EC030BEE02E5659304008BA185EA4804EC000D0679B765830402025F37E92804EC0C0377BB14158304058F1D4230D804EC05091C6B2AA553040A804E67C0C804EC090254685A055304008B6E9190C804EC0A0F74FDC965530409842BF000C804EC050A6327B8F553040A8A8C1340C804EC080E19B0189553040C02C0F2D0D804EC0A0C404357C553040A88DD36B0E804EC090AA2C65745530408869013510804EC0A048EC246C553040501DBCC0F6994EC0E0C458A65FCE2F409091C4DCFF994EC04036F7A11CCE2F4098F18E9D019A4EC0A055455D10CE2F40189628D6049A4EC0C01A01CB00CE2F40608CB4F9249A4EC0A00459AA66CD2F4078A180ED609C4EC0C0373701E1C62F4020658BA4DD9D4EC080608F8994C22F40C8F3F11A059E4EC0A07E01182AC22F40C0D9194BFD9E4EC020D5004AE8BF2F40601D554D109F4EC06096CCB1BCBF2F40C0FF780A149F4EC080D13538B6BF2F4058E38E92B29F4EC0C00A8563F1BE2F40B09D00D41EA04EC0A086F82C74BE2F405076FA415DA24EC000311BAE1FBC2F40D04CBED9E6CA4EC0C0E6673403AA2F40D09AF749FFCA4EC000FDA204FDA92F40
+CR	CRI	61	CRI	كوستاريكا	Costa Rica	Costa Rica	Costa Rica	Costa Rica	Коста-Рика	哥斯达黎加	Member State	NO	San José	Americas	Central America	0101000020E610000020DA4BEA5A0C55C047D47F7F47F32340	0106000020E6100000010000000103000000010000001A000000D0B7CCE9B2C455C0800E396C11FF15402CEC6987BFC455C0000D608033FF15409C6120BE82C655C040CB1C812E08164024361FD786C655C080182DF64D08164024361FD786C655C040123125920816405CBF60376C7D55C0604F58E201B52540ECE016E2C77C55C0E0FF6DBB75C72540D4817346947C55C0E0872EA86FC9254044A7AE7C966755C0401FF46C566D264088A19C68576755C020486DE2E46E2640289ACE4E066755C0E03CF207036F2640705188DB7CEB54C080FE2CF1DBDF2540F8C425BA53EB54C0A058800063DF2540681D40B225EB54C0E00D034CCFDE2540C092BC84D4EA54C0A009319754DD2540F40BD17CA9EA54C0008BA71E69DC254088B6195D14EA54C02084AE8E2DD925405CD654AE81E954C020312592E8D52540446C66E3F7E854C0E0EBFA05BBD1254008A0FC0323A454C0C003FE02D7242340182648DC4BA354C020F465500A192340F83849DC4BA354C0E06117BC1D17234000E81DC5FEB854C0A08C64DBDE192040C86F7610A0B954C0E05EF7DC5D142040ECD984C572C355C0C05704FF5B091640D0B7CCE9B2C455C0800E396C11FF1540
+MK	MKD	241	MKD	جمهورية مقدونيا اليوغوسلافية السابقة	The former Yugoslav Republic of Macedonia	la ex República Yugoslava de Macedonia	l'ex-République yougoslave de Macédoine	Macedónia	бывшая югославская Республика Македония	前南斯拉夫的马其顿共和国	Member State	NO	Skopje	Europe	Southern Europe	0101000020E61000001A8C485D6CB33540579748E6D6CC4440	0106000020E6100000010000000103000000010000003E00000030016A6AD91A3540281FF46C566D44403019390B7B0A354048EDF0D7646D44406070B1A206FB3440507155D9776D4440703C8386FEC13440306519E258734440E0484BE5EDC0344030D9B11188734440F0EA39E97DBB3440286C787AA5744440C07BF2B050BB3440980B0742B27444409030F0DC7B983440D046205ED78B4440804F1E166A9534401080F10C1A8E4440A052D0ED25953440C864AA60548E44402084640113883440901A4CC3F099444000919BE106843440D09C2E8B899D4440400395F1EF8334409891B3B0A79D4440C05FB01BB67D3440586B9A779CAA4440800E10CCD1733440187008556AC24440F06D179AEB743440C886A757CAC6444070C6A2E9EC843440407F130A11E0444020ED2AA4FC84344040B9DFA128E04440808577B9888F3440B0BDC11726EF4440A0B5DA51898F3440E098BE7426EF4440E0390664AF8F3440B0F78DAF3DEF4440A0D651D504C93440580FD1E80E0A4540506458C51BC93440A8FD4811190A4540305305A392CA344090B0E1E9950A454010336DFFCACA344090CDC7B5A10A454090832F4CA61A3540205B0872501A454080567DAEB61A354060E20165531A454000825660C81A354080931804561A4540804C4F58E271354078F4F8BD4D234540E0601A868F7835404830478FDF234540102016B3A378354080A9BBF9E0234540B0BC1DE1B478354068E15D2EE223454080F59CF4BEF13540409CF9D51C2C454040F9669B1B4B3640F039E97DE32F4540103D9B559F4B364010EBFF1CE62F454070FCFB8C0B4F3640D080ECF5EE2F45407058C51B994F3640D080ECF5EE2F4540E0B9145795DD364078AD2F12DA024540200C037095DD3640D8B63A03DA024540E04A7D00A2DD364048A05879D2024540C05FB01BB6DD3640207D0569C6024540604C6C3EAE05374028D1CB2896DF4440C0533A58FF073740F81B5F7B66DD444020677E3507083740585C55F65DDD4440A00B0742B208374070A4A5F276DC4440F01E4B1FBA083740080EA14ACDDA4440F0D022DBF9F636401024287E8CAD4440406002B7EEF6364040E50AEF72AD444080EFE192E3F63640388672A25DAD4440E012F241CFF636407091ED7C3FAD4440407216F6B4BB364068807D74EA92444040C4B12E6EBB3640B83C0FEECE924440D0340C1F11BB364090EAAD81AD92444060888043A8BA36406090662C9A924440300C3CF71EB636406802B7EEE6914440907D74EACA97354008486DE2E46E44409095438B6C1F3540D028965B5A6D44406017F759441F3540C03A02E3596D444000726DA8181F354068A6ED5F596D4440808074DFA11D3540D88B3A70576D4440104CE0D6DD1C3540281FF46C566D444030016A6AD91A3540281FF46C566D4440
+GR	GRC	97	GRC	اليونان	Greece	Grecia	Grèce	Grécia	Греция	希 腊	Member State	NO	Athens	Europe	Southern Europe	0101000020E610000011058971649636404A6B40CD14BD4340	0106000020E6100000010000000103000000010000002100000050C701006F20384020E4FF3FA2674140F091FE1FA61E3840E8C3FFFFFA674140906D0040921538401009FFBF3D6A4140005FFFBF7B0F3840280AFF1F306C414070030200740035403019FF5F719F424000970120D4FF344090EAFF7FD09F4240002B0000DF563440108CFF7F3F174340C0CFFF1FE5603340A0B70020E6EA4340B0230240DB5F334048F5FF3FC8EC4340E03FFFDF0660334098FF004015ED43409058FF7F4D613340C84DFFBF55EF4340A04801C03662334060BCFF5FDAEF43406070B1A206FB3440507155D9776D444020F3E505D80F3640F0094B3CA094444070CC5D4BC8CF3640601344DD07AC444030404D2D5B1B3840006284F068C7444030B9FC87F4433840F000C11C3DCA4440F0AB5626FC2A3A406094D92093E04440D01C3D7E6F3B3A40F0D495CFF2E04440F0BFB2D2A45C3A4018A14ACD1EDC4440900569C6A2713A4058573ECBF3D8444000C6504EB4733A40A0FEEC478AD8444040ACE28DCC733A409072A25D85D84440A06B43C5387F3A40F08711C2A3D5444070D68BA19C983A40B0D590B8C7CE444020B0008045A53D4078BDFFBFCC0E4240409400C0A7A53D40A0A2FF5F610E4240B071FEDF3EA53D406882FF1FFA0D424000E8000081A23D4040FDFE9FD30C4240909BFE7F2B223A40C86AFFDFA5754140209901E0B8B43940F8A7FF3F5D6F414040E301C00CB2394080B50060416F414050C701006F20384020E4FF3FA2674140
+BJ	BEN	29	BEN	بنن	Benin	Benin	Bénin	Benim	Бенин	贝 宁	Member State	NO	Porto-Novo (constituti	Africa	Western Africa	0101000020E610000071FEAC6E07B802408A2AA99B07522340	0106000020E6100000010000000103000000010000002400000000BB66F2CD16FA3FC0715303CDEF1840002C01D8500FFA3F00A916A428F0184000D04E0647C9E83F409E4143FFC424400052DF32A7CBE83F203B70CE88D224400072E6577380E93FC0C090D5AD5E2540003E1D253598E93F20A6957ACA68254000765E6397A8E93F8016F6B4C36F25400006172B6A30ED3F2095F1EF33FE254000325F5E807DED3F00FA6184F00826400084CAF8F719EF3FC0BB96900F2A264000E22D3F5929EF3FC0BF1565432B2640000E76C3B645EF3FC0CE31207B2D2640007C2021E64CEF3F00B94E14022E264000D851D50451EF3FC0D85F764F2E264000DD9DB5DB2EF23FA065A549298826400054AA3F200E034080AC2A1F7580284000564480E5320340C091319FF583284000768D96039D06408092037635D1284000454840F9B506400065516137D0284080CB9F6F0BB60640A0B932A836D028408091EF52EAF2064060B29C84D2C728400015AE47E1FA0640803788D68AC6284080ED7E15E01B0840600796236488284000FBE5AAB1E40B40E0012D5DC1B62740007D410B09780C40C03E1EFAEE8E274080891E008A840C40A02AEBED858B274000A8CAF78C840C400052B81E858B27400054AEF02ED70C4020967840D964274000AD8BDB68C00E40E086A757CA62254080D5B2B5BEC80E40E000FBE8D45525400007F01648D00E40007D5C1B2A3625400005FF5BC9CE0E40C0A0DB4B1A3325400043E73576C90E40A06C04E2752D254080C7FA40D1AC054000856C3AB1801940803CE6F2D5A405404021D6D12780194000BB66F2CD16FA3FC0715303CDEF1840
+GD	GRD	99	GRD	غرينادا	Grenada	Granada	Grenade	Granada	Гренада	格林纳达	Member State	NO	Saint George's	Americas	Caribbean	0101000020E6100000EFE2CEC080D74EC05440F2688D3A2840	0106000020E6100000010000000103000000010000001B0000009067A89BD5E44EC0001853FA53F82740D08C45D3D9E44EC00072E54757F8274040673E8CB5E64EC0E04692205C012840108255F5F2DF4EC0C0C1A6CEA3422840C0C738903FDF4EC0C068797995482840B807324CB7DC4EC0A0335992F25D28407055B142DBDB4EC0607D42D197612840781B62BCE6CA4EC080FA6F6FC8A82840389AA03CE2CA4EC060337106DAA8284010E2A2A4D1CA4EC0803B511212A928404085AF84B5CA4EC04053C1F231A9284088DC781CABCA4EC0E0DFE5D830A92840C89DF419ABC54EC020118134ADA22840E0AE6F719EC54EC040D09F9163A2284070B6FDE19DC54EC0004D689258A228400896B1A19BC54EC000DBCD42F1A1284048BD35B055C64EC0E0172C30BF6A28408884002A66C64EC000318793EA692840609D96C4FECE4EC040ABC14538272840E87541333ED14EC0002BA4FCA416284080C0255BB8D14EC0009AA2128D1428409868797995D34EC060C4E9245B0D2840D0646B22D8D34EC04013CE13740C284090F650ECB2DA4EC020DE2FB0D8FC2740A0B8AAECBBDA4EC0A033F8FBC5FC274028C901BB9ADC4EC0E0E248B1EDFA27409067A89BD5E44EC0001853FA53F82740
+CM	CMR	45	CMR	الكاميرون	Cameroon	Camerún	Cameroun	Camarões	Камерун	喀麦隆	Member State	NO	Yaoundé	Africa	Middle Africa	0101000020E6100000347F0B04777E29408F71151443C51640	0106000020E6100000010000000103000000010000002400000050BA66F2CD0E30400015D044D870FA3FC00BEA5BE61424408065FCFB8C4B014020D061BEBCD0234000D5B2B5BE880140203659A31EB22340006631B1F9F801408028C643290321404076E679CB0812406083914DA802214040C672A6640C1240A0A5B4A3DD012140C0F1F09E03131240606B67F393012140006CAE3F2E161240A07D6E0D11002140003CDC0E0D2B1240A07560EFB4FF204080675A07AC3112400033F1587DFF2040C018C51792381240E07ECCBD76FF20400050E9BBB6721240E07ECCBD76FF2040408AC91B60761240E06D01FCAEFF20404076CE05E4791240A0EF0E3A3200214040D65F65237E1240607AD4A93C132140C0B6741607191340E0B360AF9EAE2140C08EEB3F684C174040B2E83326AF214040ED6470944E1740E031207BBD2B2C408040F67AF7272A40605C72DC296D2C400091B8C7D2272A40C0A3C7EF6DBA2C40C05E29CB10272A40602B306475EB2C40C01A2FDD24262A404049D74CBEA92D40801283C0CA412940A088467710AB2D40C0DD76A1B93E294040BE13B35E2C2E40A09CA223B9FC274080E674594C5C2F40E06D3480B700244080349D9D0C5E2F402032C9C859F82340C028B34126313040808733BF9AC30140203CF71E2E31304080C79DD2C1BA014040F180B2292730400042B7973446FB3F7088635DDC26304000B7847CD033FB3F80029A081B263040001B2FDD2406FB3FC01812166625304000B846ED46F3FA3FD013B35E0C2530400065E42CECE9FA3FE0601A868F1030400043EC4CA173FA3F50BA66F2CD0E30400015D044D870FA3F
+GW	GNB	105	GNB	غينيا - بيساو	Guinea-Bissau	Guinea-Bissau	Guinée-Bissau	Guiné-Bissau	Гвинея-Бисау	几内亚比绍	Member State	NO	Bissau	Africa	Western Africa	0101000020E6100000185C185A66A32DC0E6CD9C2376282840	0106000020E6100000010000000103000000010000001F000000A017EDF142722FC020D0285DFAB72540A06BB41CE82D30C0806E6935240E26407092020B602E30C0E084984BAA0E2640205DFA97A42E30C0C097FC4FFE0E2640C0A01342073930C0E0A3A99ECC1F2640B04DB857E63930C0E01FB75F3E212640F050F701487930C06027840EBA8C264000336DFFCA7A30C0607100FDBE8F2640903F34F3E47A30C00034F5BA4590264000D7253B1AB530C0C031A71F62AD284020BA83D899B230C040FA27B858B12840704C327216AE30C0C04ACD1E68B52840F06BB2463DAC30C0607B832F4CB62840904143FF043730C0E018ADA3AAE92840A09DEFA7C65B2EC060E3C281905C294060E63A8DB4242EC0E00182397A5C2940E04BCC5F93A52BC000544560C85A2940E0C3EBFA056B2BC080CD0182395A2940A0BDADC6A26A2BC060C1798F385A2940001BE636A7442BC0C08E24C7F1F12840201580B184432BC0206E73E9B3EB28400050F17D466D2BC020AD4EA8896B274080D82E3A476D2BC0E0EC1B28886B274040990EA2576D2BC0000165AC666B2740A06E72417B6E2BC000C92C7D13692740201EDE7360F52DC0A0BE2D58AAEF2540C0449F8F320A2EC0E03EAC376AE52540805B76887F202EC0E0C96FD1C9DA254000CD91955F262EC0206ADC9BDFD82540403C8386FE712FC0A0AE44A0FAB72540A017EDF142722FC020D0285DFAB72540
+CX	CXR	54	AUS	جزر كريسماس	Christmas Island	Isla Christmas	Île Christmas	Ilha do Natal	остров Рождества	圣诞岛	AU Territory	NO	The Settlement	Asia	South-Eastern Asia	0101000020E6100000E9CE33BAC7685A40356DE25E40F824C0	0106000020E6100000010000000103000000010000001E000000FC1F990E9D695A4020276893C32325C00C01EAE79C695A4040A8624EC32325C054D7C9CF7C695A40E0DD02098A2325C088E04CA750625A4040A86851440725C020B5C2F43D625A40803963F3CC0625C0BC8D507D31625A4060684760620625C004319D3127625A40204EC642BE0525C004319D3127625A40A05565DF150525C0D81EE51629625A40C0A4C409A70425C048DAC69F28635A40A0DBAB45FAE324C044541A3133635A40C070917BBAE224C070E8B00C3B635A4020D44A7C49E224C04CCD57C947635A40E0EEA02303E224C05C52938554635A40E0355F80D8E124C00093EAC1386B5A4020A6F4A7E8D324C05CB78B7AD26C5A4000AADF3B20D324C008829433EF6C5A40006321DF4AD324C04419880AFA6C5A4080D3FF28A0D324C0DCE08E81066D5A40C0312BCA5BD424C0541C8A4C0A6D5A40003BD0F9DFD424C050EDB199686D5A4060BAB486F7E124C0908818656C6D5A4020B86EEFBFE224C0504D8237A46D5A40A04C142175EF24C01828BDCAB56A5A40000137E6D02125C0EC9326EFAD6A5A40E0107008552225C0304487C0916A5A400094CF3CCA2225C0849774EF3C6A5A400003A1AB632325C0F0551AE7256A5A40E0DD02098A2325C05C2547F0F5695A40403BF6589F2325C0FC1F990E9D695A4020276893C32325C0
+BM	BMU	30	GBR	برمودا	Bermuda	Bermudas	Bermudes	Bermudas	Бермуды	百慕大	UK Non-Self-Governing Territory	NO	Hamilton	Americas	Northern America	0101000020E6100000F6D9ECC7853250C0F3D6BEA816264040	0106000020E61000000100000001030000000100000013000000386900C0883750C008A000E0911F40407CBEFF1F1F3850C01026FFDFCD1F4040209CFF1F733850C05890FFFF88204040348600E0583950C0D83FFFDF4624404090250020A33850C0B8B800805827404068F7FFFF8C3850C0B0090060852740405C9FFF3FCA2C50C0C0C1FF3F96314040D0D1FFDF892B50C0E823FF1F6932404084CDFF5F202B50C068EE0040EF31404090BFFF7FF12950C050C100806B3040409C7D00E0C52950C018B8FFDF10304040CC280040BA2950C018D5FFFF202F4040582200000C2A50C0189BFFBFC02D404068DAFFDF1C2A50C09067FFBF8E2D4040E8B5FF1F4C2B50C0008BFF1F8D2B4040A86F0000973250C0583000E01A2240409C340060443450C070FD0080F02040409485FF3F113750C0983CFFBFAF1F4040386900C0883750C008A000E0911F4040
+TF	ATF	88	FRA	أراضى جنوبى فرنسا	French Southern and Antarctic Territories	Tierras Australes y Antárticas Francesas	Terres australes et antarctiques françaises	Terras Austrais e Antárticas Francesas	Французские южные и антарктические территории	法国南部领	FR Territory	NO		Antarctica	Antarctica	0101000020E61000004D37D01E4A5F5140EC6C11A443A848C0	0106000020E6100000010000000103000000010000002800000044E1A2491808514000723F96F4FA48C084FAE0C6F7075140588731E9EFFA48C0C08A20297D34494030B29712EE3647C088D23F7738324940D057FC4BF73547C0C0181417911549408039D5B5510D47C080FE6AC48215494060CAF385350D47C02838674469D74340906CCA15DE7D35C02838674469D74340B0874B8E3B7D35C0888F0B186E594540103CEB64BA0B31C0F037A7EDBAA4474060ED88F9A82527C040FA04F5D2A4474000C54A16412527C0D0F8F71917A54740A0A5E0DF562427C0681ED72BD1AF474060D34F93740827C0D0DF51BEFBAF4740A00D7BEB0D0827C07011AC0551B04740C0D2591C840727C050AB4DA8CFB0474040987F99940727C0A0D6F03ED8B047408060600C9B0727C0B065A4DE53434B4040EE10B523C72FC048E43E8397434B4080EADA28FCC72FC0E0EFABCDDA645340D8FA44F9DDE542C0400D62B117655340F8FB9D375FE642C044389F3A56655340C0D11C59F9E642C04C13DED476655340387B9A385EE742C074D05E7DBC65534068BD3A223AE842C0E0D20F8FE9655340684E250340E942C0E89997C3EE655340F82378E860E942C03CB066AE1D66534030F5DC9D10EB42C03022D45636665340C0ADA47098EC42C01828BDCA35665340084CDAF923ED42C054C642BE1563534090080A72065E43C03CFA3D56156353404880AB860E5E43C00C5D06BF14635340E8EE66E5155E43C0E82F2DEA1363534080E51945205E43C05CB3CEF83EA2514088E3761ECBA648C058701D88519C51400809BDA36BB848C02C1AFF999C8F5140B0DE14FB70D848C054792A96918F514080E7EFEF7DD848C0D824C2D0348E51408007944DB9D948C04CE1308713605140D8DC04847BF948C044E1A2491808514000723F96F4FA48C0
+TK	TKL	244	GBR	جزر توكيلاو	Tokelau	Tokelau	Tokélaou	Toquelau	Токелау	托克劳	NZ Non-Self-Governing Territory	NO		Oceania	Polynesia	0101000020E61000000DCAD7734E8F65C07B04CE58791B21C0	0106000020E61000000100000001030000000100000023000000E829DF24976665C040AD6E5056E322C0D4DB55FE2B7A65C0005624CBEE7222C081BBFD03B67A65C0807E28E2BE6F22C05CBB59283E9065C020DF88EE592B21C060246A58429065C0405BB1BFEC2A21C0810F6FE74C9065C060043175FC2821C0F9264D83A29065C000DEE522BE1321C0BE32CA8EA89065C08079C7293A1221C014FA0560A89065C0C04C744CCC1121C050460147A79065C0206090F4691121C0C4138B29A29065C0E08CC179271121C01B655820959065C0C0463CD9CD1021C0F5E6DC92819065C06067C581A11021C0EE815861739065C0409EB70C931021C0439E3640DF8F65C0C0463CD9CD1021C0493C45B3D78F65C060DD6CBDF01021C0F1DFCD64C98F65C06094B080531121C0DDCA129DA56665C060B70DFED9A622C06029DC3C9F6665C040F723A01DA722C0DC6344FD896665C0001FC1E84DA822C0D6A3703D4A6665C0A0B9ED8C00AC22C00420A45D3B6665C080A17433EDAC22C0184C0D7E2C6665C040D3EF671DAE22C00D8FB39FFB6565C0E0CBCC7113B222C036A79201E06565C0205173A895B422C081339D42D36565C0C0CCE26A09B622C073E3271FCC6565C0A08B0EED08B822C0833A9B44336665C0400EF450DBDA22C087D0AD7C3B6665C0E0ADA305C3DC22C0A023038A626665C080FBFB3152E022C05C0828C3676665C0C0E37F97BEE022C0F53C2421766665C0C0F1CB05D3E122C0435266DE856665C0C04DD4D2DCE222C078F64B7A8E6665C060F9D0AA3BE322C0E829DF24976665C040AD6E5056E322C0
+SV	SLV	75	SLV	السلفادور	El Salvador	El Salvador	El Salvador	El Salvador	Сальвадор	萨尔瓦多	Member State	NO	San Salvador	Americas	Central America	0101000020E610000033622C0E553756C06B80DA40EE762B40	0106000020E61000000100000001030000000100000020000000008173EB5AFA55C040F389E18F4F2A407CA19119B91956C0C0CA4C69FD512A4000553772381E56C040DAB0016C572A40540ED2F82A2F56C0605E2BA1BB742A40786940730C3056C000567B7D52762A40C049E4CC403056C00005D957C3762A4004F2A265933056C080948F9378772A400C1DA78D8F7356C000C27174F00B2B40A89D17DDB07356C000260AE35D0C2B40B8F9FCE6F48756C060DC871C587B2B40604F3BFC358756C0E02C26361FA72B40E06D054A338756C060AB5BF651A72B40F037A110018756C00013D55B03AB2B401027F73B148556C040B1169F02C02B40781EDC9DB58156C0A014916115DF2B40508CF337A16456C0A0AA2688BACF2C40ECCEDA6D176456C0208D0B0742D22C40C88CFBB2FB6356C040655F0081D22C40DC7F2BD9B16356C0E06ED8B628D32C4094900F7A365956C0802BF697DDE32C40C0DD59BBED5856C0A0DC0C37E0E32C40387966897B4656C0402E78789FCE2C40808AEF336AF355C08025867A80D72B40103136BE20F355C000000E283BD62B40604648429AED55C0800E781CE3A12B40A88F40E94FED55C0804DB605749B2B4050450257C3EB55C020392E3E60552A40D0F434BBC9EB55C0C0B94E232D552A4098F16C45D1EB55C000BC9F0903552A40B844509033ED55C040DF94A8CD522A4004CA6DFB9EF955C0C03F564B954F2A40008173EB5AFA55C040F389E18F4F2A40
+JP	JPN	126	JPN	اليابان	Japan	Japón	Japon	Japão	Япония	日 本	Member State	NO	Tokyo	Asia	Eastern Asia	0101000020E6100000CE7C62CF663F6140EF62968CAD534240	0106000020E6100000010000000103000000010000000F000000009AFF5F4EF25E40001A02E055093840F82A0000BFF05E40102C0060510A3840D80B00206ABC5E40202FFE9F0B7038409808000013BC5E40D06200801A71384088EAFF7F10BC5E40C072FE3FB17138403C030020672A6040409DFF7F25524140243C0000E59E614080AFFFDF3DBE4640A84300A015BE6140302E0020F6C246404C2100A0A92A6240D05CFFFFD62B46400C0F0040012B6240607900603C2B4640E8D2FF3F0C2B624000D4FF9FEE2A4640F0E1FF7F3D3A62404003002017B145403CE6FFFF863F634030B3FEBF7F4A38409CCEFFBF823F63405063FF3F45473840009AFF5F4EF25E40001A02E055093840
+TL	TLS	242	TLS	تيمور- ليشتى	Timor-Leste	Timor-Leste	Timor-Leste	Timor-Leste	Тимор-Лешти	东帝汶	Member State	NO	Dili	Asia	South-Eastern Asia	0101000020E6100000D797851D797C5F40BF154BDB579821C0	0106000020E61000000100000001030000000100000041000000C070006069125F40C017FD1F620223C0B861002068125F40007A03E0600223C040ACFFBF66125F400079FE7F5F0223C0385A0080E7115F408064FC7FC50123C0187EFF9FD0115F40406003E0A70123C0A8FAFF1F44065F40202E002036D122C08884FFDF3E065F40A02BFC9F17D122C0A8FAFF1F24035F40203FFE3F3FB322C0280200C0E4025F4080C5000035B022C018E4FF3FE2025F40A01AFE7F0EB022C0189BFFBFE0025F40000DFD5FEAAF22C090CDFF5FE0025F4080FFFB3FC6AF22C078A0FF9FDC025F40C0E5FB3F0DAE22C0E8D2FF3FDC025F4000EB0020D8AD22C068CBFF9FDB025F40E0CFFCFF72AD22C0E04600C0DC025F406057FF1FDBAC22C008C6FFBFDF025F4080D102003CAC22C0003A0040E0025F40C00EFE5F24AC22C048CAE156AB675F40E0B17F4DBF4320C0A89D55F7AC675F402072C48AB54320C010859AE4B1675F4040512BFB974320C0C812A1D4C8675F40E08F8256494320C0086AFC8588685F40805B029F084120C098DF6DA195685F4000E69083FB4020C0F06400407FCC5F408076FFFFCFAB20C0189BFFBF80CC5F40207AFEDFD1AB20C0B81800A086CC5F40005C0360DEAB20C0402F008088CC5F404032FEBFE2AB20C0504D00008BCC5F4000730200EBAB20C0208DFFDF91CC5F4080D2FB7F02AC20C02059002095CC5F4000B8FFDF10AC20C0B895FFDFC4D25F40406201C06FC720C030110000C6D25F402038044075C720C0C02700E0C7D25F4020E401207FC720C0A8DDFFFFD3D25F408059FFDFBFC720C0E08000003DD55F40C0CBFE5FC6D420C00800000040D55F4040BCFF5FDAD420C0985F006063D55F40E0A8FF9FCFD520C0B009006085D55F4000C3FC7F16D720C010F2FF1F91D55F40A0EB01C09FD720C0D0A5FF7F98D55F40609CFCFF00D820C0B0090060A5D55F4020A5FEDFB0D820C0C8360020A9D55F4040D40360E8D820C098420040B3D55F40401A01A080D920C0202D00C0C3D55F40E0C7FD9FA7DA20C0289CFF1FD3D55F4060ED02C0D9DB20C048120060D8D55F4000B6010049DC20C068CBFF9FDBD55F40A0EB01C09FDC20C0804100E0E0D55F40609AFE1F39DD20C0008300C0E1D55F4080C8FE3F6FDD20C020760040E5D55F40C066032056DF20C0283C0000E5D55F40004A00E0D3DF20C0308EFF3FE4D55F40E0FD012038E020C0807B0020E1D55F40C0550000BEE020C0F0E1FF7FDDD55F4040C5FE1F18E120C0B87E0040D8D55F406087022068E120C050870040CBD55F404032FEBFE2E120C008490080C1D55F40E045024027E220C008490080E1C05F404073FFDF785E21C028D6FF5FB39E5F40E0F0FFBFBEE421C028850080A69E5F4020A30000E9E421C0404C00A0989E5F4000C3FC7F16E521C0E0FDFF3FBB455F40C0B4FFBFB9EB22C060D9FF7F6A125F40A0E20200620223C0C070006069125F40C017FD1F620223C0
+UZ	UZB	261	UZB	أوزبكستان	Uzbekistan	Uzbekistán	Ouzbékistan	Uzbequistão	Узбекистан	乌兹别克斯坦	Member State	NO	Tashkent	Asia	Central Asia	0101000020E6100000B409708C0A944F406BC3568199E14440	0106000020E6100000010000000103000000010000001C00000074045D86D5F15040F80C4A33FE9642406C0CF20181D1504028FE9AAC51974240AC7004A914D150406885949F54974240CC409E5DBEA95040C03EAC376AA942403C91990B5CA85040B06950340FAA4240F0AF575870A350404094DA8B68AD424060302AA913004C40183FC6DCB5A84440381E4D11FAFF4B4008559E9E893446407065C22FF5FF4B4018677E350780464080A2658940474D4080E54AA276CA4640E853008C674C4D40709A779CA2CB4640B4A71DFE9AC85140A8245D33F9224540D46492A09EC951408892916C1B224540ACAE7C96E7C9514040EA211ADD214540802C7DE882D05140B09196CADB194540A41A2FDD2448524098A46B26DF6C44403C4A5E9D63485240206F641EF96B4440800F971C7748524080F7C77BD56A44408827A66B634852400019AB81316A44401C04560E2D48524020B62DCA6C684440247E72D223485240B0C3F31A47684440F8108DEE204852402867614F3B684440C842AD69DE4752407053AEF02E674440DC20938C9C47524070F7E461A166444020E1B4E04547524088D89942E7654440B80C71AC8BF3504018FD135CAC984240FC72BD729FF250404886C711BA97424074045D86D5F15040F80C4A33FE964240
+TV	TUV	252	TUV	توفالو	Tuvalu	Tuvalu	Tuvalu	Tuvalu	Тувалу	图瓦卢	Member State	NO	Funafuti	Oceania	Polynesia	0101000020E6100000202A9CABE324664099D826AF8FE31CC0	0106000020E6100000010000000103000000010000001F0000000C7FD0C4857B66404048D7F104DF22C0FC56DA984D7B664060E7830AB3DD22C074CE3E45447B664080A09D7873DD22C014A5BDC1177B6640C051724732DC22C03C6A85E9FB7A664020C2A8FF07DB22C0188ACFF89924664040CF6ADCF6001DC0E432B8F73A0A664040C09DFAF63419C01462EF44370A6640002B53BA5E3419C014FB4EDD260A6640C0BCEE63BB3119C08859B2740F0A664000B742588D2D19C08CB08630E301664080C338C9A09416C04C3BDADDE801664080963AC8EB9116C0E40574D314026640801411BE2A9316C05C2E1B9D3302664080F1C1210A9416C0E037BEF68C036640C0DF7DFA74A116C088414FB9382B66404048AFBC9A6A18C06C114020462B66404079A1CA7A6B18C028A424DA44566640C0717ED470EB1DC0F80F2219B27B6640E071E4DC81C922C0DC7D7D63BE7B6640E0C8F7D6D1CA22C07CDB9612D37B664040A236BBFFCD22C03827405ED97B6640A0DE69D729CF22C064A5DD43DD7B6640600C063296D022C078B63643E07B664060BBF2B457D222C0409D3C76E17B664080DAF74D06D422C06049F25CDF7B664000987B9285D522C088AD7E11D97B6640E0CE2F4AD0D722C06CEF9DE2C27B664020F6F29606DD22C018F36217BB7B6640E059153CE0DD22C0A4D77CB5A37B6640E04B7ACECCDE22C00C7FD0C4857B66404048D7F104DF22C0
+CL	CHL	51	CHL	شيلى	Chile	Chile	Chili	Chile	Чили	智 利	Member State	NO	Santiago	Americas	South America	0101000020E61000004704A407DECD51C099BDEB5ABE9A41C0	0106000020E6100000010000000103000000010000001E000000A00A35F91C2E51C008A5F622DA444CC0AC69DE718A4452C050616C21C84D4BC0C0EA8F300C5D5BC0A06E2EFEB6333BC0B894BA641C5D5BC060CCB22781333BC038B69E211C5D5BC00006C6B079333BC0D83BA3ADCA5C5BC0F0B6A4598F2D3BC0089EF820BA5C5BC0B042E6CAA02C3BC044681547AF5C5BC0000FE4EA112C3BC024ADF886425C5BC00089F83DA0263BC0D0DF4BE1415C5BC08095F32098263BC050A280481A5B5BC040452A8C2D1C3BC0509CA38E8E595BC0B076F700DD113BC0883D6A027B595BC0804D75125B113BC030DF669629595BC010C68267E70F3BC0E8AA8ABA20595BC00085CFD6C10F3BC0D444550218595BC0D044FA48A50F3BC09CEC6646BF585BC0204190CD9F0E3BC000FFA556A9585BC0A000B738740E3BC010CD977299585BC080000231640E3BC0DCDBF4673F5E51C01003B2D7BB7F31C090C151F2EA4451C0F0A7A9656B0D32C06C8B321B644451C0804AEA04341132C0747AA52C431A51C0E01890BDDE6533C0409AB1683ABF50C0E08C28ED0DFE36C030A7CB62626350C08031C797F5524BC0E03087936A6350C03843FF0417534BC0283DE47764B250C00861EB0896E94BC0C0BB5CC477C050C0F80F1C3CB8F74BC054E2F038FB2D51C078F18F08D7444CC0A00A35F91C2E51C008A5F622DA444CC0
+AT	AUT	18	AUT	النمسا	Austria	Austria	Autriche	Áustria	Австрия	奥地利	Member State	NO	Vienna	Europe	Western Europe	0101000020E61000005DEE74FBB1472C40F15AC2B854CB4740	0106000020E6100000010000000103000000010000001900000080D4601A861F2D40404A5E9D63304740C0A17F828B35244078C971A7746C4740408F19A88C1F2440806649809A6E474020A67EDE54C42340405D16139B774740A0CE6BEC12352340D888D2DEE08747400033A7CB62122340F012D55B03A347408066666666162340888CB96B09C54740C076F86BB2162340180F289B72C54740E0B08A3732AF2B4078E7FBA9F1624840C042CA4FAA0D2E40F808A7052F824840204356B77A8E2E406060C8EA567F4840603F6F2A52893040304833164D67484060AF946588A33040107C7E182164484010A5D43746A63040E8469EDFC86348402084640113A83040206A4DF38E634840F061A1D634E7304068A27A6B605B484080F552FA87E730401864A99A455B48403025AFCE31E83040D059D8D30E5B484080CC4065FCEB304050F0BF95EC584840C0679604A829314010E544BB0A01484000C91F0C3C173140007A53910ADB47400074B515FB83304038478FDFDB804740409D9D0C8E823040E8A59BC420804740C07A4E7ADF08304098F6065F9854474080D4601A861F2D40404A5E9D63304740
+GE	GEO	92	GEO	جورجيا	Georgia	Georgia	Géorgie	Geórgia	Грузия	格鲁吉亚	Member State	NO	Tbilisi	Asia	Western Asia	0101000020E61000008E77E38991C145403F4C1D42F4164540	0106000020E61000000100000001030000000100000035000000F8B5679604404740904160E5D086444040AFB14B54DF4540C847C494488E4440F838454772BD4540689CBF098590444028A12DE752BC4540B08251499D904440608121AB5BE944400818CFA0A1B74440F841CF66D5D344406802B7EEE6BD4440A876F86BB2D2444068EAE74D45BE4440C8BA541904C64440D86DBF0564C344407825E07C4F014440100D2C960EB1454010CD751A69014440C817265305B34540A86CCA15DE01444000F4A62215B64540D86DAD2228024440C829B6C6C3B6454008780B242802444000CCEEC9C3B64540702783A3E4054440906CE7FBA9BD454090FE092E560C44409050A5660FC8454068D4CA91890C4440C02CA9243CC845407820240B980C4440E0B2B5BE48C8454040E0F3C3080D44401822E010AAC8454090EB51B81E0D4440E8016553AEC84540F06A2BF6970D4440380DC347C4C84540B88EAA2688164440C83AC780ECC94540F000C11C3D1E4440B8DD76A1B9CA4540305AADA4B91E4440E8DD4E4BC1CA45406850DF32A71F444028BFB7E9CFCA45408852D781C31F4440602F7690D1CA454010B13385CE1F4440209AEB34D2CA4540708CD651D554444058CC7A3194C7454090CE6BEC12554440E80720B589C745403867B62B3455444088E6ECFD83C74540E8455F419A55444008A4367172C74540B8D7BB3FDE374540E8AAB2EF8AA0454068EAE74D45724540A832FE7DC6954540A02F2FC03E7A4640A009BFD4CF5F4540A0A223B9FC934640889ECDAACF594540D0457C2766954640883A1E3350594540781B0DE02DE046403890A0F8313E4540E819BDE52DE046407017B3F5313E4540780D6C9560E1464048618907943D454050F0BF95EC304740686397A8DEFA444008A7099EEC30474078A2EF9EDEFA4440F0F1830C07314740E01E98D1BFFA4440F02B483316314740D8967329AEFA444058E8BCC62E314740A0FA795391FA4440081C42959A3547408023F3C81FF4444090E123624A5C47403027DA5548A5444000F66933535C4740B842AD43D7A4444048524486555C4740A0728577B9A44440F8E505D847534740F05BE6745990444060C51B9947524740C01A12F7588E4440283CDA3862514740F85014E8138D4440906D8B321B504740B0656B7D918C4440C84D7FF62341474068807D74EA864440F8B5679604404740904160E5D0864440
+LI	LIE	146	LIE	لختنشتاين	Liechtenstein	Liechtenstein	Liechtenstein	Liechtenstein	Лихтенштейн	列支敦士登	Member State	NO	Vaduz	Europe	Western Europe	0101000020E61000007497BC56A81B23409330280D93924740	0106000020E61000000100000001030000000100000013000000E0FF56B263232340D093A46B26874740A06ABC7493F82240F0A353573E8747400009C4EBFAF522409819A88C7F87474060942EB1BDF5224018991732A787474000C0B2D2A4F42240788FA50F5D884740C06588635DFC2240584A41B797984740A0C3315691FD2240B8A64BFC5A994740A01BF0F961042340F8C9C342AD9D47400033A7CB62122340F012D55B03A34740E0B83F0AE31A2340586BF32FE4A04740C0510FD1E81E2340D063062AE39F47408094D920933C2340A8D7D825AA93474080E7C423933C2340701EC223AA934740606C5B94D9402340B8A71DFE9A90474080B75D68AE432340886ABC74938C47404051B253AE43234030F2F767938C474020E4BD6A6542234068CC5D4BC88B4740A0CE6BEC12352340D888D2DEE0874740E0FF56B263232340D093A46B26874740
+CI	CIV	66	CIV	كوت ديفوار	Côte d'Ivoire	Côte d'Ivoire	Côte d'Ivoire	Costa do Marfim	Кот-д`Ивуар	科特迪瓦	Member State	NO	Yamoussoukro	Africa	Western Africa	0101000020E6100000EEA90955FA3616C058551E4B9A801E40	0106000020E61000000100000001030000000100000021000000C02EDC8EB0171EC0808953696872114040FA96395D361EC0002A5778978B11404029CB10C73A1EC08085CE6BEC92114040FC1873D73221C040BD8C62B9051A4080A6B393C1F120C080C1E270E6371E4040546F0D6C5520C0409E4143FFE42340C09717601F4D20C000C66D3480F72340206DFFCA4A4320C08019E258170724402046CEC29E3620C0805DDC4603182440804B546F0DEC1FC0A074EACA675924400017D4B7CCE91EC02046257502DA244000FF21FDF6951EC0E0627FD93DF9244040A862E126921EC000914F53C1F9244080FEB27BF2901EC0200C59DDEAF92440801DFE9AAC911AC00079E926315825400029E8F6920619C0E0D9C9E02879254000DA38622DFE18C0E07A4E7ADF78254080CA4A93529009C0806397A8DEDA234000F2B597CF7E05C080F8A3C941FB224080022FE4257805C0E083B9B24BF822400061390F15F103C0C0A779DB0D69204080656FAA67C905C0C0D7D6458D90144080F0AAE305CC05C040D66FFB258D14400025EA14CACF05C0400CCB32D388144000D4917C55D105C040D87F510D871440003A07E368E905C000F07A6B8B771440805968C6260E06C040C50E6A8C68144000E59BE9351006C040970B252B68144080B0D9106A1206C040EB820BC3671440C0957840D9E41DC0800395F1EF73114000CA332F87ED1DC0C0874D64E6721140C04DD367070C1EC0802EA9DA6E721140C02EDC8EB0171EC08089536968721140
+NI	NIC	180	NIC	نيكاراغوا	Nicaragua	Nicaragua	Nicaragua	Nicarágua	Никарагуа	尼加拉瓜	Member State	NO	Managua	Americas	Central America	0101000020E610000086477B267D4255C0A3C5AD4F50B02940	0106000020E610000001000000010300000001000000220000006C2A52616CFB54C06039D1AE426A254080D89942E7FB54C0C0024356B76A254060365C3F586D55C040934D5E092926405843A9BD886F55C040D8FCAEBE2C26400892D2C7D77155C0404A592B7F372640A8763C1C937255C060EB9D1BE43B264000D1933229A155C0600E9425848C2740888FAA8141A155C020D16BFD3E8D2740C81352C8DFEB55C06098ADABB8CF294020CF9AC445EC55C0A0693A96D2D22940548CBAD6DEEB55C0005675A098262A407887911447EB55C0E075CB69AA2A2A402805DD5ED2B055C080C47762D68B2B4044382D78D13955C0004E452A8C9D2D40EC7211DF893955C0C0122C0E679E2D40D84B1AA3753455C0E035B05582A52D404472F90FE9D954C080475513440D2E40CC0F238447C954C0204169030BFF2D40FC52F5E18FC854C040A3586E69FD2D40404C2E6B87C854C0A071C5C551FD2D4078B94F8E82C854C0E0D210FA3EFD2D40EC8C11E47BC854C080DEB0C80AFD2D4064FFA8F262C854C0002F23AB11FC2D4090B245D26EAF54C0C0C013C48AD42C4094CDD20440AF54C0E014F6FE50D22C409CF474641BAF54C080E0FDA7D1CE2C40F09C9905FFAE54C0808CC5257DC02C40B8C8A94228BE54C0806B36967D8E2840AC9CCE5F32BE54C040D93400658D2840F06C567DAEEA54C040680586AC9E254064E89FE062EB54C0806666666696254000E78C28EDEB54C0801327F73B942540ACCE31207BF754C060D1AE42CA6F25406C2A52616CFB54C06039D1AE426A2540
+TJ	TJK	239	TJK	طاجيكستان	Tajikistan	Tayikistán	Tadjikistan	Tajiquistão	Таджикистан	塔吉克斯坦	Member State	NO	Dushanbe	Asia	Central Asia	0101000020E6100000274F2B1961C25140A22E5D0241434340	0106000020E610000001000000010300000001000000270000007C7B8F813CEB514008E99B340D564240304EB516660151406897A8DE1A764240D043A67C08015140D000892650764240E47590E60E005140A88A42359F774240908862F20600514020F9BCE2A9774240500169FF03F3504028A12DE7528A4240ECA562635EF2504008C80913468D42406CA8514832F2504020E0826C598E42404053E8BCC6D85040D8F19881CAA4434078D59448C8D85040889149A680A5434028C32ADEC8D8504040B05582C5A543405401309E41DB5040E84F8D976EC2434028404D2D5BDB5040B0D590B8C7C2434090DD96ACB0DB504078975472F0C34340DCA88969BFDB5040C0D8AD9823C44340A8367172BFDB5040282D95B723C44340582B137EA9595140E03E1D8F196444405007EBFF1C5A51403808AC1C5A64444010BABDA4319C51405822895E468544403C15A930B69C5140A84ACD1E68854440F4ACDD76A1A55140E8DF675C38844440C09179E40FA65140608FC2F52884444010897B2C7DA65140A8703D0AD7834440D43AAA9A206A52401003CFBD87BB4340C88F31772DB75240A823B9FC874043404448163081B7524018D6FF39CC3F43406C520ABABDC85240B0FF73982FB74240E0166536C8C85240D04065FCFBB44240C44868CBB9C85240F073B515FBB34240FCBD4D7FF6C7524090C3995FCDA94240400AD7A370C75240A845B6F3FDA842400070253B36BA5240483EE8D9AC9E4240AC0018CFA0B95240700FB402439E42404C6DE2E47EB9524048FF04172B9E424004FDBE7FF3B8524010293FA9F69D4240E42B3975E5F55140F021533E04574240BCA72ABB60F2514000AC00DF6D5642402C72073884ED5140687AC2120F5642407C7B8F813CEB514008E99B340D564240
+LR	LBR	144	LBR	ليبريا	Liberia	Liberia	Libéria	Libéria	Либерия	利比里亚	Member State	NO	Monrovia	Africa	Western Africa	0101000020E6100000F49B768B7C9E22C0A35205D1B9C91940	0106000020E61000000100000001030000000100000027000000C058D306716F1EC0C0ECC1FFB16B1140C086C01FEB721EC040F977C2BA6B114000CA6C9049761EC04051853FC36B114040BDFBE3BDEA1EC0003EEC85027611400080F0A144EB1EC0403C139A247611402005A4FD0F8020C0807D59DAA9491240E03905F9D98020C0C0FBAC32534A124000FE501F373221C08062934616FA1240203FFED2A26E21C0C0770E65A83A134060BF153F7C1322C04030FFD76FEC134080776341619822C04066BD18CA991440C0F86871C69822C000E6E95C519A1440E0E56091BAB826C0C014E7A8A3D31A40600E6B8544B926C040459DB987D41A40C0A7716F7EBB26C0C011E96D22D91A40C0A9DB3411BD26C0401ADD41ECDC1A40C0F5775B8EC426C0807BC102F3F31A40E0CCEA6EB5FE26C040D9196299B11B40602ECDC6AD9E26C080617F7412D71C40E08E92D8679024C060B79AECD4F9204060CDE49B6D8E24C040AFCE3120FB2040E043FAEDEB5024C0C0EB17EC860D214060A4B969C18B23C020850838841A214060D2E5078D8923C00040F6DD211A2140E0C77BD5CA8423C0808907944D192140E087F4DBD78123C0001D2098A317214060FAB31F295223C0A061325530FA2040C0942BBCCBF522C080EB6E9EEAC02040002E39EE941E21C040EA78CC40C51E4080E4D53906D420C0807138F3ABF91D40C08DCC237FB01DC000F06DFAB35F1740C0C281902C801DC0C0B94E232D751640C078CC40657C1DC0C038D6C56D54164000C55565DF751DC0C0368E588B4F154000766C04E2151EC000D5CF9B8A7411408043D720F4151EC08062CD3875741140C02EDC8EB0171EC08089536968721140C042A1AF6A6A1EC0801378CCE56B1140C058D306716F1EC0C0ECC1FFB16B1140
+BZ	BLZ	28	BLZ	بليز	Belize	Belice	Belize	Belize	Белиз	伯利兹	Member State	NO	Belmopan	Americas	Central America	0101000020E6100000B9A900B33A2D56C03725693939323140	0106000020E6100000010000000103000000010000001F000000482FED782C3B56C0E09B417E61C62F4058C0046EDD4D56C0C0C07C5E63C72F4030043871DD4D56C040ABC46A63C72F40C00DF8FC304E56C0E080D87EA4C82F40B4FD2B2B4D4E56C0A0F9DE8BA1CC2F40282DA52C584E56C040650AB72BD32F4024DF6C73634E56C020EF7211DFD92F4070F4F8BD4D4956C0609B38B9DFF1314010967840D94856C0506A1327F7F33140C8EAB842A14856C0C01C1B00F8F431408069183E224856C0207A36AB3EF73140907EFB3A701E56C0102670EB6E7E3240F830314C5C1E56C0A0EAB183837E3240BC266BD4431E56C080417DCB9C7E324050404A543E1E56C0F0279E4BA27E324004B64AB0381E56C040B29DEFA77E3240EC8AE07F2B1956C0B07B0F971C7F324038E466B8011956C08080608E1E7F3240D4F0F44A591456C0402FC03E3A7D3240A87561F2461456C0604F1911227D3240142301593E0656C0001506C0D35F3240C0BC6CE033F655C0B032ED516E2F324028A2708717F655C030D291B7B72E32405CAFFA6D19DF55C010FEA666C5763140C0D32B6519DF55C0204438C19276314054545804DAE155C0A0302EB02234314020A34D1F4BF155C01004F0051CC2304034A330397F1156C0B0E33103951930401CEED9298C1156C07064B8F072193040BC0DEA88073B56C0E09B417E61C62F40482FED782C3B56C0E09B417E61C62F40
+LA	LAO	139	LAO	جمهورية لاو الديمقراطية الشعبية	Laos	República Democrática Popular Lao	République démocratique populaire lao	Laos	Лаосская Народно-Демократическая Республика	老挝人民民主共和国	Member State	NO	Vientiane	Asia	South-Eastern Asia	0101000020E61000002C0692E422F1594043A3C68097813240	0106000020E61000000100000001030000000100000025000000A03610B6AB865A40800073F0F6D32B4000B9899C567A5A40C0DD2AEDACDB2B40C45D1F6BE0575A4060819F2754342C403CC707DD28575A40A0A80C9A98372C4058FF3476E83D5940603FC2727C9231402038CD26D3055940C084627CAF453440D86E10876E055940A02C5AFF355B344098E3163FC20A594060B6CDC9959D3440E09FB9BE570B594040DB48EB05A43440205E73BB950B594000894D3BE7A53440ACF7FE4DE20B5940705895E202A83440B439E9782A0D5940E0BAE2E962B0344000F9760B770D5940508D15A435B234405CEA472D4E0E5940C0DF5D0BD3B63440E02C700FA86A5940B0F14F39BE723640205B6F9E616B594010696A329375364084C44105716B5940807BEB5ECF75364004B77F49506C5940D0E2383CF9783640D86732DC336F594050DDD954E67F3640EC2C559723715940A059EFFD2E81364048A41D6C2E83594050346AF33C7536400CA9CF66B98659404059A78D147136401CC5CB03D3875940204876C3BB6F3640AC10D750FB875940003FB162796F3640447037B64E885940A0AF0107F06E3640BC515DF33C145A40B06F2EA57EE63440FC4EDBA59E1E5A404015E29178C4344084B4D481D91E5A4060CAC99675C3344048235B3A9F3F5A408040C71E8C183440F8EA4E3DB3DD5A40B06D8EA3D4193040E08F58AE3EDE5A40C000CCD3BE1530405457F3F331ED5A40602E1399479B2E409085FBAA97E35A4080C5AB448A5F2D4080BA7A48EADB5A40C0E6F3DDEF0C2D4008BE52CB13875A406059032432D42B405C6C05E0EE865A4080BF30241DD42B40A03610B6AB865A40800073F0F6D32B40
+YT	MYT	161	FRA	مايوت	Mayotte	Mayotte	Mayotte	Mayotte	Майотта	Mayotte	FR Territory	NO	Mamoudzou	Africa	Eastern Africa	0101000020E6100000D9E090377192464039A761B09FA529C0	0106000020E6100000010000000103000000010000001F000000E098219FA191464060981826AE022AC070CB80B394914640E0A72105AA022AC0903A2982EE8D464080887E6DFDFC29C0409380E2118A4640006085A5CBEC29C098BD39B764824640600EBA84434B29C048D00A0C59824640E0AFE595EB4929C048BC9D335882464000CC5944B94929C0486EAE505A824640205D82F8654929C010C545A45C824640C05C2FF2574929C0183C743051834640E0F2A732314629C02024C7E75F834640C0F5D214014629C000EAF5DD6383464060057AF2FA4529C04884132C69834640200EEFDEF64529C0D84BE71E6D8D464020DB04CE084D29C0487529649DA246406012D89C837F29C05074E0E69EA4464060A38FF9808429C0803606F8C9A44640A07378AD298529C020959BA8A5A54640008491A8618929C0E0B122B42FA6464040687572868E29C0809C91F760A6464020B121EEA09029C008CF071566A6464040BD1358A59129C0D828C9DF62A64640804E136C129229C0B05D13D21AA64640003A26E6B49629C03056574FF7A5464060203537F09829C0D022A87576A44640207C163A65A829C050E251CF279A4640A090C48146F329C0D856B9ABB2994640804825862EF629C0E0C3B9E1D298464020CC423BA7F929C010640A31F29646404097F26B35FD29C0E0F68777CA964640C05C46FB69FD29C0E098219FA191464060981826AE022AC0
+MT	MLT	156	MLT	مالطة	Malta	Malta	Malte	Malta	Мальта	马耳他	Member State	NO	Valletta	Europe	Southern Europe	0101000020E6100000BD321D9A63E12C406D42E4A8ADF14140	0106000020E6100000010000000103000000010000001F000000A072F2C759D12C40C05F9912A4E44140A072B389DDD02C40987F0B57ACE44140409B0C7D665F2C40386DDD729A0442404091007F425F2C40701382B0AE04424000880BE5E95D2C404054D6805208424060B04FA50B5E2C40A8F8C500E4084240609F84E3435E2C4078AB7BBF2C094240C01C661EAF5E2C40E0C56D348009424040CE481F1B5F2C40603101648D094240A077691E1B682C40F8A9F7AF070A42408015CA1D916A2C40D8082582270A4240202205FB21722C40F0A5ACF0780A424040BD33639C762C40F0E126FE830A424000B0E02307792C40F0E126FE830A4240C021BB1CC0802C40907C86263F0A4240605266DE05812C40781E4E603A0A4240A08BB5C26B9E2C40A0BFAECB95074240C0D3A304589F2C40F897AA0F7F074240C0EC38341B1A2D4058FAD6E2AEF14140E0525DC0CB202D4048BD63C279F0414020D7208260242D40A0922FB2AEEF4140E071C45A7C262D4088B34A9F0CEF414020C2CBC28D262D40180FCDE1FFEE414020D8D5E429272D40D8895F0C40EE4140000D648742252D4020A88C7F9FEB4140A007F5E3E51F2D40D032FD12F1E84140A04D7BEF141F2D40A8B1F677B6E84140004D6E6F12122D4088D8F4FB59E7414000CF4C309C0F2D403009788835E7414060BE9B1320D32C40C84D243DB1E44140A072F2C759D12C40C05F9912A4E44140
+BY	BLR	26	BLR	بيلاروس	Belarus	Belarús	Bélarus	Bielorrússia	Беларусь	白俄罗斯	Member State	NO	Minsk	Europe	Eastern Europe	0101000020E610000084B7FF09FA0D3C400A50E72C77C54A40	0106000020E6100000010000000103000000010000002800000010E8305F5E903E40102FFA0AD2A0494090AEB6627FA137406858C51B99BF4940C0E9CF7EA4A0374010CE1951DABF494020265305A3923740802D211FF4C449405043FF0417333740D0C342AD691E4A40D0A4315A472D37408040D9942B244A4050696FF08581374008529B38B9FB4A40A0E34EE960A53A40683255302AD94B4080515B5A75A73A40B07B205698D94B40D0DD59BBEDAA3A400085251E50DA4B40F0675C3810023B4050D235936FEA4B4090D382177DFD3B4080758E01D90F4C40E0845FEAE71D3C40587FF62345144C4090A4164AA61E3C40001FC0E55B144C40C0D100DE02213C409813ED2AA4144C4050C69A2C96213C40E8B2331AB3144C40B093DE37BE263C40A8D634EF38154C40606B9A779C1A3D40B8EA73B515074C408099D36531413E40B88BDB6800EF4B4070376C5B94413E40689D6340F6EE4B40108312A33D433E40E8125448CAEE4B4020CB2DAD86443E4058888043A8EE4B40D08F31772D493E40C8D32B6519EE4B40A052D0ED257D3E40F0B8533A58E74B40D03368E89FF03E40A8077767EDCE4B406096E899CFF03E407029A9DEDDCE4B4010944DB9C2F33E40D0845FEAE7CD4B4048CA4FAA7D624040E0648D7A88BA4A40E8E00B93A9624040B85FB01BB6B94A4028718FA50F6140408851499D80B24A40501630815B5F4040381B649291AB4A4010566BE74F5F4040E89A549780AB4A40B85E0CE5445F4040309FE57970AB4A4030EDF420D05E4040C8953D20C8AA4A4098D5AD9E935E4040E02AC1E270AA4A40E042908312CE3F40E8AB5626FC0E4A4060766C04E2CD3F40B00F5D50DF0E4A400074B515FBCB3F403049D74CBE0D4A40C0B0A71DFE923E40789EEA909BA1494010E8305F5E903E40102FFA0AD2A04940
+EH	ESH	268	XXX	الصحراء الغربية	Western Sahara	Sáhara occidental	Sahara occidental	Saara Ocidental	Западная Сахара	西撒哈拉	Non-Self-Governing Territory	NO		Africa	Northern Africa	0101000020E6100000066ADB1615452AC0DC994CCECCA93840	0106000020E61000000100000001030000000100000023000000B06D5CB5210D31C0D0DA070F89C53440E05AE784750E31C030C3A7EFEBC63440E0ED748CD00E31C0D0D2760250C73440300C8BF61D1A31C0C03BCC4D8AD5344090567666271A31C0D07482ECABD5344090EAFC80AC1A31C070EC3A0AC6D7344000B06DF6AC1A31C0C0147FCAE7D734402072BB3C421831C000268DD13AEC3440003E5B0707FB30C0608DD0CFD4B735408020956247F730C0402F4E7CB5CB354000967840D9F430C06095B6B8C6D33540B0A5D590B8CF30C090CDC7B5A1263640C0436D1B460130C0C08993FB1DA63740E02EBC372BD32FC030E758390FCE37400011F64124F32CC0F0D8EC48F52D3A404084622B68F22CC0C0B48CD47B2E3A40A085895A28F12CC0A0921E86562F3A40E0D9C87553EA2CC0B0EBC20FCE333A4000FF8BBBCFE92CC020F6ED2422343A4040FA5E4370DC2CC0100726378A3C3A4060B8231D97582AC070E9260BC1AA3B40A04D7FF623C529C080E7FBA9F1AA3B40405969520A5A28C0603BFC3559AB3B40C0D1C6116B1128C0500E4A9869AB3B4040B31BD1CBC827C0D01C3D7E6FAB3B40E0D8C95FA89B27C04048FB6B6EAB3B40609B1264929127C040C4B12E6EAB3B40A0AA1D19398B21C0A0C8B08A37AA3B40A03AC780EC7521C06066834C32AA3B4060C70306535521C00014F6367BA93B40003C8D60555521C0202FC1A90F503B40C02137C30D5821C03098A3C7EF4D3A40C0F3D77F2B5921C0F0D5390664FF3940A0E1CCAFE6002AC0A030D3F6AF543540B06D5CB5210D31C0D0DA070F89C53440
+LK	LKA	231	LKA	سري لانكا	Sri Lanka	Sri Lanka	Sri Lanka	Sri Lanka	Шри-Ланка	斯里兰卡	Member State	NO	Sri Jayewardenepura Ko	Asia	Southern Asia	0101000020E61000004A8B64061D2D5440AC7EE72B72751E40	0106000020E6100000010000000103000000010000005B000000544D0000AB255440005F04C08AAD1740B05200E0A6255440C0FE07C08EAD1740506A00205B1E5440805D05A06DBF1740A0B1FF9F021D544080F907E052C31740E07AFF7F591854408033082073D91740FC730080C0105440C0D4054005FF1740AC260080950F54408071FA1F05061840143B00A0920F5440400107401E061840640500E0FB0D5440805BFBDF6A1718403C80FF5F350C5440C0ABFC3F422B1840149BFFBFA00B544040E7FD7F9C321840587900609C0B544040B60600D8321840A877FF5F0208544080E3F7BFEE631840608800A01D06544080DE078027841840D0450060EA0354400092032035C61840ACC0FFDFE303544080EE00402FC71840E0E0FF1F2B025440C02AFA5F88121940D0C2FF9F2802544000BF03E0F8121940003A004040F7534040DB0580B34B1B4098BFFF7FD1F55340C08F0860DFBD1B40608800A05DE1534000CCFE5FC6362240D85400A0ABE95340404B0040461723408092FFBFADE953402077FEBF7A172340208DFFDFB1E9534040E5FF9FD41723402C680060B6E9534000C2012033182340F4640040BFE95340C03FFDFFE918234018E4FF3FC2E95340C096FD5F1A19234030ABFF5FD4E953408024FEDF131A234074060040CEF1534060410300B35E2340BC44000038F7534060C701006F8523409033000052F75340806103401A862340C819000059F75340607001A03E862340F47BFFDF2BFE5340C0DA01C0799C2340646B00800DFF534000970120549F2340E06300E0EC00544080800140F2A12340D04500604A01544080A0FF9F3CA2234094F9FFBF510D5440C081038081AB2340046600A0910D5440C0FCFDFF8BAB2340C8B3FF5FA70D5440C0F701E089AB234090330000B20D54404054FFFF83AB2340CC79FF1FC70F544080A302E005A82340FC560060D00F544060EB0200F5A72340844100E0E00F5440E083FC5FBAA7234020F3FF7F0310544080C0020016A723407883FF7F0C10544020D80240EAA62340A8DDFFFF13105440C0E2FB1FB6A6234000B7FF7FFE335440E06200801A9522406C7A00C00E4D5440601901400E722140E0FDFF3F9B565440A03200A0FFFD204080F8FF5F9F56544060F30160C0FD2040543000E0BA715440C08F0180337E1E40786C00E0BF715440002E01608B7D1E4038D7FFBFC571544040E60220B97C1E40046600A0F1715440409F00801F761E4010F2FF1F51725440005EFD7F6C671E40CC6200805A725440408A01A0F7651E40EC5500005E7254400083FEDF64651E4020F3FF7F6372544080D9048079641E40D8D1FFDF69725440C01D06C066631E4098BFFF7F71725440802608A016621E40E4C3FFFFDA725440401005A0424D1E400849008001775440C033050001681D40105800C022775440C02DFF7F6E601D40F4E1FF7F3D7754408016FEFF445A1D404412006058775440008F07C017531D40D0C2FF9F6877544000110320984E1D40D85400A06B77544080ACF8DF7A4D1D4024D6FF5F73775440C06EF9BF584A1D4048D8FF1F78775440801906409D451D40740600408E77544000DC0300092D1D40A877FF5F4278544080C403C034171C40084900804178544000DCF71FCE161C405CD9FF7FCA75544000FBFCFF51581B4054CAFF3FC9755440007E07C0F1571B40348EFF3FC474544080980360E30E1B40D0280040BA7054404084052083631A406C7A00C0CE6C544000630760C6F81940E42900A0CC6C544080B300A09CF81940F01B00C09D6C54404096FE9F6FF51940A84300A0C5695440C0D703803FCB1940740600406E67544080AAFCDFCFA81940A0CEFFBF32645440400007E0AB7D19408092FFBF2D645440C08E08006D7D194030ABFF5F9459544040E0FC9F26FF1840ECD2FF3FBC5454400023FFBFF6CD1840684E00605D48544080F3FA7F147C18401CC7FF1FF22D5440006300801AD71740D40B00200A26544080DD004009AE1740D4EEFFFFD92554404052FF3F9FAD17402CE5FF9FD4255440C041F9FF94AD1740544D0000AB255440005F04C08AAD1740
+MW	MWI	152	MWI	ملاوي	Malawi	Malawi	Malawi	Malawi	Малави	马拉维	Member State	NO	Lilongwe	Africa	Eastern Africa	0101000020E61000003DB7059120274140387A926DDE722AC0	0106000020E6100000010000000103000000010000001D000000983B59F56F8C414090E194B9F92031C0E00D8CD0108C4140E05F63DBC52031C070DE02EDF48941407006BBFE301C31C0209F4CED56364140C0003F99354130C0D83FC1C58A62404060AA436E868B2BC0E02AC1E270564040E00390DAC4392BC0D8915CFE4356404020A297512C372BC0986A9F8EC778404000DA5548F9D922C02893B665FE784040A0EF4B0FA0D622C050E0D6DD3C794040E0E8D495CFD222C060349D9D0C7A404040F5B9DA8ACD22C06846B1DCD27E4040E04BE0D6DDBC22C038E197FA797F404080F1EF332EBC22C0286C787AA5044140A0D7BB3FDEFB22C0B08C7F9F71054140C02DAD86C4FD22C0404ED1915C164140E01B5F7B663923C008F6D1A92B27414000581CCEFC7A23C048FB912232404140A03E3A75E5F323C0B013D044D840414080465A2A6FF723C0286D1CB11643414020B1DCD26A0824C08852EDD3F144414000E4839ECD1A24C0A8957B8159F1414060AC7F21F5582DC0A8EFA7C64BF741400014179172C92DC0B084EEFFD4E84140307D7B0C130530C088E7D19923E84140306070C3AB0830C020E79D7A8CA7414080B58853A61F31C03871FE68F0A64140E00B60DE242031C0801AC261C4A54140A0CAF1AF8A2031C0983B59F56F8C414090E194B9F92031C0
+SA	SAU	215	SAU	المملكة العربية السعودية	Saudi Arabia	Arabia Saudita	Arabie saoudite	Arábia Saudita	Саудовская Аравия	沙特阿拉伯	Member State	NO	Riyadh	Asia	Western Asia	0101000020E6100000FE6D143A02464640A6652A6D3A203840	0106000020E6100000010000000103000000010000001900000058591476516A4540A0EA3BBF286130409835BFA1BDF24440F0E6BB5E916C3040C824721AD2C9444060802E084FB0304030E44EAC7D40414000DC97D368F13B4068DA509438404140F027F90495F23B408031E0A1723F4140600E266555FD3B4028EC1D66D6764140303DF57D75493D40A0911D282B774140A08B3669484B3D40E8AA80B5C97941407085B7AE68583D4028428E737C7A4140709E5F784B5B3D40D06D54D7FC7F42406034B4A61E803F40608737C6A9904340608EDA0E57114040704B5645B89943406065DF15C1134040E8C14F1C40E54340201406651A074040E809F65FE7344440901A8524B3F23F4008C2C073EFBB474080499C1551FF3C4070964B7D753748406037841B0A883C405036EDE8133948404033E07D6C863C40884E45804CEB484080C5C55139B93B40B826C0F7D1EB484030E5EF2A60B83B40C0D6DEA7AA9A4B4080ADBD4F55B5364088031F5855D54B4010000000000036400800000000804B40100000000000344090A3AB74779747404033333333F3304058591476516A4540A0EA3BBF28613040
+SM	SMR	213	SMR	سان مارينو	San Marino	San Marino	Saint-Marin	São Marino	Сан-Марино	圣马力诺	Member State	NO	San Marino	Europe	Southern Europe	0101000020E6100000C1BE12071AEB2840CFE607C0C4F84540	0106000020E61000000100000001030000000100000017000000E08EAA2688EA2840386002B7EEF24540A0D95CACDDE92840C8CD3055F3F24540C050888043E82840E0868A71FEF2454060672783A3D4284040622D3E05F44540404B02D4D4D22840A83B889D29F4454020A0C37C79D128402884471B47F4454060B9DFA128D0284030E8F692C6F445408090662C9ACE2840C81DE1B4E0F54540C07C96E7C1CD2840D8C1FA3F87F9454040C9E53FA4CF2840801F80D426FA4540204E0B5EF4D528407829AE2AFBFA4540C0777FBC57ED284058616C21C8FD4540607FF62345F4284010BFD4CF9BFE4540C0342905DDFE284008FBE8D495FF4540C05221C888022940E8C28247D0FF4540E04D7FF623052940601B2AC6F9FF4540009981CAF8072940C0F770C971FF45408043C5387F032940103411363CF945408078978BF8FE284010F9A067B3F64540C081AD122CFE284098442FA358F64540A00EF3E505F82840E8C281902CF44540A05DBF6037EC284098F7AA9509F34540E08EAA2688EA2840386002B7EEF24540
+08	XXX	218	XXX		Senkaku Islands						Sovereignty unsettled	YES		Asia	Eastern Asia	0101000020E61000004AB3BC4858DE5E401CAE79D95DBE3940	0106000020E610000001000000010300000001000000200000003846EBA86AE35E4020E71A6668B8394060D2510E66E35E40C058518369B83940D86394675EE35E4030B62DCA6CB839408824B37A87DD5E40403D618907BC394078E0D57267DD5E40901AF7E637BC39404876DEC666DD5E4060FA7B293CBC3940C837143E5BDD5E4000B282DF86BC394098E00D6954DD5E40E0E9B298D8BC39402857B1F84DDD5E405019AA622ABD394040CDC98B4CDD5E4030C154336BBD39405013EF004FDD5E4080641EF983BD39408050508A56DD5E40B09A92ACC3BD3940C0AAB35A60DD5E40302713B70ABE39405849641F64DD5E4030B682A625BE3940F004FBAF73DD5E406001F73C7FBE3940B8B8FFC874EB5E402083C0CAA1ED3940B0B019E082EB5E40C009F7CABCED3940089013268CEB5E40C0997CB3CDED3940C075FEEDB2EB5E409078EBFCDBED394090D7BCAAB3EB5E4070E5D022DBED3940407100FDBEEB5E40F0DEC325C7ED394038FE4465C3EB5E40D0409E5DBEED3940D89849D40BEC5E40007DCD72D9EC39401892CCEA1DEC5E40B08427F4FAEB394050ED45B41DEC5E40000116F9F5EB3940A0EE3CF19CE35E40D0F1B56796B83940C8DEC4909CE35E40700E492D94B83940D0C0C8CB9AE35E40105CC98E8DB8394078A911FA99E35E40B0BB24CE8AB839408898840B79E35E4090A06AF46AB83940E8BA624678E35E4070CA87A06AB839403846EBA86AE35E4020E71A6668B83940
+DE	DEU	93	DEU	ألمانيا	Germany	Alemania	Allemagne	Alemanha	Германия	德 国	Member State	NO	Berlin	Europe	Western Europe	0101000020E6100000D73C08FC1EC324408837CECB958B4940	0106000020E61000000100000001030000000100000020000000208A1F63EE5A2440304833164DA3474080E2016553AE1E40288E75711BC54740C05E46B1DC521E4020EC866D8BCA4740003E7958A8151E40C04AB0389CD54740C0A25D85947F1940680CE544BBBA4840405D33F9667B1940E8989EB0C4BB4840C0F59CF4BE91184008000000000049404049D74CBE791840E03E1D8F1908494040ED02B667761740385E300E67864940001BF5108DCE17407091ED7C3FE94940805766B988CF174018DF89592FEA494080BE04204EA71A4028760040E5CC4A408099FEBFC6C72040E097FF9FE9854B40C0120420D2CD204080FE00E0E2864B40E0930100FDD52040F09E00801F874B40608BFCFFDADA2040F0EFFF5F0C874B40000804605ADD2A4028BF00C086574B4080BFFD9F14552B4038EEFE5F92494B40A0E3FE9F9A5C2B4060C200E01D484B4020A126E1DF722C40D83E43C398F64A40804E97C5C4E62C40801A69A9BCA14A406097C5C4E6132E4038EC6987BFA249408087BF266B142E4098882991449F4940600E4A9869FB2D4060B77A4E7A8F4940A033BF9A03F42D4020B7D100DE8A4940E01E6805869C2B402880D4264E4A4840401895D409182A40D0EF6DFAB3BF4740807407B133152A40C86ED8B628BF4740C03E74417D0B2A400098DD9387BD4740E01AE90A8B082A40384233E010BD474060A60A4625052A40A823B9FC87BC4740208A1F63EE5A2440304833164DA34740
+12	XXX	40781	XXX		Jammu and Kashmir						Sovereignty unsettled	YES		Asia	Eastern Asia	0101000020E6100000561D7F2B6AF352404EA5C7DFF9464140	0106000020E61000000100000001030000000100000027000000D02DAD86C4DF524020A3755435214040740D6C9560DF524070E89FE062214040D8B7CCE9B2AC5240E0429083123E40405CEC2FBB27695240F0ED08A7058B40409CAB1F9B0469524078C1678B2E8B404070CA15DEE568524070AA6054528B40400070253B36685240604D10751F8C4040B0174339D1205240F8C81F0C3CF341401C821C943021524098537424970B4240846ABC7493225240100C59DDEA194240A4B0C403CA225240B85E0CE5441B4240C417265305235240582D5BEB8B1C4240740D6C956023524008F775E09C1D4240380708E6E8235240B04929E8F61E4240B8FD2B2B4D24524068CC5D4BC81F4240503789416043524068CC5D4BC8574240742F698CD6435240D80968226C58424060DA70581A6A5240008CA03193744240B081AD122CAC5240C0A0BE654E8B4240B0FA5C6DC5AC5240E8CD531D728B4240B039403047C95240A0E7C1DD598342409CB67F65A5D95240F8F0D7648D7A4240008D0B0742DA52405041B797347A4240E0334B02D488534068BF60376CBF41405010751F80C25340F0B33C0FEE2A4140787B4963B4C25340C01A12F7582A414084FB3A70CEC2534038C55565DF294140E0FE959526D3534068376C5B945D404078BA2C2636D35340F0263108AC5C4040409B559FABD35340802D211FF44C4040F87684D382D15340F83D5C72DC454040000F45813ED1534020C05B204145404090E9094B3CD0534030581CCEFC42404060E01DD90FD0534098532B4EA042404034207BBDFBCF53403863D17476424040D0E49B6D6EC653403855302AA92F40400CB64AB038BE534048CF66D5E72A4040488B6CE7FBBD534098831266DA2A4040D02DAD86C4DF524020A3755435214040
+06	XXX	193	XXX		Paracel Islands						Sovereignty unsettled	YES		Asia	South-Eastern Asia	0101000020E6100000205EF34DA5155C40623DB45F9FD53040	0106000020E6100000010000000103000000010000001A0000004C43D7CF2CCD5B406097E2AAB28F2F40086D61CCCCCC5B4040EEC8FDB38F2F402C45D03D90CC5B40A04D9D47C58F2F40C0AD3E6887CC5B40E0F0941F02902F4030604C4489CC5B40E0C7CCAA74902F404CF4328AE5E05B4070CEA5B8AA1C3140F89E14F7E9E05B40008EAF3DB31C3140CC1F0C3CF7E05B40108E1546C41C31406C006F8104E15B4030E010AAD41C3140E80AEF7211E15B40D09F1A2FDD1C314050EDFB2683115C4000B1D35977FB304020EED9298C115C40B0EF24D86EFB30402858B0E8B1135C407009939856F7304038D07CCEDD135C4000E16BBE00F73040C8222B64D3145C4040C896E5EBF43040E88D27DDF1145C40908C91369FF43040C833FC02D52E5C40B01831FD5CAC3040287D6B71D72E5C40A093670355AC3040505E6402FE2E5C40806A1D0BC0AB30402033D3075C2F5C40D0DA8420ACA93040889E72F15C2F5C40601E2796A5A93040F06B6E965C2F5C4080B7465F9CA9304050BE7E2D542F5C40107250C24CA93040D05EC7C98E1C5C408027A5FB9406304040AC376A851C5C40C0D5E594800630404C43D7CF2CCD5B406097E2AAB28F2F40
+SK	SVK	223	SVK	سلوفاكيا	Slovakia	Eslovaquia	Slovaquie	Eslováquia	Словакия	斯洛伐克	Member State	NO	Bratislava	Europe	Eastern Europe	0101000020E61000008D9A40945C7C3340795561A17E5A4840	0106000020E61000000100000001030000000100000021000000801EDC9DB54B324008F25EB532DD474020799274CDE4314080543541D4DD4740A09C853DEDC83140280C3CF71EDE47403025AFCE31B83140F0CA67791EE04740F0F692C668153140883E912749034840D0FA3F87F9DA3040585C55F65D2D4840E082177D05D93040103D9B559F2F484030E99AC937DB3040981804560E39484060B77A4E7AF730402051DA1B7C554840500DA661F8003140602A6F47385D4840A045D3D9C908314078641EF983614840D05F9335EA19314090C3995FCD69484070AA6054522F3140A829745E636F48408099D365319932409852D0ED25C1484020527E52ED7333409835EA211ACD4840D05EEFFE78773340904AEA0434CD484050DD0720B5A13540382FC03E3AB9484010C9022670A33540B0A44E4013B94840C045990D32D935405866834C32B24840709CBF0985F83540301DACFF73AC4840A054185B0892364088CAF8F7198B4840B096D32905923640A86199CD0F8B4840802F698CD691364050EF1B5F7B8A4840D0BDA4315A8F3640181AFA27B8844840D04351A04F8C364010172B6A308148408009F9A0675B364078641EF98359484060A4C2D842283640201DC9E53F344840F0B4E0455F213640D82B6519E2304840B049CBE391203640B83C2EFBCC30484030EBE2361A203640B0D903ADC03048404095B7239C1E3640284F92AE99304840C047E17A14AE3240A875543541E04740801EDC9DB54B324008F25EB532DD4740
+SJ	SJM	234	NOR	جزر سفالبارد وجان مايين	Svalbard and Jan Mayen Islands	Islas Svalbard y Jan Mayen	Îles Svalbard et Jan Mayen	Svalbard e Jan Mayen	Острова Свальбард и Ян-Майен	斯瓦尔巴特群岛	NO Territory	NO	Longyearbyen	Europe	Northern Europe	0101000020E610000040BC6230A2B62F40D8B24AC2FDA55340	0106000020E6100000010000000103000000010000001E00000060F89F5A4FFF21C0C4380202E7B4514000C0666FDF1122C034D28BDAFDB451408080E211261622C04CEA4EC12BB5514020AEDA90DA1722C0706292DB40B5514040E0EC7B792A22C074E7B11C57B75140C0E65A0FBA2722C06463038EA9B751408043F751B22522C09CC228ADE4B75140803726D5882222C0582A977C22B85140C075D7231E52254074A36DA150F0534040060484206925401C83E22252F1534080E4F38AA7822540A818D643EAF1534080B296A7189C2640D014843C4CF753405008FB1B5954344034BFD36446355440109B821BFA563440700C60E856355440C0F14F5F85583440844A4B9B60355440D09C346843093940F8831502142B54406067107A91924040FC7E0F0302105440908851C6AE944040B0293520E70F5440F0211ADD419E40401CF6B4C35F0F5440105064F72EA4404008E55BC49C0E5440401169C0C5A440400056CA7C510E5440E0588F561096394084CBAD5AE32C5340103F77DDB6F63840B8171B04E71C534000D66C8A6C2E33407CD267AC2297524050AC1337F12D3340882C55B31897524010DE358D921A3340C441203CFF95524080A719F78B103340508F0134A5955240807DC9C683F921C0B07C2A02F7B45140602D5EA8D3F921C0D4D89C25F6B4514060F89F5A4FFF21C0C4380202E7B45140
+SS	SSD	74	   		South Sudan	Sudán del Sur	Soudan du Sud	Sudão do Sul	Южный Судан		Member State	NO	Juba	Africa	Eastern Africa	0101000020E61000004AC0F3C483533E40201A8453C5291D40	0106000020E6100000010000000103000000010000001E000000D08E5D74C2DA3E40003F3A2957E60B4050A94278BE5F3C4080CAABF48C1B114050802805CE333C4000C0EB0DA064114030AE523099133C4080F532C490A4114050C9A771B6C83B40C0AFB2E66264124080D049E2F133384060FFDB2A5D9C20405052C305402E3840605ACF4838AB2040F0D90C6D09283840403A014312BD20406015332586273840C0108D5604BF204020CC76BD68273840E005A4E673BF204060FF240194263840E0D61BC4EDCA2040D0A7C1B38B293840A0B59AA3FEF52040D0E48DF924393840C00AAF52B1482140C0B3046056B83840E0E2F61F277D2340F025FDFF30193940E0C9F99F52A02440303EFEDFCC193940A0C6FE7F8AA12440F02206A02220394080BFF1BFD9A824404048FDFFFC203940600CFFDF94A92440C8B900E04A5E4040400AFF1FB079284088B2FD1FB8824040A067F3DF5374284020E802E0DDA54040404301E07A6E284010C0FE3F1CA64040E02700E0876C28402863EE5A42EE414000BF0E9C3342154000AAF1D24DEE41408011B79BC4401540606660D081EE4140C0871EE2333A1540E8C325C79DEE414000BC3FDEAB361540B035CD3B4EF94140C014AE47E17A124028AB5B3D27C14040002EAD86C4FD0D40788BFC71F019404080815E55490A0C40D08E5D74C2DA3E40003F3A2957E60B40
+LT	LTU	147	LTU	ليتوانيا	Lithuania	Lituania	Lituanie	Lituânia	Литва	立陶宛	Member State	NO	Vilnius	Europe	Northern Europe	0101000020E61000002C6791E2D1E83740140160A7F2AA4B40	0106000020E6100000010000000103000000010000001E000000C0D85F764FCE374048F163CC5DF34A408084D382179D374010CD751A69F54A4050696FF08581374008529B38B9FB4A401003200507F13440607F24EF93A34B402009EE26491235408043AB771E084C40907077D66E3B3540582844C021144C4050A9F6E978543540B85E0CE5441B4C4010F61D38F15435400019B5F3641B4C40F054A4C2D85A35400861E0B9F71C4C4000DE1FEF557B3540F04317D4B7244C40C0E1BE15567B354048FE54DAB7244C40F02B4833167D3540A020EA3E00254C4090D2DEE00B9B354050E0D6DD3C294C401000000000003640C830992A18354C40D0FBE3BD6A1D36401068226C78364C40F05031CEDF24364008603C8386364C4080E9263108E43840904AEA0434394C406001AFB08FE53840D0E64BBE05394C40A0313913A5E83840C036BC6FA8384C4010969526A5E8384068F3716DA8384C40D0F2599E07AF39405836E50AEF124C4080046CB1A29E3A40282DD01951D64B40F07F2BD9B1A13A4040D6C56D34D44B401013B87537DF3A40A09F54FB74A44B40C0024356B7CA3940488655BC91154B40A089CDC7B5A93940985CFE43FA114B4030456458C5C33840B893C151F2FA4A4050AA9A20EA6E384068450DA661F44A4090B0E1E99562384000A167B3EAF34A40C0D85F764FCE374048F163CC5DF34A40
+JM	JAM	123	JAM	جامايكا	Jamaica	Jamaica	Jamaïque	Jamaica	Ямайка	牙买加	Member State	NO	Kingston	Americas	Caribbean	0101000020E6100000584E573BE25353C07E5017AE6A283240	0106000020E6100000010000000103000000010000002E000000AC4912DFE44A53C040C13D2A59B53140C0BB5CC4774B53C0905FFB13A6B53140087316516E6F53C040DB87BCE5DA3140A82A3410CB9653C0906F7209D13D3240F0660DDED79653C0A00464F9043E324078E2EFCD259753C020CAFB389A3F3240BC49D3A0689753C040DA2D138F413240F4C83038949753C000DB3928BC433240F86BC372959753C000E9B81AD9433240C4E3B3869C9753C000A0A124C944324088016D06939753C0D0F462CD6D453240EC3F4349129653C000F209D9795B32402CF4D25E0E9653C0808280C6965B3240100E0753DE9553C0E0F19881CA5C3240305310F2B09553C04062331BBF5D324094C8AAAD7D9553C030F36D66995E3240FCEEC27B338F53C09074B169A5703240A4619DCFA58D53C060722C94F174324058153CE0958D53C09004487E0E75324004215551727853C070465046A68532403CF83F764D7653C060A3C3E85E863240F8ED9007477653C0B007D220608632408C672B8A327653C0E09D49F6638632408C0A9C6C037553C0708D4127848632409480F33DFE7353C0E03329AA2386324098B27856F75353C0D0E9DACD427932407C750B137C3953C03067D311C0693240D4B37B4D6A3953C040F598EDAF693240F060E696313953C0D01A2E724F69324068A44A39041753C050D076F1232B3240C417FE1D9B1553C0002AD890C92732406857D7578D1553C0B036F4609C273240187112946C1553C060F6BEA72827324038A000E5CA0B53C080C12A2856EB3140E867B114C90B53C0F07217BC43EB3140A45C86A4BB0B53C0E02BD1FEACEA31404858C0A9B40B53C0C03DEC8502EA3140DC1A33E4B30B53C0A08235CEA6E931405CE40A94B90B53C0B0AC623B29E93140F88B8F05BB0B53C030BAC21616E9314000AD1B4AC80B53C060EE056685E83140C46B6F01320C53C080B98ECC7EE63140E41714BC571353C050869F49ACDE31408818C0A5AD1553C0907D851623DC314090F3B4B2334A53C0B04CDC2A88B53140AC4912DFE44A53C040C13D2A59B53140
+07	XXX	216	XXX		Scarborough Reef						Sovereignty unsettled	YES		Asia	South-Eastern Asia	0101000020E6100000EEE445DD96715D4098BF04B616532E40	0106000020E61000000100000001030000000100000012000000E0FC6431D6745D40C08317D8BE332E40F8B3B343D7725D40E077184971342E40C0C0F6DD3E6F5D4080682508B2392E4010A2934A9D6E5D406002A72D643C2E406873D53C476E5D40009BA10271402E4080051F39886D5D4000EEADED92692E40B08BCA3CA86D5D40C0E1838DA16E2E4028C50089266E5D40405AF2785A722E40C84B81165C6F5D408047C1F80E732E4040C59915C0755D40606062E2454D2E40E0C6E93507765D406096BB85644B2E40605B1DA537765D40A0ED49BB2C492E40904A7E1F69765D40A02238899C452E403840B3356C765D40A0AB09FDA7422E401000FA2246765D40A0BE277BF03F2E40C0D7385101765D40003FDE509D3B2E40400664AF77755D4060AD7A0ACA362E40E0FC6431D6745D40C08317D8BE332E40
+SH	SHN	207	GBR	سانت هيلينا	Saint Helena, Ascension and Tristan da Cunha	Santa Elena, Ascension y Tristan da Cunha	Sainte-Hélène, Ascension et Tristan de Cunha	Santa Helena, Ascensão e Tristão da Cunha	острова Святой Елены Вознесения и Тристан-да-Кунья	圣赫勒拿	UK Non-Self-Governing Territory	NO		Africa	Western Africa	0101000020E610000009F0971467D416C068921C2D30EE2FC0	0106000020E61000000100000001030000000100000028000000C0211E9309CA23C0187CDE43782F44C0809643587BD623C0E837C9456B2F44C0C0431262D3DB23C0A8004B53A92E44C060EE04FBAF0724C050F76D2D382844C02002F1BA7E0924C0287CD866BE2744C0006F0388CC6629C0788BBA7B25A842C040A7EC4F3D6929C05058045A15A742C020B5B05D90D72CC0802E4BE07BC41FC0E0AC495C6CD72CC000305EDFC6B91FC0E03A7B1D27CF2CC080504F1F819F1FC0A0AB90F293CE2CC040E1AC2DE19D1FC060E09634EBCD2CC0000EB10B509C1FC0006DBB1AEAC92CC0C014DE8A69931FC0C044775AC8C92CC0C07365AB26931FC0C0E1A47A7CC82CC0C0FEDF2241921FC060971F1384C22CC0403E58C6868E1FC0E078E8BB5BC12CC08078C839568E1FC0203476D377C02CC0C01D6D1CB18E1FC0C06E7C92E0BE2CC040F926F2C98F1FC0002950D54EB62CC0801B4A48FF961FC0C08BC3F418B42CC0C0C36EE9E2981FC0E0C220FAFFA62CC0C0B2316596AB1FC040FF756EDA9C2CC080BF531223BD1FC080800E4E9FA016C0E001B452ADD22FC080820651AD9C16C020C2363D83D52FC000125D610B9B16C02069D086B2D62FC080B8718BF98916C0004AED45B4E52FC040600B30E28916C02037B176CAE52FC0400BB3D0CE8916C0209D7BB4DDE52FC0408709B4858916C00071F03B3CE62FC000B23C597B8916C000BEADAA4DE62FC0403EF72F5A8916C04019EE128BE62FC080878F3E9C8616C000BB9FAE49F62FC000F619619B8616C060D7AB7E5BF62FC0A094F9A298BF23C0F8E851A7F22B44C0A08E102F99C423C0B049A01C602E44C0A06565A0D7C423C058DE0B827D2E44C040DB865110C823C080BB0E304E2F44C08061A3ACDFC823C0C8EE46D5652F44C0C0211E9309CA23C0187CDE43782F44C0
+SR	SUR	233	SUR	سورينام	Suriname	Suriname	Suriname	Suriname	Суринам	苏里南	Member State	NO	Paramaribo	Americas	South America	0101000020E6100000B17C294CDDF34BC0AE72E91BD48A1040	0106000020E6100000010000000103000000010000002A000000E0654F2D5BFF4BC0005DE674594CFD3FE8F490E48AFF4BC0001F10D9214DFD3FB80A4E4F68034CC000AE97165D5DFD3F389679D66E034CC0001E1B81785DFD3F30D252793B224CC0003C3602F13AFE3FB0AAECBB22344CC000C447C494C8FE3FF890655E1A3D4CC000A10E849422FF3F90CAA3676F574CC080C7A71E6E1D0040D0FCAD7429D84CC0805020DFEA440B40F01D4B0B96034DC08083037DC9DE0F40E0D4B12462064DC0004AA9909A9A1040089A729261F64CC08073160F5242134088B3A23394F54CC0C0F9AC5160561340401152B7B3884CC040AED0AC11C61740F068609AD8874CC080F3B116FACB17408860A8984A7B4CC000AF4D19EE0A184028CF83BBB36C4BC0C015D56C2FFB174028B528FDCE6B4BC0C0F5C99B0DFB1740C8A9D0E5726B4BC040C012FEFBFA1740F0D33549E26A4BC08074C46BA8FA17407895C679496A4BC0409BABE639FA1740C037802326694BC0803C4A253CF91740505DC0CB0C5A4BC080C38A0920EB17409044F64196544BC0C093837E4BE51740089865F448534BC0C015C9B2BBE317408820CEC309384BC08007B29E5ABD174028943B2295274BC0C04B17073CA5174030F64773BF234BC040097E65EF9E1740D0C6116BF1FD4AC0407A36AB3E571740303CBD5296FD4AC0C07FBC57AD4C17408835A3B96AFD4AC0004B511037DD0C40A0CD0D8DF4FF4AC0802AE79AE8800B40F0DBB5BCE6174BC080FFE89B34B10640383BC51C57194BC080FE975CA66D0640B004822ED11A4BC0809BADE764340640E0DD4ADC8E2C4BC080B63EAA3633044090DD43F7292D4BC0809A9A5F282304406836A2F0E32F4BC08038B7CF4BE90340088B1AE41F324BC0804FC4E8DABB034040913C7705414BC0804F9AB245B10240607FD93D79FC4BC0009D68572165FD3FE0654F2D5BFF4BC0005DE674594CFD3F
+CY	CYP	64	CYP	قبرص	Cyprus	Chipre	Chypre	Chipre	Кипр	塞浦路斯	Member State	NO	Nicosia	Asia	Western Asia	0101000020E6100000E3F81636F39C4040D68B4ABC6A864140	0106000020E6100000010000000103000000010000001C000000B8135E8253834040300EA0DFF7474140E8D87A8670774040904BFA2070484140B822C55B423F4040E05D34BFF55941406881542F643D4040E0DE24BCF35A4140B840BB438A374040A0B7239C165E414030166470393340402898929B976041404827DFC72C33404040BBFFD9A0604140A0BA3CE7B8274040B07180AA1B73414050332779BF224040501BA26538864140B0E463778122404060C51B99478841404054539275224040A8DD21C5008941405085C2B178224040F0397D98188941401828F62BF8224040407BFBCE8A8B414048F45ABF4F234040880FA848CF8C41405033823232244040D8D666086C8D4140903E1F65C475404090CED7D1DDB3414030396057934D41405883A27900DB4140F0EB32FCA74D4140D0A4863600DB4140B8AA5E7EA74D414050C0E8F2E6DA41402053E9279C4D414060629E95B4DA4140084A7CEE0449414010C1AA7AF9D24140C8A15CBF050B414068F6EB4E777A414080351E11F80A4140F87002D3697A4140E816E247EB0A4140A8A57565617A414020F2CF0CE2834040B08E1CE90C484140585BEA20AF83404088DE1B4300484140C827D8AA5D834040300EA0DFF7474140B8135E8253834040300EA0DFF7474140
+PF	PYF	87	FRA	بولينيزيا الفرنسية	French Polynesia	Polinesia Francesa	Polynésie française	Polinésia Francesa	Французская Полинезия	法属波利尼西亚	FR Territory	NO	Papeete	Oceania	Polynesia	0101000020E61000003DFA2716D4AC62C0D19CA51072AD31C0	0106000020E6100000010000000103000000010000001C000000788AC168BBEF61C070DDC77663E63BC0D4E132B8770A62C0405B34AEC9A63BC02CE7F7A2A20A62C0D06A64575AA63BC017737C59BF0B62C050B19D94EEA13BC0BEE7D19E1C5763C09095DC1786D035C0DA368C82205763C020F944436BD035C01E903AF0205763C0E0FD2F325CD035C06C003620425763C0D08BB2C8C08530C014962EB33E5763C0A050A4FB398530C07E935CB4365763C0F0A765B50A8430C0880563E9685163C0C0F3FC69A3A22FC09F90F870645163C000A47F93B7A12FC07EA4880C6BFA62C080B7E45D9AD326C081774DA364FA62C080C6E52E78D326C0A0D3F36EEC9161C080BFDB72E4971FC0E271ACE6148C61C0C00C3C52D8701FC084A059C8128C61C0401A6437D8701FC0567ECFFE765D61C0E06D77C542DF22C084DC56C43A4D61C0402E217AADB724C08A45C2AD71CE60C010576D48ED5937C01292167878CE60C0304F4D93635A37C034A671B98BCE60C0501498A9A45B37C0647B3E1496CE60C070EA1F44325C37C0A83DDB59AACE60C0B017BA6D3A5D37C0A6E26B74B3CE60C0D04B4D277E5D37C08E6AD8EFC9CE60C010AA95AE055E37C0E69B23E1B1EF61C0F09600FC53E63BC0788AC168BBEF61C070DDC77663E63BC0
+BB	BRB	24	BRB	بربادوس	Barbados	Barbados	Barbade	Barbados	Барбадос	巴巴多斯	Member State	NO	Bridgetown	Americas	Caribbean	0101000020E6100000195A664538C74DC09737127F28582A40	0106000020E6100000010000000103000000010000002600000018DF837C75C34DC0E05DCEB6E4162A40A074441905C44DC0207278F7B6172A40F88FC99871CE4DC0805BC75D29282A4030DA71C3EFD04DC0C0E6FB4E38342A40D8579BB5CAD14DC02043458B224A2A4038878D0D38D34DC0A0494CAB7C922A4008CD2B8D4ED34DC0004615B47F9C2A40101747E526D34DC000F2C528199E2A4078C9213DA0D14DC080964E35C4A62A40401B800D88D14DC080C3561A42A72A40E8BDAE1523D14DC040A325EA60A82A404883B3A558CF4DC020FEE5A441AB2A40D8D2D62DA7CE4DC020C42A3982AB2A40102411757ACE4DC0A0A92D7590AB2A4080CFC59569CE4DC0004FAA2281AB2A40F89DDCA5C3CD4DC0806C825E6EAA2A4020168CA5A3CC4DC020B73E517EA72A40909DC8DD31CA4DC060C065040A9F2A4058B5430DF0C94DC080C5D67D119E2A40D03B48F4D7B64DC0209453967C532A4098DCA5C3F9B54DC040396057934F2A40C0E18222CCB54DC0E0ABF01DEB4C2A4018407562C5B54DC0C0B316B02E4C2A4098F0129CFAB54DC0A0848E67E1482A4028B5EF9B0CB64DC0001DECA8C5472A40789CE6D319B64DC02022B94615472A40483C670B08B74DC0E07BBEC1723F2A40C866C4BB12B74DC0204C8BFA243F2A403874E6C358B74DC000058FCAA83D2A4050B2632310B94DC0800861246A342A40D0B9EC212BBA4DC06066D993C02E2A40F80C2549C6BA4DC0A09D5CF8662C2A4020D236FE44BB4DC0805F79909E2A2A407801AC448FC04DC020F3B85E891A2A4080D4A35F11C24DC0C0D3DC651A182A40B0A6C35444C24DC0E07F0AECD6172A40E8C4F6A45DC24DC060E7960CB6172A4018DF837C75C34DC0E05DCEB6E4162A40
+OM	OMN	187	OMN	عمان	Oman	Omán	Oman	Omã	Оман	阿 曼	Member State	NO	Muscat	Asia	Western Asia	0101000020E6100000B136A7BF3D0C4C40B5CAEBC167913440	0106000020E6100000010000000103000000010000001B0000007072DF07B38D4A40707BDDEA85A7304090A3AB74775F4A40F08096AE604B31400800000000004A401000000000003340A819B5DC880C4C4070C9073071183A40C021A35C8A174C40C07FA275FE3B3A4020BF4D724C184C40B0E07DE3D83D3A40F09EEF53871A4C4010E3F624E0413A40402F7443582C4C40902D003752603A40C86A147B702F4C40A0EE79C151633A4010FAEE9D2B434C40309785CACD623A40F8413600C3434C40F0ED61CC69623A40A05F611CB7E54D40D02C73A10F88364098B1BD5D89E94D40B0A22F2C1B773640987F60A001EB4D40D0341547BD6D36409024AF0B15EB4D40C0AF0D59806C364070A70C3AA6E94D40904C2347694C3640387877E864E74D406096A40FB63A3640F0765A7726E74D4010575DAD31393640B0F7735BB97A4D40C03A735B178334406850A989F3EB4C407095F8FADF003340882990FAA72C4C40A0FD09870E7F31404897CBA1602C4C40C0B87A46897E3140C06F97F801834B4020A18BC570013140485B775BF8734B408065C43020F7304008380518E7724B40A06A2CEF97F63040183CA72176664B40A06BA1C99DF030407072DF07B38D4A40707BDDEA85A73040
+SZ	SWZ	235	SWZ	سوازيلند	Swaziland	Swazilandia	Swaziland	Suazilândia	Свазиленд	斯威士兰	Member State	NO	Mbabane (adm.)	Africa	Southern Africa	0101000020E61000009135E2CC61803F40687164BE90903AC0	0106000020E61000000100000001030000000100000029000000D02154A9D9D33F40C08F31772D513BC0B04143FF04C73F4090779CA223513BC03034F44F70893F40A04D9CDCEF503BC050088F368E803F40E085C954C1503BC050DEAB56267C3F4080705AF0A24F3BC00046425BCE4D3F40C0264EEE77403BC010314278B4393F4020F224E99A393BC0E0A145B6F32D3F4090D634EF38353BC0A040BCAE5F283F4080EFC4AC17333BC0506BB75D68263F40A01DFE9AAC313BC0402FC03E3AFD3E40E002ECA353073BC060D50451F7F93E4020C9C859D8033BC090F7C77BD5D23E40002384471BD73AC0A01EBFB7E9CF3E405085949F54D33AC000E08FB7E9CF3E4010C2749E54D33AC0E0845FEAE7CD3E40D09E5912A0C63AC0D0EC9E3C2CCC3E40D0DF675C38B83AC000001DE6CBCB3E40B0EC9E3C2CAC3AC0406DFFCA4ACB3E40B00F406A13973AC08001F6D1A9CB3E4000FD135CAC903AC0D0F0113125D23E4030EA211ADD713AC08015527E52D53E4050BA490C026B3AC030A5A0DB4B223F409004A8A965EB39C040992A1895243F40403D44A33BE839C010CB4A9352503F40E05EB532E1BF39C0D0E1CBF802523F40006A1EDE78BE39C060F2EA1C03523F40203E05C078BE39C00025E99AC9573F40B0D9E6C6F4BC39C02068226C786A3F4040CEC29E76B839C040D3F6AFAC6C3F40F0907EFB3AB839C0B06B26DF6CFB3F4010287E8CB9F339C0904677103B0B4040B086A757CA023AC05015231D6E0B4040C03F245D62053AC0D0BFCFB8700C4040D089592F86123AC0E8D6DD3CD50D404060C5FEB27B2A3AC088AEB6627F114040B00BCD751A893AC0488655BC91114040906588635DA43AC0D07F48BF7D114040C016821C94B83AC0506458C51B11404060D0D03FC1D53AC090224F92AEF93F40B028B34126513BC0D02154A9D9D33F40C08F31772D513BC0
+AG	ATG	11	ATG	أنتيغوا وباربودا	Antigua and Barbuda	Antigua y Barbuda	Antigua-et-Barbuda	Antígua e Barbuda	Антигуа и Барбуда	安提瓜和巴布达	Member State	NO	St John's	Americas	Caribbean	0101000020E6100000C60A0A074EE64EC025AFB251CA133140	0106000020E61000000100000001030000000100000022000000F81FBB664D2C4FC06046DFEEF6EE3040585A8A9A9E2C4FC040323A2009EF30402030AE02C62C4FC090D2AB5C03F03040104187ECC82C4FC0107490BEE6F0304000ECFE0CCA2C4FC0A0F73EB03EF1304070C2F0B677F14EC020F6926BAFB2314088823BAB60EF4EC070AFE94141B73140D04F937428ED4EC0D0CAB2710EBA3140004AAF720DED4EC0E0C721872DBA31408890BA9D7DEC4EC00072DF6A9DBA314008A760E86CEC4EC0007FCB52A1BA314048C422861DEC4EC0C0282504ABBA314050A725B1FFEB4EC030796462A9BA3140A07697D585E54EC06059CAE836B33140588D47043EE54EC030105432A5B23140F8EACC98DDDF4EC0A028FE3916A7314050DDC8E138DF4EC0F0F791B64CA531405070D3FAB6DE4EC06097207E59A3314020337271AFDE4EC040AF343A31A33140E015F4835FDE4EC0302F6B6281A13140303575C35BDE4EC0E06559E663A13140387E80FFF7DD4EC0707A562D449E314000E7AE809DDD4EC030157C89679B3140288DBA3198DD4EC0102692431F9B314008FE915E1ED44EC0A0D37C3AC3113140B04714FF1CD44EC0A0D0F12C9C113140482047CE1DD44EC040F680D481113140B8D2D7987CD54EC000C03A33660D314020C23C1A3DD64EC0E0D36938C00B314080247A19C5D74EC0902D76FBAC08314010AA622AFDDD4EC0406B4B789D003140B0FAB1497EDF4EC020B5125F92FF30407065CD7E93E04EC0C0975C7B55FF3040F81FBB664D2C4FC06046DFEEF6EE3040
+RS	SRB	2648	SRB	صربيا	Serbia	Serbia	Serbie 	Sérvia	Сербия	塞尔维亚	Member State	NO	Belgrade	Europe	Southern Europe	0101000020E6100000523C605C08CE344097D5E306E4034640	0106000020E61000000100000001030000000100000042000000B00C8E92579F3440785F07CE19ED4440A059F56D4C9F3440E07DD41A1BED444050DC63E9439F3440703A3B191CED4440603ECBF3E09E34407899D36531ED4440304B1FBAA09E3440B83DB32440ED444030080ED7869E3440086B964A46ED444010603C83869E34405822895E46ED4440601CCEFC6A9E344020DD41EC4CED44408036447F629E3440180085154FED4440201956F1469E34400849111956ED44407044696FF09D344060BBED4273ED4440F0094B3CA09C34407044696FF0ED444040548CF33799344088B2295778EF4440005114E813993440C0313D6189EF4440303FA9F6E998344038384A5E9DEF4440507C2766BD9834408843A852B3EF444040842A357B983440F841CF66D5EF4440307C6132559834405072F90FE9EF4440D0340C1F113B33409857E71890BD45406053CBD6FA3A3340B01DFE9AACBD4540E027F224E93A334000632827DABD4540404CA60A46FD3240682310AFEB734640409886E123DA3240B83C0FEECEE246401088F4DBD7D9324020C616821CE84640C0632310AFDB3240306BD44334EE4640D044F5D6C0DE3240F8C308E1D1F24640502EFF21FDDE3240A84143FF04F3464080E40F069EE332402090BDDEFDF54640E06EBBD05CE732407026DF6C73F74640909A5AB6D6E7324030137EA99FF74640204A9869FBE73240105A8121ABF7464090DAE1AFC91A3340C00BCD751A054740706C21C84191334030E4839ECD16474040AB3E575B913340706B7D91D016474000C5AC1743A9334090C43D963E18474060650C9748A93340B04807E93E18474070A6ED5F59A93340201DC9E53F18474010DFA63FFB193440181E6D1CB1164740C069DE718A2E34409072A25D85144740A03E74417D433440A016BCE82B104740808A8EE4F2473440286D1CB1160F4740C04CF8A57EB63640D8CCCCCCCC4C464080F4F8BD4DBF364030965B5A0D494640009E98F562C03640D81E68058648464070670A9DD7C03640308C2D043948464010F775E09CC13640B8632310AF474640B0D590B8C7C2364078567DAEB64646409088467710C33640B8122C0E67464640D01C3D7E6FC3364040EA211ADD45464070A6ED5F59013740F0211ADD4198454070A6ED5F5901374080E9263108984540603F6F2A52013740983BA583F5974540A0F2936A9FFE364038A86F99D3914540905FD20191FE3640701FB6EAB6914540E047A7AE7CFE3640E82879758E914540004B598638FE36409042041C4291454040E197FA79FB3640F87C3F355E8E4540700D897B2C853640F815A4198B32454050A9F6E97874364060CA32C4B12A45408065C22FF57336405814E813792A454030A7E8482E6F3640309B728577294540406002B7EE6E3640E8D1C6116B29454060E71890BD6E3640D86A48DC632945409009DCBA9BAF3440B074B0FECFED4440A0DFDBF4679F3440C00BCD751AED4440B00C8E92579F3440785F07CE19ED4440
+TM	TKM	250	TKM	تركمانستان	Turkmenistan	Turkmenistán	Turkménistan	Turquemenistão	Туркменистан	土库曼斯坦	Member State	NO	Ashgabat	Asia	Central Asia	0101000020E610000061ED3BD689324D40C21349A7FB9A4340	0106000020E6100000010000000103000000010000002A000000A87F828B15274F4040842A357B90414068DC460378C34A40F81B5F7B66A94240109DD7D825124A4010DD5ED218ED4240B8907716D60B4A4048A8EE3E85EF4240483F8C101E094A4048E3C28190F04240788FA50F5DFC4940984946CEC2F64240A80BEA5BE6E4494098DE37BEF60C4340B88F4E5DF9D0494090032159C02043404803ED8577A54940A86AC833805B4340309B728577A54940E0C56D34805B4340880EF3E505A0494010410E4A989D4440D8307C444C814A40E0BFB2D2A410454098CC237F30844A4068AB048BC3114540D0AB730CC8AE4A40309ACE4E061F4540A00D32C9C8B54A4060F0A2AF2021454028AB5B3D27BD4A40D071A774B0224540F0ED08A705CB4A40C818CA8976254540281ADD41ECD04A40F000C11C3D26454008C11C3D7EEF4A40C83AC780EC29454028EF552B13F64A4040191C25AF2A4540385A475513504D40A02A1895D46545401011700855F24D40A016BCE82B244540B03E575BB1034E40A854FB743C1A4540D866D5E76ACF4E4070DAFE9595A24440D0CD70033EDB4E40E80720B5899B44402810AFEB17E84E403855302AA99344409CD36531B1A75040E0942BBCCB014340305DD118D3A75040E0FED5B08D0143400C11700855A85040D03368E89F004340885FEAE74DAB5040E0DD3CD521FB4240B47C96E7C1AB504098E34EE960F9424018FBCBEEC9AB5040A0ECD808C4F74240CC293A92CBAB50402838674469F742409CE7C1DD59A95040B09196CADBB942405436E50AEFA8504018F8FC3042B8424088AB829F38A3504068670A9DD7AC4240B07EA5F3E1A25040E870E65773AC42403056D25FAF8C4F40009C508880B54140F0C93505325F4F40A0CB0D863AA04140D8436D1B465B4F4008EB387EA89E414010815AE15D504F40C0ED42739D9A4140A87F828B15274F4040842A357B904140
+TG	TGO	243	TGO	توغو	Togo	Togo	Togo	Togo	Того	多 哥	Member State	NO	Lomé	Africa	Western Africa	0101000020E61000009C2EA152FC50EF3FE6D5DF0CCE0F2140	0106000020E6100000010000000103000000010000001500000000D626889931F33F40EEA2571F73184000BF9C7EF55DF13F4092C1081CAC1840005C9C697638E93FC03E5431CDA21940009A9AD7EDF0E73F80C4C15C8DC519400048281E666BE43FC0E105798C8A1A4000CE3BB1FB0CE13F407314BDDF501B40007E86778607E13F008A80F461541B4000303542D236B7BF807ACBCD1E6A254000F805BB61DBC2BFA0E882FA9639264000F8AFC5642DC2BF80D81F30284726400038DA38622DC2BFC098F562284726400006172B6A30ED3F2095F1EF33FE254000A1F831E6AEF53F20000000000024400028A089B0E1F93FE04351A04F24224000F5F8BD4DFFF93F60E5ED08A715224000BB0F406A13FA3F408F19A88CFF2140002B00C633E8FC3F80DC80CF0F23194000640B410ECAFC3F8043E21E4B1F194000B1B5AD1C90F43F80D36295778A184000B6E276C331F33F800410882173184000D626889931F33F40EEA2571F731840
+JE	JEY	128	GBR		Jersey						UK Territory	NO	St. Helier	Europe	Northern Europe	0101000020E6100000DC5898E4DA0F01C009FBF919659B4840	0106000020E6100000010000000103000000010000001D0000008078AEEFC36100C028B6BB07E8924840808AFD65F76400C0C0FFC874E892484080E3CA8FAE5801C0F0C578831E95484080D868EF425901C0D8544FE61F95484000BF9F75E87F01C0A004F2368095484080BDF036AED001C030E263665596484080FD68931E0102C0983F1878EE96484000ED5F59690202C0F8ECA820F596484080D870A2A70202C0201CB9C903974840008463963D0902C03837DF88EE9F48400092EC6C230902C020CB8866F99F48400077F931410802C0B8CD21043FA0484080E9BB11CC0702C060CD188B4BA0484000A91DB40D0202C0506D76FFB3A04840804993F716FB01C0E0F3249F0DA1484080C12852ABF901C0582AF23515A14840808A485EE7D001C0D8823FB26FA1484000C0B5E0333801C080ABBF6F8DA1484000DC8EBAE7CA00C0C0945FABA9A0484000BE9AA84AC000C06832665C82A0484080B18174B16900C018F3F631309F4840805791D1016900C018CC65FE2C9F484080B6161C143300C0B054D33FD29D484080A7565F5D1500C0589DA27E729C484000FAC5B6561500C0705B7281709C484000616A4B1D2400C028FFAAC88D99484080FEEBDCB43900C0D052358B6195484000A61023DF4000C050BA66F2CD9448408078AEEFC36100C028B6BB07E8924840
+RE	REU	206	FRA	رييونيون	Réunion	Reunión	Réunion	Reunião	Реюньон	留尼汪	FR Territory	NO	Saint-Denis	Africa	Eastern Africa	0101000020E6100000159D831028C44B40DF39EB15162235C0	0106000020E61000000100000001030000000100000039000000505C4AA7BFD24B40603ED065C56335C090462D8320CE4B40F0D8EBDD1F6335C068A29CC310CE4B40F02C13341C6335C0B025B1FF95C84B4060D800B6CD6035C070A9ABF188C64B40C014B7C0D45F35C00064EEB5FBBD4B40F027F1B9135A35C0E80EE555E7BA4B406045402A6A5735C07030A1DD7CB64B4060DF92D2225335C0304BBE2374AB4B4060A08DB7F04735C040C0CC77F0AA4B4020E983C0254735C0D0722376B7AA4B40C0E13895B14635C08804A33781A54B40A0D2FFCDE63A35C0A0C81693489C4B4060595249F81335C058357A35409C4B4000B6227BCE1335C068C680913C9C4B40D02B0483B51335C0E892C1F6389C4B40F071FBE5931335C0F0F74729329C4B401097EE64261335C058858950B69B4B404005F3FC0E0A35C0D0736CF3B59B4B4010BD8685FF0935C030E5B512BA9B4B4050F6C9F6C60935C0E0E0229CBB9B4B4050ECD401B50935C038B85274C99B4B40307172BF430935C0D03C03345BA44B4090741195FCEC34C04813060A61A44B409000F676F0EC34C0B86D07D968A44B40A0626EADE5EC34C0E093F947DFA44B40E040F8AB5BEC34C018FAE307F8A44B4040E91C4D3FEC34C0F8F34B69A2B24B4060FF14D8ADE134C0C07372D06FB34B40C0F1C0B634E134C020A26538F9B54B40B0622420CBDF34C0F88D322C90B94B4070BB911E2BDF34C0C0383B63A9B94B4050669FC728DF34C0A0295206B3B94B40707A5B9F28DF34C008220E23CECB4B4000F357C85CE534C098B2A08BE1CB4B40202ED85768E534C060AB1B94D5D24B40504E098849EA34C0203A2CC36ED34B4010A7D71CD6EA34C058D6CADF18D54B40308BBC51D0EC34C040759B2622D54B40608D5253DCEC34C0987FB09D39D54B404072439D03ED34C0383E05C078D74B40907DC3E9C9F134C02835817DCFE94B4010E21FB6F42435C0D859773DE2EA4B40206700B90E2935C08842F3EFE9EA4B400063E9E85D2935C0F0678FBC18EB4B40007CA070D12E35C058D7135D17EB4B40B0FB5580EF2E35C0F09205A799E74B408048CACCBB5435C080C3B64599E74B40708EA042BF5435C090B9933E63E74B4000A3C5BE095635C058F344C659E74B40F01285F12E5635C0B09EDD6B52E64B40D05F2CC2035935C090A5DCD847E64B40A0CB12F81E5935C068A91DB40DE64B40C028A787B25935C018757A3947E44B40C06DA065825C35C0786E02C23DE34B40F0B1B5638F5D35C0A86659411DE34B40307672E19B5D35C0505C4AA7BFD24B40603ED065C56335C0
+UA	UKR	254	UKR	أوكرانيا	Ukraine	Ucrania	Ukraine	Ucrânia	Украина	乌克兰	Member State	NO	Kyïv	Europe	Eastern Europe	0101000020E6100000959FA9F9D2683F40D3CEC6EC2F814840	0106000020E6100000010000000103000000010000002C00000078890000F0E44040E840FF3FF9314640D04500604ADF40403045FFBF02324640F0310395F1B73C40281FF46C569D464060C24CDBBF923C4058840D4FAFA0464050088F368E903C402012F758FAA0464080F4F8BD4D673C4070AA605452A7464010FEB7921D633C40601B2AC6F9A7464090BDFBE3BD5A3C40980035B56CA9464070226C787A9D364060BC9179E40B4840F0B4E0455F213640D82B6519E230484060742497FF20364028C841093331484010C4EBFA052B364078BF4351A0474840701ED272972B3640B09435BC6948484000F819170E2C3640784221020E49484080A291C0802C3640604E5583AB494840300725CCB42D3640908043A8524B4840C020CD5834A5374088CF0F2384CF494080EACE694FA63740E82EB6A186D04940C0D85F764FA6374018CB2DAD86D04940A0C0ADBB7962384018967840D9F4494020BA5FC613663840500B949D89F5494090FCDEA63F6B384030361FD786F64940F05AD910AC75384068DBD9BF01F7494050FE60E0B977384088CAF8F719F74940F08C28ED0D2E394028C32ADEC8FC494020C5724BAB314040E8718A8EE42A4A40483F8C101E99404028F3C81F0C304A40A875543541E8404000DCD781732E4A403811363CBDEA404008A5DAA7E32D4A40B04929E8F6124440F027D53E1DCF4840004AB54FC717444008CFBD874BCA4840C80DF8FC301A44400071C971A7A04840303108AC1C02444030AAB706B61E4840C8EC9E3C2CE44340B021718FA5EF4740383D618907E0434070BD18CA89EA4740A8198BA6B3DF4340C0C35F9335EA4740302E002036384240D079FF1FA78A46407057FF1F5B36424090EAFF7FD089464050040080C92F424008CC004063874640D8F400801D1041403828FF9F3237464078EF00A021054140F03800E06D344640B895FFDFC4FC4040A8340060A4324640F098FFFF9BFB4040C83600208932464078890000F0E44040E840FF3FF9314640
+DZ	DZA	4	DZA	الجزائر	Algeria	Argelia	Algérie	Argélia	Алжир	阿尔及利亚	Member State	NO	Algiers	Africa	Northern Africa	0101000020E6100000C6D008533B6A054039180196D6273C40	0106000020E6100000010000000103000000010000001D00000080AF3F89CFDD0A40E0B14AE999F63240802B8716D9CE0A40B03F6D54A7F73240004D33DDEB640A403049490F43FF3240003C8D60555521C0202FC1A90F503B40605E0C06535521C00014F6367BA93B40607443F04B5521C080D3938AAAB63C4080D630D18DAD01C0205C7146D48A41400087D860E124F2BFF8346090F4DC4140002D533827FBF1BF60EDBCE886DD414000267DB5FE31EE3F00FEF6D0993942400073E4DC8155F13FB020E461463F424000FCA6FADF7BF53F78DD280D9046424000E090A1BEC0F53F9034F10EF0464240802D23F59E3A07404816B36F3867424080808F0B189E0740B8B5F7A92A684240009C68FC6712084058D54EDE1169424080A3C5BE092A0F40F878382630764240C060F426D0A9194050D2DAD9FC8A4240C0437A408FDF194010592778548B4240404ED8D9EBD01C4080977ACCF68B4240808D64EA09861D40C0C189E8D78A4240606C1107BF47214028B726DD96784240A028FA37C0482140C83C03A17778424080FA563FC44E21404082548A1D754240E0D51587C15C2140F8906280446B4240008899693AFF2740D0F972D1D6833740C01C5A643BFF274050CA880B408337400089C2D688401740A09B6F44F770334080AF3F89CFDD0A40E0B14AE999F63240
+DO	DOM	72	DOM	الجمهورية الدومينيكية	Dominican Republic	República Dominicana	République dominicaine	República Dominicana	Доминиканская Республика	多米尼加共和国	Member State	NO	Santo Domingo	Americas	Caribbean	0101000020E61000006FE842E9D09F51C00546124EFEE53240	0106000020E6100000010000000103000000010000002A00000054C7F143A5E251C050B6E2D17C8A31400C1CE1FEEDE251C0A0D5AD9E938A314010083BC52AE351C030423404118B3140D43B928172E351C0A06B3299E08C31405CB296A718EC51C0302F5A3629C5314038F71E2E390052C0902BD9B111A032408C2FEB0FDEF151C050BE182543C7334058FF9DA3C4F151C0706B4A0DC8C7334058A32FCEA9F151C0501405FA44C8334034069D10BAEF51C0E07BF1457BD03340E03C5233DAEA51C0B0762BF0BAE3334010EA68A3BAEA51C0902BD9B111E43340EC24FC3449EA51C0A000A19A37E53340C46EFA0ED9E951C040E24C5D43E633409C5E755916E551C0B04929E8F6E83340B840A43A78E251C0D09F53909FE93340A4F017E8D7C051C0C0460AC09AEE3340FC25040624C051C02060A28B97EE3340BC57BE78D0BF51C010D0CDA387EE3340949A586E36B651C03091C71D80E833407C60D8ABD97D51C0109C001EACAE334068B812CB777D51C0B0FBCD1F2EAE3340EC5E494D967C51C0D0F7B479D2AC3340FC1620AED54D51C010AFE0C84D5C33409C94FF7FD24D51C0F05D6166445C3340185AF855141651C0105169C4CCA432402CCE739FF71551C090DAB97A5FA4324014095C0D3F1551C0704BB7DBE4A03240FCD0274DDE1451C010DCC078619E32400C85741DCF1451C01036C588E99D324070834655B81451C040A4688AA59B32406808E984AB1451C0B042BF000C9932401CF87365AB1451C030462AE7E698324098A0E128D41451C050D8CE9C9A9632402005604D2F1551C0B09AC530CC9232406023B5F5782451C01012B985531D3240C85C740D8E2451C070A1421ABA1C324044843584992451C0D0DB508C871C3240A46DB2FCAF2451C0B058EB7A581C324084668D30FB2451C00016FFD2FD1B32406C708EDF00E251C0C0824B6CE38A314054C7F143A5E251C050B6E2D17C8A3140
+CV	CPV	47	CPV	الرأس الأخضر	Cape Verde	Cabo Verde	Cap-Vert	abo Verde Cabo Verde	Кабо-Верде	佛得角	Member State	NO	Praia	Africa	Western Africa	0101000020E6100000D02C844BACA237C061C280E9E4272E40	0106000020E6100000010000000103000000010000001E000000A0EA0160ADB538C0C08401C0BB9A2D40203FFE3FBFB938C0A03002C0379D2D40C0F400805DBC38C0C0230240DB9F2D4080E4FEFF0CC238C0E099028000A92D40A0C9FE9FE1C238C0E055FE1FA1AA2D40A0EEFD1F3D5B39C070FFFE5FB80A314050B6FEDFD65B39C060B300A01C0E31405016FEFF445B39C060AB0140D110314060AC01A0435A39C03019FF5FF1123140901FFF9F1F5639C070D701A0A2173140300F02205E3239C020C401E017293140A0ACFE7FD12939C0408EFF3F242D31409077FF5F422139C00016FF3F9A30314030C3FE5FB31C39C0C086FF9F0332314000C0FE3FDC1839C0E02800407A323140206BFE9F10EB36C0A07FFEBF8DDA304080FBFD9F99E336C0E088FF5FE8D5304050BCFF5F5AE336C06015FE9F52D53040F08200C001AD36C05055FF5FF6223040005800C0A2AC36C0C0CD01409D213040B0E1FD9F60AB36C01017FF9F0C19304050B6FEDF56AD36C0A0B0FF3FF00F3040401300C08AAE36C0D0530040590D3040A069FF7F731937C0C0D20260AE542E40D02BFE7FB41F37C00012FC9F5E462E40D0180280E37C37C0A03DFD3F05CF2D40D014FFDF277E37C0807FFCDFF0CD2D40E0C4FF5F6D8637C060270120DDC82D405082FF1F3A6138C0207AFCFFB49D2D40A0EA0160ADB538C0C08401C0BB9A2D40
+NO	NOR	186	NOR	النرويج	Norway	Noruega	Norvège	Noruega	Норвегия	挪 威	Member State	NO	Oslo	Europe	Northern Europe	0101000020E6100000AD8223D079FC2B40D3844BE17D0F5040	0106000020E6100000010000000103000000010000002700000040F805A0C3771E406073FFDFB8FB4C40801B0420653B1C4058D000C02CFD4C40C0C60060A7861A40A008000093084D4040C003406B771740488FFF9FD6364D40404DFE1F0EBB164078A6002080454D4040570740DCA51640E889FFBF5A474D4000AD05607D70134038FA006019A74D4040FBF7FFC299124028D6FF5F53844E40002BFE1FC2AA1240902DFF7F2EA64E40C08C0520162F1340782300607EE54E40C010FA5FCF45134028BF00C086ED4E40002CFE7F3449134010F2FF1F31EE4E4040E60400D66314401852FF3F9F184F40A087FD1FD9D82740B878FFBFD4DD504060F7FD1F50262A40E06300E06C07514020B7FF7F9EE42C40704000804E325140C0A602005D172D40609FFF3FCA345140C05801606A072E40C4EDFF9F47405140A00502C0D87B324060220000CC865140607900607CD53240105800C0628C5140A08DFE9FDC153340E8EFFF5FAC8F51406007FEBF032B3340105800C0A290514090E4FEFF0CF2374030C8FF7FE4C451402018FFFF7E093840844100E0C0C551408051FE9FD70D38403C8600E0D8C5514040200040E7AC3940487800000ACC5140609600808CA83B40945F006083C85140B0FAFF1F44303C40CCDFFFBF38C65140D00A00C0F73D3C4038BAFF9FB5C55140E0DD01E050163E4094F9FFBF11AD5140701A01A000323E40F098FFFF5BAB5140F014FFDFA7223F400C7500E072995140B02EFFDF60233F407C3200A03F995140F0675C3810F23E40BC10E4A084655140A01E34C560F03E4044A435BF27655140F0357689EAED3E40DC9E5912A064514020CB4A9352502740A82E8B89CD734D4000FED478E93627404856B77A4E724D4040F805A0C3771E406073FFDFB8FB4C40
+BH	BHR	21	BHR	البحرين	Bahrain	Bahrein	Bahreïn	Bahrein	Бахрейн	巴 林	Member State	NO	Manama	Asia	Western Asia	0101000020E610000013C5431A4846494057292FA9480B3A40	0106000020E6100000010000000103000000010000001400000058CAFF3FA968494080C30040D08A3940583000E0DA6749402078FE1F6D8B3940380BFF7FE25F494020EA00C06595394038FA006059494940C01602C0FECB3940681CFF7FC848494010C6FFBF5FCD3940107500E0B23B4940001C00C09DF239408049FF3F4C324940A00E0180961F3A4028F3FF7F63314940606A00203B253A4008E3FFDF6F3149405012006018273A40380BFF7F22324940009F00801F293A4090CDFF5F80334940A04801C0B62C3A409001FF1F5D3C4940B0D40040F6393A407800FFBF6A3D4940E0BA0040BD3A3A402093006035504940A01402009A473A4088A70080F2514940E06BFF3F58483A40C02700E0C7524940A0F3FE3F4E473A402870FFBF6154494070E8FFBF2B453A40D8D700600D554940E073FE9F23443A40183B00A0126A49402044FF5F50AC394058CAFF3FA968494080C30040D08A3940
+PS	XXX	267	XXX		Occupied Palestinan Territory			Território Palestino Ocupado			Occupied Palestinian Territory	NO		Asia	Western Asia	0101000020E6100000ED40901693A041402C3626FC23F13F40	0106000020E610000001000000010300000001000000180000002842465469224140600A46FA74383F40C04A7F48221C4140F09D0E275A523F4078B968983F89414008DFFAD1AC3A40402881265F5C894140D80B654BD03A4040D88C710A9A89414050024D511C3B404040F1EE2B838A414020E10595E13B4040003AD3BE988B414018AC4E27C93C4040005F5DC4E0994140489FADF51845404010025607B39B41404889EFF425464040B83DD37BC59C4140B09F016CB5464040104A04BCA2AD414030B34AE16842404030B45C6B6CAF41401064BFECF3414040C0AC7F938AB3414068939BCC2B404040D87AE1961BC841407819E07D33314040780524CC3AC84140E8362D5ABB2F4040209040607EC94140D8C1D478241B404098A507EC87C74140A06B47C70EC33F40B0091444ECBC414010B5BB14927D3F4070BC003D459F41401023FE7A68613F40406E3289FE9D4140803985FF6E603F40A06D3FCADC9D4140D03F803A55603F40203B4AC01097414020B14EB67D5D3F40E0127EEBFB91414070697ED45D5B3F402842465469224140600A46FA74383F40
+TR	TUR	249	TUR	تركيا	Turkey	Turquía	Turquie	Turquia	Турция	土耳其	Member State	NO	Ankara	Asia	Western Asia	0101000020E610000055DBF769AFB74140F4726D3B987E4340	0106000020E6100000010000000103000000010000002A000000105EF415A4154240B8169F0260E84140D09EFE9F82BD3D40780C01C0310E424020BE006094BC3D40C830FF9F450E4240B077FF5F42AE3D4030CE0000880F4240B077FF5F42AD3D40909900A0A30F424090B8FE9FBB673B40D81101A02D554240D0D0FF7FD75D3B4000570060B05742403030FEFFFD5C3B4018BE0060145842400059FE3FF83B3A4080E100C05223434030F3FF7F23AB3940888A0060A21044400031018062AC3940D00201606C134440A05DA27A6B583A40E078E92631E44440E06262F3715D3A40200DE02D90E8444050809A5AB65E3A40A8BE654E97E9444000D6EB09D75E3A4028CA8198B0E94440D09DD2C1FA5F3A40087D224F92EA4440A062B9A5D5A03A4088471B47ACFD4440C006B64AB0083B4088397AFCDE0A4540D0340C1F11133B40B0605452270C4540E05C873A11133B40D83D7355270C4540701D554D10153B40486F2A52610C4540B0BF098508403B40F80390DAC40D454020FC6F253B463B40608638D6C50D4540704000800E7941405081FFBF070D4540E8E00B93A95A4540305778978BCC4440F880B229575C4540D8E49B6D6ECC44403873BA2C266A454080FCDEA63FCB4440486A1327F7B7454040C780ECF5964440507B8530F7B74540E0E9B7E4F596444088712512F7B845400859D3E52296444040A9B83C19B9454090D2A43502964440386EA301BCB94540F81B5F7B66954440D8E3F736FDD54540C839234A7B774440383D61890768464058888043A8D64340A8B94E232D69464068B532E197D24340603ECBF3E06A4640481D8F19A8A4424030016A6AD96A464088608E1EBFA34240680CE544BB6A4640288A027D22A34240E876A1B94E674640004AB54FC793424020CD91955F644640E05020A28792424028011521042846405834439BFD7A4240105EF415A4154240B8169F0260E84140
+CU	CUB	63	CUB	كوبا	Cuba	Cuba	Cuba	Cuba	Куба	古 巴	Member State	NO	Havana	Americas	Caribbean	0101000020E6100000B0A2BB5A09BC53C09F2E2F44349B3540	0106000020E6100000010000000103000000010000003D000000ECE27C38486B53C030F829D890D33340BC0413245B6F53C0E06EBBD05CD73340FC59982ABD3A55C050F8174163D43540CCE737A7ED3A55C010BAFCE2ADD43540C816FF2DB73B55C0B01A18D412D63540C88FF815EB3B55C0909312279CD6354090A22996363C55C0D092509F89D73540CCAA741C643C55C0803DE2A139D835403043F4B5783C55C0E0DCAFA7C2D835405C24B4E5DC3C55C0A08BB49E6BDB35407056444DF43C55C0F00C816D0EDD3540B4F2DC8CE43C55C03002EC489ADE35409C341EB6BE3C55C0F0AF90B932E03540A44FBC14683C55C01098327040E3354010C47938813B55C0006D3425FEE93540EC618ACD221C55C030C6EE4CB26936404C404853730E55C080560BEC31993640E0428AA6D80255C0B0FD929E33B53640F8F72A43660055C010C9BE750FBA3640384A253CA1F254C0F0DDFD96A5D036401C6A36EA7CF254C000F06C8FDED03640ACBA0ED514CE54C0D034FBF2B8FE3640E0F9FB7BDFCD54C0D035F405E3FE36402CD230218B9354C0307D21E4BC2B3740EC57A604699154C030DE29D31E2D374004EC0F39A28E54C020BCB5A73F2E3740FC5030630A3A54C0700B6943B4463740300510E35A1E54C02037C9EAB134374010F8D4FB570E54C080718DCF642537403CF67AF7478A53C070504B18727B3640E4E555429C8953C0D07AFE0F0B7A3640A8BAA2EF49AF52C0A03BE933569F34402CE12B15AF8C52C0B0496249B94D3440986EC8F5258C52C0F03B7B78E04B344014E69887A78A52C000B70BCD7546344018CE46F8288A52C0D052E0AEA8443440F4831502948952C0F0C913AD8142344004B133854E8952C070EA20AF074134400C3C52D8208952C020D7E7209E3F3440845D143DF08852C0104B1A48BC3D34407CE3C6889F8852C0807CB438633A344044DCF703798852C070A49AA3D8373440CCAE8C576A8852C010CD599F723634404048CCA2668852C0D0B19A536E3534408C02E9079A8852C0505E42AACD3234408016873DD18852C0C0AF811CB030344098023EE4D28852C000B315EA9F303440AC70372D1D8952C0F0758071BA2E344038A28C028E8952C0F00D6954E02C34404026BE7F988F52C0F0DD25CC0F153440C00F2961019052C0A09E530AE613344040BF000C159052C070515B34AE13344000D71533C29052C0500F7C0C56123440E85E82AE589152C0D0CA0D2B81113440707CB43863C152C050F01A4F5FE8334038C560B4FDC452C0803BEA9E2BE6334090BEA48C13CA52C070E05E3EFEE33340F8F8951815CA52C040A479B6FDE33340449A780778D352C060D0ED258DE133407003AA24D7D652C0E0BECAEBD2E03340ECE27C38486B53C030F829D890D33340
+MA	MAR	169	MAR	المغرب	Morocco	Marruecos	Maroc	Marrocos	Марокко	摩洛哥	Member State	NO	Rabat	Africa	Northern Africa	0101000020E61000002583A7CFEA1F19C05F8B351781D73F40	0106000020E6100000010000000103000000010000001C000000605E0C06535521C00014F6367BA93B4060B8231D97582AC070E9260BC1AA3B40801CE90C8C542AC0505376FA41B13B40A0EE91CD55532AC080029A081BB23B40A02CCB7CAC9122C0281FF46C564540402016E1815C9122C028D5C10B6C454040C0599995928E22C04859315C1D46404000BCE7C072B417C0802387E354E541408033356497A317C0282BAEE06DE6414080FF3FA951A317C05070D9D770E64140402111644EA117C028031EBD86E64140003F75070CED15C09825AC8DB1F4414000D8EB8266DC15C0B83D1F0A0BF54140C0C6F9F6099B15C0E0B8591712F64140806E04F3A1B507C05090EFF730B841400004F97E0FB307C0D045B58828B8414080B91FA633A607C0A8D3E242D4B7414080D630D18DAD01C0205C7146D48A414000408B7710BBFFBFC0DFA128D07741400000561956F1FBBF10BB61DBA260414000C8FDF0EEEEFBBFD848EB7281604140003E8C101EEDFBBF3000C63368604140001CD76834F7EFBF68E5E0046C4240400076C80464EEEFBF3028570EF341404000A87D6856EEEFBFF8D78853F24140400023A3933D73F2BF78C853172F0E4040C0A32AD80C4516C080A2E92E817C3D40605E0C06535521C00014F6367BA93B40
+SY	SYR	238	SYR	الجمهورية العربية السورية	Syrian Arab Republic	República Árabe Siria	République arabe syrienne	Síria	Сирийская Арабская Республика	阿拉伯叙利亚共和国	Member State	NO	Damascus	Asia	Western Asia	0101000020E6100000F06F1E276F414340FC5CFD5967814140	0106000020E6100000010000000103000000010000001C000000E02FD80DDB6A4240C0921D1B81284040E88442041C5A424008ADC090D5294040F00434113640424000118DEE202E4040603D27BD6F3442400844FAEDEB304040604D11BFE6D24140982320035257404070131F86F3D14140B802E89CC4574040E00A05325CD14140202F55EA0B58404090083A8595CE4140C8209A8D96724040281B81785DCF414088A4880CABA040405875C8CD70CF4140E8A63FFB91A2404058195AF815DD4140F0EFF235CACA414088C0102D0AE7414008B2352D41ED414020390B7BDA554240B8D7BB3FDE6B4240F0913F1878564240B8BFEC9E3C6C424000C87BD5CA1C4540406C5B94D9A8424058BDF192981D454018A7E822A7A84240D010C7BAB81D45408887A2409FA8424048FAEDEBC0254540983BA583F5A34240E83B31EBC52C4540203E22A6449E4240E07745F0BF2D4540F86DFAB31F9D424078D39FFD4831454068FD9FC37C894240204B66FC48314540F8C13AA77C894240B046452248314540709727F16889424050BB0A293F3145400879AF5A99884240C0749318049E44405892AE997C634140C0E4B8533A844440F01890BDDE394140D0B91457958144403049D74CBE354140E02FD80DDB6A4240C0921D1B81284040
+BE	BEL	27	BEL	بلجيكا	Belgium	Bélgica	Belgique	Bélgica	Бельгия	比利时	Member State	NO	Brussels	Europe	Western Europe	0101000020E610000038934AC3BCA41240F719FFB223524940	0106000020E6100000010000000103000000010000001900000000BDE3141DE91540487DCB9C2EBF484080D9942BBCCB104040DF4F8D97FA4840C0F9D51C20981040D813967840FD484080718FA50F5D0640D01B9947FE5C4940804B598638160540908F882991684940809E5E29CBD0044098FB1D8A026D494000E2F1BF2560044030FCFE3FE18B494000FFFBDF539D084018840020F4A64940009D00C03A95094060DF0000AEAC494000E90BA066E40A40F8FEFF9FCDAF4940000406C0ADF40A4098420040F3AF4940C09F71E140E8114020C05B2041BD49404047ACC5A7201340980B0742B2C04940408195438B2C1440F85F596952BE4940C015527E522D174080832F4CA6964940808655BC91591740F863CC5D4B944940405322895E66174068F92CCF8393494000A1BE654E1719407872BF43515049408024EEB1F4811940E020938C9C394940C057E718909D1940C825C79DD2294940804030478F7F174010B5A679C7C94840C0E0696C8E7F174018AC996BC7C94840000A850838441740A081CAF8F7C548408051BD35B0751640D8237F30F0C0484000BDE3141DE91540487DCB9C2EBF4840
+CO	COL	57	COL	كولومبيا	Colombia	Colombia	Colombie	Colômbia	Колумбия	哥伦比亚	Member State	NO	Bogotá	Americas	South America	0101000020E61000005357FB9B404552C0FDE94C66723D0F40	0106000020E6100000010000000103000000010000002500000088D651D5047D51C04038109205EC10C0DC989EB0C4A951C080AE25E4839E0EC0A44929E8F63A52C000328FFCC10004C0D456EC2FBB5D53C00044B7973446D93F644E97C5C49653C000672C9ACECEF03FA839403047A353C000DF02098A1FF33F4485B18520A953C000EDA353573EF43FB4C35F9335AA53C000E12D90A078F43FF4F0FFBF5E6754C000040EE0AEB00F406C890000706754C080DC0CC0D1B50F40E4C41EDAC77654C040AE08A3FE5F2840448EBE93E06E54C0E01281EA1F1C2940307B3430CD6E54C0400807D6CC1D2940B8AFCA854A5854C0E02456EB69C82A4020C8F77B185854C040B4684B67C92A40140D7448C55754C0E0EC212B09CA2A40A083899AC35754C0E08E6BE80BCA2A40C8F21A608BEA51C06039F9E3ACEA284040CB5FC6B9E251C040639EF06DE1284094D7005B94E151C04038674469DF28406C44F7AC6BD351C02081B79B3BB5284028AFA6FC35D351C0C023B9FC87B42840D4E54AF3FDD251C0E090D5AD9EB328406467D13B15D251C0E00946CABBAF28406860AB048BD151C060F0D69EFEAC2840844DAE739DD051C060D466F73FA7284044510C35AFCF51C0E07E4FAC53A12840F850FDDE81CE51C080640DCD2B992840C0E74EB07FCE51C040AE523019992840B0506B9A77DE50C00084D89942C718407440D9942BDE50C00068791EDCBD18402C815B77F3DA50C08007EBFF1C0618404841B79734B850C000DF3CD52137F53FD880CF0F23B850C0001B2FDD2406F53F18C5724BABB750C0007BA52C439CF33F2CBE4C3AA87B51C0807D8943F9E010C088D651D5047D51C04038109205EC10C0
+AS	ASM	5	USA	ساموا الأمريكية	American Samoa	Samoa Americana	Samoa américaines	Samoa Americana	Американское Самоа	美属萨摩亚	US Non-Self-Governing Territory	NO	Pago Pago	Oceania	Polynesia	0101000020E6100000CDA21860FA5665C009BC7378F3992CC0	0106000020E6100000010000000103000000010000001A00000007E2E1E24D5865C0806A5BDE66BF2CC0A6FEE66A505865C060A81D5954BF2CC072CF5F8D185B65C080DE5FF360A52CC0EF04B122195B65C04026625B50A52CC0691261681A5B65C020ABF4C940A42CC02D043928E16265C04034208CE91B26C0DC6C6237E26265C0A0162D40DB1A26C047AD8B36E26265C0E0623953321A26C0B5C079CCDB6265C0C0CB063EAB1926C0C977DFE7AE6265C060082D358C1826C057AB764D486265C04042EE7D051826C0AB860ECB306265C0A00DB44CD01826C09D6AE33E286265C0C0DBAADA241926C044AF50B5672D65C000E9013D1E702CC0CEC941BF652D65C0408DD541B9702CC090A9CCDE632D65C0407121EA99712CC0B4A91501692D65C060A2DA96B7752CC09018F329762D65C0E0AFAC34297D2CC0F5285C8F822D65C0406B50EA81812CC01B768478892D65C0C0A95E23EE822CC0317B34308D2D65C0E049AA0029832CC0F774D080952D65C0807A21D390832CC02ED516E8A42D65C020650D28E5832CC06BA521F47D2F65C040BC523B688B2CC0E7A562639E2F65C000D7E7209E8B2CC007E2E1E24D5865C0806A5BDE66BF2CC0
+PM	SPM	210	FRA	سان بيير ومكويلون	Saint Pierre and Miquelon	Saint-Pierre y Miquelon	Saint-Pierre-et-Miquelon	Saint-Pierre e Miquelon	Сен-Пьер и Микелон	圣皮埃尔和密克隆	FR Territory	NO	Saint-Pierre	Americas	Northern America	0101000020E6100000621B60085A294CC04EA1EF3C167A4740	0106000020E61000000100000001030000000100000020000000C839C2B34E1C4CC0D89F8037EE5F4740D8FB1BB4571C4CC0787DA2FCEE5F4740307381CB631C4CC0E8D5DE4CF15F474058C933D4CD1C4CC0A086D0F7096047401062E41BC02C4CC0E0AA6E3F2A64474040E17A14AE2F4CC0F82911F28B65474050CE7234A2334CC040DA38622D69474020B3E66CA6334CC008AB23473A694740A85A88C4F3334CC0D0B72D80DF6A474090545C0B69334CC0984138B0668D47400896EA025E334CC0E8C4909C4C8E474090D28E7637324CC0705D0FCB0B90474040AA4AB615324CC018A7CCCD37904740C8C29E76F8314CC020118C834B904740806D7A06C3314CC0F05AB4006D904740D8718A8EE4304CC010076AE7EA904740A8D73E2EBB2C4CC0F86591DC5092474058ECACCC4A2C4CC04074FDCC6A924740B89976D6132C4CC0B08E441E77924740E053D856FD2B4CC020B62DCA6C924740281CAD0F90204CC0787B16DFAB87474018E5BBEF73204CC0E85ACB097F8747401091CDFA390F4CC030504134A9654740E8D1657B3E0F4CC028F7F763A4654740E84ADC7415104CC0C0212125D164474098E96F534D134CC080281B20E2614740E0F21FD26F134CC0B8BF91E5C9614740609D3B0B8C134CC068402FDCB961474048D1FD41C9134CC090D2832799614740A0B8F479D6134CC060D7A19A92614740B864F4ED6E164CC040A8C4758C604740C839C2B34E1C4CC0D89F8037EE5F4740
+AZ	AZE	19	AZE	أذربيجان	Azerbaijan	Azerbaiyán	Azerbaïdjan	Azerbaijão	Азербайджан	阿塞拜疆	Member State	NO	Baku	Asia	Western Asia	0101000020E61000002194DB3A787648405614CE18252A4440	0106000020E61000000100000001030000000100000021000000700113B875DB4840F08711C2A3214340800FAAB696544840F8F2EDBD35324340F0FB5D630D5248405810B3CC9F324340F02219CD65F44640481BB8B7E66F434040B7214A64F24640E00DDCCD48704340D8D59097B9CE4640C82B54C782784340F883EB385BBA464000526E24CE7E4340F0DE3BEBCCB94640B8342F081E7F434028CC3AA457B94640B06934DF5F7F434030AA09983C934640F0A5BC656D9A4340C05EFC02747B46407841C29FFDB54340E869CDB70768464008288D6B58CF43400097395D16634640E09942E735DA434078904946CE62464030404D2D5BDB4340689CBF0985804640282E39EE94A64440408386FE0996464018F3E505D8B34440F8FE78AF5AA1464030C79DD2C1BA4440508E3BA58335474090F9F202ECF34440885704FF5BE1484010A7052FFA5A454008F6D1A92B4B4940A0A223B9FCF7444020FBCBEEC95B4940F057738060E64440880EF3E505A0494010410E4A989D4440E0A428EB05A04940B0706F44989D4440F03E00A94DC44940104B3CA06C76444078D8B628B3D1494030F73B1405564440F0357689EAD54940606AF6402B3C444018AAD4EC81D6494058DA1B7C612A444080374F75C8D54940C8F5285C8FDA434030137EA99FD34940B09A20EA3EB44340309B728577A54940E0C56D34805B434078C971A7748C4940B07823F3C84F434010AC1C5A642749401003CFBD87334340700113B875DB4840F08711C2A3214340
+GL	GRL	98	DNK	غرينلاند	Greenland	Groenlandia	Groenland	Gronelândia	Гренландия	格陵兰	DK Self-Governing Territory	NO	Nuuk	Americas	Northern America	0101000020E6100000D4585A3165B244C0BAE9F28266B05240	0106000020E6100000010000000103000000010000003000000038E6FFFF06F545C0F8E1FF7F7DE34D4000CC0040A30C46C0B086FF9FC3E54D4040F5FF3F089946C030850080A6FC4D40E8E70000010948C05847FF7F27574E40B8A4FF1F461748C020B00080C55D4E406CA0FF9FDC5052C0D83700805B2E5340107EFF9FB04252C018010060128B534024680060B63952C0945F0060239753404C4D00004B2652C0143B00A0B2A053406C890000F0CA50C0784F00C06F205440081E0080829D4EC0448FFF9F76745440A00F01E088684EC0880700A000785440287700A097604EC028B9FF3F83785440E8E70000414D4DC0B43500C0B6865440B012FF1F830A49C0D8D1FFDF29B35440F833FFBFDCC446C038D7FFBF85C9544018D6FF5F13BA46C0C0A4FF1FE6C9544058FFFE5F781346C02C7FFFFF02CF5440002C006091D645C0CC79FF1FC7D0544030A3000029E042C05081FFBFC7E0544010DEFEBF9E4342C0F0FEFF9FEDE35440B07E0040783842C00C8CFF7F1FE45440685D00A01E6941C028B9FF3F03E7544000CC0040639340C02C4B0040E6E75440F007FF5F0B5540C0C4EDFF9F27E85440C079FF1FE74D40C09093FF1F20E8544040EFFEBF84503EC0D02800405AE654404064FF9FB70E3EC0EC550000BEE5544080D9016087DB3DC0C00A00C037E55440706FFE1F5A613BC034F4FFDFF5DD5440300102408F0A3BC010F2FF1FB1DC544030E0FE7FC3483AC0FC73008000D95440C01A00602B0E28C0FC730080C0675440400E04A0080628C0C8B3FF5F87675440402C04208BA726C0945F0060835D544000080140E89F26C060BCFF5F3A5D5440309B01A09D5C35C0C0A4FF1FA6A9514080CB0180B87935C0786C00E05FA25140908B00C0949235C0B81800A0069E514080BFFF7F311E36C0D02800407A865140302F0080282836C0907C0080F38451409045FE7FED2F36C02C7FFFFFC2835140D07AFF7F195136C09C85FF3F317F51403080FF5FD59E45C0B003FFDF41F74D40A0DDFFFFF3A345C0189BFFBF00F54D400043FFFFDDCA45C0602200004CE84D40A886FF9FC3CD45C098F9FFBFD1E74D4038E6FFFF06F545C0F8E1FF7F7DE34D40
+GT	GTM	103	GTM	غواتيمالا	Guatemala	Guatemala	Guatemala	Guatemala	Гватемала	危地马拉	Member State	NO	Guatemala	Americas	Central America	0101000020E61000001F6B2CC0BA9656C05DB3D3025C642F40	0106000020E61000000100000001030000000100000020000000AC510FD1E88656C0A0AEB6627F792B40F8A875D1C6CD56C02064AF777FDC2B402C794D5917CF56C00075594C6CDE2B4070A25D8594CF56C0E0CD70033EDF2B40A4074F3203D156C0E0D6112CB3E12B4044717D0E62D156C0C0D8767F61E22B40AC6A5A7311D356C060DDF016A3E52B4044E988328AD356C0203356F6B8E62B40D85A5F24B4D356C040B5EA2928E72B40C8051D635DD456C0E0D100DE02E92B409C8026C286D556C0E0E2BA7372EC2B404CDF32A7CBE256C0C08026C286172C4020938C9C85E556C0A0F9F202EC232C408CC4156154E656C020CE0248C8272C40807E3A796CF256C0C08A81BFA9612C4074A73B4FBCF256C000C727092E632C40A4DAB80F8A0E57C0203483F8C00E2D40A0A8D83D9E0E57C02008C490410F2D40883045B9B40E57C0803DFF8705102D40A4878FF2CD0E57C000D04DB40E112D404C232D95B70D57C020DF89592F862E405817B7D100DC56C030B1169F024031406CB1A206D3BE56C0A00B0742B2D031404C8D976E129556C0406F47382DD031400C8E9257E75056C00003ECA353CF31407C74EACA674956C0C01C5A643BCF314080A4AD1C2A0E56C0405C78B9E3702F40F49CF4BEF14956C080E388B5F8242D40E4BCC62E516156C0E008E1D1C6712C4094900F7A366F56C0C030B610E4102C40DCE00B93A98656C0A0D0B359F5792B40AC510FD1E88656C0A0AEB6627F792B40
+PE	PER	195	PER	بيرو	Peru	Perú	Pérou	Peru	Перу	秘 鲁	Member State	NO	Lima	Americas	South America	0101000020E61000000E7203FB0D9752C035F87EAFC65622C0	0106000020E6100000010000000103000000010000003B0000006CF8362D139851C0702E2813845A32C024CEE561FCC852C00016DC0F78D02EC00CD22D1D4ECC52C0205D88D51FBD2EC068DA6A7B60CC52C04024480092BC2EC00C2384471BFB52C0A05F9335EA512DC0B0704859F50D53C060D954826A8C2CC07CCEDDAE971153C0A0F4EB9804652CC008F9A067B32E54C080F5566EB3CA1BC0E8B314DA032F54C040AF3DB324C01BC098DEC5FBF14854C080EB8843360818C084F0C39CFB4854C0803A2EF4D20618C08043030C264954C0808003FF000018C018FB928D874954C0001015F428EE17C014878E788D4954C0C014223BCAEC17C048FE710C924954C0805F28BBF4EA17C02CC37FBA015554C0001FED24C7BA12C050D048DFFF5454C04029DC3C1FAF12C090D8A491855354C0808A8D3248EB11C060E1DA3F855354C08055CBE726EB11C0ACD8BA2F425054C0C0B66BF8CC1811C08488409A564F54C000FCD4C2760111C0F41ACC704D4F54C00088484DBB0011C03029AA236C3254C000516C6006FE0DC08CE9AE91493054C000470CF1FEBE0DC0E4F28BB73A2054C080B902C0670A0CC04C232D95B7E752C000A0B5BE4868BBBF5C5969520ACE52C000004946CEC28EBF1CE1B4E045CD52C00000041C42958ABF9C4B08BB00CD52C000005A7592B78CBF24C79DD2C1CC52C000005E6397A88EBF380FEECEDAC752C000209886E123A2BF18DD41EC4CB552C00008A5BDC117C2BFC46D3480B7B452C000C85CA79196C2BFF095C1CAA19351C000DEAB5626FC03C04CB4AB90F28551C000BF7D1D382705C0D48FBA8EF28551C080AD0E55382705C058511B86C38551C080822CD17A2C05C0B0463D44A38551C000E14048163005C048F8A57EDE8451C000B20C71AC4B05C034B56CAD2F8251C080730CC85EEF05C00C0BB5A6792B51C0A069DE718AFE28C0F4402B30642B51C0E0840838840A29C074029A081B3451C0306BB75D685630C0F0B0506B9A7351C010649291B31832C0B81662322B7451C0D00D2681AA1C32C080177D05697451C0E0A10BEA5B1E32C0B4B1DC49B97451C0F07C2D78E91F32C0E0B5578EEC7451C070627964E72032C070C45A7C0A7651C040D235936F2632C0B0F4A10BEA7B51C0E04317D4B73C32C01022E010AA7C51C0406DE2E47E3F32C08866CBDDBA7D51C0E0B3DDE6084232C054D97745F07D51C0A08EAA26884232C0C8D24ECD057F51C0D0D9DEA13A4432C0F458FAD0057F51C0D0BA9BA73A4432C0F02900C6338A51C0C0C4E6E3DA5032C068E5B919898A51C0402CCEBD2C5132C0A0B94E232D8B51C02066BD18CA5132C06CF8362D139851C0702E2813845A32C0
+KZ	KAZ	132	KAZ	كازاخستان	Kazakhstan	Kazajstán	Kazakhstan	Cazaquistão	Казахстан	哈萨克斯坦	Member State	NO	Astana	Asia	Central Asia	0101000020E61000009A3D75FC71A95040667C20D998024840	0106000020E61000000100000001030000000100000022000000F837A110011F5140602B137EA94B4440880EF3E505A0494010410E4A989D44409835EA211A6949409814916115CF444000F819170E104940A8D11DC4CE284540885704FF5BE1484010A7052FFA5A4540300AF4893CA94840A0A3C7EF6DA64540B8AA5C7D3CA94840D0C42E036EA6454090B5F814009B48409840BCAE5FBC4540F81ABB44F53E474090E63A8DB438484038CA6C904972474018EECEDA6DEB4840E017096D39734740C07A4E7ADFEC4840908A71FE26744740E09942E735EE4840C8BC00FBE8A84740F0913F18782A494008ED478AC8B84740988C9C853D354940F8A7C64B37C1474050B54FC7633A494030D49AE61D5F4940482CD49AE6E1494068419AB168AA4E402846088F360A4B4078B515FBCB3C5140000BD28C45B74B4008FA449E243F51403833333333B74B40C00512143FB45140A871E14048A64B40C820B072683B5340A017601F9D3A4B4094DFDBF467B3554030E4839ECDE6484088BBB376DBD1554070A032FE7D9A48401488D7F50BD2554040CD3B4ED199484020B1169F02D45540C8C073EFE18E484080999D4F01D45540C8102EC1C28C484094588B4F01D4554088DE54A4C28C4840F42900C6336C5540D080ECF5EE9B47406402B7EEE6615540B8D6526B9A87474068E94317D4115440001973D7121E4540AC3AE466B80F5440C0019F1F461C45401CCA89761508544018143FC6DC19454064807D74EA265140F060FD9FC34C4440F837A110011F5140602B137EA94B4440
+SL	SLE	221	SLE	سيراليون	Sierra Leone	Sierra Leona	Sierra Leone	Serra Leoa	Сьерра-Леоне	塞拉利昂	Member State	NO	Freetown	Africa	Western Africa	0101000020E61000003393CCEA688F27C051310E9DF7222140	0106000020E6100000010000000103000000010000002500000020394E9A9EEB26C000A714E8D1B01B40E0CCEA6EB5FE26C040D9196299B11B40A0839F3880F629C080BE688F17421E406068588CBA1E2AC000460A65E16B1E4060F8DD74CB1E2AC080443179036C1E4060D0419770202AC0C0336953756F1E40C0B8FE5D9F212AC040691B7FA2721E4020446ADAC5242AC0404F05DCF37C1E40803C9E961F802AC000064A0A2C3020408054FB743C962AC080B3CEF8BED82040E0C484E2D8982AC0400AF4893CFD204000EA60C5F59A2AC0804FC939B1142240E0C01C3D7EFF28C0808A8EE4F2AF234020FD45E27BFB28C04035B46E74B22340609ECDAACFF528C0206BF12900B62340E0BF78060DDD28C06058E20165C3234000404D2D5BBB28C0E05CA79196CA2340A05296218EC527C00023BE13B3FE2340208C2D04397827C0200000000000244080341E23DB6926C000E0675C38002440E0384547726926C02000000000002440E08FF7AA955926C040384A5E9DF3234040AF777FBCD725C06074417DCB4C234040834C32725625C0604ED1915C9E224020384A5E9D5325C040A089B0E1992240E057AC07EA8C24C0A0F89910F9F42040E0229BBDC98C24C08081F650C6F32040C03063A7AB8C24C0E03FC97DA8F22040206591CD258B24C0A002D38FA4E3204080DA6CEEE08B24C0606F819CE1D6204000ECFE9F2D9724C060B3D6434072204020AA50006C9724C080FE37AD16702040A0825427F39924C00091E048CB652040C04142E0BD9A24C060C9406B6C642040E0BF648FC23525C040B1C22D1F191F4020962AFDF6D526C000A3E6A172C01B4020394E9A9EEB26C000A714E8D1B01B40
+UY	URY	260	URY	أوروغواي	Uruguay	Uruguay	Uruguay	Uruguai	Уругвай	乌拉圭	Member State	NO	Montevideo	Americas	South America	0101000020E6100000E32EC9100F024CC09CEC87862A6640C0	0106000020E61000000100000001030000000100000029000000F8CFBC772F714BC0A822FEBC048441C0881600E061F64BC07083FF7FAC7A41C0E04FFF7F3A144CC0D097FF9F297841C0681DFFDFFA274CC0104A00E0D37441C06857FF1F9BED4CC02871FF1F143E41C0502AFF5F971A4DC0D08000005D1541C048FEFEFF451C4DC0989A0000961341C040F5FF3FC8304DC048FEFEFFC5FD40C030BAFF9FF5314DC060140020BDFB40C0D00301C01E354DC0D88F00409EF440C0D87AFF7F19374DC03863FF3F05EB40C0407800008A374DC04864FF9F77E840C0B8F30020AB384DC0C8EEFFFF99D640C0787B0020E1374DC050F0FE1FB7C340C04864BE3A89194DC0406CBCE330DF3FC00899878664F24CC060788FD35A823EC0681AFF31B9F14CC0307B0B447F803EC0E856A8CB68D24CC0806099DAF92D3EC088DAC98277D14CC090CDCA93F72C3EC0F0AA9509BF884CC0008DEE2076163EC0B883D899427F4CC0B013B35E0C153EC070AA436E866F4CC0800F7A36AB163EC07029AE2AFB6A4CC060AA605452173EC0805E46B1DC664CC090E7C1DD591B3EC008406A1327CB4BC080FD65F7E4D93EC0785B77F354434BC0A09A20EA3E803FC09030D3F6AF404BC0E0CA67791E843FC050616C21C8ED4AC0A0342905DDFE3FC060DF15C1FFDE4AC038A583F57F0A40C01838674469DB4AC07015527E520D40C0D0A3703D0A8B4AC0B00BCD751A5D40C010C5724BAB894AC0A061F888985E40C0D09AF54894894AC05036CFB8005F40C0B818CA8976894AC0E02CEC69875F40C0E8552B137E894AC0587138F3AB6140C048A2A7C660B04AC00043EF1D0DE040C0F8ECECD055C44AC020D604ACB00541C0E8C49BEBEADF4AC000821145923341C0285EE27E76134BC0F881284EA45541C0F05D11FC6F6F4BC040263B91BB8341C0F8CFBC772F714BC0A822FEBC048441C0
+AE	ARE	255	ARE	الإمارات العربية المتحدة	United Arab Emirates	Emiratos Árabes Unidos	Émirats arabes unis	Emirados Árabes Unidos	Объединенные Арабские Эмираты	阿拉伯联合酋长国	Member State	NO	Abu Dhabi	Asia	Western Asia	0101000020E6100000CB2CAE56592A4B40A76E065556E73740	0106000020E6100000010000000103000000010000001B0000006025917D90914B40900E2C47C8A03640880660D8614A4A40908461C092EF3640B814C75697CB4940908461C0921F384080C0D939CFC3494020D2EB937F673840F8D81CA8D2C34940C0A1054FBE673840807D5292DAC44940A06F2959616F38402890FCD5E4C44940C04E8C348A6F3840985418EE2BDB4940C057298170983840507AC91349DB494080FF7B97A2983840C02CA3B49EE8494020FD6FCC82A938404006D604A0314A4020DDEA0EE9F738401823B537156F4A4040FE200CE8293940E0BC6F512D124C40E084268925113A405866E6762D124C4080643D9925113A40605056AE65134C40102DC5A4AB113A40708C0FB397134C4030E1421EC1113A40C0A9B4D798134C4050E2E09DBF113A4018B22C98F8134C401064E8D841113A40E84735ECF7144C4080435376FA0D3A40287D93A641174C40E0D6C1C1DE043A40B09559BC8C2D4C40B0074C7AF497394020517238872F4C40706E05E7E886394078E157E4CB304C4060CB5430C65339406009148608304C404049862B06FB3840909AE8F351024C400075E789E7103840084D840D4F9B4B407066118AADB436406025917D90914B40900E2C47C8A03640
+HN	HND	111	HND	هندوراس	Honduras	Honduras	Honduras	Honduras	Гондурас	洪都拉斯	Member State	NO	Tegucigalpa	Americas	Central America	0101000020E6100000E409433312A755C08ECFDAD20FA32D40	0106000020E610000001000000010300000001000000160000000049BC62E4D355C040557B6E27F729405419CB969A5656C0006CDB0C44D62C40E070E657735656C0E074763238EA2C40F4BEF1B5675656C0008D28ED0DEE2C40946588635D4E56C0E0D8429083C22D40247E8CB96B4B56C040F180B229072E4034894160E54A56C060E50AEF72112E407CB74082E24956C0A0DB68006F212E4028FBAE08FE0F56C0A0A50F5D506F2F4054FCF03DEDFC55C0E03FC1C58ABA2F402CE7525C55FC54C03069A9BC1D69314070E4373B88FB54C0E0472A9D596A3140645721E527FB54C060781A7AD56A3140709D465A2AF954C03070EB6E9E6A3140A8E628F606F954C0B0D0798D5D6A3140C0FA3F87F9F854C0002EF6A8096A31401CBAA0BE659C54C000605969522A2E401CBAA0BE659C54C04063D751302A2E405C3C8386FEC155C04044C02154F92940B0AA5BC6D8C255C0C071A90386F8294088101E6D1CC355C0E0019F1F46F829400049BC62E4D355C040557B6E27F72940
+IQ	IRQ	118	IRQ	العراق	Iraq	Iraq	Iraq	Iraque	Ирак	伊拉克	Member State	NO	Baghdad	Asia	Western Asia	0101000020E610000009AD9FBD29E34540BCAD4F16E0854040	0106000020E610000001000000010300000001000000180000001863997E89364740E0272B86AB0F3D40C0C0E5B1665C464050959A3DD0323D40704B5645B89943406065DF15C113404088E882FA96854340B02C431CEB264040C8120F289B824340A0438B6CE72F40400070253B367E4340C84D7FF6233D4040480AD7A370654340209430D3F6AF40403091442FA3B44440108A1F63EE424240205DCB820E644540A083D193CFAF4240C020855F2865454050B3040F4FB04240382E4EAFA66545403086735981B0424028E8E7D4B5924540186246FC73AF4240A09A45D4F6024640D0DC5D16BCA94240889E70F07110464088CF4F3EEBA8424018B0ADA4F761464028683D304B954240C0BCB8DBD5624640B087CD9FED944240302CB61E852B4740D0C8A365EEE8414058A37157582C4740E09372572CE74140482F0080A8494840E01101A0EDEF3D40383D0060B749484020DEFEBFDEEE3D40581300C08A484840D064FE5F62EA3D40F0ABA901CA464740B03AA24AE6193D4080A1DBA61345474030634E60D2183D401863997E89364740E0272B86AB0F3D40
+IR	IRN	117	IRN	إيران	Iran (Islamic Republic of)	Irán (República Islámica del)	Iran (République islamique d')	Irã	Иран (Исламская Республика)	伊 朗(伊斯兰共和国)	Member State	NO	Tehran	Asia	Southern Asia	0101000020E6100000F56C924A51194B40ABAFA4D9425F4040	0106000020E61000000100000001030000000100000022000000F004012011B54E4050BBFFFF6710394088A1FFFF6E454B4090ECFD5FD8E43940F8E70000C13F4B40406F01404CE63940404C00A0383F4B40A0570100F8E63940881EFF3F6DBA494000E8000001D83B4098C34FD2B23A4840704C9FC2B6FE3D40802C7BE717034840C0C5DA84207A3E4018AE47E17A0C4740307E20D4A07D4040A069C0F528B446407084B70721FD40405029E8F6921E464038FA0AD28CF1424060349D9D0C064640004087F9F2AE4340C8B645990D064640A0F1EF332EB043402880D4264E06464018C347C494B04340B04D9CDCEF08464020359886E1B34340604D10751F4C4640F8940ED6FFE14340C8B12E6EA34D46407004E275FDE24340F8478AC8B04E4640086A6AD95AE343408058A835CD4F464010E6E8F17BE34340C832B8ABECFD474078FD5DCDB1DA434020E95C89349B4C40B86CF873D023434028D752E2689E4C40A84F8D923523434030B9166FDCAA4D40E0C1538B32C54240900F630792AD4D40883B997DF3C3424050954A4018934E40F8041705E3514240D8DB602703944E4000174CE575504240889EB87C61954E40801DAD74FB4D424058E24AA8E6954E40A01C3276E64C424080B583E1C1974E4038E5435075484240E8E47E87A2A84F408043C5387F233B40F8B5679604A44F4060BC9179E4DF3A40C0679604A8954F40300725CCB4A53A40B84CFF5F23CE4E40E088FF5FE831394018D5FFFFA0CC4E4080460100D22F3940F004012011B54E4050BBFFFF67103940
+CF	CAF	49	CAF	جمهورية أفريقيا الوسطى	Central African Republic	República Centroafricana	République centrafricaine	República Centro-Africana	Центральноафриканская Республика	中非共和国	Member State	NO	Bangui	Africa	Middle Africa	0101000020E6100000E691D6664C7C34400B0D85324D4D1A40	0106000020E61000000100000001030000000100000022000000D0BFBB4126313040803F78BF9AC30140D00DF8FC302A3040000B293FA9F60140A057E718901D2E4000302FC03EFA0F40C0B0C403CA762D40C01EBFB7E96F1240601405FA440E2D4040D847A7AE1C15408019E25817D72C4080E42CEC69271840A0D0B359F5D92C40401BBB44F5561840608D976E12732E40C067B3EA73F51C40E0B5A1629C7F2E4080EA043411161D40604C291FEA802E4080E7013B1D191D4080EB6E9EEA802E4080156F641E191D40802A52616C012F400036936FB6191E40E0A414747BE13540A04F1E166ABD2540A03BA583F577364040ACFF7398FF2540205B087250823640007CB8E4B80326405001347A50823640402728E5B803264070AED3484B853640A0DC0C37E003264070520ABABD9C3640A09BE1067CFE254080CC4065FCBB3640008F705AF0F2254060E9BE6E21E03640E09EC363DCDC2540B066961152513740C05DD4003BEE244040D8A8AFB0283B40C0FE7BF0DA131740209EA56BF3293B40C0D09750540D174000238FB7C7363B4080D1381153C7164000775C0B35483B4080C33BA23D5C164040E3EAB67A743B4000116C270D4B1440603886C37C743B40807B5BFAE1491440F08CEEAEA0743B40809CAEB7653514402085EBBE54743B408091BC870C28144070174B127D733B40C0BF419C031B1440A0C7FE7260733B40000A3FC448191440206A0CFBBC723B404068FD1464171440E0D98C7D90713B40006AC020E9131440D0BFBB4126313040803F78BF9AC30140
+NL	NLD	177	NLD	هولندا	Netherlands	Países Bajos	Pays-Bas	Países Baixos	Нидерланды	荷 兰	Member State	NO	Amsterdam	Europe	Western Europe	0101000020E6100000C3146EE1D7B41640B86A12A8B8214A40	0106000020E6100000010000000103000000010000001C00000000BD00FBE8941740A0BC3AC78060494000BB9BA73AC4164080103B53E8604940004D327216760B4090BF266BD49F494080147992740D0B40B88A37328FA4494080F4D2C6710D0B40788C32558FA4494000202922C3EA0A40C0E0455F41A649400052499D80E60A40F885C954C1A84940000406C0ADF40A4098420040F3AF494000E2F2FF7A7E0B4040BAFF9FB5C449404098FC7F376B1340B87E0040789C4A40806001008B701340A08B00C0D49C4A4080DE05A00ACD1440E04EFF1F48B34A40C02903C0DED61440E84600C0BCB34A40C0120240B5881640C804FF3F34BC4A40C02202E068C71940803200A0FFC64A4040C0FE3FDCCE19401835FF1F0FC74A40C0C0FDFF86701A4020C7FF1F92C64A4040BAF8BF49611B40D0450060CABA4A40C04806C045851B40E0FDFF3FDBB84A404050066066DA1C40E04EFF1F889E4A4080E3A59BC4E01C4078C971A7749C4A404057678C41E11C40389C1850379C4A40809413ED2AE41C406004FF5BC99A4A4040CD751A69E91C40501B47ACC5974A404090DAC4C9DD1C40E8E47E87A2804A40C0D7F50B76431C40307A19C5721F4A40801F9DBAF2191840E8AAB2EF8A60494000BD00FBE8941740A0BC3AC780604940
+GQ	GNQ	76	GNQ	غينيا الاستوائية	Equatorial Guinea	Guinea Ecuatorial	Guinée équatoriale	Guiné Equatorial	Экваториальная Гвинея	赤道几内亚	Member State	NO	Malabo	Africa	Middle Africa	0101000020E6100000B45636A095EE244031B8352F690EF93F	0106000020E61000000100000001030000000100000021000000801C3AE2358C164000153DA6A47DF7BF80DE7D44028416400067C81DDB77F7BF00375A69AD7B164000D5E76A2B56F7BF408B46883C7B164000E847C32953F7BF400EB7E809781640009EAD83839DF6BF00BA0FE5B078164000579FBCD990F6BF80F8B6AA36791640008461C0928BF6BF80E18AD530E12040000E373BAD860B4080CF8D9F7CE8204080F6306AADAE0B40A015527E5261214000692BE56B350E40E039D9BC6062214080CCA266FE370E40A0489D256D6721400093832392420E40605A5DF34F6D21400057E24BF24D0E40801F5E7C766D2140807E10131E4E0E40008CB4EFB26D2140008EFC0B4E4E0E40009A1AB2CB6D214000FF4124434E0E40A091802C9FC4214000C62AEFF4240E4040811A1285C621408076B3F5C2230E40607DF9677DC9214080DDB419A7210E40804892D6CECA214080793C2D3F200E40A0D60748EACB2140002331410D1F0E406023A3C62ED1214080B903D083160E4060D47D0052AB264000D0B8702064014000001DE6CBAB264080FA7E6ABCF40040C0D7BB3FDEAB26400074D712F241FE3FA09274CDE4AB264000B05FB01B36F63FA0C7293A92AB264000626C21C841F13FE083BBB376AB264000D84CBED966F03FE0A615796EAB2640000086FA6A2AF03F20CA254968AB264000BC03DAF5F9EF3FC0B5BE4868AB26400070861BF0F9EF3F00CB7E82309416400038471D1D77F7BF801C3AE2358C164000153DA6A47DF7BF
+GM	GMB	90	GMB	غامبيا	Gambia	Gambia	Gambie	Gâmbia	Гамбия	冈比亚	Member State	NO	Banjul	Africa	Western Africa	0101000020E6100000A696934207E52EC02E20F64EC7E52A40	0106000020E61000000100000001030000000100000025000000B09B6E463EBF30C060052ECC98202A409072BED87BC530C0004703780B282A4080E86BF184C530C0409D26D824282A40508396BF8CC530C0A06DB9443F282A4090F930D692C530C080C88F9D5C282A40003C1F5498C530C0E0365FDB91282A4050E652019CC930C0207FB9BB73512A4080BAD6DEA7CE30C00031653B3A8D2A408044FC1E50D130C0A0EC399FF0AC2A40F09D2633DED230C0E0DAA6785CC42A40308DB454DED230C0A00B24287EC42A40D0CEB480AD8F30C0E08ECC7E38332B40A078EB6E31AF2EC080C76BC300902B40208F1DF670A52EC000D7A7B968912B40009EE0860B1E2EC0A03B5684F6A12B40603F941983132EC0A09F1ABD87A12B4080B7CB9A32D72DC0A0CA239E3D9C2B40609FB0B220DA2BC0203CA567A0202B40C0CC1680AED02BC06080F436FE1C2B40E0E0642AE3C72BC040629E235F172B4060AAD5AD57C02BC080686B0013102B402075E4D611A82BC020B3243B94F12A40A09E8EDEA8A32BC0202FB6EDD4EB2A4000AC4592C0A02BC04040C1F00AE82A40807C3D9C169E2BC0A0827A0FA4E22A4080D210D4779B2BC02068FFC900DA2A402004510E9E9A2BC0A0C1001888D32A40404E48C6C59A2BC0C0D4A6D0CACE2A40A0938DA9E99A2BC0803AF78E82CA2A40408C5018069E2BC020733B3BE6BE2A40C04B37AF08A42BC06006DB507DB42A408048419488AC2BC0A0A0D96BFDAB2A4040B5A17EF1B62BC0204AEAD4FAA52A4020E6122DCA5E2CC0E0DA21D029752A40604BE1F06B642CC0A0C684DF20742A40809E45BC63692CC020C0CA2A37732A40B09B6E463EBF30C060052ECC98202A40
+ZM	ZMB	270	ZMB	زامبيا	Zambia	Zambia	Zambie	Zâmbia	Замбия	赞比亚	Member State	NO	Lusaka	Africa	Eastern Africa	0101000020E61000003447FAEE2CCB3B40CB327D05CCEA2AC0	0106000020E6100000010000000103000000010000001F00000090C16ED8B6B03A4050035B25581432C020EC866D8BEA3940201895D4090032C0B0E062450D6E374010A7AFE76BA231C04098A55B7E363740B0DC69D0EF8431C0309E662D77233740208D75CA537731C0E0C78A2106DD364020D9F276763A31C0E0125891351F3640603CC8EDC27D30C0207A1B0DF31E3640F07053AD4C7D30C060A5A372CCFF35403080515EB83430C060A5A372CCFF3540A06876E7CD3130C0109D0C3812003640A0F199EC9FEF2AC040F3B91A26003640A07642D8BED92AC08081CBD0E900364020798F7569022AC0709C82A6EC003640005454FD4AFF29C040242311E1FF374020D13C8045C625C080C4F9BF96003D400098FC7F37EB20C010819D2170C53E40206B30476E6220C07026DF6C735F4040A080ECF5EE8F22C040D252793B7240404068AED348BB22C060349D9D0C7A404040F5B9DA8ACD22C04092CB7F489B4040E0E175FD823D23C0C044F5D6C0AE404000363CBD52B623C04860E5D022AF4040A0973446EBB823C040B4C876BEC7404040C6A2E9EC7424C0A02F2FC03EDA4040A073EFE1922325C0B8DE7D9549DA4040E07CA8F5FD2425C0C864AA6054DA4040E0BEF1B5672625C0D85790662CC6404020F180B229B728C0C8AE1523019F4040E0B70F2F3EFF2BC020C5724BAB093B405078978BF8F631C090C16ED8B6B03A4050035B25581432C0
+LS	LSO	142	LSO	ليسوتو	Lesotho	Lesotho	Lesotho	Lesoto	Лесото	莱索托	Member State	NO	Maseru	Africa	Southern Africa	0101000020E61000000278B55FED403C404C90AC3096943DC0	0106000020E6100000010000000103000000010000001E00000000683F52441E3C4000556AF640AB3EC07062F3716D003C40B07020240BA83EC0A0101E6D1CF13B4070BE9F1A2FA53EC060B4AB90F2C33B409042E73576993EC09048BF7D1DC03B4030D6C56D34983EC060E2D198D9BD3B40F083C597BF963EC0C0B6627FD9BD3B4020EC6987BF963EC00059FAD005653B40A0A71DFE9A543EC0804BAB2171073B4080E34EE960A53DC010C11C3D7E073B40C067791EDC9D3DC060DE8E705A083B4080F6065F989C3DC05034BA83D8C13B40300FEECEDAE53CC0000EBE3099C23B4090D634EF38E53CC080E6577380303C40C00E7F4DD6B03CC0B0CB6262F3693C40B079AA436E9E3CC0C0E7A4F78D773C40807615527E9A3CC0106A6AD95AA73C4080592F8672923CC080B2463D44AB3C40E02FBB270F933CC0E091A9D650AD3C40C06A002A2D943CC060FAD005F5AD3C4000CB2DAD86943CC0E02DAD86C4553D4090077767ED163DC0708D7A8846573D40E0D7648D7A183DC060573ECBF3583D40F09B5088801B3DC0709335EA21723D40B07762D68B493DC0D0B08A3732773D40B04082E2C7583DC000C91F0C3C773D402088BA0F405A3DC0D02ADEC83C723D4060F2CD3637663DC090D7F50B762B3D4040A60A4625ED3DC020A2EE03902A3D40201C08C902EE3DC000683F52441E3C4000556AF640AB3EC0
+CD	COD	68	COD	جمهورية الكونغو الديمقراطية	Democratic Republic of the Congo	República Democrática del Congo	République démocratique du Congo	República Democrática do Congo	Демократическая Республика Конго	刚果民主共和国	Member State	NO	Kinshasa	Africa	Middle Africa	0101000020E61000006405219624A8374077E21C644B0307C0	0106000020E6100000010000000103000000010000002600000020DEFEBF5EB63D40A0BF01604EE92AC000FD01C0C52E3D40801CFC5FD6E22AC060B300A01C033D402016FC1F28D62AC03096FE9FEF003D4020AEFD9FEED42AC0307D70972D40364080FB7E46F68926C0E0F3C473B6E0284000F3565D873A18C0406A1492CCCE2840801EC99BB21918C0802CD90CCB762840C0209EDB3A4617C0E0E0F5F46C75284000DC52BDEB4217C020F3075E88742840C03EE3C2814017C0E0B0779D1264284000B43EA8350E17C0E0A4A91F4DED2840000AFBB0BD5214C080371480778D32404063DA2ACD5D1140E0C77DF703183340C0EDB2A193B21340201A45927D1C334080788639D9BF1340103AFACF8265334000B4E1557B791440901812A410673340002918B99A7B144040BC959CC86D3340C003A400C88414402035CD78316E3340009AB53A57851440908E200CF18C334000D688B9D49B144090C208301888394040F2F6D1BD911540301C08A3BB203B40404F4E450ED3144040CA136B65223B40C05B7214D4D1144070EA4FC49D253B4080559AC773CF1440902BFB76DE7F3D404094E6D83FC2124020EB05B3CA9D3D40C065313FA4A4124010C0D8E555A63D4040AC7FF1BB961240600BA55C05D13D4080DA00045D411240906BD40198C63E40808431EF5F630D40E05BA80ECFEA3E4080D33C10F12C0C40C05623D727ED3E40807DBE269E150C4090D1CA2F964C3F408036D8945E4D0140100B73F7C34C3F4080D5ED422C480140802803A7414E3F4080E07FD5D81C0140E0D77222D24F3F4000B05E3363EF004010819D2170C53E40206B30476E6220C070C5FE1F18CF3D400042018008E92AC020DEFEBF5EB63D40A0BF01604EE92AC0
+SD	SDN	6	   	السودان	Sudan	Sudán	Soudan	Sudão	Судан	苏 丹	Member State	NO	Khartoum	Africa	Northern Africa	0101000020E61000002BF48F1A3BF53D40AC26A3DA04053040	0106000020E61000000100000001030000000100000015000000A0ACF2C024F83740206B851E6E462140204C9592DF86374000BFFF036A6521405092BB309B843740A0D501785A682140907DBA087383374080029B06546D2140104F5901C9D03540A06094FB789B2940D0343655A6D03540A074EA5DCB9D2940601730BB86D03540E0C5381CE99F29404018D7F0DBD03540401E272450A32940C092EE056B1236408024D586A98E2B40904B040000003840104E7D2079FF334010000000000039401000000000003640C0F3FDD478793F40E0FBC6D79E393640084C9AB8F570424010E5916D5001364030712E0FE3A84240004884EBF6103540905EB296A74A434090D6A13FD90532409059C3A0A74A4340F0AF027CB7053240705C3810924A4340406BBD3A22043240F0EDE798DC134240E099C88DA15C2940E8ACB8D37E0E4140209437414DFF2240D0884C122E393840207D64FEC7482140A0ACF2C024F83740206B851E6E462140
+TC	TCA	251	GBR	جزر تركس وكايكوس	Turks and Caicos Islands	Islas Turcas y Caicos	Îles Turques et Caïques	Turcas e Caicos	острова Тёркс и Кайкос	特克斯和凯科斯群岛	UK Non-Self-Governing Territory	NO	Cockburn Town	Americas	Caribbean	0101000020E610000036EF60F433FD51C0C05E6B5276E43540	0106000020E6100000010000000103000000010000001C0000004CA61B727DE751C0B06527CD3047354010B4C9E193E851C0A0321587D8473540BC9F1A2FDD1E52C0B0EFA7C64B9F3540BC9F1A2FDD1E52C0D04B378941A0354044B6F3FDD41E52C0302FDD2406A1354050B81E85EB1D52C0D04B378941B03540B09DEFA7C61D52C0C0F3FDD478B13540BCCAA145B61D52C0508B6CE7FBB1354048682673871D52C000025F76F4B2354058643BDF4F1552C040DD240681DD35409479ABAE430152C0D0D82038D3F535408C88731E5FFF51C040EAC6606AF63540A895E5F8FCFC51C0F0A3DC22D5F435402027A7D1BFFC51C00082C24593F43540501DCDEC4EFB51C010D0DECFDFF235402C58607EDDFA51C0F0E1766858F235409CE815AAF6F951C090C40A1236F135407CCC183012EB51C060A3906456D53540B8185EA42BDE51C06034F8567FB9354028FE00B562C851C00022CA726D8335400C30A99061C851C070F22ECD638335407CA9B063EDC551C0A0EBB7C02F6935403069AE2E82C551C090B652BE566035404C8072254CC551C0607E2AB869593540E05E4F2A50C551C030F22AC65459354070428DE758C551C0208CAB803159354054F95404EECD51C0D0B60C384B4D35404CA61B727DE751C0B06527CD30473540
+HK	HKG	33364	CHN		Hong Kong						CN Special Administrative Region	NO	Hong Kong	Asia	Eastern Asia	0101000020E6100000E1298F6A1B8A5C40B83CC1FC166C3640	0106000020E6100000010000000103000000010000001400000058E05D6113905C4060636BDE3A273640F042B000BF795C4030423404112836407844DAA018765C4050219FE3653236400022AD66DA755C40202ED83121353640B80FD2839D755C40604BDA57153A3640F084C719AB795C407014B1D92867364078D06939B7795C4090BA593AA16736406064E5DE967F5C40D0C8192AC97A364050E960FD9F855C4000D8648D7A88364008E275FD82895C4050E97DE36B8F3640682C9ACE4E8A5C40C0921D1B81903640E008C4EBFA8B5C40604D10751F903640104E32DC3A9B5C40303AD454EE8B364098B0BAFED29B5C40B039FA111F893640509D83DED0995C40A0D2B8AC4C683640A05A1F04F4985C4040406338B45C3640700EADA196975C40A0B4D0A5EA4E3640E809AF1D5F915C4070E32F6ACD28364008298E5C47905C402027BB8F5F27364058E05D6113905C4060636BDE3A273640
+KM	COM	58	COM	جزر القمر	Comoros	Comoras	Comores	Comores	Коморские Острова	科摩罗	Member State	NO	Moroni	Africa	Eastern Africa	0101000020E6100000E906C64F58AD45400731CFBB015327C0	0106000020E61000000100000001030000000100000023000000A063E53C08D64540008F58E608D828C068B6BF0EF7D5454020B7D09508D828C0B84C648B49D3454080C3CCE3D5D228C0C03088FEBFD145404066553A0ECE28C010421E66D49E45408013D621929027C0181CA89DAB9E4540A089EEB4908F27C0B0F622DA8E9D454060D3D85E0B7E27C070A09EE3489D4540A0F0F5B52E7927C0D080FD21479D45400063997E897827C0284EDD4BD0A14540C0DF89B4E8E426C0D8D2BAB2B0A24540C04246F6F7D426C018C5D3E1D7A24540C0DF4BE141D326C0A839EB538EA34540A0B7D8A326CC26C0F899362DC2A3454000A2E826D6CA26C0809494055DA4454080EAFC80ACC826C0A06C2BAC0AA64540A0FB71FBE5C326C0B08DD948C8A6454060336ABE4AC226C0582D228AC9AB4540A0CF9CF529BB26C08013211A82AD454000EF8E8CD5BA26C000553D4FF2B04540E0720B02D0BD26C06817FB8161B2454080A6199CD2BF26C0683024CC593C464060D00836AE2328C038B99BF1C73C464040D8F4AFCB2428C0E883C602153D4640407C6B161E2628C05874C9DD8C3D46404076FA415D2828C0B8AE0AD4623E464000AA622AFD2C28C0003D9006013F464020F015DD7A3128C080B1E6B633454640C0990986738528C008992034CC444640E0398EC470B228C0785C10DB2744464000A64AEF76BC28C0402E4F8CD1434640C0CE746506C028C040AD80E783434640C0AE3610DCC228C0683FB3DAB242464040E48D8296C428C038F42D1801424640C094F837C3C428C0A063E53C08D64540008F58E608D828C0
+IO	IOT	38	GBR	المناطق البريطانية في المحيط الهندي	British Indian Ocean Territory	Territorio Británico del Océano Indico	Territoire britanique de l'Océan Indien	Território Britânico do Oceano Índico	Британская Территория в Индийском Океане	英辖印度洋海域	UK Territory	NO		Africa	Eastern Africa	0101000020E610000044DCB8F1A11B5240B28418A2DC551DC0	0106000020E6100000010000000103000000010000002E000000FC4D61A5821B52404017D929B1C61DC06CDD06B55F1B5240804F1DAB94C61DC0ECC479933A1B524000F30016F9C51DC0D0BDD1D8281B5240C0A0F07E81C51DC07C0B7FE1F0D45140406A1D0BC0AD1AC02CA325EAE0D45140C03E2201FEAC1AC070D443343AD4514000DF8ECB13A31AC0186A978029D451408039EB538EA11AC06CC1300510D4514040847357C09E1AC084D0C4854DCF5140804C3679259419C05477F93141CF51404019541B9C9019C068AF777F3CCF514000D0775CF98919C05438166F3FCF5140405E7AA0BA8619C088D4377A46CF51400021B9EB5B8419C05CED5003BCD251408032F2C352EE18C09863FC451AEF5140406A33A9FC2615C0689CBF0905F05140007661B5430D15C0EC6F422182F05140C0FE0B5FBA0415C0F0084C4CBCF05140807D456DD10015C06455078AE9F05140407E294D94FE14C0583E1581FBF0514040E2772EE7FD14C0587D42D117F1514040A4F55C4BFD14C0A06C5E3093F4514080E11C1ABBF114C0DCA89894CCF45140C0EABCD75AF114C0D8A1639F11F551408015945808F114C0C8DC499FB1FD5140402041F163F414C08C52D6CA5F10524080669C86A83215C0F86217FB01115240007BA6F2D13D15C074E360800E115240006717C2203F15C090ACEB06C0115240C0C1A4F8F85415C048334FAEA91F5240801EE0A4C4311DC0ACB64027A91F5240002A64F899341DC06C0F20E88D1F5240C0128BCEE8851DC038FC5D8E8D1F5240C0FCAD539B861DC090FE2B86861F52400021866753871DC0A8DB5C467B1F5240C0F05A536A881DC0F0CF34176E1F5240C00E739362891DC0CC2A5BDA5F1F5240809DABF7658A1DC0141F33AB521F524080B4DC3E508B1DC0A466A3CE371C524080F5FBB440C11DC07C6D6FB7241C52400080B74082C21DC0306A41391B1C524080D689CBF1C21DC0F00C535BEA1B5240C0B67C2425C51DC0ACDC442DCD1B524080BC9580F3C51DC04C03780BA41B5240405E358584C61DC0FC4D61A5821B52404017D929B1C61DC0
+NP	NPL	175	NPL	نيبال	Nepal	Nepal	Népal	Nepal	Непал	尼泊尔	Member State	NO	Kathmandu	Asia	Southern Asia	0101000020E6100000F1F7561281FC54405184A4DA59423C40	0106000020E61000000100000001030000000100000024000000F0F8521F98D55540A09C630B845A3A40987B7A9FFCAE55409066812A796C3A4064450BA596765540A0C32E57AD913A407010ED30744D554030132DCFBCC23A40304DB2240CD35440D0D69E1F67553B404C8DE822AEB054409037EC7054803B40FCB84837C878544020945D2E37DB3B40C8C1E0C59B7854406083264588DB3B408CD0D14253545440D0BC4A1BE7223C409CA9C2FF13215440F0444E6E7A8D3C40E4CDA3AD4D185440800F30F065A03C406C304BDD031754402009811D7EA33C4010F9A721F8045440E045A539FBD23C406026308EEB045440906415643BD33C409CDCD4B24804544040DEA3527AD63C40A471FF96C2035440001625073DEA3C406C90B598B50F5440301E71B1EA713D40288D6A0E79175440E03F5228B1BF3D4058B853773B1A544090B8324844CA3D408417E1E68726544040E621C513F53D40C088CDFFDF39544040FFA93771373E4014E4A084995A544090E123624A6C3E40E8C281902C68544060AA7D3A1E733E4004F6D1A92B855440805B94D9205B3E404C0C022B87865440A0BE823463593E4060F736CDA0095640D0B95D0785E03B4008D41D898C0C5640901129AAD7DA3B4080AD5D70EC0C56405089CA778AD73B40CCAFA0E2180C564060C9AA4F8CBF3A400C37A045990A5640D0C242E05AA53A401813DBAAF2055640608E8EEDAD6D3A40B4430435BF055640C0710AE6C06C3A40B0ED0F5CF101564090E574FE125D3A404CA88BA72D015640608550EF735C3A40E8A381FCA5005640C008D538615C3A40F0F8521F98D55540A09C630B845A3A40
+BW	BWA	35	BWA	بوتسوانا	Botswana	Botswana	Botswana	Botswana	Ботсвана	博茨瓦纳	Member State	NO	Gaborone	Africa	Southern Africa	0101000020E61000004032F8E351D037404A6BA932243036C0	0106000020E6100000010000000103000000010000001900000000562B137EB13440C04B378941E83AC0405BEB8B84A6344020A86F99D3D53AC0F0B9F770C9A1344070978BF84ECC3AC0506458C51BA1344020016A6AD9CA3AC0A0479AECDDFF3340902A720480C038C0E025F3FAD9FF3340D0E867AD124F37C00058E166D6FF334070907134E3FF35C030BD28A7E1FF344050243C8D735132C0B096AEACA9193740F0FFFFFFFFFF31C0D004D8C1EDF53840E087A626A0C931C0B061ABB08B28394090D913FC6DC731C070A67AC0A92C3940806838EE5FC731C010CCEAEDB444394090DD1F3172CA31C060BC9179E40F3D40B05296218ECD35C08001F6D1A9133D4080FD65F7E4D135C0C0C35F93355A3D40B03FDEAB562E36C0004FCC7A315C3D40D09C11A5BD3136C040C4928E4C5C3D4000FACBB41E3236C0100DFD135C5C3D409069FB57563236C05027BD6F7C953940E0CEDA6D17A239C0A0CFF23CB86B394010C32ADEC8BC39C0D04B3789415839409023B9FC87C439C0805B94D920B33540306F2A5261DC3AC0A0A19C6857A93540E0A90EB919DE3AC000562B137EB13440C04B378941E83AC0
+MP	MNP	185	USA	جزر ماريانا الشمالية	Northern Mariana Islands	Islas Marianas septentrionales	Îles Mariannes du Nord	Marianas Setentrionais	Содружество Северных Марианских островов	北马里亚纳群岛	US Territory	NO	Saipan	Oceania	Micronesia	0101000020E6100000E38453DE1D386240F9CC95ECC0602E40	0106000020E61000000100000001030000000100000023000000308A79B18B256240A04DBF9F75382C40E4D6EE686D256240804C22B193382C40B4147FCAE7236240608710FC143C2C405080BCB2E6236240602663C6253C2C40A8E3D649E2236240802F3608CE3C2C40A8453305E1236240E0EF1241413E2C40F05C6276601C6240F0F1C528198A344080840607601C624080B32E24168B344040A0D8AF601C6240F0FA3E1C248C3440C8D0FB10651C62407018D819958C344084DE0A17681C6240C04214DDC48C3440B072A1F26F1C6240A063C9C1118D344030ACD161741C6240300F7D772B8D34402C15F99A8A1C6240002B5A6F8A8D3440F0388FD48C1C6240105E8E0D938D34408C074AC09E1C624000AF58688C8D3440ACA33E24D71C6240E039BCD6948C3440184779419F27624020D86322A5053440A4658286632D624080F53B5E92B23340442B8B1D682D62405017E5E324B23340E0E819B145366240C0486EA873CA324010A5F6225A36624050727CFEC5C73240CC94206DED396240D035FAE29C2432405C74FC611542624060C6AEA360063040ECFF1CE68B3A624060CD7FFE31872E403078769E5D396240805925A2A94C2E404435CA9F142962406036EBE7A8522C40B83412FC0A29624040DB5438DD512C4014B2987D032962400021826044512C4094A7ACA6EB26624000BC9A971E3C2C40CC7AD6DAE0266240A0ECEF11D63B2C40CC4E9A61BE266240C033411E0B3B2C40EC56CF49AF266240403F15DCB43A2C40188387695F26624080F0ADFEBE392C40308A79B18B256240A04DBF9F75382C40
+AI	AIA	9	GBR	أنغويلا	Anguilla	Anguila	Anguilla	Anguilla	Ангилья	安圭拉	UK Non-Self-Governing Territory	NO	The Valley	Americas	Caribbean	0101000020E6100000425D34FFFC864FC051D0EC2EFA363240	0106000020E61000000100000001030000000100000012000000A8353720AE944FC030914A0C5D26324088F1CDDB7D964FC0D07DE4D6A4273240308C71B499964FC0C0EB2818DF273240485C9F8378A14FC0B09FBA038646324080A0C5ADDDB64FC03038C2FDDB943240686D7594DEB64FC0D0575DE223953240B01B6CA0AFB64FC01036F80CF2963240B071E6B22CB64FC0C09BF1C7FE973240F85030630AB64FC090C1C99129983240F098FEDB1B764FC0C05FFAA8D04A3240301AC05B20764FC0C0DEF2A2C04A3240486B3FBE297E4FC05012071A7D3A324068DCF698A37E4FC02081C8C79339324008070951BE7E4FC0309AF68370393240488248D0A9814FC000E4B21BC7353240B0577AC8EF894FC00076638BEE2C3240E002D0285D8B4FC02069E8FA992B3240A8353720AE944FC030914A0C5D263240
+BF	BFA	42	BFA	بوركينا فاسو	Burkina Faso	Burkina Faso	Burkina Faso	Burkina Faso	Буркина-Фасо	布基纳法索	Member State	NO	Ouagadougou	Africa	Western Africa	0101000020E61000004AB09AFA3FF1FBBF093D850A7C8C2840	0106000020E6100000010000000103000000010000002A00000080B0A71DFE1A06C0A032384A5ECD224040662C9ACE8E11C080AC8BDB6830234040006F8104C512C0E0967329AE5A2340C0FA3DD25CC612C0403DB418075B2340C0FA22A12DC712C0804BC8073D5B2340401344DD072013C0401422E0107A2340C0BB051214DF13C0E0484BE5EDC8234080FF56B263C315C04018B2BAD5A32440C0B8533A58DF15C0805F07CE19B1244000EE995AF3E315C0208DCF8054B42440C00C37E0F3E315C020A67EDE54B4244040693524EE1116C0802D3E05C0D8244000F6B4C35F1316C020ADC090D5DD244040EE3D5C72FC15C0405F7B6649202640802154A9D9A315C0A009DCBA9BA72740403EF498D9A315C0E0EE8BF09BA72740006536C824A315C0C064E42CECA92740C039CC9717A015C0C0F4A10BEAAB2740C0E253008C6711C060205ED72F482A40C0E444BB0A6910C0C0BE654E97C52A40C022BE13B35E10C0204B3CA06CCA2A400072BF4351E00FC0A0711B0DE0FD2A400033DC80CFCF03C060EBA86A82982C40000EE9B7AF03E7BF803255302A292E4000120F289B72E6BFC0F04BFDBC292E4000AC08FEB792DDBF20F4893C492A2E40004C8369183ED0BFE0DA8AFD65272E400010C1FF56B2CFBFE07EC16ED8262E400040AB3E575BCD3F40AAB706B6FA2D40800DA661F848014020917EFB3A602940802E39EE94CE014060CA4FAA7D2A2940008E5DA27A2B0240002DEC6987EF28408063EE5A423E0340607E6FD39FCD2740805778978B3803402073F4F8BDBD27400018601F9DFA0240A04C32721696274000302FC03E7A02406087F9F2025C27400040FB9122720240808907944D5927400096438B6C27004040581CCEFCDA264000D427127C1E004020E2ADA7E1D9264080075F984C150040E0D4B2B5BED826400002309E41C3F13FE098BB96900F264080B0A71DFE1A06C0A032384A5ECD2240
+CK	COK	60	NZL	جزر كوك	Cook Islands	Islas Cook	Îles Cook	Ilhas Cook	Острова Кука	库克群岛	NZ Territory	NO	Avarua	Oceania	Polynesia	0101000020E61000004C6F42A3E4F863C0126CE8DD193C35C0	0106000020E610000001000000010300000001000000200000004F5F854AD2BD63C030953F845DF535C0B6C13F5BFDBD63C070E6CEA7E9F435C0B5EBEFB61CFA63C0C0B2A492F04135C08665D8CD31FA63C0F0F7F1E1A34135C051B241CB9F6564C0C0870C50BF1632C059C1CAFC3E6664C000818F66D10E32C0B3DCE396A0BD64C04096B5A8AAC725C03E00A94D9CBD64C02033164D67C725C0EDF208C91DBB64C000E3B89DC7B225C0B71C548701BB64C0404381881EB225C0899C7411D5BA64C040AFE94141B125C0D3532DE777C163C0803B4ACA82D621C0F4899702EDBF63C06042041C42D521C01C4938E3EABF63C0204E870442D521C0FBE87624DEBF63C0C0B7EE4163D521C06F52E284D3BF63C04017789384D521C0BB3BD79CE8BD63C000C4ACBC89DE21C0AEFA12E0AABD63C020E12538F5E121C0184BA2A83DBC63C040DEB0C80A0D22C0159051F932BC63C0208CAA155C0E22C073E3271F4CAA63C050BF2DB3632834C084E2D8C453AA63C09085D107262C34C01481FB4B5CAA63C02024E362562D34C0EC61D45AFDBB63C0D049552470F335C073DD4A6500BC63C09038EC63AAF335C0908AB5AE07BC63C0D0B01298F3F335C0D6DEA7AA10BC63C0007E761B2FF435C0356387E71BBC63C07002AB3473F435C0533A58FF27BC63C040C7D5C8AEF435C0FB06DCA92FBC63C0A0B8AAECBBF435C083E0A76043BC63C030ECCF8FD0F435C04F5F854AD2BD63C030953F845DF535C0
+KN	KNA	208	KNA	سانت كيتس ونيفيس	Saint Kitts and Nevis	Saint Kitts y Nevis	Saint-Kitts-et-Nevis	São Cristóvão e Nevis	Сент-Китс и Невис	圣基茨和尼维斯	Member State	NO	Basseterre	Americas	Caribbean	0101000020E610000099391DA802624FC02E69F6D3FB563140	0106000020E6100000010000000103000000010000002D0000008848D5F5D24C4FC070B004AD1B183140D01643DE174D4FC01024E4CD2B183140B84C5EAE8F4D4FC01030E8CE5D18314088508E5DFD4D4FC040B68DF5C3183140F082E38D274E4FC030335019FF183140607F34F7EB4F4FC0D0E88601A61B3140F074649B0A504FC040364C7ED51B3140A88339306F6C4FC06023884E2A593140E05410A8A36E4FC0D0F6BB66A85E3140C82F2878AF6E4FC0C0F1608BDD5E3140B8BBA651926E4FC07001857AFA623140086A53D0486E4FC030577E744564314088819774EF6D4FC01029B16B7B653140C8316A08D86D4FC0D0439550B065314000580630C06C4FC0605B6732D2673140D8EF9AA1026C4FC02093FE5E0A693140F0C4CE6FF36B4FC0B093EF631669314000EA9447376B4FC0D02B38729369314070FAD577D9684FC0B0B8C1F5CD6A31404041953F84684FC0F0EA7D99DE6A3140489BBBA7BC674FC09000BE80036B314028CCD655DC634FC0F062B1F270673140B06E9406C8634FC0B0ECB0D3596731409886F24FBA5E4FC090EA9C5555603140C06416461F474FC060BE8F59AC313140206A4716D5454FC060489E90422E3140E01CD02DCF454FC0F0536C71322E3140A09B0EAECA454FC070269BBC122E3140E866EB85A7454FC0F0746A78C42C314038C49A255C454FC0E041E1FD0229314088A548BE12454FC0A09F104B1425314088A548BE12454FC0208C005DEA243140F05503DE13454FC0008EC646C52431402072D24554454FC070AB048BC321314060F393C558454FC0C06BA3F08F213140E809A6F512464FC04054A3FC491D3140E8DBA4FD6A464FC040A682E5631C3140387BE4C578464FC0C035E9B6441C3140B8A5417683464FC0B03E96992D1C314088BDDEFDF1464FC01053EF04561B31400878AA8DFB464FC0006383E04C1B3140B0DDA925C24B4FC0004C80AB86183140502E54FEB54C4FC0A0462D83201831402074F27DCC4C4FC030272AC01C1831408848D5F5D24C4FC070B004AD1B183140
+SC	SYC	220	SYC	سيشيل	Seychelles	Seychelles	Seychelles	Seychelles	Сейшельские Острова	塞舌尔	Member State	NO	Victoria	Africa	Eastern Africa	0101000020E61000003653025CCFBB4B40EA6169E7AEB612C0	0106000020E6100000010000000103000000010000002300000088BF5FCC96904940806E675F797424C0D8F47E4864DE4740A07A3D4E873824C0703ED6427F3F4740605A1D4AFE8123C0B07F6B82033F474080F122B8368123C0D86DE415E31D4740A0BDF49B2EF822C0880F4D8F5C1D4740002015B5EAF522C0E8F6CB272B1D4740E0C962AC80F422C0401E6CB1DB1C4740A04BD75DEAF122C000E7FEEA711B47406028C64329E322C0B06906A7F41A47406051DDB7B5DC22C0800B3554D61A4740000D350A49DA22C068AF9FB4261A474000EF552B13CA22C0B8E9F7B30E1A4740A020448D9DC722C018D29D712B1A4740A01809C8F2C522C0A886808D351B474020577D0970C122C018ACF424FA1B474060FDD7B969BF22C0E0BB500A049A4B4080A2B6685CB30DC0E012036E279A4B40005F62878CB20DC0886D1F4D509A4B4080475167EEB10DC0E078FA5289D54B40002F963325630EC03864E190B2D54B40807F6E1E3D640EC0600D784FD4D54B4000E50412B9650EC098933FCEEAD54B4000524DFF48670EC0F8F5B52E35F64B4000128596755711C09881F22D62F64B4040AA7180AA5B11C0D06FAF71A2254C4080F6C6B546611CC078FECB5AAF254C4040473E0A32651CC00038C368B1254C40C0E58D38096A1CC0B8D52F229B254C4080CB738E4B761CC0784122122A254C4040D4377A46841CC0282D29D258244C400072A9A5148F1CC0F890BD39B7214C40005AB91798AD1CC0784CAA1155214C40001D1EC2F8B11CC068C0ED64CB904940A0ED9D2C107424C088BF5FCC96904940806E675F797424C0
+AW	ABW	14	NLD	أروبا	Aruba	Aruba	Aruba	Aruba	Аруба	阿鲁巴岛	NL Self-Governing Territory	NO	Oranjestad	Americas	Caribbean	0101000020E6100000438048F0187E51C0C4B1AD09AA042940	0106000020E61000000100000001030000000100000034000000F83C9006817851C0A0E9DCA3EDD228409043D5F9817851C04099EC44EED228408073EBDA837851C0A0DDBBBCEFD228400007B474857851C06043D1F2F2D22840E4A55137867851C060191648F5D2284078399105F17A51C0A03CF4DDADDC28409845836FF57A51C0A041FADCBFDC284058A48977807C51C0A07A66EEC6E32840347282DBFF7F51C0601D67E43DF42840F8CE2F4AD08051C020B859BC58F82840E41CF285FF8051C0E0C41F459DF928407886263F188151C0C04C158C4AFA2840E0A9FD8C418151C0C045443179FB2840780E1B1BF08151C0402AC6F99B002940F815212B2E8351C08025ADF8860A294094A1E018388351C000A26131EA0A294000F390291F8451C0202E01F8A71429401C705D31238451C0E0713B8FE51429400414EAE9238451C000EBABAB0215294028780AB9D28351C000A3AAAEE83B29406C3A5D71CC8351C000E8757A943C29400CDC37ADCA8351C080600C9BB73C2940B4932D37BD8351C0407B7EBD673D29401428733D9B8351C06009336DFF3E29403818FBDC9A8351C02079268F023F29406CBB86CF8C8351C0A0AC133C2A3F2940286E81A98B8351C0607ABDA02A3F2940102FAAA07D8351C0A032A42F293F29402087889B538351C00048A1D1C23E294010DA1775528351C0A0F9916CBF3E2940145EA4AB4F8351C020D4D4B2B53E2940E0E9F06BFF8251C080DCAC0B893D29408071265C7E8151C0405877876F3429404063DCC3947C51C00063E47679142940CCC2F92F6B7B51C020AF57FDB60C2940A064726A677B51C020C166CA980C2940DC88EE59D77851C020C3031434F72840082EB18DD37851C00026DD3B0FF72840401C469CA97851C04047B71446F52840349F3A56A97851C020CA9B0D43F52840704AF6BEA77851C0C07686A92DF528408CA08C4C9B7851C0A0210CF269F428408CF74FDC967851C0E0E8AE3610F42840B41E2A32DF7751C0C0321AF9BCE22840F488E29F637751C080AE0CAA0DD628400CB22C98787751C0E04A4FA26FD42840F40D02E1797751C0405E7C7665D42840406392367A7751C0E03747C263D42840D8DA0C81ED7751C000C645FF15D32840E0F21FD2EF7751C00053A6E210D32840AC2C76A0F37751C0A085387B0CD32840F83C9006817851C0A0E9DCA3EDD22840
+VI	VIR	258	USA	جزر فيرجين التابعة للولايات المتحدة	United States Virgin Islands	Islas Vírgenes (EE.UU.)	Îles Vierges américaines	Ilhas Virgens Americanas	Виргинские острова США	美属维尔京群岛	US Non-Self-Governing Territory	NO	Charlotte Amalie	Americas	Caribbean	0101000020E6100000B217A95C293150C04F10462FA6BB3140	0106000020E6100000010000000103000000010000001A0000002088831CA53950C0701826A985AC3140801255AEA63950C080E7D37487AC31407089D981A93950C0C07EC74B92AC3140E4A56263DE3950C000A6F0A0D9AD31405C8B7159E03950C0A0587446EFAD3140406C0B2A854650C0407F3B3F7B4832400CC9DAF0854650C080BA0ACE8548324084BF153F7C4550C0C0E52329E9553240084169030B4450C0C099E8989867324054E4D70F314350C0D093933FCE68324014618A72E93450C030E4CD2BE8733240847D4CB5E03450C0405B2F3CE5733240D8CFCE0EDD3450C030D66542DD733240ACAB6E9A632A50C0B0C7009A525832409092793F492A50C0F061DA37F757324084302361842950C0303A048E04543240148D1079262450C030FA27B858C1314014B49080512450C0207C783B67C031406CAB6A93542450C0B06C585359C03140FCC41220D42450C0D0A98C3512BF3140D0A6EA1ED92450C0F001767F06BF3140208337FF0A2750C0703BDF4F8DBB3140A8DDC02ED42850C040EFDD8BD4B83140B4F578C6632F50C070D6E65A0FB03140FC5CE8D5B63050C080C592CDB0AE31402088831CA53950C0701826A985AC3140
+TW	CHN	147296	CHN		Taiwan						CN Province	NO	Beijing	Asia	Eastern Asia	0101000020E6100000186FE1090F3E5E40E8E2637323C03740	0106000020E6100000010000000103000000010000001E000000B8610020A8365E40408C0160DCE635409825002043365E409092FFBFEDE63540F88AFF1F6D2E5E403036FF7F81EB354030E5FF9F142E5E40005FFFBFFBEB35405081FFBF272D5E404097FEFFE1EE3540A8C0FFDFA3DA5D40E0D9FE3F1531374018840020B4D35D4060CAFF3F2966374018840020B4D35D401006018083663740E06300E0ECD35D4010FE012038683740807B0020A1DF5D4050D2FE9F74A23740A8C0FFDF43E05D40E039FE5F83A537409093FF1FA0E65D4080210280F6C13740086600A091425E40606A0020BB083940B8DEFF5FC6425E4000DA002032093940E80C00803C435E40D01F01803C0A3940107500E0B2455E409052FEFFC90F3940488FFF9F165E5E4030B3FEBFFF443940302E002056605E40E06BFF3FD849394010D5FFFFE0615E4090BC0140F74B3940780600400E625E4040E8FDDF0E4C394000D4FF9F4E645E40F089FFBF5A4C39407883FF7FAC645E406064FF9F374C3940087DFF3FDE655E40003CFE1F684A394040C9FFDF967A5E40908A0060A22039406082FF1FFA7F5E40103A0040A00339403820004007805E40603000E09A023940D83700801B675E40708E0120C1F33540F80D00E00E675E40F06300E00CF33540082C006091665E40605C00406CF23540B8610020A8365E40408C0160DCE63540
+05	RUS	136	RUS		Kuril islands						Sovereignty unsettled	YES		Asia	Eastern Asia	0101000020E6100000CD164529187C6240CA8AB478BF894640	0106000020E61000000100000001030000000100000033000000E40A39002C406240D07BC49E2CAE4540B8E0FBD126406240407925242DAE454038338EECA53F6240806CCB80B3AE454094A8177C9A3F6240D0E7BA95CAAE4540504F690E9A3F62408835BD7ACBAE454054DD6D28C63C62403089361147B54540643DFF87C53C6240F8CB608C48B545406C990CC7F32D624090C91B60E6DB4540B817E2A2E42D6240F06613BB11DC4540F0810CD3AD2D624080DC6DCD0CDD4540B41C8DE8832D624020672ECB32DE4540BCD2D7987C2D6240F0E5666E74DE4540A0BCC8047C2D6240082AFAE879DE454020F6E747682D6240E830C0F4ACDF45401085CFD6C12C62409856C6D0FBE94540ACED7085C12C624050C7E6F406EA4540D8631179C12C6240D8E2C5C210EA4540E858390FC22C62409814DBEE2FEA45400067BD73C32C6240B0926D8555EA4540DC81CEFFC62C62407819709692EA454048578E35C82C6240D02B6BF69BEA4540C0F957A0E72C6240E00462235AEB4540387A3540E92C624030E45B6963EB4540E8C40DAEEF2C6240C8AA306C83EB454084ADC89EF32C6240B843FCC396EB45403C40E6B9F42C6240506CE3F49AEB4540C411FF0B9F426240E059E322AD3C46406074B2D4FA42624058173AC0DD3D4640D0280241254462406850F05EFF404640C4907AF4EB7C6240781BC35213B74640CC540B367F7D6240489CE2CC0AB846401C83798809986240D0E550D037C74640A878019B18996240A0C019A144C746407831BC48D79A6240002B436678C6464064404008D29B6240F0CD3C1460C44640BCC903ECFE9B624098E634B0FAC34640887945A6729C6240E07B5D2B46C24640A4A06F668F9C6240684D1BC4BDC146404066B15E969C6240E0A5907582C146403009F599989C6240E8F4E45075C046403C3C84F1139C6240D09C1D5F31B246405C11EB430D9C6240183356F6B8B146404496AA590C9C6240B8E55C8AABB14640282D019D2E9B624070BE39121EAC464070DFA3FEFA9A624010F87F1F1FAB4640689C86A8025D6240A8955929A9E74540CC8F9D5CB859624070E84427F0DF45409C852CC1985962407844BE4BA9DF4540B4B4F8B9064562409874289E0EB4454010D76A0F3B406240801B406436AE4540E40A39002C406240D07BC49E2CAE4540
+AM	ARM	13	ARM	أرمينيا	Armenia	Armenia	Arménie	Arménia	Армения	亚美尼亚	Member State	NO	Yerevan	Asia	Western Asia	0101000020E6100000EDD5C1B3E477464047F5C626B1254440	0106000020E61000000100000001030000000100000026000000A8B7C6074016474010B062CD956B4340B88FAF868914474058FD0C3AA46B434030CD432CB61247401095859DCC6B43403024B92C01124740B0D6491D276C4340E06CC6180112474058324327276C4340A8D11DC4CED44540D8C1FA3F870D44405897C5C4E6D3454068B01BB62D0E444040751B5DB0D34540F0D9FB40710E4440C04FCC1C00D34540C8D6D1104C0F444090B5F81400D34540C8C58A1A4C0F4440080473F4F8C54540682310AFEB3B444090321B6492B94540D0293A92CB8B4440287BBDFBE3B94540B81BB62DCA8C444028D5C4C33ABA4540C0E4A871698D4440A81F46088FBA4540C0749318048E444028F1A2E452BC454098BB93459D90444028A12DE752BC4540B08251499D90444050D8F0F44AC5454068D72FD80D93444050809A5AB616464008309E41439F444078C971A77468464018C7BAB88DA6444098FCC1C0737F4640F84F70B1A2A64440080000000080464010BFD4CF9BA6444000BEDF2B64804640C8A16CA196A64440689CBF0985804640282E39EE94A64440C0847CD0B381464030DA5548F9A544407036C82423B74640A8F4BEF1B5834440B014747B49CB4640183B53E8BC72444010B13385CECB4640C0E0455F41724440407F130A114847404800A94D9CC8434038D80DDB16494740D0E53FA4DFC64340D0E6E3DA5049474048AD69DE71C64340283CDA3862494740802766BD18C6434008969526A550474058621058399C4340205D77F0DC454740E81FA3C7657043407088BC152445474098656152736F43402019FDCB6244474028FDB4590E6F4340A8DCDCB6741747403073951CA76B4340A8B7C6074016474010B062CD956B4340
+AF	AFG	1	AFG	أفغانستان	Afghanistan	Afganistán	Afghanistan	Afeganistão	Афганистан	阿富汗	Member State	NO	Kabul	Asia	Southern Asia	0101000020E61000006959A14FB6815040F9AEF9FC6FEA4040	0106000020E6100000010000000103000000010000001D000000C025396057075040906ABC7493603D40D80CA7A10D3C4F40701EF98381633D40B803E58BBD6F4E4030882CD2C4DB3D4088BEF4F6E73C4E4058CDACA5800A4140D8A57D48BF8B4E4068DF4E22C2A1414020588C8F16A34E405896218E75CD4140888D2441B8A44E40208A743FA7CE4140A83EC91D366D50408852EDD3F1C44240C42B82FFAD705040706CE8667FC64240DC3730B951B15140602041F1633A43402C2A1BD654BF5140A0236420CF3E43405021904B1CAC5240389B00C3F2B3424030254AC972B3524088F964C570AD42408419D22F11B5524028AED51EF6AA42402806819543B55240E0F3FC69A3AA4240F8A9E2141DB852407010E6762FA34240085C902DCBB85240B8E4F1B4FCA042405CC0046EDDB8524070EA758BC0A04240D4F3A78DEAB8524078D1C952EB9F424004FDBE7FF3B8524010293FA9F69D42406485DABDDCB8524008ADF9F1979C42409C42E73576475140B06B26DF6CB33F4044B797344641514020022B8716A13F4000B8921D1B915040807D91D096DB3D40EC8F696D1A905040D08844A165D93D4020059C668048504050F0E412488C3D401CE76F4221445040908461C092873D409038E38233085040C08D3F51D9603D40C025396057075040906ABC7493603D40
+01	XXX	2	XXX		Aksai Chin						Sovereignty unsettled	YES		Asia	Eastern Asia	0101000020E6100000E27FF585F2C75340833A9C3323834140	0106000020E61000000100000001030000000100000020000000703997E2AABC534048A9F6E978B04040DC25AAB706BC5340E06D179AEBB04040E063E94317B6534020213CDA38B6404014B9196EC0B55340B8DD76A1B9B640403CAB3E575BAF5340401E335019C740401CE25817B7AB53401042B28009D44040E059BBED428D534030CB10C7BA5C414020F5108DEE80534018D55B035B9D4140B403E78C287B5340487DCB9C2EBF41404CD74CBED97C534060CF49EF1BC74140E4404816307D534018747B4963C84140E4EEACDD767D53408067EDB60BC9414058D97745F07D5340B85FB01BB6C94140CCDCB5847CAC5340F06514CB2DF54140BCEEE6A90EAD5340D818ADA3AAF5414008172B6A30B35340D8E9B298D8F84140804E7ADFF8B4534020868F8829F9414074EB6E9EEAD25340800A80F10CFE414028C79DD2C1D45340E05F764F1EFE4140ECCF7EA488DA5340D0BE2B82FFFD4140CC93A46B26DB5340E03D7958A8FD4140C8AC174339115440A8AA09A2EEC3414074E140481612544050D74CBED9C241403456D4601A14544080C7293A92BF4140344CA60A46155440D882177D05BD41400C944DB9C2155440400664AF77BB4140B41188D7F5155440F0C6F48425BA414010293FA9F615544080B471C45AB84140F4C9C342AD0B5440E8B5847CD06F414058910A630B0B5440A0AC510FD16C4140741283C0CA0354401011700855564140703997E2AABC534048A9F6E978B04040
+CA	CAN	46	CAN	كندا	Canada	Canadá	Canada	Canadá	Канада	加拿大	Member State	NO	Ottawa	Americas	Northern America	0101000020E6100000826E46C2DF9E59C021626CD52C054D40	0106000020E61000000100000001030000000100000064000000F4AA3A50CCAB54C0782486D338D74440A87B09BAE2AB54C018A6835039D74440A01F5734E7AB54C0D07DBCA13AD74440E412584AE0E95EC0000B88FF2A28484000FDBE7FF3FA5EC020EC754133304840B4F8252C3B295FC030BB05B75A494840F0BF4B5FBE2D5FC06888ADEAF64B4840C04D469561465FC0001BCC704D5C484070B614EB2F4A5FC05076C7BD545F4840D8D6602BB25E5FC020BECF02FE6F48401C154905DFA25FC0509B4FC2F1B04840FC06DCA96FA55FC09045C2AD71B3484000780B2428FC5FC0B043A7E7DD0D494048D345AF2B6060C0B86A6B9FE9F5494098EFE0278E6260C03886DE8728FC4940DC9497A1966D60C0082F6CCD561B4A40F4BBB0359B8760C0208F9C9669664A407CAAAF53119160C000CAF6C6B5854A40FA60CF8D9F9260C008FD080D0E8B4A40FEFFFFFFFF9F61C0F0482EFF21294E407089000000A061C0B006616E77234F407089000000A061C0D8E38F5348564F40FEFFFFFFFF9F61C00400000000005040BED9E6C6F49F61C004000000004050407AED4B96C09F61C044335AD780675140F87E6ABC749F61C0D4109F85CE675140CCAACFD5569F61C0D4A5B8AAEC67514028255F645DA85EC060A3D4143716534098A49EAAE7CC5DC0ECF692C6685453402420819A35825CC070CD0CD1D79353407830CE84CB095CC0AC1F2FFFFCA65340D8A8F34DBF9E56C0A8040EB2F67D544090B87D45ED8055C04870B77FC09B54402814D852F67455C0B0938ECDE99C54407C6C4892D67055C0B0C156644F9D54407CC6962FF96D55C07C8DA72F959D54404086E9D6466955C018861277069E5440445CA560326554C09CC228ADE4B35440583E8166460554C0F4FED368CDBB544068D6BE25250254C0FCFF71C204BC5440BC1DF2E038F453C0D09EA97CF4BC54404CA088458CE953C064FE0A99ABBD544050D735B5C7E453C01071F618F6BD54401C705D31233B53C07CE981EA7AC65440E4EF94C4C81253C0684348275CC854409C989AA9351053C0680F481D78C8544010DCA392150E53C0903D0F4988C85440FC2C9622F9FB52C07CC5E7A9E9C854408863247B04F852C034D8C34DFCC85440C4CD154A4BF652C02CF2DA5B00C95440FC0A4F9E68AF52C0A8BD0BA540C95440D896B7D98EA952C0E09D5A223CC95440702CEFAA879652C0247931DE20C954408C28A380A37051C090DCD3D51DC7544088E2FA1CC46D51C0744E362F18C7544054A835CD3B6D51C0F8D901D715C75440DCD517AE336C51C00022478410C7544060ADA1D45E6B51C0ACEE25E80AC75440F48A1304B46851C0A42A95A6F7C65440E4C699CB326851C04806F2ECF2C6544014D9CEF7533550C018223BCA1CBA5440B07680CC73C94FC050F509455FB5544068381BE1A3C84FC080E35AA354B5544018237E6A61C84FC07C21C2644FB55440981A2FDD24C84FC024A6E9584AB55440088EFE3CB2C14EC0CCCD70033E9E54409865CC13BEA34EC01C6C8F83379B54408035CEA623A04EC0BC077CD9D19A5440F89FD4A8D18E4EC0A4D22DE08A9754408849905BDD8C4EC08C1C5BCF1097544050EF0456698C4EC0AC9CE568C49654404859E1F1484F4AC09018D1D105C34740485F1965474F4AC0E897E94DFBC24740E8B93B212A514AC018742090F0BD4740989A26C7F8774AC0C8FC5FBF71684740783D26529A794AC05888916F00654740B08CC34FD2794AC018AE916E95644740D070DB08D5794AC0C05A931392644740F0391C02EC794AC0D80DF21F7764474000B6943D53894AC0281631EC3054474098D44D1883894AC0A09240DE065447408006184CB28B4AC0E0AD0A79A95247401899582AB98B4AC0688918C0A5524740E855E185638C4AC010DFEAEF5B524740300A5A924DE74DC0B0F0FB92E8F8454088D2B6ABA1E74DC0F047D455CBF8454018664007A7E84DC07041CD3571F84540B09377C4D7E84DC0302D5C5661F84540C85048D7F1E94DC0E8D671570AF84540502C7E5358EB4DC0E871F673AFF74540E0C2482F6AEB4DC0A0A38E8EABF74540288F464FDBED4DC0E0B122B42FF74540C0C72764E7ED4DC070BAF9A12DF7454098F28D8DE5EE4DC08024F2B803F74540C864EE10B5EF4DC080365085E4F6454070FBE59315F04DC050549742D6F645405057056A31F04DC0E095A7BDD2F6454098D65C24A3F24DC0185F268A90F64540C4B08A37B2AB54C08065BC523BD74440F4AA3A50CCAB54C0782486D338D74440
+FR	FRA	85	FRA	فرنسا	France	Francia	France	França	Франция	法 国	Member State	NO	Paris	Europe	Western Europe	0101000020E61000001BAF50B13FA50340DA28FF8A75504740	0106000020E6100000010000000103000000010000002700000080C901C053842240F8A7FF3F5DAB44400072FE261422004080E5B33C0F2E454000001878EE3D8CBF708CD651D55845400080E3F10DB594BF50BE2E9DF85845400040F4F8BD4D9FBF7899D3653159454000E0C8022670ABBF107BDAE1AF594540008C3BA583F5E1BF80F86BB24665454000101E6D1CB1F6BF88F57F0EF385454000E17AE1BCF2F6BFF0B4A22BE3864540005B5A0D89FBF6BFF012D55B038745400096C59E1F09F7BFE0555ADC45874540007211DF8959F7BFF07DE36BCF884540002A52616CA1FBBFF815A4198BA6454000610200C59DFCBF100F004081AD4540406506E0557F13C060BCFF5F5A05484000C00700A59114C020CD00A0153A4840803B0820069114C0F8AD00C0603A484040C80160E18914C050ED00E03C3B484080A5F89FCC8614C0C8360020893B4840807303A0B27114C0D8D70060CD3C484000F6F45F8714FFBF30CE0000C8DD48400063F0DFA514FC3F68EE0040EF79494000AFEFDF9679FC3FB81800A0C67A4940000B1A00989DFE3FA00E0180967E494000E2F1BF2560044030FCFE3FE18B4940406A4DF38E73204080DB85E63A7D4840C0D2C1FA3F772040209947FE607C4840001231259278204018846401137C484060E6FFFF46EC224048950020DA7E4540E039036092F92240B086FF9F036D454060500340F411234080B50060C14545402088FCDF831F2340A86000C0B5234540A06FFE1F5A1F2340F0D800C03F18454080BDFFBF4C1B2340D04500604A114540E022FFBFF618234008E3FFDF6F0F454000F4020088C82240F8E1FF7F7DD54440A054FCDF11BD224050C100806BCD4440005302C08385224030680060D6AB444080C901C053842240F8A7FF3F5DAB4440
+PR	PRI	200	USA	بورتوريكو	Puerto Rico	Puerto Rico	Porto Rico	Porto Rico	Пуэрто-Рико	波多黎各	US Territory	NO	San Juan	Americas	Caribbean	0101000020E610000095CE7C71AE9E50C03A0A19D788393240	0106000020E6100000010000000103000000010000002B00000060720FAE25A250C050FA70DA9DE13140003E89192BA250C040ADCA749EE131405816A7B5C4F350C0605CC1DB28F13140C05B316DC9F350C0B01CF45B2AF131404CF04DD367FC50C0F07179628C143240E826423484FC50C0C0155C621B153240A4B2DE5E88FC50C0C0B24A4453153240D03C36B8E3FC50C0D0F9B2599A283240347870C1E3FC50C0A082024A9E28324000B00111E2FC50C0B0DD0ABCEE283240200093AFDFFC50C00018C45103293240449451C0D1FC50C070C1DB28572932402C41A1F9F7DE50C0A0744AF6BE63324028099AE0E5DE50C07033F389E1633240EC963F3AD0C850C0A0DD825B2D8232404C9F2E9C35C850C090B207FFC7823240047AF2FADDC750C0F00CE7751F83324034B0B03BB8C750C0D090AD78348332402484697377C650C040564046E583324040B51C43DBC550C0509F56D11F843240D469FF5E65C350C0D0D9194BFD833240D455815A8C9950C03081E4428A7E324078DAFF05A49650C0702A7A96D67D3240CCF14338D57F50C0F0BF571932773240D40B4FF9A17950C0C0D3C55C0874324034073DD8185850C040DDFCD0165F3240D8323BE6175850C070A95038165F3240C89DF4192B4F50C000D5FBD703593240F09C88D9264F50C0B0C9B4ECFF583240E8263108AC4E50C0804D70A076563240E4EF4A372E4E50C0D0ACE4BE30523240083E1757264E50C030C28C8411503240083E1757264E50C000B6679604503240B8A8CC832A4E50C060F047F6AD4F324058D3BCE3145150C010BA51BF66223240CC1CED131B5150C000D5D97F5322324038B31314755150C0102DA74E51213240A4BFF27B765150C0D0BE092A4F213240B08DE497E65550C070EE6B6E961C3240288F6E84C57A50C0D0806FE4CBF93140CC9F36AAD37A50C02001D1DDBFF931400069B576918E50C0303D6766C1E9314060720FAE25A250C050FA70DA9DE13140
+KY	CYM	48	GBR	جزر كايمان	Cayman Islands	Islas Caimán	Îles Caïmanes	Ilhas Cayman	Каймановы острова	开曼群岛	UK Non-Self-Governing Territory	NO	George Town	Americas	Caribbean	0101000020E6100000D2718B97944F54C0A9CD06B77B513340	0106000020E61000000100000001030000000100000031000000080A6C96B75854C010D8ECED3B4333401CD83BEDBA5854C090D9F3EB3D433340ECDA3928BC5854C0F007759142433340706616FC115954C0E0A28856384533406CF02A10E25A54C0B0158497855F334030D95E5CE15A54C0E0BDBCD0C15F33409847FE60E05A54C0D08377031660334068357FA7A45A54C060FBF72A43623340FC72D2A08D5A54C0608C0A41B3623340D0611976735A54C070C037F2E56233405CE9C605B15954C080F9B42F45643340F84AD6975B5954C020FE0C6FD6643340FC87F4DBD75854C09068F7F58D653340E0D7B4F7CE5854C0305AB91798653340D4DAA09B220354C060918D51E8B23340B460A92EE00254C0C0BAB31B22B33340383C3A64B9FE53C0402806ED7AB63340F0936A9F8EEF53C0F07F2BD9B1C13340E00F069E7BEF53C02098C0ADBBC13340E4B8533A58EF53C0F0B9F770C9C13340F4065F984CEF53C0D008E1D1C6C13340149F02603CEF53C02098C0ADBBC133409CC893A46BEE53C030E8F692C6C03340F8C6D79E59EE53C030AE2AFBAEC03340445A2A6F47EE53C040BEF6CC92C033405CEAE74D45EE53C0C0AF03E78CC0334004D3307C44EE53C0B06D6E4C4FC0334004D3307C44EE53C060A4C2D842C0334024A5A0DB4BEE53C0A0E4F21FD2BF3340A0923A014DEE53C0501B47ACC5BF334088027D224FEE53C0A08D40BCAEBF3340B41E85EB51EE53C02045813E91BF3340B054DE8E70EE53C0D071A774B0BE3340DC6C73637AEE53C0506BB75D68BE3340A023B9FC87EE53C0B01A2FDD24BE3340442575029AEE53C0C0B6627FD9BD3340E0067C7E18EF53C050A4DFBE0EBC334014139B8F6BEF53C0D017265305BB33406040F67AF7EF53C0605C55F65DB933409CE062450DF053C090C6850321B9334044E6913F18F053C000342E1C08B933402CAD86C43DF053C08094BC3AC7B83340D447A7AE7CF053C0404A5E9D63B83340D8DC989EB0F653C0B050888043B03340E0575128304754C020B30353724B3340A08169624B4754C0D036983C544B3340FCBA89108D5154C0E07A2BB75943334018249BB01F5254C0A0158A743F433340080A6C96B75854C010D8ECED3B433340
+MX	MEX	162	MEX	المكسيك	Mexico	México	Mexique	México	Мексика	墨西哥	Member State	NO	México	Americas	Central America	0101000020E610000072BAC47785A159C04B11225D27F13740	0106000020E6100000010000000103000000010000001B000000F4F3A622150E57C080B1A206D3102D409C93DE37BE0E57C0601D7233DC102D4074E09C1125B05CC0A0731882D2563240AC93FAB234B05CC0105ED2BDF3563240545DE2233DB05CC0F0808582085732400089377C9CB05CC060A9C8D754583240B476A224A4B05CC0D095911F96583240FCA8E1B611935DC0A0932EA292DD3C40C432A2597E975DC0F0BE1FC88B123D40586ABDDF68975DC0D04F9F2E9C253D409C4F8990DF505DC0E0F6764B7236404094CA8058DB505DC0884DD6A88736404090CC36ACF3475DC0C009C2D86C4440400C10CCD1E3AD5CC0688AABCABE5B4040C828965B5AA15AC050BF7D1D38C73F40304B02D4D49A5AC0C0436E861BC03F405855F65D119A5AC030A7E8482EBF3F40C0B12E6EA35959C0E03B4ED191C43D40C4B13F9A7BB355C060B0D705CD883540A06D461765B355C0E04433AA6788354024D3687231B355C060A3C9C51886354094EB23A67AAD55C0209E2BA5C23335406C9CB92C4BAE55C0E031AEB8389634406890EE8C5BAE55C0A07A27B04A953440CCF29771AED355C01021C5A5CF993240C051F2EA1CD855C070914836B2643240F4F3A622150E57C080B1A206D3102D40
+GG	GGY	104	GBR		Guernsey						UK Territory	NO		Europe	Northern Europe	0101000020E61000009A361037FDA204C0DE408A9453BA4840	0106000020E6100000010000000103000000010000001C000000003671DF5BF202C020193FE834B348400010BA3AB6E404C0604D21A177B548400076830DF4E504C0C811499979B5484000E805E9734F05C0E824DE4B2BB6484000D0FE51E55505C0A855777643B648400063D57B856005C0988CF73EB0B6484000F12895F06405C0F0DC92C1F6B6484000A497EB496505C060455E5AFDB648400051781A7A6505C0A80B34E900B74840002622B2FE6505C04859315C1DB7484080D7ADAFBF6605C038935E8A61B748400056009D936805C0905A50CE06BB484080F22A210E6805C0B83374A213BB484080B376DB850603C0B84AE9995EDC484080F52686E40403C0309831056BDC48400035069D103A02C0F81989D008DE484080AC50A4FBF901C0888E8F1667DE484000A017EE5CF801C070239EEC66DE48408097045E1C4B01C0782A1900AADD484000CC2AC7BF4A01C05097FE25A9DD4840809925016A4A01C0F835CB65A3DD4840003D48AA4A4601C0F0A39DE458DD484000849F93394101C060B65906E6DC484080E13C9CC0B402C060F0582206B7484080C9EA0C42EF02C038F87EB449B34840008AE99D65F102C030C1C01836B34840802D628ED4F102C0D8052E8F35B34840003671DF5BF202C020193FE834B34840
+SG	SGP	222	SGP	سنغافورة	Singapore	Singapur	Singapour	Singapura	Сингапур	新加坡	Member State	NO	Singapore	Asia	South-Eastern Asia	0101000020E61000009FA975F4E3F359406A041A89B1C6F53F	0106000020E61000000100000001030000000100000017000000ECD2FF3F7CEF5940006EF95FE69FF23F00B7FF7F5EEF594000EFDFBFF09FF23F581300C04AEE594000A8FFDFEAD6F23F14B8FFDF30EE594000290D608ADDF23FF47BFFDFEBE8594000831140D938F53F4C2100A0D9E8594000201260864EF53F805E0000F1E859400000EC9F5181F53F68310040CDEA594000A6F4DF9272F63FCC96FF3F77EB5940000FDE1F3BC4F63F947C0080B3EB594000071E4008D6F63FA4B1FF9FE2ED5940006B0D40CB2CF73F9093FF1F80EE594000371B00B13AF73F404C00A0F8F35940000DEF3F2082F73F4C2100A079F4594000D2F25FC787F73F1C4A00E0B3F4594000931280548AF73F947C008013045A4000EF130016EBF63FBCC1FF3F96045A40007407007AE1F63F0400000020055A40003B0900E9C6F63F38D7FFBFA5055A400058E39F2B9FF63F28B9FF3FC3055A4000A50A607989F63F1C4A00E0B3055A40003FE75FAC76F63F24D6FF5F53FD59400066F5FF8BEEF43FECD2FF3F7CEF5940006EF95FE69FF23F
+US	USA	259	USA	الولايات المتحدة الأمريكية	United States of America	Estados Unidos de América	États-Unis d'Amérique	Estados Unidos	Соединенные Штаты Америки	美 国	Member State	NO	Washington, D.C.	Americas	Northern America	0101000020E61000008B31F9CFA8DC58C0B8223806BBB34340	0106000020E61000000100000001030000000100000032000000707F3F468AC052C00058B730C16332401C80C3FAB57563C070E36A5F1EE9324003ECFE0CCA7563C080C87C9620E93240DC9497A1D67563C0E07B8F3F40E9324023456458C5BE65C030A70AA1DE0D3A4053292CA7F3BE65C0E0FB7C4A840E3A407E7C53A2F6BE65C0C03610DC920E3A40EF90BD39F7BE65C0D07DB1529C0E3A4080F91A3816BF65C0408A688533113A4020CD58341DBF65C07046DD1313123A40ECD79DEEBC6466C04003D9A1509F49403B1EE9C2BE6466C0A8B95F4F859F4940AEBE709DB56466C04806860728A349408E6A7D36D76166C07883352960CB494067FAC971A77765C0F8FCFDBD6FE44F40A52A6D71CDDA64C01C221704C5155140E183E85AC5DA64C0CCF405A6D315514084251E5036C764C0B447E17A14385140ECBB22F8DFC664C018747B496338514054CEBB0A294064C0A8082A5C8F9251408BB96B09F93F64C07460E2F7A59251401013B1E1E9F363C0CCCFC72E51B351408E0AE542CAF363C0386F56F65DB351407093AC1E4BF163C0F0BAA6F658B4514067098DBB5C8F63C0C4E34B10E4D85140D6DD3CD5218F63C010B5DD6CE2D8514028CA4BEFEC9865406037EF4971814A40D07DCDCDD2A36540087ED9B2C67E4A401888E821E4A3654070B25F47C17E4A40F4E7A3D8B674664040D44A7C49034A40D40562CAD1746640006B364536034A409422D7F2EF746640B86FBB2B16034A40DC8D999FF674664010EE8A2A0D034A40FC7376D77E766640C820448D9D004A40D04EF51A717866409886BFCBB1FC494024A5D93C8E786640E07E9EAB52FC49409497EB23A6786640B0E97AA2EBFB4940087FBF98AD78664050CB48BDA7FB4940B030C73CBC786640C8929C2D0FFB494000275EAFBA786640D8E5AB89AAFA4940F4FA94AFF06E6640805E190A8EAF4940F89112BDE76E6640B83209CD64AF494078DE3303E66E6640A0BA2BBB60AF4940DCF73CDA536E6640382471A0D1AE494014899D846D6D66408066EEC627AE4940CC17212D9F6C6640D060318FA1AD4940381F4423696C66409030236184AD4940A0E7F461626C6640388100BE80AD49408C47156A72C052C000926CBFC6633240707F3F468AC052C00058B730C1633240
+KE	KEN	133	KEN	كينيا	Kenya	Kenya	Kenya	Quênia	Кения	肯尼亚	Member State	NO	Nairobi	Africa	Eastern Africa	0101000020E6100000731969B5EEED4240A1726E440020E13F	0106000020E61000000100000001030000000100000013000000D86751E971AF4340404F351F7CE512C040B56CAD2FAF43400092205C01E512C0E06E38E27F9A4340C012F241CFB612C0609E669F8CF74040000E453F22FFEFBFB0E169CC80F440400010CCA23B7EB93F8019C5724BFF40404020B58993DB1040186C956071304140C014AE47E17A1240B035CD3B4EF94140C014AE47E17A1240F0ACC9FFD661444000E4673F2C231140703FAA452A64444000E10E6C46201140381684C77EF4444000EB5910CADB0F40E864E25641C8444000E61E42F77DFABFD09EE2DD36C2444000C6743282F7FBBF58466D2C72C144400041F5C5941EFCBF4038D89B18BD444000C68E7C14E4FCBF8081A32E63B44340C0F2583332D012C010734FB230B4434000E905442DD212C0087C952133B04340C0568B998EE212C0D86751E971AF4340404F351F7CE512C0
+MS	MSR	168	GBR	مونسراط	Montserrat	Montserrat	Montserrat	Montserrat	Монтсеррат	蒙特塞拉	UK Non-Self-Governing Territory	NO	Plymouth	Americas	Caribbean	0101000020E6100000341057414A184FC01946CAEE51BD3040	0106000020E6100000010000000103000000010000001D0000008873AC9C07184FC0407CD866BEAC3040405D6BEF53184FC0B000F676F0AC304070FA7ABE66184FC0D06CC9AA08AD30400098439C98184FC0E0A00D654DAD3040F04FBA3EBD1A4FC0A010CE0248B03040806BFF14D81A4FC0304586B075B0304070977ACCF61E4FC0E07D288705B93040C075F810F91E4FC050014D840DB93040B89C6DC9051E4FC0D08ED7CDD6BF304098CF807A331A4FC000AB07CC43D23040804E2A75241A4FC0C010B11C7CD2304090705939BF194FC0306294B1EBD23040184894AC79194FC0900B9B5CE7D23040780EA958EB184FC03062838593D2304040E5BA849E174FC060794CEEC1D130407881C58613174FC0F07B7F83F6D03040D8DDCA129D164FC0D07064D46BCF304048309C6B98134FC0601B41CF0BC230407088DA9145134FC0F0AF24D467C0304028A803B408134FC090BE3E8402BE3040F0797BC674124FC060ECA17DACB2304040E22F7777124FC08092191472B23040D89C4A0680124FC0A0BE219E36B23040D8BE918A10134FC0A0602D8892B03040C00CE8E0F4134FC0A067035548AE304048B010678F144FC04079F29F24AD30408833E1F2B3144FC05046F6F708AD304048DF217B73154FC0F09B5C42F4AC30408873AC9C07184FC0407CD866BEAC3040
+PH	PHL	196	PHL	الفلبين	Philippines	Filipinas	Philippines	Filipinas	Филиппины	菲律宾	Member State	NO	Manila	Asia	South-Eastern Asia	0101000020E6100000B6051BD2245B5E401887B85259E52F40	0106000020E61000000100000001030000000100000021000000A0170040F4D85D40004EF8DF29741240F80D00E08ED85D4080A5F9DF21751240805E000071D85D40C0E107A07E771240F873008080845D40C02EFDFFC32119405890FFFFE83F5D4080C8FA7F353C1F40F098FFFFBB3F5D40C001F83F71401F4020590020F53B5D40C0FCFDFF8BA91F4008490080A13B5D400015FDFF0ABD1F40705D00A09E3B5D400088F81F4AC01F4008490080013D5D40A0E3FE9F9A102040F0FEFF9F4DF25D4070200220845230402059002015245E40B00001A0477E3240E06300E04C245E4050DE00A0FB7F32404080FF5FB57C5E40E0FA0100E11E354050E7FF5FD97C5E4080C30040D01E3540880700A0207D5E402009FFBFBD1D3540E0C3FFFF7A645F40803D024094342840D8EEFFFFF97D5F4020C3FC7F16872540A894FF7F127E5F40806003E0A7832540184A00E0D38A5F4060100280D09D234090CDFF5FA0A45F40C06FF91FCBE41E40009AFF5F6EA65F40C075FF9F5D001E40783200A07FA65F40C0D2008091251D4038F4FFDF55A65F40C06D004092191D4038D7FFBFA58C5F4080CD0280722419402848DD82708C5F40409015BA1A201940103B00A0128C5F400069FA1F7218194030110000A65E5F408001FD3F0099154070A8A547A05E5F40C0AF303D94981540C0A4FF1F665E5F400088F81F4A941540A877FF5F225E5F40000AFB5F76911540C87F00A0EA5A5F40C029FCDF32791540A0170040F4D85D40004EF8DF29741240
+NC	NCL	178	FRA	كاليدونيا الجديدة	New Caledonia	Nueva Caledonia	Nouvelle-Calédonie	Nova Caledônia	Новая Каледония	新喀里多尼亚	FR Non-Self-Governing Territory	NO	Nouméa	Oceania	Melanesia	0101000020E61000007924C82BBBAF64403D1E368E805335C0	0106000020E61000000100000001030000000100000017000000A0971DF1DADD6440A04FCD40C0E136C0ECDEC26E33DB6340B0AF80F8AF6A35C06820CF2E1FDB634040657330F66935C0B88EAA2688C86340306AB86D84CA33C0D88E2CAA8FC76340609E8FD7288833C01867B1B98FC7634020276893C38733C0641AE148FBC76340C065378EB38233C0281E9AC3FFC76340E016BA12818233C0843E479AEED1634060776A89F01E33C0846C489216DC6340406AA164720833C0787C201EAE5E644060CD78B6A20632C09C5F28BBB45E644040061445A30632C0BCF3B347DE82654010AF9BAD176436C07C680EFFDF82654050FA64202A6436C0C0659824E08265404016CFEA2E6436C0EC4E6672E0826540C0BB7E1C286536C08805F703DE82654010C9E53FA46536C0D40A0C59DD826540D0CE6339AE6536C06888635DDC82654070786EEBB86536C088903D8CDA8265401074BFF9C36536C074733B45D8826540000BC6D2D16536C0006872D6CC82654020FB31F7DA6536C0A0971DF1DADD6440A04FCD40C0E136C0
+KI	KIR	135	KIR	كيريباس	Kiribati	Kiribati	Kiribati	Kiribati	Кирибати	基里巴斯	Member State	NO	Tarawa	Oceania	Micronesia	0101000020E61000005355F082A8AB63C0E0C4E55962B9FD3F	0106000020E6100000010000000103000000010000002A0000009273620F2DC762C00020F35C3A0524C0E42F88A346C762C06080CC73E90424C01F6FA8CED9CF65C0C0B6E974C5C912C03B139A2416D165C000A28790A9B912C0CD339B6C28D165C00072F90FE9B712C054CF937C36D165C040426B8F28B612C0EF749DFC4CD165C0C05014E813B112C07710960C5BD165C0C05A0E4F0AA612C07710960C5BD165C0C014DE8A69A312C00D04B7A459D165C0404A46297CA112C06D8B8DD456D165C0407C64CE8E9F12C0983B44ED08C465C0007220DA7DBD0CC02DEEF5A402C465C0009EF1D82ABC0CC0217596B4FD0C64C000AF658DD5C91240ED5BAD13D70C64C0C09C69C2F6CB124088B1F105D20C64C08085CD0017CC1240754FB179CB0C64C000A1ACCE20CC124058EA48E431A06540807F32C687290B406C2EDC5E37A0654080A2D86553290B4090BE93603BA06540003E5DDDB1280B4048C373004EA06540801884A8B1230B4050F8A57E5E0E664000C54BDCCF2EF5BF1859C6E1670E6640002195BD0036F5BF34558BE39B0F664000BD2E68C627F6BFC45E1734A30F6640009D639BAF2DF6BFE47BDA3CA90F66400059BBED4233F6BF704F90D8AE0F6640002A02F79738F6BFF0B47FAFB20F664000E6E9B70A3DF6BFD8D06119B60F6640008310902F41F6BF7CBE0B00BA0F6640008541F4FF45F6BF44A8E6CDBC0F664000313B8BDE49F6BF0892C19BBF0F664000DC8948034EF6BF10542179C20F664000EE38454752F6BF74CB4752D20F664000C623021F6DF6BFC4CE030E171B66408071D41BFF4F05C0589D8B75201B664080F6DDBE585905C0F01D7FB31E1B664000894567F45E05C07C40344E1E1B66408047F718515F05C06CE6DA611D1B66400039CA66B35F05C0C077407E1B1B6640809330D3F65F05C0D88A8054141B66408054336B296005C09273620F2DC762C00020F35C3A0524C0
+HT	HTI	108	HTI	هايتي	Haiti	Haití	Haïti	Haiti	Гаити	海 地	Member State	NO	Port-au-Prince	Americas	Caribbean	0101000020E6100000221CB12BDF2A52C03750B15E4EEF3240	0106000020E61000000100000001030000000100000037000000102EE411DC7752C0209535A094053240E834C126217852C030941FA79E053240F4C18DEF667852C020BA956FC7053240BC2CA347C27852C0209348EC24063240844A2366F67852C000E1606F6206324078F2FADD057952C0905DB9837D063240804AA654D37952C04049D16F04083240A46A16C3B09752C070694C2D004C3240982386787F9C52C0D00CB55CEC58324058B4B6DF909C52C0506766C11F59324030F66FA8A99C52C0001E6E87865932402C466E97C79E52C010A271F26C6A324084A1C49DC19E52C050588D25AC6D3240086355CEA89D52C08051AA33AD7D324024C6E86F789B52C070DF2CCA119B3240C8E7154F3D9B52C0A006239B509D3240CCD2BAB2309B52C090C99E4EC39D3240C834F515FF5A52C0600751082ED43340243DC21F345A52C030158DB5BFD7334008193499163E52C030EC8090D110344024CF06AA103E52C0C088505BD9103440F05C84CE903D52C010FFDEB76B11344048E361EBE33B52C000C430163C1334400CC74ED3C23B52C000590BFD5D133440C03467D8833B52C070CD45329A133440487952CB7B3B52C060458545A0133440B44EB747CA3852C0607853DB9715344038CDA7339C3852C0406B9505B8153440D0B58A598A3852C0E0D67734C41534407CA83462663852C080B36785D815344080053065603752C050AADED04A163440503DE30C0F3752C0D07E99396E163440B831981AFC3652C04002BE3676163440BCF4AC5A883452C0F0EF8398F016344040B8020A753452C020DFC2BAF11634402058665B973352C06031F614EF1634408803E8F77D3352C0E0B76004E8163440485BA6704E3352C0A03DD6E7C5163440B40721205F2B52C0301483763D0B3440D4C9BED0482B52C0F06F8CAE1C0B3440A45489B2B7F051C0F0FB4E3860B43340A43C049FB0F051C0802519DE51B433403CC803A881F051C040DF5621B5B33340184CC3F011EF51C00090F7AA95A933407050C24CDBEB51C0900F971C77823340C8EEC9C342E751C0901BF0F961343340282B4D4A41E751C0D090D5AD9E333340342D78D157EC51C06060C8EA56573240CCED258DD1EE51C0C06D516683143240BCD9E6C6F4EE51C0A086E1236212324048546F0D6CEF51C0301ADD41EC0C3240E46F422102F051C030B3412619093240FCB5AF483BF051C0D011A8C1DE07324020A12DE7D27352C0C0EF07F2A2053240102EE411DC7752C0209535A094053240
+AD	AND	7	AND	أندورا	Andorra	Andorra	Andorre	Andorra	Андорра	安道尔	Member State	NO	Andorra la Vella	Europe	Southern Europe	0101000020E6100000B87BB5BD4038F93F5532BC0C7C464540	0106000020E61000000100000001030000000100000019000000000A1687333FF83F90687407B137454000CD7A319493F73F389413ED2A384540002198A3C76FF73FB8506B9A7738454000948C9C853DF73FC0B9313D6139454000C13E3A75E5F63F086B0E10CC3D454000F3E51C74E5F63FB88F3F32CC3D454000577DAEB6E2F63FB864C746203E45400045FAEDEBC0F63FE8C83CF2074745400059E20165D3F63F20FBCBEEC94B4540008772A25D85F73F08F6D1A92B53454000B2683A3B99F73F40234A7B8353454000912C6002B7F73F0835B56CAD53454000362905DDDEF83F30C6F99B5054454000852A357B20FB3F509E245D33514540006D956071B8FB3FF802ECA3534F4540000CB5A679C7FB3FC8340C1F114F4540005821E52755FC3F70DAFE95954A454000509B3E2955FC3F106E9289954A4540000382397A7CFC3FF88AE07F2B4945400044C5387F93FB3F800B24287E40454000CC540A7F93FB3F78C562277E40454000C04868CB39FB3F007A53910A3F454000392D78D157FA3F389413ED2A3C454000CB6C9049C6F83F2057957D57384540000A1687333FF83F90687407B1374540
+ZA	ZAF	227	ZAF	جنوب أفريقيا	South Africa	Sudáfrica	Afrique du Sud	África do Sul	Южная Африка	南 非	Member State	NO	Pretoria (Adm.)	Africa	Southern Africa	0101000020E6100000DE9C0C9FB316394095A9F7051AFF3CC0	0106000020E61000000100000001030000000100000032000000A0D0045A5FEA424078BBECD79D7D47C0E8EDD522FDE9424090BB3BD79C7D47C0E8F8461916D4424038DA931BA07C47C0B864332CEBD34240607A67599C7C47C0901C6CFB68D0424038A8E6CD3C7C47C0A8AB0892D2CD424050772CB6497B47C048194FA9B7CC4240800C9A4CCB7A47C000E2E7BF07CC4240080044B0607A47C0800D8EED10703240E099A8EF462B41C0F00C37E0F36B3240E0FBA9F1D22941C010AAF1D24D6A324058F0A2AF202941C03085EB51B8663240A8E7A4F78D2741C0D01AF5108D663240986340F67A2741C0300AF4893C613240901C774A072341C0F023624A24613240203B3602F12241C050A852B307523240704BAB21711341C0407997E6B1513240A09E16CD141341C0E0FBC6D79E513240D0868A71FE1241C0E051D50451DF3140E89881CAF87F40C060389F609D723040706AC19A699F3CC090C53E874D74304040DCD487489A3CC030EFAF2D22783040D093961DA4953CC040EBAC4611E3304010F6EFB830163CC090C7D6172FE63040A0C2271CC8123CC0A0479AECDDFF3340902A720480C038C0405778978B083D40909D0C8E923736C0509AB1683A333D40E0913F18782E36C0702783A3E4A53D40B0585183692036C040FE7DC685C33D405072DC291D2436C08055D97745283F40D0240681955336C050903C3DDA283F4020CA128EBA5336C020F4893C492A3F40400B5EF4155436C04046EBA86A423F40D0BA9BA73A5C36C0D067E828D2433F4050FE496A8B5D36C0F08AFD65F7443F40F099081B9E5E36C0E0390664AF4F3F40203B3602F16A36C010E31934F4DF3F406009F9A067F337C0C03CE66E1D724040708AED9FBBDB3AC03033DE567A00434030C489F9035247C0F030BA17F3FF4240B82E2F65855347C0E88002942BF44240E0E62CFD957347C0F870E07AB9EF42404882925DC47947C0282235ED62EF424030E03D51237A47C0685727C2E1ED424098B92CCB7C7B47C0906E18607AED424098EF4C0DD97B47C0002DCF83BBEC4240006C62DC687C47C058D87E32C6EB424088A8893E1F7D47C070046564DAEA424008E32483927D47C0C0DC161BA9EA4240C031A3699A7D47C0A0D0045A5FEA424078BBECD79D7D47C0
+GN	GIN	106	GIN	غينيا	Guinea	Guinea	Guinée	Guiné	Гвинея	几内亚	Member State	NO	Conakry	Africa	Western Africa	0101000020E61000002C66A18556CF25C0802AD61016DF2440	0106000020E6100000010000000103000000010000002600000040226C787A3522C08090A0F831C61C4000EA60C5F59A2AC0804FC939B1142240E01B6ACA04A22BC04061EA9DC0DE22402011B92A9AA82BC040FFFFA446E52240C0C9D5D9DA082EC020F7425C94902540A0354A4D71132EC060A02D8C999D25408044D4E9E5182EC0E05F387C77A42540E0ED79FEB41D2EC020268117C7AA2540200A6BBEA5232EC04099F7938CB325402077555689242EC080006F8104B5254060871F52C2262EC040A66C4727BD2540C0AA4CE779262EC060B5CCD886C0254000132FAAA0252EC060643090B1C42540C09486753E8F2DC06070D4F8EFB42640A09EE023E1822DC020FAFAEA42C72640605E0F05B7782DC0E07DF84DEFD42640E0490F2C0F672DC0A0A47D099BEC2640A0BDADC6A26A2BC060C1798F385A294020C6F99B50282BC0A0E882FA96592940E0304278B48122C040FA27B858012940A0823788FC8022C0606C41D338012940008F19A88C7F22C0A0B96B09F900294040DF32A7CB5222C0A052EDD3F1F8284080149161154F22C0C04B7155D9F7284040D0ED258D1122C080D68BA19CD82840C0CCCCCCCC0C22C0E0FF56B263D3284040302AA913F021C04095D40968B2284060C971A774C020C060DEAB5626BC2640405DDC4603D81FC0E0D573D2FB96244040DC460378CB1FC060E3A59BC48024400066834C32F21EC08040F67AF727224040C971A774901EC0200F45813EC12040A051F2EA1C6320C000F9F719172E1E4040BEBC00FB6820C04054E3A59B241E40E06F253B36B221C040392861A60D1D40A08993FB1DBA21C080C6F99B50081D40601283C0CA2122C0C0374F75C8CD1C4040226C787A3522C08090A0F831C61C40
+JO	JOR	130	JOR	الأردن	Jordan	Jordania	Jordanie	Jordânia	Иордания	约 旦	Member State	NO	Amman	Asia	Western Asia	0101000020E61000009741943585644240D59D7252D23F3F40	0106000020E610000001000000010300000001000000130000005836E30984084240C024C33B0A2F3D4058F25A71807A41405010B25C515B3D4088E795EDEE7A41406028C68AFE653D40200FED38457D4140B007B0C8AF933D40409BD3D4CEC74140A0B13348AB524040E024EDE334C8414068C12BB9F2524040E841695EC4CD4140A0E2F9F88356404048D5C1577ACE414060913BE6E8564040B00A462575E241406072DC291D60404098D5AD9E93E64140D0AC174339614040480AD7A370654340209430D3F6AF4040F8F96184F0A04340482FA3586E2D404058B3075A81A1434018BE30992A2C4040A0D87C5C1BA24340209AEB34D22A4040703EAE0D15A343406038109205284040B04412BD8CA64340507155D9771D404088A1B170FEFF424090E7AB3F1D803E40D0683FADFDBF424070C471851C003E405836E30984084240C024C33B0A2F3D40
+BG	BGR	41	BGR	بلغاريا	Bulgaria	Bulgaria	Bulgarie	Bulgária	Болгария	保加利亚	Member State	NO	Sofia	Europe	Eastern Europe	0101000020E61000006B92DEDD1E3D3940F9868E09F7614540	0106000020E61000000100000001030000000100000028000000405EBA490C4A3940E8AB5626FC9E4440B0AC510FD1183740C8DEFDF15EA94440E0F0F44A59F63640189C33A2B4AB4440D095793959F63640703269A7B4AB44404011363CBDF23640E0166536C8AC4440302D95B7235C36407065C22FF52745405064DDB4235C3640306BDA46F5274540A0D40968225C364028D6E25300284540E049EF1B5F5B3640004AB54FC7E74540E049EF1B5F5B3640A84B7155D9E7454070A27A6B605B3640206F641EF9E74540606F0D6C9568364058A9D903AD004640A0FB1D8A02A5364010F9A067B31A4640C0E600C11CA536409007944DB91A4640402FC03E3AA53640A893DE37BE1A46407007CE1951AA3640305D33F9661B46408084D38217AD364030F697DD931B4640700B410E4A083B40484816308113464040164D6727233B40A8EFA7C64B134640502CD49AE6453B401093A98251114640B0E973E806473B40C84903DA3E114640C0AAECBB22483B40600D897B2C11464000800EF3E5ED3B409835EA211A01464040B4FE1F72953C4078EF00A061DE4540C0FBFF7FB69C3C40680B0160FFC44540B0750180FA9B3C4048C9FFDF36C34540D00201602C0B3C40E84600C0BCFE44405029FFFF240A3C40107500E072FE4440904963B48E223A40B8342905DDAE4440D0C2B7ED51213A4098056FEFAAAE4440004CFDBCA9203A403878D15790AE4440302AC6F99B203A40607380608EAE44402044DD0720FD3940407689EAADA94440A01249F432FA394010B08F4E5DA944401008E6E8F1EB39408865A54929A84440607E4F3545EA3940A8A8F94B07A84440A0321B6492E93940206F641EF9A7444020F3E505D8E7394040EE940ED6A74440303CDA3862553940E051D504519F4440405EBA490C4A3940E8AB5626FC9E4440
+IS	ISL	114	ISL	آيسلندا	Iceland	Islandia	Islande	Islândia	Исландия	冰 岛	Member State	NO	Reykjavík	Europe	Northern Europe	0101000020E6100000E5A469720F9832C0C0B0B21F663F5040	0106000020E61000000100000001030000000100000021000000C02E01C0FD9434C038ABFF5FB4A44F40B0B001200DB736C0F0BB00A02FE64F40F02201A093BA36C0A068FF1F41E74F406051FE9FD7BE36C010C6FFBF9FE84F40F0CB0040E3ED37C0886D0040F22F504080500020820438C084DBFF3F6F3450409068FF1F010D38C0E8EFFF5FAC36504030A30000E98B38C0442F0080E85F50403006FE5F118A38C01C2D00C063605040B09EFE9F82CB37C0049AFF5FAE835040600EFF9F792337C0F0810060AF9B5040B03C01A0CCF136C04C3E00C0E99D5040F0EE01E0F6E136C0A8DDFFFF139E5040C065FEBFD40432C0281F00E014A4504040ED00E03C0630C078CCFFFF2DA25040C0A5FF7F780430C0D0C2FF9F28A25040608E0300DE172DC09C85FF3F31985040407EFC7F7E152DC0509EFFDF17985040C002FC5F1D392BC038D7FFBFA560504060C703E08B082BC0FC560060504A5040E024FF7FDBFD2AC0D8D1FFDFC9445040C0C3FFFFFA052BC0DCB4FFBF793F5040E0E602802B092BC030C8FF7FA43E5040005EFC3F173B2BC07C1500806F3A5040C0D4FD1F04502CC01C2D00C0C325504080EE02204C162DC0F82A0000BF195040406DFE5F75EE2DC0A0510080340F50401033014047A430C0A894FF7F52E64F40E02A00005F3432C0880D012024BB4F4030B4FE1FF23832C04846FF1FB5BA4F4040D000C02CB132C0A0A2FF5FA1B24F408076FFFF4FB632C0E889FFBF5AB24F40C02E01C0FD9434C038ABFF5FB4A44F40
+HR	HRV	62	HRV	كرواتيا	Croatia	Croacia	Croatie	Croácia	Хорватия	克罗地亚	Member State	NO	Zagreb	Europe	Southern Europe	0101000020E6100000BF0812DF256D3040EB88249469914640	0106000020E6100000010000000103000000010000002000000070DE54583448304058B489CBE5314540200199336147304090987573EF31454060CCAD223941304050A117E17232454020732FEE0EE82E406846C878488B4540602AD84EADE62E40D8C66621A38B454040CC4D647E812B40E89AC5A261724640209DE526287F2B401803B96B19734640E0455B8619422B40384B7027A788464000DE4F9508412B40B8A5495428894640A0A51CF4EE342B40B8300433788F4640C02DF95BDF2D2B40584ACCA960934640402EEC1588FC2A40C0944F3635BE464060C11AD46FFD2A4048A55E78A4BE4640A0BB8E669C032B401824D7C9B0C04640B0D0798D5D4A3040A86340F67A43474090FB3A70CE583040A828D027F244474000221ADD416430400844FAEDEB444740A0054CE0D665304058E3A59BC444474000683F5244E6324020C5724BABF5464050A583F57FE63240880569C6A2F546406090662C9AE63240789EEA909BF54640A00F7A36ABE632406012A0A696F54640200EC134B6E6324058F0167390F54640704E97C5C4E632404844A33B88F54640B0E4D539066C3340801A69A9BC9D464090FB3A70CE70334050CD1E68059A464010314278B4713340E0A7E33103994640B04412BD8C72334058D1915CFE974640D0FA3F87F9723340F034D25279974640F0B4AA09C8873240C8C4A0C572324540C03EE2E01D87324030F346E85232454070DE54583448304058B489CBE5314540
 \.
 
 
 --
--- TOC entry 5343 (class 0 OID 55588849)
+-- TOC entry 5343 (class 0 OID 55597359)
 -- Dependencies: 303
 -- Data for Name: individual; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9582,7 +9564,7 @@ COPY spatial_metadata.individual (individual_id, email) FROM stdin;
 
 
 --
--- TOC entry 5344 (class 0 OID 55588855)
+-- TOC entry 5344 (class 0 OID 55597365)
 -- Dependencies: 304
 -- Data for Name: layer; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9592,7 +9574,7 @@ COPY spatial_metadata.layer (mapset_id, dimension_depth, dimension_stats, file_p
 
 
 --
--- TOC entry 5345 (class 0 OID 55588864)
+-- TOC entry 5345 (class 0 OID 55597374)
 -- Dependencies: 305
 -- Data for Name: mapset; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9602,7 +9584,7 @@ COPY spatial_metadata.mapset (country_id, project_id, property_id, mapset_id, di
 
 
 --
--- TOC entry 5346 (class 0 OID 55588894)
+-- TOC entry 5346 (class 0 OID 55597404)
 -- Dependencies: 306
 -- Data for Name: organisation; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9612,7 +9594,7 @@ COPY spatial_metadata.organisation (organisation_id, url, email, country, city, 
 
 
 --
--- TOC entry 5347 (class 0 OID 55588900)
+-- TOC entry 5347 (class 0 OID 55597410)
 -- Dependencies: 307
 -- Data for Name: proj_x_org_x_ind; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9622,7 +9604,7 @@ COPY spatial_metadata.proj_x_org_x_ind (country_id, project_id, organisation_id,
 
 
 --
--- TOC entry 5348 (class 0 OID 55588908)
+-- TOC entry 5348 (class 0 OID 55597418)
 -- Dependencies: 308
 -- Data for Name: project; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9632,7 +9614,7 @@ COPY spatial_metadata.project (country_id, project_id, project_name, project_des
 
 
 --
--- TOC entry 5349 (class 0 OID 55588914)
+-- TOC entry 5349 (class 0 OID 55597424)
 -- Dependencies: 309
 -- Data for Name: property; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9727,7 +9709,7 @@ ZNTOT	Zinc (Zn) - total	ZIN	mg/kg	\N	\N	quantitative	10	#F4E7D3	#5C4033	{soil,"d
 
 
 --
--- TOC entry 5350 (class 0 OID 55588921)
+-- TOC entry 5350 (class 0 OID 55597431)
 -- Dependencies: 310
 -- Data for Name: url; Type: TABLE DATA; Schema: spatial_metadata; Owner: sis
 --
@@ -9737,7 +9719,7 @@ COPY spatial_metadata.url (mapset_id, protocol, url, url_name, url_description) 
 
 
 --
--- TOC entry 5803 (class 0 OID 0)
+-- TOC entry 5801 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: audit_audit_id_seq; Type: SEQUENCE SET; Schema: api; Owner: sis
 --
@@ -9746,7 +9728,7 @@ SELECT pg_catalog.setval('api.audit_audit_id_seq', 1, false);
 
 
 --
--- TOC entry 5804 (class 0 OID 0)
+-- TOC entry 5802 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: uploaded_dataset_edit_edit_id_seq; Type: SEQUENCE SET; Schema: api; Owner: sis
 --
@@ -9755,7 +9737,7 @@ SELECT pg_catalog.setval('api.uploaded_dataset_edit_edit_id_seq', 1, false);
 
 
 --
--- TOC entry 5805 (class 0 OID 0)
+-- TOC entry 5803 (class 0 OID 0)
 -- Dependencies: 250
 -- Name: element_element_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9764,7 +9746,7 @@ SELECT pg_catalog.setval('soil_data.element_element_id_seq', 1, false);
 
 
 --
--- TOC entry 5806 (class 0 OID 0)
+-- TOC entry 5804 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: observation_num_observation_num_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9773,7 +9755,7 @@ SELECT pg_catalog.setval('soil_data.observation_num_observation_num_id_seq', 928
 
 
 --
--- TOC entry 5807 (class 0 OID 0)
+-- TOC entry 5805 (class 0 OID 0)
 -- Dependencies: 256
 -- Name: plot_plot_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9782,7 +9764,7 @@ SELECT pg_catalog.setval('soil_data.plot_plot_id_seq', 1, false);
 
 
 --
--- TOC entry 5808 (class 0 OID 0)
+-- TOC entry 5806 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: procedure_model_procedure_model_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9791,7 +9773,7 @@ SELECT pg_catalog.setval('soil_data.procedure_model_procedure_model_id_seq', 1, 
 
 
 --
--- TOC entry 5809 (class 0 OID 0)
+-- TOC entry 5807 (class 0 OID 0)
 -- Dependencies: 264
 -- Name: procedure_spectrometer_procedure_spectrometer_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9800,7 +9782,7 @@ SELECT pg_catalog.setval('soil_data.procedure_spectrometer_procedure_spectromete
 
 
 --
--- TOC entry 5810 (class 0 OID 0)
+-- TOC entry 5808 (class 0 OID 0)
 -- Dependencies: 265
 -- Name: profile_profile_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9809,7 +9791,7 @@ SELECT pg_catalog.setval('soil_data.profile_profile_id_seq', 1, false);
 
 
 --
--- TOC entry 5811 (class 0 OID 0)
+-- TOC entry 5809 (class 0 OID 0)
 -- Dependencies: 275
 -- Name: result_spectral_result_spectral_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9818,7 +9800,7 @@ SELECT pg_catalog.setval('soil_data.result_spectral_result_spectral_id_seq', 1, 
 
 
 --
--- TOC entry 5812 (class 0 OID 0)
+-- TOC entry 5810 (class 0 OID 0)
 -- Dependencies: 277
 -- Name: soil_map_soil_map_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9827,7 +9809,7 @@ SELECT pg_catalog.setval('soil_data.soil_map_soil_map_id_seq', 1, false);
 
 
 --
--- TOC entry 5813 (class 0 OID 0)
+-- TOC entry 5811 (class 0 OID 0)
 -- Dependencies: 280
 -- Name: soil_mapping_unit_category_category_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9836,7 +9818,7 @@ SELECT pg_catalog.setval('soil_data.soil_mapping_unit_category_category_id_seq',
 
 
 --
--- TOC entry 5814 (class 0 OID 0)
+-- TOC entry 5812 (class 0 OID 0)
 -- Dependencies: 281
 -- Name: soil_mapping_unit_mapping_unit_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9845,7 +9827,7 @@ SELECT pg_catalog.setval('soil_data.soil_mapping_unit_mapping_unit_id_seq', 1, f
 
 
 --
--- TOC entry 5815 (class 0 OID 0)
+-- TOC entry 5813 (class 0 OID 0)
 -- Dependencies: 286
 -- Name: soil_typological_unit_typological_unit_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9854,7 +9836,7 @@ SELECT pg_catalog.setval('soil_data.soil_typological_unit_typological_unit_id_se
 
 
 --
--- TOC entry 5816 (class 0 OID 0)
+-- TOC entry 5814 (class 0 OID 0)
 -- Dependencies: 288
 -- Name: specimen_prep_process_specimen_prep_process_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9863,7 +9845,7 @@ SELECT pg_catalog.setval('soil_data.specimen_prep_process_specimen_prep_process_
 
 
 --
--- TOC entry 5817 (class 0 OID 0)
+-- TOC entry 5815 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: specimen_specimen_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9872,7 +9854,7 @@ SELECT pg_catalog.setval('soil_data.specimen_specimen_id_seq', 1, false);
 
 
 --
--- TOC entry 5818 (class 0 OID 0)
+-- TOC entry 5816 (class 0 OID 0)
 -- Dependencies: 291
 -- Name: specimen_storage_specimen_storage_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9881,7 +9863,7 @@ SELECT pg_catalog.setval('soil_data.specimen_storage_specimen_storage_id_seq', 1
 
 
 --
--- TOC entry 5819 (class 0 OID 0)
+-- TOC entry 5817 (class 0 OID 0)
 -- Dependencies: 293
 -- Name: specimen_transport_specimen_transport_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9890,7 +9872,7 @@ SELECT pg_catalog.setval('soil_data.specimen_transport_specimen_transport_id_seq
 
 
 --
--- TOC entry 5820 (class 0 OID 0)
+-- TOC entry 5818 (class 0 OID 0)
 -- Dependencies: 296
 -- Name: spectrum_spectrum_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9899,7 +9881,7 @@ SELECT pg_catalog.setval('soil_data.spectrum_spectrum_id_seq', 1, false);
 
 
 --
--- TOC entry 4890 (class 2606 OID 55588930)
+-- TOC entry 4890 (class 2606 OID 55597440)
 -- Name: api_client api_client_api_key_key; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9908,7 +9890,7 @@ ALTER TABLE ONLY api.api_client
 
 
 --
--- TOC entry 4892 (class 2606 OID 55588932)
+-- TOC entry 4892 (class 2606 OID 55597442)
 -- Name: api_client api_client_id_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9917,7 +9899,7 @@ ALTER TABLE ONLY api.api_client
 
 
 --
--- TOC entry 4894 (class 2606 OID 55588934)
+-- TOC entry 4894 (class 2606 OID 55597444)
 -- Name: audit audit_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9926,7 +9908,7 @@ ALTER TABLE ONLY api.audit
 
 
 --
--- TOC entry 4896 (class 2606 OID 55588936)
+-- TOC entry 4896 (class 2606 OID 55597446)
 -- Name: layer layer_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9935,7 +9917,7 @@ ALTER TABLE ONLY api.layer
 
 
 --
--- TOC entry 4898 (class 2606 OID 55588938)
+-- TOC entry 4898 (class 2606 OID 55597448)
 -- Name: setting setting_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9944,7 +9926,7 @@ ALTER TABLE ONLY api.setting
 
 
 --
--- TOC entry 4902 (class 2606 OID 55588940)
+-- TOC entry 4902 (class 2606 OID 55597450)
 -- Name: uploaded_dataset_column uploaded_dataset_column_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9953,7 +9935,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 4905 (class 2606 OID 55588942)
+-- TOC entry 4905 (class 2606 OID 55597452)
 -- Name: uploaded_dataset_edit uploaded_dataset_edit_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9962,7 +9944,7 @@ ALTER TABLE ONLY api.uploaded_dataset_edit
 
 
 --
--- TOC entry 4900 (class 2606 OID 55588944)
+-- TOC entry 4900 (class 2606 OID 55597454)
 -- Name: uploaded_dataset uploaded_dataset_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9971,7 +9953,7 @@ ALTER TABLE ONLY api.uploaded_dataset
 
 
 --
--- TOC entry 4907 (class 2606 OID 55588946)
+-- TOC entry 4907 (class 2606 OID 55597456)
 -- Name: user user_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9980,7 +9962,7 @@ ALTER TABLE ONLY api."user"
 
 
 --
--- TOC entry 4941 (class 2606 OID 55588948)
+-- TOC entry 4941 (class 2606 OID 55597458)
 -- Name: category_desc category_desc_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9989,7 +9971,7 @@ ALTER TABLE ONLY soil_data.category_desc
 
 
 --
--- TOC entry 4909 (class 2606 OID 55588950)
+-- TOC entry 4909 (class 2606 OID 55597460)
 -- Name: element element_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9998,7 +9980,7 @@ ALTER TABLE ONLY soil_data.element
 
 
 --
--- TOC entry 4943 (class 2606 OID 55588952)
+-- TOC entry 4943 (class 2606 OID 55597462)
 -- Name: individual individual_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10007,7 +9989,7 @@ ALTER TABLE ONLY soil_data.individual
 
 
 --
--- TOC entry 4945 (class 2606 OID 55588954)
+-- TOC entry 4945 (class 2606 OID 55597464)
 -- Name: languages languages_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10016,7 +9998,7 @@ ALTER TABLE ONLY soil_data.languages
 
 
 --
--- TOC entry 4947 (class 2606 OID 55588956)
+-- TOC entry 4947 (class 2606 OID 55597466)
 -- Name: observation_desc observation_desc_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10025,7 +10007,7 @@ ALTER TABLE ONLY soil_data.observation_desc
 
 
 --
--- TOC entry 4913 (class 2606 OID 55588958)
+-- TOC entry 4913 (class 2606 OID 55597468)
 -- Name: observation_num observation_num_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10034,7 +10016,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 4915 (class 2606 OID 55588960)
+-- TOC entry 4915 (class 2606 OID 55597470)
 -- Name: observation_num observation_num_property_num_id_procedure_num_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10043,7 +10025,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 4949 (class 2606 OID 55588962)
+-- TOC entry 4949 (class 2606 OID 55597472)
 -- Name: organisation organisation_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10052,7 +10034,7 @@ ALTER TABLE ONLY soil_data.organisation
 
 
 --
--- TOC entry 4917 (class 2606 OID 55588964)
+-- TOC entry 4917 (class 2606 OID 55597474)
 -- Name: plot plot_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10061,7 +10043,7 @@ ALTER TABLE ONLY soil_data.plot
 
 
 --
--- TOC entry 4951 (class 2606 OID 55588966)
+-- TOC entry 4951 (class 2606 OID 55597476)
 -- Name: procedure_desc procedure_desc_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10070,7 +10052,7 @@ ALTER TABLE ONLY soil_data.procedure_desc
 
 
 --
--- TOC entry 4953 (class 2606 OID 55588968)
+-- TOC entry 4953 (class 2606 OID 55597478)
 -- Name: procedure_desc procedure_desc_uri_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10079,7 +10061,7 @@ ALTER TABLE ONLY soil_data.procedure_desc
 
 
 --
--- TOC entry 4957 (class 2606 OID 55588970)
+-- TOC entry 4957 (class 2606 OID 55597480)
 -- Name: procedure_model_def procedure_model_def_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10088,7 +10070,7 @@ ALTER TABLE ONLY soil_data.procedure_model_def
 
 
 --
--- TOC entry 4955 (class 2606 OID 55588972)
+-- TOC entry 4955 (class 2606 OID 55597482)
 -- Name: procedure_model procedure_model_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10097,7 +10079,7 @@ ALTER TABLE ONLY soil_data.procedure_model
 
 
 --
--- TOC entry 4959 (class 2606 OID 55588974)
+-- TOC entry 4959 (class 2606 OID 55597484)
 -- Name: procedure_num procedure_num_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10106,7 +10088,7 @@ ALTER TABLE ONLY soil_data.procedure_num
 
 
 --
--- TOC entry 4963 (class 2606 OID 55588976)
+-- TOC entry 4963 (class 2606 OID 55597486)
 -- Name: procedure_spectrometer_def procedure_spectrometer_def_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10115,7 +10097,7 @@ ALTER TABLE ONLY soil_data.procedure_spectrometer_def
 
 
 --
--- TOC entry 4961 (class 2606 OID 55588978)
+-- TOC entry 4961 (class 2606 OID 55597488)
 -- Name: procedure_spectrometer procedure_spectrometer_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10124,7 +10106,7 @@ ALTER TABLE ONLY soil_data.procedure_spectrometer
 
 
 --
--- TOC entry 4921 (class 2606 OID 55588980)
+-- TOC entry 4921 (class 2606 OID 55597490)
 -- Name: profile profile_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10133,7 +10115,7 @@ ALTER TABLE ONLY soil_data.profile
 
 
 --
--- TOC entry 4965 (class 2606 OID 55588982)
+-- TOC entry 4965 (class 2606 OID 55597492)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10142,7 +10124,7 @@ ALTER TABLE ONLY soil_data.proj_x_org_x_ind
 
 
 --
--- TOC entry 4927 (class 2606 OID 55588984)
+-- TOC entry 4927 (class 2606 OID 55597494)
 -- Name: project project_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10151,7 +10133,7 @@ ALTER TABLE ONLY soil_data.project
 
 
 --
--- TOC entry 4931 (class 2606 OID 55588986)
+-- TOC entry 4931 (class 2606 OID 55597496)
 -- Name: project_site project_site_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10160,7 +10142,7 @@ ALTER TABLE ONLY soil_data.project_site
 
 
 --
--- TOC entry 4967 (class 2606 OID 55588988)
+-- TOC entry 4967 (class 2606 OID 55597498)
 -- Name: project_soil_map project_soil_map_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10169,7 +10151,7 @@ ALTER TABLE ONLY soil_data.project_soil_map
 
 
 --
--- TOC entry 4969 (class 2606 OID 55588990)
+-- TOC entry 4969 (class 2606 OID 55597500)
 -- Name: property_desc property_desc_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10178,7 +10160,7 @@ ALTER TABLE ONLY soil_data.property_desc
 
 
 --
--- TOC entry 4971 (class 2606 OID 55588992)
+-- TOC entry 4971 (class 2606 OID 55597502)
 -- Name: property_num property_num_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10187,7 +10169,7 @@ ALTER TABLE ONLY soil_data.property_num
 
 
 --
--- TOC entry 4973 (class 2606 OID 55588994)
+-- TOC entry 4973 (class 2606 OID 55597504)
 -- Name: result_desc_element result_desc_element_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10196,7 +10178,7 @@ ALTER TABLE ONLY soil_data.result_desc_element
 
 
 --
--- TOC entry 4975 (class 2606 OID 55588996)
+-- TOC entry 4975 (class 2606 OID 55597506)
 -- Name: result_desc_plot result_desc_plot_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10205,7 +10187,7 @@ ALTER TABLE ONLY soil_data.result_desc_plot
 
 
 --
--- TOC entry 4977 (class 2606 OID 55588998)
+-- TOC entry 4977 (class 2606 OID 55597508)
 -- Name: result_desc_profile result_desc_profile_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10214,7 +10196,7 @@ ALTER TABLE ONLY soil_data.result_desc_profile
 
 
 --
--- TOC entry 4979 (class 2606 OID 55589000)
+-- TOC entry 4979 (class 2606 OID 55597510)
 -- Name: result_desc_surface result_desc_surface_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10223,7 +10205,7 @@ ALTER TABLE ONLY soil_data.result_desc_surface
 
 
 --
--- TOC entry 4933 (class 2606 OID 55589002)
+-- TOC entry 4933 (class 2606 OID 55597512)
 -- Name: result_num result_num_specimen_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10232,7 +10214,7 @@ ALTER TABLE ONLY soil_data.result_num
 
 
 --
--- TOC entry 4981 (class 2606 OID 55589004)
+-- TOC entry 4981 (class 2606 OID 55597514)
 -- Name: result_spectral result_spectral_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10241,7 +10223,7 @@ ALTER TABLE ONLY soil_data.result_spectral
 
 
 --
--- TOC entry 4935 (class 2606 OID 55589006)
+-- TOC entry 4935 (class 2606 OID 55597516)
 -- Name: site site_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10250,7 +10232,7 @@ ALTER TABLE ONLY soil_data.site
 
 
 --
--- TOC entry 4984 (class 2606 OID 55589008)
+-- TOC entry 4984 (class 2606 OID 55597518)
 -- Name: soil_map soil_map_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10259,7 +10241,7 @@ ALTER TABLE ONLY soil_data.soil_map
 
 
 --
--- TOC entry 4992 (class 2606 OID 55589010)
+-- TOC entry 4992 (class 2606 OID 55597520)
 -- Name: soil_mapping_unit_category soil_mapping_unit_category_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10268,7 +10250,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_category
 
 
 --
--- TOC entry 4988 (class 2606 OID 55589012)
+-- TOC entry 4988 (class 2606 OID 55597522)
 -- Name: soil_mapping_unit soil_mapping_unit_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10277,7 +10259,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit
 
 
 --
--- TOC entry 4994 (class 2606 OID 55589014)
+-- TOC entry 4994 (class 2606 OID 55597524)
 -- Name: soil_mapping_unit_profile soil_mapping_unit_profile_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10286,7 +10268,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_profile
 
 
 --
--- TOC entry 4998 (class 2606 OID 55589016)
+-- TOC entry 4998 (class 2606 OID 55597526)
 -- Name: soil_typological_unit_mapping_unit soil_typological_unit_mapping_unit_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10295,7 +10277,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_mapping_unit
 
 
 --
--- TOC entry 4996 (class 2606 OID 55589018)
+-- TOC entry 4996 (class 2606 OID 55597528)
 -- Name: soil_typological_unit soil_typological_unit_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10304,7 +10286,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit
 
 
 --
--- TOC entry 5000 (class 2606 OID 55589020)
+-- TOC entry 5000 (class 2606 OID 55597530)
 -- Name: soil_typological_unit_profile soil_typological_unit_profile_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10313,7 +10295,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_profile
 
 
 --
--- TOC entry 4937 (class 2606 OID 55589022)
+-- TOC entry 4937 (class 2606 OID 55597532)
 -- Name: specimen specimen_code_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10322,7 +10304,7 @@ ALTER TABLE ONLY soil_data.specimen
 
 
 --
--- TOC entry 4939 (class 2606 OID 55589024)
+-- TOC entry 4939 (class 2606 OID 55597534)
 -- Name: specimen specimen_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10331,7 +10313,7 @@ ALTER TABLE ONLY soil_data.specimen
 
 
 --
--- TOC entry 5002 (class 2606 OID 55589026)
+-- TOC entry 5002 (class 2606 OID 55597536)
 -- Name: specimen_prep_process specimen_prep_process_definition_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10340,7 +10322,7 @@ ALTER TABLE ONLY soil_data.specimen_prep_process
 
 
 --
--- TOC entry 5004 (class 2606 OID 55589028)
+-- TOC entry 5004 (class 2606 OID 55597538)
 -- Name: specimen_prep_process specimen_prep_process_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10349,7 +10331,7 @@ ALTER TABLE ONLY soil_data.specimen_prep_process
 
 
 --
--- TOC entry 5006 (class 2606 OID 55589030)
+-- TOC entry 5006 (class 2606 OID 55597540)
 -- Name: specimen_storage specimen_storage_definition_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10358,7 +10340,7 @@ ALTER TABLE ONLY soil_data.specimen_storage
 
 
 --
--- TOC entry 5008 (class 2606 OID 55589032)
+-- TOC entry 5008 (class 2606 OID 55597542)
 -- Name: specimen_storage specimen_storage_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10367,7 +10349,7 @@ ALTER TABLE ONLY soil_data.specimen_storage
 
 
 --
--- TOC entry 5012 (class 2606 OID 55589034)
+-- TOC entry 5012 (class 2606 OID 55597544)
 -- Name: specimen_transport specimen_transport_definition_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10376,7 +10358,7 @@ ALTER TABLE ONLY soil_data.specimen_transport
 
 
 --
--- TOC entry 5014 (class 2606 OID 55589036)
+-- TOC entry 5014 (class 2606 OID 55597546)
 -- Name: specimen_transport specimen_transport_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10385,7 +10367,7 @@ ALTER TABLE ONLY soil_data.specimen_transport
 
 
 --
--- TOC entry 5018 (class 2606 OID 55589038)
+-- TOC entry 5018 (class 2606 OID 55597548)
 -- Name: spectral_sample spectral_sample_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10394,7 +10376,7 @@ ALTER TABLE ONLY soil_data.spectral_sample
 
 
 --
--- TOC entry 5020 (class 2606 OID 55589040)
+-- TOC entry 5020 (class 2606 OID 55597550)
 -- Name: spectrum spectrum_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10403,7 +10385,7 @@ ALTER TABLE ONLY soil_data.spectrum
 
 
 --
--- TOC entry 5022 (class 2606 OID 55589042)
+-- TOC entry 5022 (class 2606 OID 55597552)
 -- Name: spectrum_x_result_spectral spectrum_x_result_spectral_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10412,7 +10394,7 @@ ALTER TABLE ONLY soil_data.spectrum_x_result_spectral
 
 
 --
--- TOC entry 5024 (class 2606 OID 55589044)
+-- TOC entry 5024 (class 2606 OID 55597554)
 -- Name: translate translate_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10421,7 +10403,7 @@ ALTER TABLE ONLY soil_data.translate
 
 
 --
--- TOC entry 4919 (class 2606 OID 55589046)
+-- TOC entry 4919 (class 2606 OID 55597556)
 -- Name: plot uk_plot_code; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10430,7 +10412,7 @@ ALTER TABLE ONLY soil_data.plot
 
 
 --
--- TOC entry 4923 (class 2606 OID 55589048)
+-- TOC entry 4923 (class 2606 OID 55597558)
 -- Name: profile uk_profile_code; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10439,7 +10421,7 @@ ALTER TABLE ONLY soil_data.profile
 
 
 --
--- TOC entry 5026 (class 2606 OID 55589050)
+-- TOC entry 5026 (class 2606 OID 55597560)
 -- Name: unit_conversion unit_conversion_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10448,7 +10430,7 @@ ALTER TABLE ONLY soil_data.unit_conversion
 
 
 --
--- TOC entry 5028 (class 2606 OID 55589052)
+-- TOC entry 5028 (class 2606 OID 55597562)
 -- Name: unit_of_measure unit_of_measure_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10457,7 +10439,7 @@ ALTER TABLE ONLY soil_data.unit_of_measure
 
 
 --
--- TOC entry 4911 (class 2606 OID 55589054)
+-- TOC entry 4911 (class 2606 OID 55597564)
 -- Name: element unq_element_profile_order_element; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10466,7 +10448,7 @@ ALTER TABLE ONLY soil_data.element
 
 
 --
--- TOC entry 4925 (class 2606 OID 55589056)
+-- TOC entry 4925 (class 2606 OID 55597566)
 -- Name: profile unq_profile_code; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10475,7 +10457,7 @@ ALTER TABLE ONLY soil_data.profile
 
 
 --
--- TOC entry 4929 (class 2606 OID 55589058)
+-- TOC entry 4929 (class 2606 OID 55597568)
 -- Name: project unq_project_name; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10484,7 +10466,7 @@ ALTER TABLE ONLY soil_data.project
 
 
 --
--- TOC entry 5010 (class 2606 OID 55589060)
+-- TOC entry 5010 (class 2606 OID 55597570)
 -- Name: specimen_storage unq_specimen_storage_label; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10493,7 +10475,7 @@ ALTER TABLE ONLY soil_data.specimen_storage
 
 
 --
--- TOC entry 5016 (class 2606 OID 55589062)
+-- TOC entry 5016 (class 2606 OID 55597572)
 -- Name: specimen_transport unq_specimen_transport_label; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10502,7 +10484,7 @@ ALTER TABLE ONLY soil_data.specimen_transport
 
 
 --
--- TOC entry 5030 (class 2606 OID 55589064)
+-- TOC entry 5030 (class 2606 OID 55597574)
 -- Name: unit_of_measure unq_unit_of_measure_uri; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10511,7 +10493,7 @@ ALTER TABLE ONLY soil_data.unit_of_measure
 
 
 --
--- TOC entry 5032 (class 2606 OID 55589066)
+-- TOC entry 5032 (class 2606 OID 55597576)
 -- Name: class class_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10520,7 +10502,7 @@ ALTER TABLE ONLY spatial_metadata.class
 
 
 --
--- TOC entry 5034 (class 2606 OID 55589068)
+-- TOC entry 5034 (class 2606 OID 55597578)
 -- Name: country country_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10529,7 +10511,7 @@ ALTER TABLE ONLY spatial_metadata.country
 
 
 --
--- TOC entry 5036 (class 2606 OID 55589070)
+-- TOC entry 5036 (class 2606 OID 55597580)
 -- Name: individual individual_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10538,7 +10520,7 @@ ALTER TABLE ONLY spatial_metadata.individual
 
 
 --
--- TOC entry 5038 (class 2606 OID 55589072)
+-- TOC entry 5038 (class 2606 OID 55597582)
 -- Name: layer layer_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10547,7 +10529,7 @@ ALTER TABLE ONLY spatial_metadata.layer
 
 
 --
--- TOC entry 5040 (class 2606 OID 55589074)
+-- TOC entry 5040 (class 2606 OID 55597584)
 -- Name: mapset mapset_file_identifier_key; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10556,7 +10538,7 @@ ALTER TABLE ONLY spatial_metadata.mapset
 
 
 --
--- TOC entry 5042 (class 2606 OID 55589076)
+-- TOC entry 5042 (class 2606 OID 55597586)
 -- Name: mapset mapset_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10565,7 +10547,7 @@ ALTER TABLE ONLY spatial_metadata.mapset
 
 
 --
--- TOC entry 5044 (class 2606 OID 55589078)
+-- TOC entry 5044 (class 2606 OID 55597588)
 -- Name: organisation organisation_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10574,7 +10556,7 @@ ALTER TABLE ONLY spatial_metadata.organisation
 
 
 --
--- TOC entry 5046 (class 2606 OID 55589080)
+-- TOC entry 5046 (class 2606 OID 55597590)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10583,7 +10565,7 @@ ALTER TABLE ONLY spatial_metadata.proj_x_org_x_ind
 
 
 --
--- TOC entry 5048 (class 2606 OID 55589082)
+-- TOC entry 5048 (class 2606 OID 55597592)
 -- Name: project project_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10592,7 +10574,7 @@ ALTER TABLE ONLY spatial_metadata.project
 
 
 --
--- TOC entry 5050 (class 2606 OID 55589084)
+-- TOC entry 5050 (class 2606 OID 55597594)
 -- Name: property property_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10601,7 +10583,7 @@ ALTER TABLE ONLY spatial_metadata.property
 
 
 --
--- TOC entry 5052 (class 2606 OID 55589086)
+-- TOC entry 5052 (class 2606 OID 55597596)
 -- Name: url url_pkey; Type: CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10610,7 +10592,7 @@ ALTER TABLE ONLY spatial_metadata.url
 
 
 --
--- TOC entry 4903 (class 1259 OID 55589087)
+-- TOC entry 4903 (class 1259 OID 55597597)
 -- Name: idx_uploaded_dataset_edit_table; Type: INDEX; Schema: api; Owner: sis
 --
 
@@ -10618,7 +10600,7 @@ CREATE INDEX idx_uploaded_dataset_edit_table ON api.uploaded_dataset_edit USING 
 
 
 --
--- TOC entry 4989 (class 1259 OID 55589088)
+-- TOC entry 4989 (class 1259 OID 55597598)
 -- Name: idx_category_map; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10626,7 +10608,7 @@ CREATE INDEX idx_category_map ON soil_data.soil_mapping_unit_category USING btre
 
 
 --
--- TOC entry 5821 (class 0 OID 0)
+-- TOC entry 5819 (class 0 OID 0)
 -- Dependencies: 4989
 -- Name: INDEX idx_category_map; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -10635,7 +10617,7 @@ COMMENT ON INDEX soil_data.idx_category_map IS 'Index on soil map for root categ
 
 
 --
--- TOC entry 4990 (class 1259 OID 55589089)
+-- TOC entry 4990 (class 1259 OID 55597599)
 -- Name: idx_category_parent; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10643,7 +10625,7 @@ CREATE INDEX idx_category_parent ON soil_data.soil_mapping_unit_category USING b
 
 
 --
--- TOC entry 5822 (class 0 OID 0)
+-- TOC entry 5820 (class 0 OID 0)
 -- Dependencies: 4990
 -- Name: INDEX idx_category_parent; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -10652,7 +10634,7 @@ COMMENT ON INDEX soil_data.idx_category_parent IS 'Index on parent category for 
 
 
 --
--- TOC entry 4985 (class 1259 OID 55589090)
+-- TOC entry 4985 (class 1259 OID 55597600)
 -- Name: idx_mapping_unit_category; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10660,7 +10642,7 @@ CREATE INDEX idx_mapping_unit_category ON soil_data.soil_mapping_unit USING btre
 
 
 --
--- TOC entry 5823 (class 0 OID 0)
+-- TOC entry 5821 (class 0 OID 0)
 -- Dependencies: 4985
 -- Name: INDEX idx_mapping_unit_category; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -10669,7 +10651,7 @@ COMMENT ON INDEX soil_data.idx_mapping_unit_category IS 'Index on category for j
 
 
 --
--- TOC entry 4986 (class 1259 OID 55589091)
+-- TOC entry 4986 (class 1259 OID 55597601)
 -- Name: idx_mapping_unit_geom; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10677,7 +10659,7 @@ CREATE INDEX idx_mapping_unit_geom ON soil_data.soil_mapping_unit USING gist (ge
 
 
 --
--- TOC entry 5824 (class 0 OID 0)
+-- TOC entry 5822 (class 0 OID 0)
 -- Dependencies: 4986
 -- Name: INDEX idx_mapping_unit_geom; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -10686,7 +10668,7 @@ COMMENT ON INDEX soil_data.idx_mapping_unit_geom IS 'Spatial index on mapping un
 
 
 --
--- TOC entry 4982 (class 1259 OID 55589092)
+-- TOC entry 4982 (class 1259 OID 55597602)
 -- Name: idx_soil_map_geom; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10694,7 +10676,7 @@ CREATE INDEX idx_soil_map_geom ON soil_data.soil_map USING gist (geom);
 
 
 --
--- TOC entry 5825 (class 0 OID 0)
+-- TOC entry 5823 (class 0 OID 0)
 -- Dependencies: 4982
 -- Name: INDEX idx_soil_map_geom; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -10703,7 +10685,7 @@ COMMENT ON INDEX soil_data.idx_soil_map_geom IS 'Spatial index on soil map exten
 
 
 --
--- TOC entry 5127 (class 2620 OID 55589530)
+-- TOC entry 5127 (class 2620 OID 55597603)
 -- Name: audit audit_no_delete; Type: TRIGGER; Schema: api; Owner: sis
 --
 
@@ -10711,7 +10693,7 @@ CREATE TRIGGER audit_no_delete BEFORE DELETE ON api.audit FOR EACH ROW EXECUTE F
 
 
 --
--- TOC entry 5128 (class 2620 OID 55589529)
+-- TOC entry 5128 (class 2620 OID 55597604)
 -- Name: audit audit_no_update; Type: TRIGGER; Schema: api; Owner: sis
 --
 
@@ -10719,7 +10701,7 @@ CREATE TRIGGER audit_no_update BEFORE UPDATE ON api.audit FOR EACH ROW EXECUTE F
 
 
 --
--- TOC entry 5129 (class 2620 OID 55589093)
+-- TOC entry 5129 (class 2620 OID 55597605)
 -- Name: result_num trg_check_result_value; Type: TRIGGER; Schema: soil_data; Owner: sis
 --
 
@@ -10727,7 +10709,7 @@ CREATE TRIGGER trg_check_result_value BEFORE INSERT OR UPDATE ON soil_data.resul
 
 
 --
--- TOC entry 5131 (class 2620 OID 55589094)
+-- TOC entry 5131 (class 2620 OID 55597606)
 -- Name: layer class_func_on_layer_table; Type: TRIGGER; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10735,7 +10717,7 @@ CREATE TRIGGER class_func_on_layer_table AFTER UPDATE OF stats_minimum, stats_ma
 
 
 --
--- TOC entry 5132 (class 2620 OID 55589095)
+-- TOC entry 5132 (class 2620 OID 55597607)
 -- Name: layer map_func_on_layer_table; Type: TRIGGER; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10743,7 +10725,7 @@ CREATE TRIGGER map_func_on_layer_table AFTER UPDATE OF layer_id, mapset_id, dist
 
 
 --
--- TOC entry 5130 (class 2620 OID 55589096)
+-- TOC entry 5130 (class 2620 OID 55597608)
 -- Name: class sld_func_on_class_table; Type: TRIGGER; Schema: spatial_metadata; Owner: sis
 --
 
@@ -10751,7 +10733,7 @@ CREATE TRIGGER sld_func_on_class_table AFTER INSERT OR UPDATE ON spatial_metadat
 
 
 --
--- TOC entry 5053 (class 2606 OID 55589097)
+-- TOC entry 5053 (class 2606 OID 55597609)
 -- Name: audit audit_api_client_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10760,7 +10742,7 @@ ALTER TABLE ONLY api.audit
 
 
 --
--- TOC entry 5054 (class 2606 OID 55589102)
+-- TOC entry 5054 (class 2606 OID 55597614)
 -- Name: audit audit_user_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10769,7 +10751,7 @@ ALTER TABLE ONLY api.audit
 
 
 --
--- TOC entry 5057 (class 2606 OID 55589107)
+-- TOC entry 5057 (class 2606 OID 55597619)
 -- Name: uploaded_dataset_column uploaded_dataset_column_procedure_num_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10778,7 +10760,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 5058 (class 2606 OID 55589112)
+-- TOC entry 5058 (class 2606 OID 55597624)
 -- Name: uploaded_dataset_column uploaded_dataset_column_property_num_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10787,7 +10769,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 5059 (class 2606 OID 55589117)
+-- TOC entry 5059 (class 2606 OID 55597629)
 -- Name: uploaded_dataset_column uploaded_dataset_column_table_name_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10796,7 +10778,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 5060 (class 2606 OID 55589122)
+-- TOC entry 5060 (class 2606 OID 55597634)
 -- Name: uploaded_dataset_column uploaded_dataset_column_unit_of_measure_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10805,7 +10787,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 5061 (class 2606 OID 55589127)
+-- TOC entry 5061 (class 2606 OID 55597639)
 -- Name: uploaded_dataset_edit uploaded_dataset_edit_table_name_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10814,7 +10796,7 @@ ALTER TABLE ONLY api.uploaded_dataset_edit
 
 
 --
--- TOC entry 5055 (class 2606 OID 55589132)
+-- TOC entry 5055 (class 2606 OID 55597644)
 -- Name: uploaded_dataset uploaded_dataset_project_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10823,7 +10805,7 @@ ALTER TABLE ONLY api.uploaded_dataset
 
 
 --
--- TOC entry 5056 (class 2606 OID 55589137)
+-- TOC entry 5056 (class 2606 OID 55597649)
 -- Name: uploaded_dataset uploaded_dataset_user_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10832,7 +10814,7 @@ ALTER TABLE ONLY api.uploaded_dataset
 
 
 --
--- TOC entry 5062 (class 2606 OID 55589142)
+-- TOC entry 5062 (class 2606 OID 55597654)
 -- Name: element element_profile_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10841,7 +10823,7 @@ ALTER TABLE ONLY soil_data.element
 
 
 --
--- TOC entry 5086 (class 2606 OID 55589147)
+-- TOC entry 5086 (class 2606 OID 55597659)
 -- Name: result_desc_element fk_element; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10850,7 +10832,7 @@ ALTER TABLE ONLY soil_data.result_desc_element
 
 
 --
--- TOC entry 5088 (class 2606 OID 55589152)
+-- TOC entry 5088 (class 2606 OID 55597664)
 -- Name: result_desc_plot fk_plot; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10859,7 +10841,7 @@ ALTER TABLE ONLY soil_data.result_desc_plot
 
 
 --
--- TOC entry 5090 (class 2606 OID 55589157)
+-- TOC entry 5090 (class 2606 OID 55597669)
 -- Name: result_desc_profile fk_profile; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10868,7 +10850,7 @@ ALTER TABLE ONLY soil_data.result_desc_profile
 
 
 --
--- TOC entry 5069 (class 2606 OID 55589162)
+-- TOC entry 5069 (class 2606 OID 55597674)
 -- Name: project_site fk_project; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10877,7 +10859,7 @@ ALTER TABLE ONLY soil_data.project_site
 
 
 --
--- TOC entry 5070 (class 2606 OID 55589167)
+-- TOC entry 5070 (class 2606 OID 55597679)
 -- Name: project_site fk_site; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10886,7 +10868,7 @@ ALTER TABLE ONLY soil_data.project_site
 
 
 --
--- TOC entry 5105 (class 2606 OID 55589172)
+-- TOC entry 5105 (class 2606 OID 55597684)
 -- Name: specimen_prep_process fk_specimen_storage; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10895,7 +10877,7 @@ ALTER TABLE ONLY soil_data.specimen_prep_process
 
 
 --
--- TOC entry 5106 (class 2606 OID 55589177)
+-- TOC entry 5106 (class 2606 OID 55597689)
 -- Name: specimen_prep_process fk_specimen_transport; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10904,7 +10886,7 @@ ALTER TABLE ONLY soil_data.specimen_prep_process
 
 
 --
--- TOC entry 5092 (class 2606 OID 55589182)
+-- TOC entry 5092 (class 2606 OID 55597694)
 -- Name: result_desc_surface fk_surface; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10913,7 +10895,7 @@ ALTER TABLE ONLY soil_data.result_desc_surface
 
 
 --
--- TOC entry 5063 (class 2606 OID 55589187)
+-- TOC entry 5063 (class 2606 OID 55597699)
 -- Name: observation_num observation_bum_unit_of_measure_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10922,7 +10904,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 5075 (class 2606 OID 55589192)
+-- TOC entry 5075 (class 2606 OID 55597704)
 -- Name: observation_desc observation_desc_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10931,7 +10913,7 @@ ALTER TABLE ONLY soil_data.observation_desc
 
 
 --
--- TOC entry 5076 (class 2606 OID 55589197)
+-- TOC entry 5076 (class 2606 OID 55597709)
 -- Name: observation_desc observation_desc_procedure_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10940,7 +10922,7 @@ ALTER TABLE ONLY soil_data.observation_desc
 
 
 --
--- TOC entry 5077 (class 2606 OID 55589202)
+-- TOC entry 5077 (class 2606 OID 55597714)
 -- Name: observation_desc observation_desc_property_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10949,7 +10931,7 @@ ALTER TABLE ONLY soil_data.observation_desc
 
 
 --
--- TOC entry 5064 (class 2606 OID 55589207)
+-- TOC entry 5064 (class 2606 OID 55597719)
 -- Name: observation_num observation_num_procedure_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10958,7 +10940,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 5065 (class 2606 OID 55589212)
+-- TOC entry 5065 (class 2606 OID 55597724)
 -- Name: observation_num observation_num_property_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10967,7 +10949,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 5066 (class 2606 OID 55589217)
+-- TOC entry 5066 (class 2606 OID 55597729)
 -- Name: plot plot_parent_plot_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10976,7 +10958,7 @@ ALTER TABLE ONLY soil_data.plot
 
 
 --
--- TOC entry 5067 (class 2606 OID 55589222)
+-- TOC entry 5067 (class 2606 OID 55597734)
 -- Name: plot plot_site_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10985,7 +10967,7 @@ ALTER TABLE ONLY soil_data.plot
 
 
 --
--- TOC entry 5078 (class 2606 OID 55589227)
+-- TOC entry 5078 (class 2606 OID 55597739)
 -- Name: procedure_model_def procedure_model_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10994,7 +10976,7 @@ ALTER TABLE ONLY soil_data.procedure_model_def
 
 
 --
--- TOC entry 5079 (class 2606 OID 55589232)
+-- TOC entry 5079 (class 2606 OID 55597744)
 -- Name: procedure_num procedure_num_broader_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11003,7 +10985,7 @@ ALTER TABLE ONLY soil_data.procedure_num
 
 
 --
--- TOC entry 5080 (class 2606 OID 55589237)
+-- TOC entry 5080 (class 2606 OID 55597749)
 -- Name: procedure_spectrometer_def procedure_spectrometer_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11012,7 +10994,7 @@ ALTER TABLE ONLY soil_data.procedure_spectrometer_def
 
 
 --
--- TOC entry 5068 (class 2606 OID 55589242)
+-- TOC entry 5068 (class 2606 OID 55597754)
 -- Name: profile profile_plot_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11021,7 +11003,7 @@ ALTER TABLE ONLY soil_data.profile
 
 
 --
--- TOC entry 5081 (class 2606 OID 55589247)
+-- TOC entry 5081 (class 2606 OID 55597759)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_country_id_project_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11030,7 +11012,7 @@ ALTER TABLE ONLY soil_data.proj_x_org_x_ind
 
 
 --
--- TOC entry 5082 (class 2606 OID 55589252)
+-- TOC entry 5082 (class 2606 OID 55597764)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_individual_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11039,7 +11021,7 @@ ALTER TABLE ONLY soil_data.proj_x_org_x_ind
 
 
 --
--- TOC entry 5083 (class 2606 OID 55589257)
+-- TOC entry 5083 (class 2606 OID 55597769)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_organisation_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11048,7 +11030,7 @@ ALTER TABLE ONLY soil_data.proj_x_org_x_ind
 
 
 --
--- TOC entry 5084 (class 2606 OID 55589262)
+-- TOC entry 5084 (class 2606 OID 55597774)
 -- Name: project_soil_map project_soil_map_project_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11057,7 +11039,7 @@ ALTER TABLE ONLY soil_data.project_soil_map
 
 
 --
--- TOC entry 5085 (class 2606 OID 55589267)
+-- TOC entry 5085 (class 2606 OID 55597779)
 -- Name: project_soil_map project_soil_map_soil_map_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11066,7 +11048,7 @@ ALTER TABLE ONLY soil_data.project_soil_map
 
 
 --
--- TOC entry 5087 (class 2606 OID 55589272)
+-- TOC entry 5087 (class 2606 OID 55597784)
 -- Name: result_desc_element result_desc_element_property_desc_id_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11075,7 +11057,7 @@ ALTER TABLE ONLY soil_data.result_desc_element
 
 
 --
--- TOC entry 5089 (class 2606 OID 55589277)
+-- TOC entry 5089 (class 2606 OID 55597789)
 -- Name: result_desc_plot result_desc_plot_property_desc_id_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11084,7 +11066,7 @@ ALTER TABLE ONLY soil_data.result_desc_plot
 
 
 --
--- TOC entry 5091 (class 2606 OID 55589282)
+-- TOC entry 5091 (class 2606 OID 55597794)
 -- Name: result_desc_profile result_desc_profile_property_desc_id_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11093,7 +11075,7 @@ ALTER TABLE ONLY soil_data.result_desc_profile
 
 
 --
--- TOC entry 5093 (class 2606 OID 55589287)
+-- TOC entry 5093 (class 2606 OID 55597799)
 -- Name: result_desc_surface result_desc_surface_property_desc_id_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11102,7 +11084,7 @@ ALTER TABLE ONLY soil_data.result_desc_surface
 
 
 --
--- TOC entry 5071 (class 2606 OID 55589292)
+-- TOC entry 5071 (class 2606 OID 55597804)
 -- Name: result_num result_num_observation_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11111,7 +11093,7 @@ ALTER TABLE ONLY soil_data.result_num
 
 
 --
--- TOC entry 5072 (class 2606 OID 55589297)
+-- TOC entry 5072 (class 2606 OID 55597809)
 -- Name: result_num result_num_specimen_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11120,7 +11102,7 @@ ALTER TABLE ONLY soil_data.result_num
 
 
 --
--- TOC entry 5094 (class 2606 OID 55589302)
+-- TOC entry 5094 (class 2606 OID 55597814)
 -- Name: result_spectral result_spectral_observation_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11129,7 +11111,7 @@ ALTER TABLE ONLY soil_data.result_spectral
 
 
 --
--- TOC entry 5095 (class 2606 OID 55589307)
+-- TOC entry 5095 (class 2606 OID 55597819)
 -- Name: result_spectral result_spectral_procedure_model_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11138,7 +11120,7 @@ ALTER TABLE ONLY soil_data.result_spectral
 
 
 --
--- TOC entry 5096 (class 2606 OID 55589312)
+-- TOC entry 5096 (class 2606 OID 55597824)
 -- Name: soil_mapping_unit soil_mapping_unit_category_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11147,7 +11129,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit
 
 
 --
--- TOC entry 5097 (class 2606 OID 55589317)
+-- TOC entry 5097 (class 2606 OID 55597829)
 -- Name: soil_mapping_unit_category soil_mapping_unit_category_parent_category_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11156,7 +11138,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_category
 
 
 --
--- TOC entry 5098 (class 2606 OID 55589322)
+-- TOC entry 5098 (class 2606 OID 55597834)
 -- Name: soil_mapping_unit_category soil_mapping_unit_category_soil_map_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11165,7 +11147,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_category
 
 
 --
--- TOC entry 5099 (class 2606 OID 55589327)
+-- TOC entry 5099 (class 2606 OID 55597839)
 -- Name: soil_mapping_unit_profile soil_mapping_unit_profile_mapping_unit_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11174,7 +11156,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_profile
 
 
 --
--- TOC entry 5100 (class 2606 OID 55589332)
+-- TOC entry 5100 (class 2606 OID 55597844)
 -- Name: soil_mapping_unit_profile soil_mapping_unit_profile_profile_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11183,7 +11165,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_profile
 
 
 --
--- TOC entry 5101 (class 2606 OID 55589337)
+-- TOC entry 5101 (class 2606 OID 55597849)
 -- Name: soil_typological_unit_mapping_unit soil_typological_unit_mapping_unit_mapping_unit_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11192,7 +11174,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_mapping_unit
 
 
 --
--- TOC entry 5102 (class 2606 OID 55589342)
+-- TOC entry 5102 (class 2606 OID 55597854)
 -- Name: soil_typological_unit_mapping_unit soil_typological_unit_mapping_unit_typological_unit_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11201,7 +11183,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_mapping_unit
 
 
 --
--- TOC entry 5103 (class 2606 OID 55589347)
+-- TOC entry 5103 (class 2606 OID 55597859)
 -- Name: soil_typological_unit_profile soil_typological_unit_profile_profile_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11210,7 +11192,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_profile
 
 
 --
--- TOC entry 5104 (class 2606 OID 55589352)
+-- TOC entry 5104 (class 2606 OID 55597864)
 -- Name: soil_typological_unit_profile soil_typological_unit_profile_typological_unit_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11219,7 +11201,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_profile
 
 
 --
--- TOC entry 5073 (class 2606 OID 55589357)
+-- TOC entry 5073 (class 2606 OID 55597869)
 -- Name: specimen specimen_element_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11228,7 +11210,7 @@ ALTER TABLE ONLY soil_data.specimen
 
 
 --
--- TOC entry 5074 (class 2606 OID 55589362)
+-- TOC entry 5074 (class 2606 OID 55597874)
 -- Name: specimen specimen_specimen_prep_process_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11237,7 +11219,7 @@ ALTER TABLE ONLY soil_data.specimen
 
 
 --
--- TOC entry 5107 (class 2606 OID 55589367)
+-- TOC entry 5107 (class 2606 OID 55597879)
 -- Name: spectral_sample spectral_sample_specimen_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11246,7 +11228,7 @@ ALTER TABLE ONLY soil_data.spectral_sample
 
 
 --
--- TOC entry 5108 (class 2606 OID 55589372)
+-- TOC entry 5108 (class 2606 OID 55597884)
 -- Name: spectrum spectrum_procedure_spectrometer_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11255,7 +11237,7 @@ ALTER TABLE ONLY soil_data.spectrum
 
 
 --
--- TOC entry 5109 (class 2606 OID 55589377)
+-- TOC entry 5109 (class 2606 OID 55597889)
 -- Name: spectrum spectrum_spectral_sample_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11264,7 +11246,7 @@ ALTER TABLE ONLY soil_data.spectrum
 
 
 --
--- TOC entry 5110 (class 2606 OID 55589382)
+-- TOC entry 5110 (class 2606 OID 55597894)
 -- Name: spectrum_x_result_spectral spectrum_x_result_spectral_result_spectral_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11273,7 +11255,7 @@ ALTER TABLE ONLY soil_data.spectrum_x_result_spectral
 
 
 --
--- TOC entry 5111 (class 2606 OID 55589387)
+-- TOC entry 5111 (class 2606 OID 55597899)
 -- Name: spectrum_x_result_spectral spectrum_x_result_spectral_spectrum_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11282,7 +11264,7 @@ ALTER TABLE ONLY soil_data.spectrum_x_result_spectral
 
 
 --
--- TOC entry 5112 (class 2606 OID 55589392)
+-- TOC entry 5112 (class 2606 OID 55597904)
 -- Name: translate translate_language_code_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11291,7 +11273,7 @@ ALTER TABLE ONLY soil_data.translate
 
 
 --
--- TOC entry 5113 (class 2606 OID 55589397)
+-- TOC entry 5113 (class 2606 OID 55597909)
 -- Name: unit_conversion unit_conversion_unit_from_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11300,7 +11282,7 @@ ALTER TABLE ONLY soil_data.unit_conversion
 
 
 --
--- TOC entry 5114 (class 2606 OID 55589402)
+-- TOC entry 5114 (class 2606 OID 55597914)
 -- Name: unit_conversion unit_conversion_unit_to_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11309,7 +11291,7 @@ ALTER TABLE ONLY soil_data.unit_conversion
 
 
 --
--- TOC entry 5115 (class 2606 OID 55589407)
+-- TOC entry 5115 (class 2606 OID 55597919)
 -- Name: class class_mapset_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11318,7 +11300,7 @@ ALTER TABLE ONLY spatial_metadata.class
 
 
 --
--- TOC entry 5116 (class 2606 OID 55589412)
+-- TOC entry 5116 (class 2606 OID 55597924)
 -- Name: layer layer_mapset_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11327,7 +11309,7 @@ ALTER TABLE ONLY spatial_metadata.layer
 
 
 --
--- TOC entry 5117 (class 2606 OID 55589417)
+-- TOC entry 5117 (class 2606 OID 55597929)
 -- Name: mapset mapset_country_id_project_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11336,7 +11318,7 @@ ALTER TABLE ONLY spatial_metadata.mapset
 
 
 --
--- TOC entry 5118 (class 2606 OID 55589422)
+-- TOC entry 5118 (class 2606 OID 55597934)
 -- Name: mapset mapset_property_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11345,7 +11327,7 @@ ALTER TABLE ONLY spatial_metadata.mapset
 
 
 --
--- TOC entry 5119 (class 2606 OID 55589427)
+-- TOC entry 5119 (class 2606 OID 55597939)
 -- Name: mapset mapset_unit_of_measure_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11354,7 +11336,7 @@ ALTER TABLE ONLY spatial_metadata.mapset
 
 
 --
--- TOC entry 5120 (class 2606 OID 55589432)
+-- TOC entry 5120 (class 2606 OID 55597944)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_country_id_project_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11363,7 +11345,7 @@ ALTER TABLE ONLY spatial_metadata.proj_x_org_x_ind
 
 
 --
--- TOC entry 5121 (class 2606 OID 55589437)
+-- TOC entry 5121 (class 2606 OID 55597949)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_individual_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11372,7 +11354,7 @@ ALTER TABLE ONLY spatial_metadata.proj_x_org_x_ind
 
 
 --
--- TOC entry 5122 (class 2606 OID 55589442)
+-- TOC entry 5122 (class 2606 OID 55597954)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_organisation_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11381,7 +11363,7 @@ ALTER TABLE ONLY spatial_metadata.proj_x_org_x_ind
 
 
 --
--- TOC entry 5123 (class 2606 OID 55589447)
+-- TOC entry 5123 (class 2606 OID 55597959)
 -- Name: project project_country_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11390,7 +11372,7 @@ ALTER TABLE ONLY spatial_metadata.project
 
 
 --
--- TOC entry 5124 (class 2606 OID 55589452)
+-- TOC entry 5124 (class 2606 OID 55597964)
 -- Name: property property_property_num_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11399,7 +11381,7 @@ ALTER TABLE ONLY spatial_metadata.property
 
 
 --
--- TOC entry 5125 (class 2606 OID 55589457)
+-- TOC entry 5125 (class 2606 OID 55597969)
 -- Name: property property_unit_of_measure_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11408,7 +11390,7 @@ ALTER TABLE ONLY spatial_metadata.property
 
 
 --
--- TOC entry 5126 (class 2606 OID 55589462)
+-- TOC entry 5126 (class 2606 OID 55597974)
 -- Name: url url_mapset_id_fkey; Type: FK CONSTRAINT; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11475,7 +11457,7 @@ GRANT USAGE ON SCHEMA spatial_metadata TO sis_r;
 
 --
 -- TOC entry 5372 (class 0 OID 0)
--- Dependencies: 1647
+-- Dependencies: 1648
 -- Name: FUNCTION check_result_value(); Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11484,7 +11466,7 @@ GRANT ALL ON FUNCTION soil_data.check_result_value() TO sis_r;
 
 --
 -- TOC entry 5374 (class 0 OID 0)
--- Dependencies: 1648
+-- Dependencies: 1649
 -- Name: FUNCTION class(); Type: ACL; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11493,7 +11475,7 @@ GRANT ALL ON FUNCTION spatial_metadata.class() TO sis_r;
 
 --
 -- TOC entry 5376 (class 0 OID 0)
--- Dependencies: 1649
+-- Dependencies: 1650
 -- Name: FUNCTION map(); Type: ACL; Schema: spatial_metadata; Owner: sis
 --
 
@@ -11502,7 +11484,7 @@ GRANT ALL ON FUNCTION spatial_metadata.map() TO sis_r;
 
 --
 -- TOC entry 5378 (class 0 OID 0)
--- Dependencies: 1650
+-- Dependencies: 1651
 -- Name: FUNCTION sld(); Type: ACL; Schema: spatial_metadata; Owner: sis
 --
 
@@ -12036,7 +12018,7 @@ GRANT SELECT ON TABLE spatial_metadata.class TO sis_r;
 
 
 --
--- TOC entry 5672 (class 0 OID 0)
+-- TOC entry 5670 (class 0 OID 0)
 -- Dependencies: 302
 -- Name: TABLE country; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12045,7 +12027,7 @@ GRANT SELECT ON TABLE spatial_metadata.country TO sis_r;
 
 
 --
--- TOC entry 5676 (class 0 OID 0)
+-- TOC entry 5674 (class 0 OID 0)
 -- Dependencies: 303
 -- Name: TABLE individual; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12054,7 +12036,7 @@ GRANT SELECT ON TABLE spatial_metadata.individual TO sis_r;
 
 
 --
--- TOC entry 5714 (class 0 OID 0)
+-- TOC entry 5712 (class 0 OID 0)
 -- Dependencies: 304
 -- Name: TABLE layer; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12063,7 +12045,7 @@ GRANT SELECT ON TABLE spatial_metadata.layer TO sis_r;
 
 
 --
--- TOC entry 5756 (class 0 OID 0)
+-- TOC entry 5754 (class 0 OID 0)
 -- Dependencies: 305
 -- Name: TABLE mapset; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12072,7 +12054,7 @@ GRANT SELECT ON TABLE spatial_metadata.mapset TO sis_r;
 
 
 --
--- TOC entry 5767 (class 0 OID 0)
+-- TOC entry 5765 (class 0 OID 0)
 -- Dependencies: 306
 -- Name: TABLE organisation; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12081,7 +12063,7 @@ GRANT SELECT ON TABLE spatial_metadata.organisation TO sis_r;
 
 
 --
--- TOC entry 5776 (class 0 OID 0)
+-- TOC entry 5774 (class 0 OID 0)
 -- Dependencies: 307
 -- Name: TABLE proj_x_org_x_ind; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12090,7 +12072,7 @@ GRANT SELECT ON TABLE spatial_metadata.proj_x_org_x_ind TO sis_r;
 
 
 --
--- TOC entry 5782 (class 0 OID 0)
+-- TOC entry 5780 (class 0 OID 0)
 -- Dependencies: 308
 -- Name: TABLE project; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12099,7 +12081,7 @@ GRANT SELECT ON TABLE spatial_metadata.project TO sis_r;
 
 
 --
--- TOC entry 5795 (class 0 OID 0)
+-- TOC entry 5793 (class 0 OID 0)
 -- Dependencies: 309
 -- Name: TABLE property; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12108,7 +12090,7 @@ GRANT SELECT ON TABLE spatial_metadata.property TO sis_r;
 
 
 --
--- TOC entry 5802 (class 0 OID 0)
+-- TOC entry 5800 (class 0 OID 0)
 -- Dependencies: 310
 -- Name: TABLE url; Type: ACL; Schema: spatial_metadata; Owner: sis
 --
@@ -12117,7 +12099,7 @@ GRANT SELECT ON TABLE spatial_metadata.url TO sis_r;
 
 
 --
--- TOC entry 3609 (class 826 OID 55589467)
+-- TOC entry 3609 (class 826 OID 55597979)
 -- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: api; Owner: sis
 --
 
@@ -12125,7 +12107,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA api GRANT SELECT ON TABLES TO si
 
 
 --
--- TOC entry 3610 (class 826 OID 55589468)
+-- TOC entry 3610 (class 826 OID 55597980)
 -- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: soil_data; Owner: sis
 --
 
@@ -12133,18 +12115,18 @@ ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data GRANT SELECT ON TABLES
 
 
 --
--- TOC entry 3611 (class 826 OID 55589469)
+-- TOC entry 3611 (class 826 OID 55597981)
 -- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: soil_data_upload; Owner: sis
 --
 
 ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data_upload GRANT SELECT ON TABLES TO sis_r;
 
 
--- Completed on 2026-05-07 19:42:59 CEST
+-- Completed on 2026-05-09 10:49:17 CEST
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict L1gZGqlSRJQHh5ENaRmroyTiVZk6mRpswbOMOmWwbiVooFpfvmP7bezHDsG0qTs
+\unrestrict 2I6KQYuaZqxtdfOOcE9AKthsozWRLGeBmREG7qWqKTM0IAh6thiu4aAUoBTjSDc
 

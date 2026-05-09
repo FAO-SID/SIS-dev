@@ -10,8 +10,10 @@ clear
 #   Database    #
 #################
 
-# pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/sis-database_v$DATE.sql
-# pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/sis-database_latest.sql
+
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/sis-database_v$DATE.sql
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v --schema-only -f $PROJECT_DIR/sis-database/sis-database_latest.sql
+pg_dump -h localhost -p 5432 -d sis -U sis -F plain -v -f $PROJECT_DIR/sis-database/sis-database_latest_with_codelist.sql
 psql -h localhost -p 5432 -d postgres -U postgres -c "DROP DATABASE IF EXISTS sis"
 psql -h localhost -p 5432 -d postgres -U sis -c "CREATE DATABASE sis"
 
@@ -55,8 +57,6 @@ psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/owl2sql/out
 psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/owl2sql/fix.sql
 psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-private/Metadata/backups/data_country_latest.sql
 psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-private/Metadata/backups/data_property_latest.sql
-# HASH=$(htpasswd -bnBC 12 "" admin | tr -d ':\n' | sed 's/$2y/$2b/')
-# psql -h localhost -p 5432 -d sis -U sis -c "INSERT INTO api.\"user\" (user_id, password_hash, is_admin) VALUES ('admin', '$HASH', true)"
 
 
 #################
