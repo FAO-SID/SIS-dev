@@ -594,6 +594,25 @@ async def get_observations(
                      get_client_ip(request))
             return [dict(row) for row in data]
 
+
+@app.get("/api/observation_bounds")
+async def get_observation_bounds(
+    request: Request,
+    api_client: dict = Depends(verify_api_key)
+):
+    """Per (property, procedure, unit) value bounds — used by the SPA to draw
+    inline bars in the Show data panel showing where a value sits relative to
+    the typical expected range."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT property_num_id, procedure_num_id, unit_of_measure_id,
+                       value_min, value_max, typical_min, typical_max
+                FROM soil_data.observation_num
+                ORDER BY property_num_id, procedure_num_id
+            """)
+            return [dict(r) for r in cur.fetchall()]
+
 # ==================== Metadata Sync ====================
 
 PYCSW_URL = os.getenv("PYCSW_URL", "http://sis-metadata:8000")

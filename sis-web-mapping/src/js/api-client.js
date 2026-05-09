@@ -141,6 +141,10 @@ class SISApiClient {
     return this.request('/api/manifest');
   }
 
+  async getObservationBounds() {
+    return this.request('/api/observation_bounds');
+  }
+
   // ==================== Admin Endpoints (JWT Token) ====================
 
   // Settings Management

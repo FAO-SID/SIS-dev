@@ -1352,6 +1352,7 @@ function refreshMapData() {
 window.refreshMapData = refreshMapData;
 
 let _allObservationsCache = null;
+let _observationBoundsCache = null;   // Map<"prop|proc", {value_min, value_max, typical_min, typical_max, unit}>
 let _profilesPanelMoveHooked = false;
 const selectedProfileCodes = new Set();
 let highlightLayer = null;
@@ -1480,6 +1481,18 @@ async function refreshVisibleProfilesData() {
     if (!_allObservationsCache) {
       _allObservationsCache = await api.getObservations();
     }
+    if (!_observationBoundsCache) {
+      _observationBoundsCache = new Map();
+      try {
+        const list = await api.getObservationBounds();
+        list.forEach(b => {
+          _observationBoundsCache.set(`${b.property_num_id}|${b.procedure_num_id}`, b);
+        });
+      } catch (e) {
+        // Bounds are optional; if the endpoint fails we just don't draw bars.
+        console.warn('Failed to load observation bounds:', e);
+      }
+    }
     const profileInfoByCode = new Map();
     allFeatures.forEach(f => {
       const code = f.get('profile_code');
@@ -1536,7 +1549,9 @@ async function refreshVisibleProfilesData() {
       columnMeta[c.key] = {
         key: c.key,
         line1: [c.prop, c.unit].filter(Boolean).join(' '),
-        line2: c.proc || ''
+        line2: c.proc || '',
+        prop: c.prop,
+        proc: c.proc,
       };
     });
 
@@ -1828,6 +1843,44 @@ function renderProfilesDataTable() {
     th.addEventListener('click', (e) => toggleProfilesDataSort(th.dataset.col, e.shiftKey));
   });
 
+  // Inline bar showing where the value sits inside the typical/admissable
+  // range from soil_data.observation_num. Padded by 50% on each side so
+  // out-of-typical values are visible at the edges instead of clipping.
+  // Falls back gracefully when bounds are missing or partial.
+  function renderObservationBar(meta, raw) {
+    if (!meta || !meta.prop || !meta.proc) return '';
+    if (raw == null || raw === '') return '';
+    const v = parseFloat(raw);
+    if (!isFinite(v)) return '';
+    if (!_observationBoundsCache) return '';
+    const b = _observationBoundsCache.get(`${meta.prop}|${meta.proc}`);
+    if (!b) return '';
+    let lo = (b.typical_min != null) ? b.typical_min : b.value_min;
+    let hi = (b.typical_max != null) ? b.typical_max : b.value_max;
+    if (lo == null || hi == null || hi <= lo) return '';
+    const span = hi - lo;
+    const pmin = lo - span * 0.5;
+    const pmax = hi + span * 0.5;
+    const pos = Math.max(0, Math.min(1, (v - pmin) / (pmax - pmin)));
+    const tloPct = ((lo - pmin) / (pmax - pmin)) * 100;
+    const thiPct = ((hi - pmin) / (pmax - pmin)) * 100;
+
+    let color = '#28a745';                       // green: in typical
+    if (v < lo) color = '#f0ad4e';               // yellow: below typical
+    else if (v > hi) color = '#fd7e14';          // orange: above typical
+    if (b.value_min != null && v < b.value_min) color = '#dc3545'; // red: below admissable
+    if (b.value_max != null && v > b.value_max) color = '#dc3545'; // red: above admissable
+
+    const title = `value ${v} | typical ${lo}-${hi}` +
+      (b.value_min != null || b.value_max != null
+        ? ` | admissable ${b.value_min ?? '−∞'}-${b.value_max ?? '+∞'}`
+        : '');
+    return `<span title="${escapeHtml(title)}" style="display:inline-block;width:50px;height:8px;background:#eee;position:relative;margin-left:6px;vertical-align:middle;border-radius:2px;">
+      <span style="position:absolute;left:${tloPct.toFixed(1)}%;width:${(thiPct - tloPct).toFixed(1)}%;height:100%;background:#cfd8dc;border-radius:1px;"></span>
+      <span style="position:absolute;left:${(pos * 100).toFixed(1)}%;width:2px;height:10px;top:-1px;background:${color};border-radius:1px;"></span>
+    </span>`;
+  }
+
   const tbody = document.getElementById('profiles-data-tbody');
   tbody.innerHTML = pageRows.length
     ? pageRows.map(r => {
@@ -1838,7 +1891,10 @@ function renderProfilesDataTable() {
           visibleColumns.map(c => {
             const meta = (columnMeta && columnMeta[c]) || {};
             const cls = meta.isBase ? ' class="pd-base"' : '';
-            return `<td${cls}>${escapeHtml(r[c] == null ? '' : String(r[c]))}</td>`;
+            const raw = r[c];
+            const valueText = escapeHtml(raw == null ? '' : String(raw));
+            const bar = renderObservationBar(meta, raw);
+            return `<td${cls} style="white-space:nowrap;">${valueText}${bar}</td>`;
           }).join('') +
           '</tr>';
       }).join('')
