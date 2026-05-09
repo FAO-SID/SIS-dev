@@ -3,8 +3,7 @@ set -euo pipefail
 
 # Set working directory
 PROJECT_DIR="/home/carva014/Work/Code/FAO/SIS-dev"      # << EDIT THIS LINE!
-COUNTRY=BT
-COUNTRY_LONG="Bhutan"
+COUNTRY=BT                                              # ISO 3166-1 alpha-2; full name and centroid are looked up from spatial_metadata.country
 ORG_LOGO_URL="https://tse4.mm.bing.net/th/id/OIP.hV37F63PxOkqMwTAlCNnvQAAAA?r=0&pid=Api"
 
 cd "$PROJECT_DIR"
@@ -138,15 +137,41 @@ docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
                                                     p_ymax := 28.28
                                                 )"
 
-# Add sis-Web-mapping applications settings
-docker exec sis-database psql -d sis -U sis -c "INSERT INTO api.setting(key, value) VALUES
+# Pull country-specific values from spatial_metadata.country:
+#  - en           → English country name, used to build APP_TITLE
+#  - geom_centroid → Point geometry, used as the default map centre
+# Fall back to neutral defaults if the row or column is missing so the
+# deploy still completes — the operator can fix the seed afterwards.
+COUNTRY_NAME=$(docker exec sis-database psql -U sis -d sis -tAc \
+  "SELECT en FROM spatial_metadata.country WHERE country_id = '$COUNTRY';" 2>/dev/null || true)
+COUNTRY_CENTROID=$(docker exec sis-database psql -U sis -d sis -tAc \
+  "SELECT ST_X(geom_centroid)::text || '|' || ST_Y(geom_centroid)::text
+   FROM spatial_metadata.country WHERE country_id = '$COUNTRY';" 2>/dev/null || true)
+COUNTRY_LON=$(echo "$COUNTRY_CENTROID" | cut -d'|' -f1)
+COUNTRY_LAT=$(echo "$COUNTRY_CENTROID" | cut -d'|' -f2)
+[ -z "$COUNTRY_NAME" ] && COUNTRY_NAME="$COUNTRY"
+[ -z "$COUNTRY_LAT" ] && COUNTRY_LAT="0"
+[ -z "$COUNTRY_LON" ] && COUNTRY_LON="0"
+
+# Add sis-Web-mapping applications settings.
+# COUNTRY_CODE is the ISO 3166-1 alpha-2 code (BT, PH, VN, …) taken from the
+# COUNTRY var at the top of this script.
+docker exec -i sis-database psql -d sis -U sis \
+  -v cc="$COUNTRY" \
+  -v title="Soil Information System of $COUNTRY_NAME" \
+  -v lat="$COUNTRY_LAT" \
+  -v lon="$COUNTRY_LON" \
+  <<EOF
+INSERT INTO api.setting(key, value) VALUES
+ ('COUNTRY_CODE', :'cc'),
  ('ORG_LOGO_URL','https://tse4.mm.bing.net/th/id/OIP.hV37F63PxOkqMwTAlCNnvQAAAA?r=0&pid=Api'),
- ('APP_TITLE','Bhutan Soil Information System'),
- ('LATITUDE','27.5'),
- ('LONGITUDE','89.7'),
+ ('APP_TITLE', :'title'),
+ ('LATITUDE', :'lat'),
+ ('LONGITUDE', :'lon'),
  ('ZOOM','9'),
  ('BASE_MAP_DEFAULT','esri-imagery'),
- ('DOWNLOAD_BASE_URL','/downloads/');"
+ ('DOWNLOAD_BASE_URL','/downloads/');
+EOF
 
 # Seed API client used by sis-web-mapping (key matches .env WEB_MAPPING_API_KEY).
 # Pass the key as a psql variable to avoid shell-quoting issues. psql variable
@@ -225,7 +250,7 @@ docker compose up --build sis-web-services -d
 
 # Customize pyCSW
 cp $PROJECT_DIR/sis-metadata/pycsw_default.yml $PROJECT_DIR/sis-metadata/pycsw.yml
-sed -i "s|COUNTRY_SIS|$COUNTRY_LONG|g" $PROJECT_DIR/sis-metadata/pycsw.yml
+sed -i "s|COUNTRY_SIS|$COUNTRY_NAME|g" $PROJECT_DIR/sis-metadata/pycsw.yml
 # Inject the per-deployment Postgres password from .env. pyCSW reads its DB
 # connection string from pycsw.yml (not from env vars), so we substitute here.
 sed -i "s|__POSTGRES_PASSWORD__|$POSTGRES_PASSWORD|g" $PROJECT_DIR/sis-metadata/pycsw.yml
@@ -234,7 +259,7 @@ sed -i "s|__POSTGRES_PASSWORD__|$POSTGRES_PASSWORD|g" $PROJECT_DIR/sis-metadata/
 docker compose up --build sis-metadata -d
 
 # Customize pyCSW UI - https://docs.pycsw.org/en/latest/configuration.html
-docker exec sis-metadata sed -i "s/pycsw website/${COUNTRY_LONG} SIS metadata/g" pycsw/pycsw/ogc/api/templates/_base.html
+docker exec sis-metadata sed -i "s/pycsw website/${COUNTRY_NAME} SIS metadata/g" pycsw/pycsw/ogc/api/templates/_base.html
 docker exec sis-metadata sed -i "s|https://pycsw.org/img/pycsw-logo-vertical.png|${ORG_LOGO_URL}|g" pycsw/pycsw/ogc/api/templates/_base.html
 docker exec sis-metadata sed -i "s/https:\/\/pycsw.org/http:\/\/$HOST_SIS_METADATA\/collections\/metadata:main\/items/g" pycsw/pycsw/ogc/api/templates/_base.html
 

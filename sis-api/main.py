@@ -1774,6 +1774,8 @@ async def validate_dataset(
                             else:
                                 truncated = True
 
+                data_min = None
+                data_max = None
                 if dt == "result_num":
                     missing_meta = []
                     if not m.get("property_num_id"):    missing_meta.append("property")
@@ -1805,6 +1807,10 @@ async def validate_dataset(
                                 truncated = True
                             continue
                         n = convert_value(n, conv)
+                        # Track the actual data range so the popup can show
+                        # how close to the bounds the user's values are.
+                        data_min = n if data_min is None else min(data_min, n)
+                        data_max = n if data_max is None else max(data_max, n)
                         if vmin is not None and n < vmin:
                             error_rows.add(rid)
                             if len(errors) < MAX_DISPLAY:
@@ -1821,11 +1827,32 @@ async def validate_dataset(
                 if truncated:
                     errors.append("...")
 
-                col_results[csv_col] = {
+                entry = {
                     "status": "OK" if not error_rows else "ERROR",
                     "errors": errors,
                     "error_rows": sorted(error_rows),
                 }
+                # For Soil-property columns, surface the bounds that were applied
+                # so the popup can display them — also a sanity check for the user
+                # that the validator actually consulted observation_num.
+                if dt == "result_num":
+                    bounds = obs_bounds.get((m["property_num_id"], m["procedure_num_id"]), (None, None, None))
+                    vmin, vmax, canonical_unit = bounds
+                    source_unit = m.get("unit_of_measure_id")
+                    conv = get_conversion(source_unit, canonical_unit)
+                    entry["applied_bounds"] = {
+                        "vmin": vmin,
+                        "vmax": vmax,
+                        "canonical_unit": canonical_unit,
+                        "source_unit": source_unit,
+                        "conversion": (
+                            {"operation": conv["operation"], "value": float(conv["value"])}
+                            if conv else None
+                        ),
+                        "data_min": data_min,
+                        "data_max": data_max,
+                    }
+                col_results[csv_col] = entry
 
             # Cross-column: upper_depth < lower_depth
             if upper_col and lower_col:
@@ -1858,6 +1885,201 @@ async def validate_dataset(
                         r["error_rows"] = sorted(merged)
                         r["status"] = "ERROR"
 
+            # Layer continuity per profile: when sorted by upper_depth, each
+            # layer's lower_depth must equal the next layer's upper_depth.
+            # E.g. 0–5, 5–34, 34–67, 67–88 is contiguous; 0–5, 10–30 has a gap;
+            # 0–30, 20–50 overlaps. Both fail this check.
+            profile_code_col_for_chain = next((m["column_name"] for m in mappings
+                                               if m["destination_table"] == "plot"
+                                               and m["destination_column"] == "plot_code"), None)
+            if profile_code_col_for_chain and upper_col and lower_col:
+                by_profile = {}   # profile_code → list of (rid, upper, lower)
+                for row in rows:
+                    rid = row["_row_id"]
+                    code = row.get(profile_code_col_for_chain)
+                    u = row.get(upper_col)
+                    l = row.get(lower_col)
+                    if not code or u in (None, "") or l in (None, ""):
+                        continue
+                    try:
+                        ui = int(float(u)); li = int(float(l))
+                    except (ValueError, TypeError):
+                        continue
+                    if ui >= li:  # malformed layer — already flagged above
+                        continue
+                    by_profile.setdefault(code, []).append((rid, ui, li))
+
+                gap_rows = set()
+                gap_msgs = []
+                truncated = False
+                for code, layers in by_profile.items():
+                    layers.sort(key=lambda t: (t[1], t[2]))
+                    for i in range(len(layers) - 1):
+                        _, _, prev_lower = layers[i]
+                        cur_rid, cur_upper, _ = layers[i + 1]
+                        if cur_upper != prev_lower:
+                            gap_rows.add(cur_rid)
+                            if len(gap_msgs) < MAX_DISPLAY:
+                                gap_msgs.append(
+                                    f"row {cur_rid}: profile_code '{code}' upper "
+                                    f"{cur_upper} ≠ previous layer's lower {prev_lower}"
+                                )
+                            else:
+                                truncated = True
+                if truncated:
+                    gap_msgs.append("...")
+                if gap_rows:
+                    for c in (profile_code_col_for_chain, upper_col, lower_col):
+                        r = col_results.setdefault(c, {"status": "OK", "errors": [], "error_rows": []})
+                        r["errors"].extend(gap_msgs)
+                        r["error_rows"] = sorted(set(r["error_rows"]) | gap_rows)
+                        r["status"] = "ERROR"
+
+            # Profile-code consistency: rows sharing a profile_code must agree
+            # on Longitude and Latitude. The first occurrence of each
+            # profile_code defines the canonical coords; subsequent occurrences
+            # with different values are flagged.
+            # (At ingest, profile_code is set equal to the value mapped to
+            # plot.plot_code — which is what the "Profile code" destination
+            # writes — so we look that mapping up here.)
+            profile_code_col = next((m["column_name"] for m in mappings
+                                     if m["destination_table"] == "plot"
+                                     and m["destination_column"] == "plot_code"), None)
+            tmp_lon_col = next((m["column_name"] for m in mappings
+                                if m["destination_table"] == "plot"
+                                and m["destination_column"] == "geom (longitude)"), None)
+            tmp_lat_col = next((m["column_name"] for m in mappings
+                                if m["destination_table"] == "plot"
+                                and m["destination_column"] == "geom (latitude)"), None)
+            if profile_code_col and tmp_lon_col and tmp_lat_col:
+                first_seen = {}      # profile_code → (rid, lon, lat) of first row with valid coords
+                bad_rows = set()
+                bad_msgs = []
+                truncated = False
+                for row in rows:
+                    rid = row["_row_id"]
+                    code = row.get(profile_code_col)
+                    lon_v = row.get(tmp_lon_col)
+                    lat_v = row.get(tmp_lat_col)
+                    if not code or lon_v in (None, "") or lat_v in (None, ""):
+                        continue
+                    try:
+                        lon_f = float(lon_v); lat_f = float(lat_v)
+                    except (ValueError, TypeError):
+                        continue
+                    if code not in first_seen:
+                        first_seen[code] = (rid, lon_f, lat_f)
+                    else:
+                        first_rid, first_lon, first_lat = first_seen[code]
+                        if lon_f != first_lon or lat_f != first_lat:
+                            bad_rows.add(rid)
+                            if len(bad_msgs) < MAX_DISPLAY:
+                                bad_msgs.append(
+                                    f"row {rid}: profile_code '{code}' coords "
+                                    f"({lon_f}, {lat_f}) differ from row {first_rid} "
+                                    f"({first_lon}, {first_lat})"
+                                )
+                            else:
+                                truncated = True
+                if truncated:
+                    bad_msgs.append("...")
+                if bad_rows:
+                    for c in (profile_code_col, tmp_lon_col, tmp_lat_col):
+                        r = col_results.setdefault(c, {"status": "OK", "errors": [], "error_rows": []})
+                        r["errors"].extend(bad_msgs)
+                        r["error_rows"] = sorted(set(r["error_rows"]) | bad_rows)
+                        r["status"] = "ERROR"
+
+            # Country-bounds check: at least 95% of (lon, lat) points must
+            # fall inside the country's convex hull. Country code comes from
+            # api.setting.COUNTRY_CODE; convex hull comes from
+            # spatial_metadata.country.geom_convexhull (SRID 4326).
+            country_bounds = {"checked": False}
+            lon_col = next((m["column_name"] for m in mappings
+                            if m["destination_table"] == "plot"
+                            and m["destination_column"] == "geom (longitude)"), None)
+            lat_col = next((m["column_name"] for m in mappings
+                            if m["destination_table"] == "plot"
+                            and m["destination_column"] == "geom (latitude)"), None)
+            if lon_col and lat_col:
+                cur.execute("SELECT value FROM api.setting WHERE key = 'COUNTRY_CODE'")
+                cc_row = cur.fetchone()
+                country_code = cc_row["value"].strip() if cc_row and cc_row["value"] else None
+                if country_code:
+                    cur.execute("""
+                        SELECT geom_convexhull IS NOT NULL AS has_hull
+                        FROM spatial_metadata.country WHERE country_id = %s
+                    """, (country_code,))
+                    h = cur.fetchone()
+                    if h and h["has_hull"]:
+                        # Get the dataset's source EPSG so we can transform
+                        # CSV coordinates to 4326 (matching the convex hull).
+                        cur.execute("SELECT cords_epsg FROM api.uploaded_dataset WHERE table_name = %s",
+                                    (table_name,))
+                        ds_row = cur.fetchone()
+                        try:
+                            source_epsg = int((ds_row or {}).get("cords_epsg") or 4326)
+                        except (TypeError, ValueError):
+                            source_epsg = 4326
+
+                        # Collect numeric (rid, lon, lat) tuples from the staging rows
+                        rids, lons, lats = [], [], []
+                        for row in rows:
+                            lon_v, lat_v = row.get(lon_col), row.get(lat_col)
+                            if lon_v in (None, "") or lat_v in (None, ""):
+                                continue
+                            try:
+                                lons.append(float(lon_v))
+                                lats.append(float(lat_v))
+                                rids.append(int(row["_row_id"]))
+                            except (ValueError, TypeError):
+                                continue
+
+                        if rids:
+                            cur.execute("""
+                                WITH points AS (
+                                    SELECT t.rid,
+                                           ST_Transform(
+                                             ST_SetSRID(ST_MakePoint(t.lon, t.lat), %s),
+                                             4326
+                                           ) AS p
+                                    FROM unnest(%s::int[], %s::float8[], %s::float8[])
+                                         AS t(rid, lon, lat)
+                                )
+                                SELECT p.rid
+                                FROM points p, spatial_metadata.country c
+                                WHERE c.country_id = %s
+                                  AND NOT ST_Contains(c.geom_convexhull, p.p)
+                            """, (source_epsg, rids, lons, lats, country_code))
+                            outside = sorted(int(r["rid"]) for r in cur.fetchall())
+                            inside = len(rids) - len(outside)
+                            pct = (inside / len(rids)) * 100.0 if rids else 0.0
+                            ok = pct >= 95.0
+                            country_bounds = {
+                                "checked": True,
+                                "country_code": country_code,
+                                "checked_rows": len(rids),
+                                "inside": inside,
+                                "outside": len(outside),
+                                "percent_inside": round(pct, 2),
+                                "threshold": 95.0,
+                                "status": "OK" if ok else "ERROR",
+                                "outside_rows_preview": outside[:MAX_DISPLAY],
+                            }
+                            if not ok:
+                                msg = (f"only {pct:.1f}% of points inside {country_code} "
+                                       f"convex hull (need ≥95%)")
+                                preview = [f"row {rid}: outside" for rid in outside[:MAX_DISPLAY]]
+                                if len(outside) > MAX_DISPLAY:
+                                    preview.append("...")
+                                outside_set = set(outside)
+                                for c in (lon_col, lat_col):
+                                    r = col_results.setdefault(c, {"status": "OK", "errors": [], "error_rows": []})
+                                    r["errors"].append(msg)
+                                    r["errors"].extend(preview)
+                                    r["error_rows"] = sorted(set(r["error_rows"]) | outside_set)
+                                    r["status"] = "ERROR"
+
             # Persist per-column validation
             total_errors = 0
             for csv_col, r in col_results.items():
@@ -1883,19 +2105,23 @@ async def validate_dataset(
                 parts.append("missing required: " + ", ".join(missing_required))
             if n_cols_err:
                 parts.append(f"{n_cols_err} column(s) with errors")
+            if country_bounds.get("status") == "ERROR":
+                parts.append(f"{country_bounds['percent_inside']}% inside country bounds")
             note = "Validation OK" if not parts else "Validation: " + "; ".join(parts)
             cur.execute("UPDATE api.uploaded_dataset SET note = %s WHERE table_name = %s",
                         (note, table_name))
 
             log_audit(current_user['user_id'], None, "etl_validated",
                      {"table_name": table_name, "columns_with_errors": n_cols_err,
-                      "missing_required": missing_required}, None)
+                      "missing_required": missing_required,
+                      "country_bounds": country_bounds}, None)
 
             return {
                 "message": note,
                 "columns": col_results,
                 "total_rows": len(rows),
                 "missing_required": missing_required,
+                "country_bounds": country_bounds,
             }
 
 

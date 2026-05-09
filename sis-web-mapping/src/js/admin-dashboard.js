@@ -1954,10 +1954,234 @@ class AdminDashboard {
 
       statusEl.textContent = result.message;
       statusEl.style.color = /OK/.test(result.message) ? '#28a745' : '#dc3545';
+
+      this.showEtlValidationPopup(result);
     } catch (e) {
       statusEl.textContent = 'Validation failed: ' + e.message;
       statusEl.style.color = '#c33';
     }
+  }
+
+  // The rule applied for each (destination_table, destination_column) — kept
+  // here so we can describe what was checked in the validation report popup.
+  // Mirrors RULES in sis-api/main.py:validate_dataset.
+  get ETL_RULE_DESCRIPTIONS() {
+    return {
+      'plot|plot_code':           "free-text identifier; rows sharing the same profile_code are merged into one profile and must agree on Longitude and Latitude",
+      'plot|type':                "must be 'TrialPit' or 'Borehole'",
+      'plot|altitude':            "must be a whole number in smallint range (-32768 to 32767)",
+      'plot|positional_accuracy': "must be a whole number in smallint range (-32768 to 32767)",
+      'plot|sampling_date':       "must be a valid date (YYYY-MM-DD)",
+      'plot|geom (longitude)':    "must be a number in [-180, 180]",
+      'plot|geom (latitude)':     "must be a number in [-90, 90]",
+      'element|upper_depth':      "must be a whole number in [0, 1000]; layers within the same profile must be contiguous (each upper = previous lower)",
+      'element|lower_depth':      "must be a whole number ≥ 0 (and greater than upper depth); layers within the same profile must be contiguous",
+      'element|type':             "must be 'Horizon' or 'Layer'",
+      'element|horizon':          "free-text horizon designation (e.g. A, Bw, C); no format check",
+      'result_num|value':         "must be a number; converted to canonical unit",
+    };
+  }
+
+  showEtlValidationPopup(result) {
+    const cols = result.columns || {};
+    const missing = result.missing_required || [];
+    const required = ['Profile code', 'Longitude', 'Latitude', 'Sampling date',
+                      'Upper depth', 'Lower depth', 'Soil property'];
+    const e = (s) => this.escapeHtml(s);
+
+    // Required-destinations checklist
+    const reqRows = required.map(r => {
+      const ok = !missing.includes(r);
+      const icon = ok ? '✅' : '❌';
+      const color = ok ? '#28a745' : '#dc3545';
+      return `<li style="color:${color};">${icon} ${e(r)}</li>`;
+    }).join('');
+
+    // Per-column rule executions — we need to know what destination each
+    // CSV column was mapped to. The mapping table has that info on the row.
+    const rows = Array.from(document.querySelectorAll('#etl-mapping-tbody tr'));
+    const colDestMap = {};   // csv_col → "plot|geom (longitude)" or null
+    rows.forEach(tr => {
+      const dest = tr.querySelector('.etl-dest');
+      colDestMap[tr.dataset.col] = dest && dest.value ? dest.value : null;
+    });
+
+    const ruleDescs = this.ETL_RULE_DESCRIPTIONS;
+    // String() wrappers below: escapeHtml() treats 0 as falsy and returns ''.
+    const fmtBounds = (b) => {
+      if (!b) return '';
+      const minStr = (b.vmin !== null && b.vmin !== undefined) ? String(b.vmin) : '−∞';
+      const maxStr = (b.vmax !== null && b.vmax !== undefined) ? String(b.vmax) : '+∞';
+      const unit = b.canonical_unit || '?';
+      const conv = b.conversion
+        ? ` (CSV value × ${b.conversion.value} ${b.conversion.operation === '/' ? '⁻¹' : ''}, ${b.source_unit} → ${unit})`
+        : (b.source_unit && b.source_unit !== unit
+            ? ` (no conversion configured: ${b.source_unit} → ${unit})`
+            : '');
+      const hasData = b.data_min !== null && b.data_min !== undefined;
+      const dataLine = hasData
+        ? `<div style="font-size:0.85em;color:#555;margin-top:2px;">Your data: min = <strong>${e(String(b.data_min))}</strong>, max = <strong>${e(String(b.data_max))}</strong> ${e(unit)}</div>`
+        : '';
+      return `<div style="font-size:0.85em;color:#555;margin-top:2px;">Bounds applied: between <strong>${e(minStr)}</strong> and <strong>${e(maxStr)}</strong> ${e(unit)}${e(conv)}</div>${dataLine}`;
+    };
+    const colRows = Object.entries(cols).map(([csvCol, r]) => {
+      const dest = colDestMap[csvCol];
+      const destLabel = dest ? dest : '(skip)';
+      let ruleDesc = dest && ruleDescs[dest] ? ruleDescs[dest] : '—';
+      // Specialise the result_num rule with the actual canonical unit so it
+      // doesn't read as generic "converted to canonical unit" boilerplate.
+      if (dest === 'result_num|value' && r.applied_bounds && r.applied_bounds.canonical_unit) {
+        ruleDesc = `must be a number; converted to ${r.applied_bounds.canonical_unit}`;
+      }
+      const ok = r.status === 'OK';
+      const icon = ok ? '✅' : '❌';
+      const color = ok ? '#28a745' : '#dc3545';
+      const errBlock = (r.errors && r.errors.length)
+        ? `<div style="margin-top:4px;font-size:0.85em;color:#dc3545;background:#fff5f5;padding:6px 8px;border-radius:3px;white-space:pre-wrap;">${e(r.errors.join('\n'))}</div>`
+        : '';
+      return `
+        <div style="border:1px solid #e1e4e8;border-radius:4px;padding:8px;margin-bottom:8px;">
+          <div style="font-weight:bold;color:${color};">${icon} <code>${e(csvCol)}</code> → ${e(destLabel)}</div>
+          <div style="font-size:0.85em;color:#555;margin-top:2px;">Rule: ${e(ruleDesc)}</div>
+          ${fmtBounds(r.applied_bounds)}
+          ${errBlock}
+        </div>`;
+    }).join('') || '<em style="color:#777;">No mapped columns to check.</em>';
+
+    // Build/replace modal
+    document.getElementById('etl-validation-modal')?.remove();
+    const modal = document.createElement('div');
+    modal.id = 'etl-validation-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:10001;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow:auto;';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:6px;max-width:780px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+        <div style="padding:14px 20px;border-bottom:1px solid #e1e4e8;display:flex;align-items:center;justify-content:space-between;">
+          <h3 style="margin:0;color:#2c3e50;">Validation results</h3>
+          <button id="etl-validation-close" type="button" style="background:transparent;border:0;font-size:22px;cursor:pointer;color:#555;">&times;</button>
+        </div>
+        <div style="padding:16px 20px;">
+          <div style="margin-bottom:10px;font-size:0.95em;">
+            <strong>Summary:</strong>
+            <span style="color:${/OK/.test(result.message) ? '#28a745' : '#dc3545'};">${e(result.message || '')}</span>
+            <span style="color:#777;font-size:0.9em;margin-left:8px;">${result.total_rows ?? '?'} data rows checked</span>
+          </div>
+
+          <h4 style="margin:16px 0 6px;">Required destinations</h4>
+          <ul style="margin:0;padding-left:20px;">${reqRows}</ul>
+
+          <h4 style="margin:16px 0 6px;">Country bounds</h4>
+          ${this.formatCountryBoundsBlock(result.country_bounds)}
+
+          <h4 style="margin:16px 0 6px;">Per-column checks</h4>
+          ${colRows}
+        </div>
+        <div style="padding:10px 20px;border-top:1px solid #e1e4e8;text-align:right;">
+          <button id="etl-validation-export" type="button" class="btn btn-sm" style="background:#17a2b8;color:#fff;margin-right:8px;">Export</button>
+          <button id="etl-validation-ok" type="button" class="btn btn-primary btn-sm">Close</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    const close = () => modal.remove();
+    modal.querySelector('#etl-validation-close').addEventListener('click', close);
+    modal.querySelector('#etl-validation-ok').addEventListener('click', close);
+    modal.addEventListener('click', (ev) => { if (ev.target === modal) close(); });
+    modal.querySelector('#etl-validation-export').addEventListener('click', () => {
+      this.exportEtlValidationReport(result, colDestMap, ruleDescs, missing, required);
+    });
+  }
+
+  formatCountryBoundsBlock(cb) {
+    const e = (s) => this.escapeHtml(String(s));
+    if (!cb || !cb.checked) {
+      return `<div style="color:#777;font-size:0.9em;">Skipped — needs both Longitude and Latitude mapped, plus a <code>COUNTRY_CODE</code> setting and a non-null <code>spatial_metadata.country.geom_convexhull</code>.</div>`;
+    }
+    const ok = cb.status === 'OK';
+    const icon = ok ? '✅' : '❌';
+    const color = ok ? '#28a745' : '#dc3545';
+    const previewRows = (cb.outside_rows_preview && cb.outside_rows_preview.length)
+      ? `<div style="font-size:0.85em;color:#dc3545;background:#fff5f5;padding:6px 8px;border-radius:3px;margin-top:6px;">Outside rows (first ${cb.outside_rows_preview.length}): ${cb.outside_rows_preview.join(', ')}${cb.outside > cb.outside_rows_preview.length ? ', …' : ''}</div>`
+      : '';
+    return `
+      <div style="border:1px solid #e1e4e8;border-radius:4px;padding:8px;">
+        <div style="font-weight:bold;color:${color};">${icon} ${e(cb.percent_inside)}% of points inside ${e(cb.country_code)} convex hull (need ≥${e(cb.threshold)}%)</div>
+        <div style="font-size:0.85em;color:#555;margin-top:2px;">Rule: ≥95% of mapped (longitude, latitude) points must fall within <code>spatial_metadata.country.geom_convexhull</code> for the configured COUNTRY_CODE.</div>
+        <div style="font-size:0.85em;color:#555;margin-top:2px;">${e(cb.checked_rows)} rows checked · ${e(cb.inside)} inside · ${e(cb.outside)} outside</div>
+        ${previewRows}
+      </div>`;
+  }
+
+  exportEtlValidationReport(result, colDestMap, ruleDescs, missing, required) {
+    const cols = result.columns || {};
+    const section = document.getElementById('etl-mapping-section');
+    const tableName = section ? section.dataset.tableName : 'dataset';
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+
+    const lines = [];
+    lines.push(`# Validation report — ${tableName}`);
+    lines.push(`Generated: ${new Date().toISOString()}`);
+    lines.push('');
+    lines.push(`**Summary:** ${result.message || ''}`);
+    lines.push(`Rows checked: ${result.total_rows ?? '?'}`);
+    lines.push('');
+    lines.push('## Required destinations');
+    required.forEach(r => {
+      const ok = !missing.includes(r);
+      lines.push(`- ${ok ? '[x]' : '[ ]'} ${r}`);
+    });
+    lines.push('');
+    lines.push('## Country bounds');
+    const cb = result.country_bounds || {};
+    if (!cb.checked) {
+      lines.push('- Skipped (needs Longitude, Latitude, COUNTRY_CODE, geom_convexhull).');
+    } else {
+      lines.push(`- Status: ${cb.status}`);
+      lines.push(`- Country: ${cb.country_code}`);
+      lines.push(`- Inside: ${cb.percent_inside}% (${cb.inside} of ${cb.checked_rows}); threshold ≥${cb.threshold}%`);
+      if (cb.outside_rows_preview && cb.outside_rows_preview.length) {
+        lines.push(`- Outside rows (first ${cb.outside_rows_preview.length}): ${cb.outside_rows_preview.join(', ')}`);
+      }
+    }
+    lines.push('');
+    lines.push('## Per-column checks');
+    Object.entries(cols).forEach(([csvCol, r]) => {
+      const dest = colDestMap[csvCol] || '(skip)';
+      let rule = (colDestMap[csvCol] && ruleDescs[colDestMap[csvCol]]) || '—';
+      if (dest === 'result_num|value' && r.applied_bounds && r.applied_bounds.canonical_unit) {
+        rule = `must be a number; converted to ${r.applied_bounds.canonical_unit}`;
+      }
+      const status = r.status === 'OK' ? 'OK' : 'ERROR';
+      lines.push(`### ${csvCol} → ${dest}`);
+      lines.push(`- Rule: ${rule}`);
+      lines.push(`- Status: ${status}`);
+      if (r.applied_bounds) {
+        const b = r.applied_bounds;
+        const min = (b.vmin !== null && b.vmin !== undefined) ? b.vmin : '-inf';
+        const max = (b.vmax !== null && b.vmax !== undefined) ? b.vmax : '+inf';
+        lines.push(`- Bounds: between ${min} and ${max} ${b.canonical_unit || '?'}`);
+        if (b.data_min !== null && b.data_min !== undefined) {
+          lines.push(`- Your data: min = ${b.data_min}, max = ${b.data_max} ${b.canonical_unit || '?'}`);
+        }
+        if (b.conversion) {
+          lines.push(`- Conversion: CSV ${b.conversion.operation} ${b.conversion.value} (${b.source_unit} → ${b.canonical_unit})`);
+        } else if (b.source_unit && b.source_unit !== b.canonical_unit) {
+          lines.push(`- Conversion: NONE (source ${b.source_unit} ≠ canonical ${b.canonical_unit})`);
+        }
+      }
+      if (r.errors && r.errors.length) {
+        lines.push('- Errors:');
+        r.errors.forEach(err => lines.push(`  - ${err}`));
+      }
+      lines.push('');
+    });
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `validation_${tableName}_${stamp}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   async handleEtlUpload() {
