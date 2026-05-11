@@ -28,10 +28,10 @@ if [[ ! -f "$PROJECT_DIR/.env" ]]; then
   P_WEB=$(rand 43)
 
   # Use | as sed delimiter since values may contain / and =
-  sed -i "s|^POSTGRES_PASSWORD=__GENERATE_ME__|POSTGRES_PASSWORD=$P_PG|"               "$PROJECT_DIR/.env"
-  sed -i "s|^POSTGRES_GLOSIS_PASSWORD=__GENERATE_ME__|POSTGRES_GLOSIS_PASSWORD=$P_GLOSIS|" "$PROJECT_DIR/.env"
-  sed -i "s|^SECRET_KEY=__GENERATE_ME__|SECRET_KEY=$P_SECRET|"                          "$PROJECT_DIR/.env"
-  sed -i "s|^WEB_MAPPING_API_KEY=__GENERATE_ME__|WEB_MAPPING_API_KEY=$P_WEB|"           "$PROJECT_DIR/.env"
+  sed -i "s|^POSTGRES_PASSWORD=__GENERATE_ME__|POSTGRES_PASSWORD=$P_PG|"                    "$PROJECT_DIR/.env"
+  sed -i "s|^POSTGRES_GLOSIS_PASSWORD=__GENERATE_ME__|POSTGRES_GLOSIS_PASSWORD=$P_GLOSIS|"  "$PROJECT_DIR/.env"
+  sed -i "s|^SECRET_KEY=__GENERATE_ME__|SECRET_KEY=$P_SECRET|"                              "$PROJECT_DIR/.env"
+  sed -i "s|^WEB_MAPPING_API_KEY=__GENERATE_ME__|WEB_MAPPING_API_KEY=$P_WEB|"               "$PROJECT_DIR/.env"
 
   chmod 600 "$PROJECT_DIR/.env"
   echo ".env generated with random secrets (chmod 600)."
@@ -45,24 +45,7 @@ set +a
 # Random first-login admin password — printed once at the end.
 ADMIN_PASSWORD=$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 16)
 
-# Hosts:port in dev and prod
-# sis-nginx:        80:80, 443:443
-# sis-web-mapping:  8001:8000
-# sis-api:          8002:8000
-# sis-metadata:     8003:8000
-# sis-web-services: 8004:80
-# sis-database:     8005:5432
-# sis-api-glosis:   8006:8000
-
-# # PRODUCTION (only nginx exposed)
-# sis-nginx:        80:80, 443:443  # Only this exposed!
-# sis-web-mapping:  expose: 8000    # Internal only
-# sis-api:          expose: 8000
-# sis-metadata:     expose: 8000
-# sis-web-services: expose: 80
-# sis-database:     expose: 5432
-# sis-api-glosis:   expose: 8000
-
+# Hosts ports
 HOST_SIS_API_DEV="localhost:8002" # make sure is the same as API_URL in docker compose.yml
 HOST_SIS_API_PROD="sis-api:8000"
 HOST_SIS_API=$HOST_SIS_API_DEV
@@ -82,8 +65,7 @@ clear 2>/dev/null || true
 #      Docker      #
 ####################
 
-# Tear down only the SIS compose project — does NOT touch other containers
-# on the host. Use `docker compose down -v` if you want to also remove volumes.
+# Tear down only the SIS compose project — now does NOT touch other containers
 docker compose down -v --remove-orphans
 # Remove old DB volume content so init.sql + dump rerun against a clean state
 rm -rf "$PROJECT_DIR/sis-database/volume/"* 2>/dev/null || true
