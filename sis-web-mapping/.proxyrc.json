@@ -1,6 +1,0 @@
-{
-  "/downloads": {
-    "target": "http://sis-nginx",
-    "changeOrigin": true
-  }
-}

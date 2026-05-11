@@ -139,14 +139,13 @@ COUNTRY_LAT=$(echo "$COUNTRY_CENTROID" | cut -d'|' -f2)
 # COUNTRY_CODE is the ISO 3166-1 alpha-2 code (BT, PH, VN, …) taken from the
 # COUNTRY var at the top of this script.
 docker exec -i sis-database psql -d sis -U sis \
-  -v cc="$COUNTRY" \
   -v title="Soil Information System of $COUNTRY_NAME" \
   -v lat="$COUNTRY_LAT" \
   -v lon="$COUNTRY_LON" \
   <<EOF
 INSERT INTO api.setting(key, value) VALUES
- ('COUNTRY_CODE', :'cc'),
- ('ORG_LOGO_URL','https://tse4.mm.bing.net/th/id/OIP.hV37F63PxOkqMwTAlCNnvQAAAA?r=0&pid=Api'),
+ ('COUNTRY_CODE', '$COUNTRY'),
+ ('ORG_LOGO_URL','$ORG_LOGO_URL'),
  ('APP_TITLE', :'title'),
  ('LATITUDE', :'lat'),
  ('LONGITUDE', :'lon'),
