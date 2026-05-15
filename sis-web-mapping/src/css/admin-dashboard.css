@@ -2,6 +2,24 @@
    Admin Panel — uses tokens defined in main.css :root
    ===================================================================== */
 
+/* Hide the Rasters table Delete column for non-admin users. Toggled by
+   the `.is-admin` class added to <body> on login. */
+body:not(.is-admin) .raster-delete-col {
+    display: none !important;
+}
+
+/* Hide native spin buttons on .no-spinner number inputs (used by the
+   Add Raster depth fields). */
+input.no-spinner::-webkit-outer-spin-button,
+input.no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input.no-spinner {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
 /* ---------- Login Modal ---------- */
 .login-modal {
     display: none;
@@ -837,6 +855,24 @@ input:checked + .toggle-slider:before {
     font-family: inherit;
     width: 100%;
     box-sizing: border-box;
+}
+
+/* Add Raster tab: use a single-row grid for the author rows so all five
+   fields fit even when the form column is only ~820px. The 6th column is
+   for the × remove button (empty on the header row). */
+#add-raster-tab .etl-author-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1.4fr 1fr 1fr 32px;
+    column-gap: var(--sp-2);
+    align-items: end;
+    flex-wrap: nowrap;
+    padding-right: 0;
+}
+#add-raster-tab .etl-author-field,
+#add-raster-tab .etl-author-field-sm {
+    min-width: 0;
+    max-width: none;
+    flex: initial;
 }
 
 .etl-remove-author {

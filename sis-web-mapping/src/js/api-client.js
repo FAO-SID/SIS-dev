@@ -191,6 +191,13 @@ class SISApiClient {
     });
   }
 
+  async updateLayerCustom(layerId, fields) {
+    return this.authenticatedRequest(`/api/layer/${encodeURIComponent(layerId)}/custom`, {
+      method: 'PATCH',
+      body: JSON.stringify(fields)
+    });
+  }
+
   async toggleLayerPublish(layerId, publish) {
     return this.authenticatedRequest(`/api/layer/${layerId}/publish`, {
       method: 'PATCH',
@@ -359,8 +366,9 @@ class SISApiClient {
     });
   }
 
-  async getProjectAuthors(projectId) {
-    return this.authenticatedRequest(`/api/etl/project/${encodeURIComponent(projectId)}/authors`);
+  async getProjectAuthors(projectId, countryId) {
+    const q = countryId ? `?country_id=${encodeURIComponent(countryId)}` : '';
+    return this.authenticatedRequest(`/api/etl/project/${encodeURIComponent(projectId)}/authors${q}`);
   }
 
   async uploadCsv(file, projectId) {
@@ -455,6 +463,92 @@ class SISApiClient {
   async disableAndDeleteGlosis() {
     return this.authenticatedRequest('/api/glosis/disable_and_delete', { method: 'POST' });
   }
+
+  // ==================== Raster registry ====================
+
+  async listRasterProjects() { return this.authenticatedRequest('/api/raster/projects'); }
+  async listRasterProperties() { return this.authenticatedRequest('/api/raster/properties'); }
+  async listRasterIndividuals() { return this.authenticatedRequest('/api/raster/individuals'); }
+  async listRasterOrganisations() { return this.authenticatedRequest('/api/raster/organisations'); }
+  async listRasterCountries() { return this.authenticatedRequest('/api/raster/countries'); }
+  async listRasterMappedSoilProperties() { return this.authenticatedRequest('/api/raster/mapped_soil_properties'); }
+  async listRasterUnitsForProperty(propertyNumId) {
+    return this.authenticatedRequest(`/api/raster/units_for_property/${encodeURIComponent(propertyNumId)}`);
+  }
+  async createRasterProject(payload) {
+    return this.authenticatedRequest('/api/raster/projects', {
+      method: 'POST', body: JSON.stringify(payload)
+    });
+  }
+
+  async inspectRaster(file) {
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch(`${this.baseURL}/api/raster/inspect`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${this.jwtToken}` },
+      body: fd
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({ detail: r.statusText }));
+      throw new Error(err.detail || `Inspect failed: ${r.status}`);
+    }
+    return r.json();
+  }
+
+  async registerRaster(file, formFields, overrideFilename) {
+    const fd = new FormData();
+    // Use FormData's filename arg to rename on the wire — avoids
+    // constructing a new File() (which has wonky behavior on large blobs
+    // in some browsers).
+    if (overrideFilename) {
+      fd.append('file', file, overrideFilename);
+    } else {
+      fd.append('file', file);
+    }
+    for (const [k, v] of Object.entries(formFields || {})) {
+      if (v != null && v !== '') fd.append(k, v);
+    }
+    const r = await fetch(`${this.baseURL}/api/raster/register`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${this.jwtToken}` },
+      body: fd
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({ detail: r.statusText }));
+      throw new Error(typeof err.detail === 'string' ? err.detail : `Register failed: ${r.status}`);
+    }
+    return r.json();
+  }
+
+  // ==================== DST ====================
+
+  async listDstRecipes() { return this.authenticatedRequest('/api/dst/recipes'); }
+  async getDstRecipe(id) { return this.authenticatedRequest(`/api/dst/recipes/${encodeURIComponent(id)}`); }
+  async createDstRecipe(payload) {
+    return this.authenticatedRequest('/api/dst/recipes', {
+      method: 'POST', body: JSON.stringify(payload)
+    });
+  }
+  async updateDstRecipe(id, payload) {
+    return this.authenticatedRequest(`/api/dst/recipes/${encodeURIComponent(id)}`, {
+      method: 'PUT', body: JSON.stringify(payload)
+    });
+  }
+  async deleteDstRecipe(id) {
+    return this.authenticatedRequest(`/api/dst/recipes/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  }
+  async validateDstRecipe(id) {
+    return this.authenticatedRequest(`/api/dst/recipes/${encodeURIComponent(id)}/validate`, { method: 'POST' });
+  }
+  async runDstRecipe(id) {
+    return this.authenticatedRequest(`/api/dst/recipes/${encodeURIComponent(id)}/run`, { method: 'POST' });
+  }
+  async listDstRuns(recipeId) {
+    const q = recipeId ? `?recipe_id=${encodeURIComponent(recipeId)}` : '';
+    return this.authenticatedRequest(`/api/dst/runs${q}`);
+  }
+  async getDstRun(runId) { return this.authenticatedRequest(`/api/dst/runs/${runId}`); }
 
   async updateOwnAccount(currentPassword, newUserId, newPassword) {
     const body = { current_password: currentPassword };

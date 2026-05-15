@@ -5,3 +5,5 @@
 
 # Working notes, not for the public repo
 PRODUCTION-PLAN.md
+RASTER-AND-DST-PLAN.md
+docker-compose.override.yml

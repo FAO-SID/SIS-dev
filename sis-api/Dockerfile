@@ -12,8 +12,10 @@ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 # --- Runtime stage: clean image with patched OS packages ---
 FROM python:3.12-slim
 
-# Apply all available OS security patches
-RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+# Apply OS security patches plus the shared libs rasterio's GDAL wheel needs at runtime.
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends libexpat1 && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -21,6 +23,7 @@ WORKDIR /app
 COPY --from=builder /install /usr/local
 COPY shared.py .
 COPY main.py .
+COPY raster_registry/ ./raster_registry/
 
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser

@@ -3,18 +3,20 @@ SIS Admin API — JWT authentication (for humans)
 Manages users, API clients, layers, and settings.
 """
 
-from fastapi import FastAPI, Depends, HTTPException, status, Request, UploadFile, File, Form
+from fastapi import FastAPI, Depends, HTTPException, status, Request, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
+import logging
 import os
 import re
 import csv
 import io
 import secrets
 import psycopg2
+import psycopg2.extras
 from psycopg2 import sql as pgsql
 from psycopg2.extras import RealDictCursor
 import requests as http_requests
@@ -31,6 +33,8 @@ from shared import (
 
 # /docs, /redoc, /openapi.json reveal the full API surface. Off by default;
 # set ENABLE_DOCS=true in the env to re-enable for local development.
+log = logging.getLogger("sis-api")
+
 _docs_on = os.getenv("ENABLE_DOCS", "false").strip().lower() == "true"
 app = FastAPI(
     title="SIS Admin API",
@@ -388,22 +392,69 @@ async def update_layer(layer_id: str, layer: Layer, current_user: dict = Depends
             log_audit(current_user['user_id'], None, "layer_updated", {"layer_id": layer_id}, None)
             return {"message": "Layer updated successfully"}
 
+@app.patch("/api/layer/{layer_id}/custom")
+async def update_layer_custom(
+    layer_id: str,
+    payload: dict,
+    current_user: dict = Depends(get_current_user),
+):
+    """Inline-edit fields shown in the admin Rasters table:
+      * project_name → soil_data.mapset.costum_group (per mapset)
+      * property_name → soil_data.layer.costum_name  (per layer)
+    Both are optional; only the keys present in the payload are written.
+    Empty strings are normalised to NULL.
+    """
+    def _clean(v):
+        if v is None: return None
+        v = str(v).strip()
+        return v if v else None
+
+    has_proj = "project_name" in payload
+    has_prop = "property_name" in payload
+    if not (has_proj or has_prop):
+        raise HTTPException(status_code=400, detail="No editable field supplied")
+
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT mapset_id FROM soil_data.layer WHERE layer_id = %s", (layer_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Layer not found")
+            mapset_id = row[0]
+
+            if has_prop:
+                cur.execute(
+                    "UPDATE soil_data.layer SET costum_name = %s WHERE layer_id = %s",
+                    (_clean(payload.get("property_name")), layer_id),
+                )
+            if has_proj:
+                cur.execute(
+                    "UPDATE soil_data.mapset SET costum_group = %s WHERE mapset_id = %s",
+                    (_clean(payload.get("project_name")), mapset_id),
+                )
+    log_audit(current_user["user_id"], None, "layer_custom_updated",
+              {"layer_id": layer_id, **{k: payload[k] for k in ("project_name", "property_name") if k in payload}},
+              None)
+    return {"layer_id": layer_id, "ok": True}
+
+
 @app.patch("/api/layer/{layer_id}/publish")
 async def update_layer_publish(
     layer_id: str,
     publish_data: PublishUpdate,
     current_user: dict = Depends(get_current_user)
 ):
-    """Publish or unpublish a layer. Unpublishing clears is_default."""
+    """Publish or unpublish a layer. Unpublishing clears is_default.
+    Writes to soil_data.layer (post-merge source of truth)."""
     with get_db() as conn:
         with conn.cursor() as cur:
             if publish_data.publish:
                 cur.execute(
-                    "UPDATE api.layer SET publish = 'true' WHERE layer_id = %s",
+                    "UPDATE soil_data.layer SET is_published = TRUE WHERE layer_id = %s",
                     (layer_id,))
             else:
                 cur.execute(
-                    "UPDATE api.layer SET publish = 'false', is_default = FALSE WHERE layer_id = %s",
+                    "UPDATE soil_data.layer SET is_published = FALSE, is_default = FALSE WHERE layer_id = %s",
                     (layer_id,))
             if cur.rowcount == 0:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Layer not found")
@@ -416,50 +467,150 @@ async def set_default_layer(
     layer_id: str,
     current_user: dict = Depends(get_current_user)
 ):
-    """Mark a layer as the default (clears previous default). Layer must be published."""
+    """Mark a layer as the default (clears previous default). Layer must be published.
+    Writes to soil_data.layer."""
     with get_db() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT publish FROM api.layer WHERE layer_id = %s", (layer_id,))
+            cur.execute("SELECT is_published FROM soil_data.layer WHERE layer_id = %s", (layer_id,))
             row = cur.fetchone()
             if not row:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Layer not found")
-            if str(row[0]).lower() != 'true':
+            if not row[0]:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Only a published layer can be set as default")
-            cur.execute("UPDATE api.layer SET is_default = FALSE WHERE is_default = TRUE")
-            cur.execute("UPDATE api.layer SET is_default = TRUE WHERE layer_id = %s", (layer_id,))
+            cur.execute("UPDATE soil_data.layer SET is_default = FALSE WHERE is_default = TRUE")
+            cur.execute("UPDATE soil_data.layer SET is_default = TRUE WHERE layer_id = %s", (layer_id,))
             log_audit(current_user['user_id'], None, "layer_default_set",
                      {"layer_id": layer_id}, None)
             return {"message": "Default layer updated successfully"}
 
 @app.post("/api/default-layer/clear")
 async def clear_default_layer(current_user: dict = Depends(get_current_user)):
-    """Clear the default layer (no layer will be default)."""
+    """Clear the default layer (no layer will be default).
+    Writes to soil_data.layer."""
     with get_db() as conn:
         with conn.cursor() as cur:
-            cur.execute("UPDATE api.layer SET is_default = FALSE WHERE is_default = TRUE")
+            cur.execute("UPDATE soil_data.layer SET is_default = FALSE WHERE is_default = TRUE")
             log_audit(current_user['user_id'], None, "layer_default_cleared", None, None)
             return {"message": "Default layer cleared"}
 
 @app.delete("/api/layer/{layer_id}")
-async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a layer."""
-    with get_db() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM api.layer WHERE layer_id = %s", (layer_id,))
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Layer not found")
-            log_audit(current_user['user_id'], None, "layer_deleted", {"layer_id": layer_id}, None)
-            return {"message": "Layer deleted successfully"}
+async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_admin_user)):
+    """Delete a layer + all derived state.
 
-@app.get("/api/layer/all", response_model=List[Layer])
-async def get_all_layers(current_user: dict = Depends(get_current_user)):
-    """Get all layers including unpublished ones."""
+    Wipes, in order:
+      1. soil_data.layer row (cascades to class / map / sld via FKs)
+      2. soil_data.mapset row if no other layers reference it
+      3. pyCSW record (CSW-T Delete by file_identifier)
+      4. on-disk artifacts in /srv/rasters and /srv/pycsw-records
+      5. api.layer row
+
+    Best-effort on filesystem + pyCSW — DB state is authoritative. Failures
+    in those steps are returned as warnings, not 5xx.
+    """
+    from raster_registry.pycsw_load import delete_record as pycsw_delete_record
+
+    warnings: list = []
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT * FROM api.layer ORDER BY layer_id")
-            return [dict(l) for l in cur.fetchall()]
+            # Source of truth is soil_data.layer (post-merge). api.layer is
+            # legacy and may not have the row even when the raster exists.
+            cur.execute("SELECT layer_id FROM soil_data.layer WHERE layer_id = %s", (layer_id,))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="Layer not found")
+
+            cur.execute("""
+                SELECT l.mapset_id, l.file_path, l.file_extension, m.file_identifier
+                FROM soil_data.layer l
+                LEFT JOIN soil_data.mapset m ON m.mapset_id = l.mapset_id
+                WHERE l.layer_id = %s
+            """, (layer_id,))
+            sm = cur.fetchone() or {}
+            mapset_id = sm.get("mapset_id")
+            file_identifier = sm.get("file_identifier")
+            file_path = sm.get("file_path")
+            file_ext = (sm.get("file_extension") or "tif").lstrip(".")
+
+            cur.execute("DELETE FROM soil_data.layer WHERE layer_id = %s", (layer_id,))
+
+            mapset_deleted = False
+            if mapset_id:
+                cur.execute("SELECT 1 FROM soil_data.layer WHERE mapset_id = %s LIMIT 1",
+                            (mapset_id,))
+                if not cur.fetchone():
+                    cur.execute("DELETE FROM soil_data.mapset WHERE mapset_id = %s",
+                                (mapset_id,))
+                    mapset_deleted = (cur.rowcount > 0)
+
+            cur.execute("DELETE FROM api.layer WHERE layer_id = %s", (layer_id,))
+
+    pycsw_deleted = False
+    if mapset_deleted and file_identifier:
+        result = pycsw_delete_record(file_identifier)
+        pycsw_deleted = bool(result.get("transaction_ok"))
+        if not pycsw_deleted and result.get("transaction_error"):
+            warnings.append(f"pyCSW delete failed: {result['transaction_error']}")
+
+    removed_files = []
+    candidates = []
+    if file_path:
+        candidates.append(os.path.join(file_path, f"{layer_id}.{file_ext}"))
+    candidates.append(os.path.join("/srv/rasters", f"{layer_id}.{file_ext}"))
+    candidates.append(os.path.join("/srv/pycsw-records", f"{layer_id}.xml"))
+    for p in candidates:
+        try:
+            if os.path.isfile(p):
+                os.remove(p)
+                removed_files.append(p)
+        except OSError as e:
+            warnings.append(f"unlink {p}: {e}")
+
+    log_audit(current_user["user_id"], None, "layer_deleted",
+              {"layer_id": layer_id, "mapset_deleted": mapset_deleted,
+               "pycsw_deleted": pycsw_deleted, "removed_files": removed_files,
+               "warnings": warnings}, None)
+
+    return {
+        "message": "Layer deleted",
+        "layer_id": layer_id,
+        "mapset_deleted": mapset_deleted,
+        "pycsw_deleted": pycsw_deleted,
+        "removed_files": removed_files,
+        "warnings": warnings,
+    }
+
+@app.get("/api/layer/all")
+async def get_all_layers(current_user: dict = Depends(get_current_user)):
+    """Raster layers for the admin Rasters tab.
+
+    Sourced from soil_data.layer + mapset + project + mapped_property +
+    property_num. Vector stubs (mapset.mapped_property_id IS NULL OR
+    layer.file_path empty) are excluded.
+    """
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT
+                  l.layer_id,
+                  l.is_published       AS publish,
+                  l.is_default,
+                  m.country_id,
+                  m.project_id,
+                  m.mapset_id,
+                  COALESCE(m.costum_group, m.project_id) AS project_name,
+                  COALESCE(
+                    l.costum_name,
+                    NULLIF(CONCAT_WS(' ',
+                      m.title, m.unit_of_measure_id,
+                      l.dimension_depth, l.dimension_stats), '')
+                  ) AS property_name
+                FROM soil_data.layer l
+                LEFT JOIN soil_data.mapset       m  ON m.mapset_id          = l.mapset_id
+                WHERE l.file_path IS NOT NULL AND l.file_path <> ''
+                ORDER BY l.layer_id
+            """)
+            return cur.fetchall()
 
 # ==================== Settings Management ====================
 
@@ -521,14 +672,78 @@ async def get_published_layers(
     request: Request,
     api_client: dict = Depends(verify_api_key)
 ):
-    """Get published layers only (requires API key). Used by the web mapping app."""
+    """Published raster layers for the public web-mapping SPA.
+
+    Sourced from soil_data.layer + soil_data.mapset (no api.layer reads).
+    Vector stubs (no on-disk raster) are excluded by `l.file_path <> ''`.
+    URLs are built per-request from the configured MapServer / download base.
+    """
+    download_base = "/downloads/"
+    map_dir = "/etc/mapserver"
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT * FROM api.layer WHERE LOWER(publish) = 'true' ORDER BY layer_id")
-            layers = cur.fetchall()
-            log_audit(None, api_client['api_client_id'], "published_layers_accessed",
-                     {"layer_count": len(layers)}, get_client_ip(request))
-            return [dict(layer) for layer in layers]
+            cur.execute("SELECT value FROM api.setting WHERE key = 'DOWNLOAD_BASE_URL'")
+            row = cur.fetchone()
+            if row and row.get("value"):
+                download_base = row["value"]
+            if not download_base.endswith("/"):
+                download_base += "/"
+
+            cur.execute("""
+                SELECT
+                  l.layer_id,
+                  m.country_id,
+                  m.project_id,
+                  m.mapset_id,
+                  m.file_identifier::text AS file_identifier,
+                  COALESCE(m.costum_group, m.project_id) AS project_name,
+                  COALESCE(
+                    l.costum_name,
+                    NULLIF(CONCAT_WS(' ',
+                      m.title, m.unit_of_measure_id,
+                      l.dimension_depth, l.dimension_stats), '')
+                  ) AS property_name,
+                  l.dimension_depth    AS dimension,
+                  l.is_default,
+                  m.unit_of_measure_id,
+                  m.keyword_theme      AS keywords
+                FROM soil_data.layer l
+                LEFT JOIN soil_data.mapset m ON m.mapset_id = l.mapset_id
+                WHERE l.is_published = TRUE
+                  AND l.file_path IS NOT NULL AND l.file_path <> ''
+                ORDER BY l.layer_id
+            """)
+            rows = cur.fetchall()
+
+    out = []
+    for r in rows:
+        layer_id = r["layer_id"]
+        map_path = f"{map_dir}/{layer_id}.map"
+        get_map, get_legend, get_feature_info = _build_wms_urls(map_path, layer_id)
+        # Route the SPA at the SIS rich-metadata endpoint, not pyCSW's slim
+        # OGC API Records JSON. Federation harvesters still hit pyCSW for
+        # the full ISO 19139 record at /collections/metadata:main/items/...
+        metadata_url = f"/api/raster/metadata/{layer_id}"
+        out.append({
+            "layer_id": layer_id,
+            "publish": True,
+            "is_default": r.get("is_default") or False,
+            "project_id": r.get("project_id"),
+            "project_name": r.get("project_name"),
+            "property_name": r.get("property_name"),
+            "dimension": r.get("dimension"),
+            "version": None,
+            "unit_of_measure_id": r.get("unit_of_measure_id"),
+            "keywords": r.get("keywords"),
+            "metadata_url": metadata_url,
+            "download_url": f"{download_base}{layer_id}.tif",
+            "get_map_url": get_map,
+            "get_legend_url": get_legend,
+            "get_feature_info_url": get_feature_info,
+        })
+    log_audit(None, api_client['api_client_id'], "published_layers_accessed",
+              {"layer_count": len(out)}, get_client_ip(request))
+    return out
 
 @app.get("/api/setting", response_model=List[Setting])
 async def get_settings(
@@ -821,7 +1036,7 @@ async def get_individuals(current_user: dict = Depends(get_current_user)):
 async def get_projects(current_user: dict = Depends(get_current_user)):
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT project_id, name, abstract, license FROM soil_data.project ORDER BY project_id")
+            cur.execute("SELECT country_id, project_id, name, description FROM soil_data.project ORDER BY project_id")
             return cur.fetchall()
 
 @app.get("/api/codelist/properties")
@@ -931,28 +1146,32 @@ async def get_source_units(
 
 @app.post("/api/codelist/projects", status_code=status.HTTP_201_CREATED)
 async def create_project(payload: dict, current_user: dict = Depends(get_current_user)):
+    country_id = (payload.get("country_id") or "").strip().upper() or os.getenv("COUNTRY_CODE", "BT").upper()
     pid = payload.get("project_id", "").strip()
     name = payload.get("name", "").strip()
+    description = (payload.get("description") or "").strip() or None
     if not pid or not name:
         raise HTTPException(status_code=400, detail="project_id and name are required")
     with get_db() as conn:
         with conn.cursor() as cur:
             try:
-                cur.execute("INSERT INTO soil_data.project (project_id, name) VALUES (%s, %s)", (pid, name))
-                return {"project_id": pid, "name": name}
+                cur.execute(
+                    "INSERT INTO soil_data.project (country_id, project_id, name, description) VALUES (%s, %s, %s, %s)",
+                    (country_id, pid, name, description),
+                )
+                return {"country_id": country_id, "project_id": pid, "name": name, "description": description}
             except psycopg2.IntegrityError:
                 raise HTTPException(status_code=400, detail="Project already exists")
 
 @app.patch("/api/codelist/projects/{project_id}")
 async def update_project(project_id: str, payload: dict, current_user: dict = Depends(get_current_user)):
-    abstract = payload.get("abstract")
-    license_val = payload.get("license")
+    description = payload.get("description")
     with get_db() as conn:
         with conn.cursor() as cur:
-            cur.execute("""
-                UPDATE soil_data.project SET abstract = %s, license = %s
-                WHERE project_id = %s
-            """, (abstract, license_val, project_id))
+            cur.execute(
+                "UPDATE soil_data.project SET description = %s WHERE project_id = %s",
+                (description, project_id),
+            )
             if cur.rowcount == 0:
                 raise HTTPException(status_code=404, detail="Project not found")
             return {"message": "Project updated"}
@@ -994,16 +1213,22 @@ async def save_etl_metadata(
     payload: dict,
     current_user: dict = Depends(get_current_user)
 ):
-    """Replace all authors for a project in soil_data.proj_x_org_x_ind."""
+    """Replace all authors for a project in soil_data.proj_x_org_x_ind.
+
+    Accepts `country_id` in the payload; falls back to the env COUNTRY_CODE
+    for backwards compatibility with single-country callers.
+    """
     project_id = payload.get("project_id")
+    country_id = (payload.get("country_id") or os.getenv("COUNTRY_CODE", "BT")).upper()
     authors = payload.get("authors", [])
     if not project_id:
         raise HTTPException(status_code=400, detail="project_id is required")
     with get_db() as conn:
         with conn.cursor() as cur:
-            # Delete existing authors for this project
-            cur.execute("DELETE FROM soil_data.proj_x_org_x_ind WHERE project_id = %s", (project_id,))
-            # Insert the current set
+            cur.execute(
+                "DELETE FROM soil_data.proj_x_org_x_ind WHERE country_id = %s AND project_id = %s",
+                (country_id, project_id),
+            )
             for a in authors:
                 org = a.get("organisation_id")
                 ind = a.get("individual_id")
@@ -1011,25 +1236,32 @@ async def save_etl_metadata(
                     continue
                 cur.execute("""
                     INSERT INTO soil_data.proj_x_org_x_ind
-                        (project_id, organisation_id, individual_id, position, tag, role)
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                        (country_id, project_id, organisation_id, individual_id, position, tag, role)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT DO NOTHING
-                """, (project_id, org, ind, a.get("position"), a.get("tag"), a.get("role")))
+                """, (country_id, project_id, org, ind,
+                      a.get("position"), a.get("tag"), a.get("role")))
             log_audit(current_user['user_id'], None, "etl_metadata_saved",
-                     {"project_id": project_id, "count": len(authors)}, None)
+                     {"country_id": country_id, "project_id": project_id,
+                      "count": len(authors)}, None)
             return {"message": f"{len(authors)} author(s) saved"}
 
 @app.get("/api/etl/project/{project_id}/authors")
-async def get_project_authors(project_id: str, current_user: dict = Depends(get_current_user)):
+async def get_project_authors(
+    project_id: str,
+    country_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user),
+):
     """Get existing authors linked to a project from soil_data.proj_x_org_x_ind."""
+    cc = (country_id or os.getenv("COUNTRY_CODE", "BT")).upper()
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
                 SELECT organisation_id, individual_id, position, tag, role
                 FROM soil_data.proj_x_org_x_ind
-                WHERE project_id = %s
+                WHERE country_id = %s AND project_id = %s
                 ORDER BY organisation_id, individual_id
-            """, (project_id,))
+            """, (cc, project_id))
             return cur.fetchall()
 
 CSV_UPLOAD_MAX_BYTES = 50 * 1024 * 1024   # 50 MB
@@ -2012,7 +2244,7 @@ async def validate_dataset(
             # Country-bounds check: at least 95% of (lon, lat) points must
             # fall inside the country's convex hull. Country code comes from
             # api.setting.COUNTRY_CODE; convex hull comes from
-            # spatial_metadata.country.geom_convexhull (SRID 4326).
+            # soil_data.country.geom_convexhull (SRID 4326).
             country_bounds = {"checked": False}
             lon_col = next((m["column_name"] for m in mappings
                             if m["destination_table"] == "plot"
@@ -2027,7 +2259,7 @@ async def validate_dataset(
                 if country_code:
                     cur.execute("""
                         SELECT geom_convexhull IS NOT NULL AS has_hull
-                        FROM spatial_metadata.country WHERE country_id = %s
+                        FROM soil_data.country WHERE country_id = %s
                     """, (country_code,))
                     h = cur.fetchone()
                     if h and h["has_hull"]:
@@ -2066,7 +2298,7 @@ async def validate_dataset(
                                          AS t(rid, lon, lat)
                                 )
                                 SELECT p.rid
-                                FROM points p, spatial_metadata.country c
+                                FROM points p, soil_data.country c
                                 WHERE c.country_id = %s
                                   AND NOT ST_Contains(c.geom_convexhull, p.p)
                             """, (source_epsg, rids, lons, lats, country_code))
@@ -2264,66 +2496,87 @@ async def delete_dataset(
 
 @app.get("/api/layer/soil_profiles")
 async def list_soil_profile_layers(current_user: dict = Depends(get_current_user)):
-    """List all soil-data projects as profile layers with total vs. published counts."""
+    """List all soil-data projects as profile layers with total vs. published counts.
+
+    After the spatial_metadata → soil_data merge the policy fields moved off
+    `project`:
+      * is_published lives on the stub `soil_data.layer` (layer_id = '<CC>-<PROJ>')
+      * profile_limit / spatial_blur_m live on the stub `soil_data.mapset`
+        (mapset_id = '<CC>-<PROJ>')
+    """
     sql = """
         WITH profile_ranked AS (
-          SELECT ps.project_id,
+          SELECT ps.country_id, ps.project_id,
                  pr.profile_id,
-                 row_number() OVER (PARTITION BY ps.project_id ORDER BY pr.profile_id) AS rn
+                 row_number() OVER (PARTITION BY ps.country_id, ps.project_id ORDER BY pr.profile_id) AS rn
           FROM soil_data.project_site ps
           JOIN soil_data.plot pl ON pl.site_id = ps.site_id
           JOIN soil_data.profile pr ON pr.plot_id = pl.plot_id
         ),
         profile_totals AS (
-          SELECT project_id, count(DISTINCT profile_id) AS total_profiles
+          SELECT country_id, project_id, count(DISTINCT profile_id) AS total_profiles
           FROM profile_ranked
-          GROUP BY project_id
+          GROUP BY country_id, project_id
         ),
         published_profiles AS (
-          SELECT pr.project_id, pr.profile_id
+          SELECT pr.country_id, pr.project_id, pr.profile_id
           FROM profile_ranked pr
-          JOIN soil_data.project p ON p.project_id = pr.project_id
-          WHERE p.is_published = TRUE
-            AND (p.profile_limit IS NULL OR pr.rn <= p.profile_limit)
+          JOIN soil_data.project p
+            ON p.country_id = pr.country_id AND p.project_id = pr.project_id
+          LEFT JOIN soil_data.mapset pm
+            ON pm.mapset_id = p.country_id || '-' || p.project_id
+          LEFT JOIN soil_data.layer pl
+            ON pl.layer_id = p.country_id || '-' || p.project_id
+          WHERE pl.is_published = TRUE
+            AND (pm.profile_limit IS NULL OR pr.rn <= pm.profile_limit)
         ),
         published_profile_counts AS (
-          SELECT project_id, count(DISTINCT profile_id) AS published_profiles
+          SELECT country_id, project_id, count(DISTINCT profile_id) AS published_profiles
           FROM published_profiles
-          GROUP BY project_id
+          GROUP BY country_id, project_id
         ),
         total_obs AS (
-          SELECT ps.project_id, count(r.observation_num_id) AS total_observations
+          SELECT ps.country_id, ps.project_id, count(r.observation_num_id) AS total_observations
           FROM soil_data.project_site ps
           JOIN soil_data.plot pl ON pl.site_id = ps.site_id
           JOIN soil_data.profile pr ON pr.plot_id = pl.plot_id
           JOIN soil_data.element e ON e.profile_id = pr.profile_id
           JOIN soil_data.specimen s ON s.element_id = e.element_id
           JOIN soil_data.result_num r ON r.specimen_id = s.specimen_id
-          GROUP BY ps.project_id
+          GROUP BY ps.country_id, ps.project_id
         ),
         published_obs AS (
-          SELECT pp.project_id, count(r.observation_num_id) AS published_observations
+          SELECT pp.country_id, pp.project_id, count(r.observation_num_id) AS published_observations
           FROM published_profiles pp
           JOIN soil_data.element e ON e.profile_id = pp.profile_id
           JOIN soil_data.specimen s ON s.element_id = e.element_id
           JOIN soil_data.result_num r ON r.specimen_id = s.specimen_id
-          GROUP BY pp.project_id
+          GROUP BY pp.country_id, pp.project_id
         )
         SELECT
+          p.country_id,
           p.project_id,
           p.name AS project_name,
-          p.is_published,
-          p.profile_limit,
-          p.spatial_blur_m,
+          COALESCE(pl.is_published, TRUE) AS is_published,
+          pm.profile_limit,
+          pm.spatial_blur_m,
           COALESCE(pt.total_profiles, 0) AS total_profile_count,
           COALESCE(ppc.published_profiles, 0) AS published_profile_count,
           COALESCE(tobs.total_observations, 0) AS total_observation_count,
           COALESCE(pobs.published_observations, 0) AS published_observation_count
         FROM soil_data.project p
-        LEFT JOIN profile_totals pt ON pt.project_id = p.project_id
-        LEFT JOIN published_profile_counts ppc ON ppc.project_id = p.project_id
-        LEFT JOIN total_obs tobs ON tobs.project_id = p.project_id
-        LEFT JOIN published_obs pobs ON pobs.project_id = p.project_id
+        LEFT JOIN soil_data.mapset pm
+               ON pm.mapset_id = p.country_id || '-' || p.project_id
+        LEFT JOIN soil_data.layer pl
+               ON pl.layer_id = p.country_id || '-' || p.project_id
+        LEFT JOIN profile_totals pt
+               ON pt.country_id = p.country_id AND pt.project_id = p.project_id
+        LEFT JOIN published_profile_counts ppc
+               ON ppc.country_id = p.country_id AND ppc.project_id = p.project_id
+        LEFT JOIN total_obs tobs
+               ON tobs.country_id = p.country_id AND tobs.project_id = p.project_id
+        LEFT JOIN published_obs pobs
+               ON pobs.country_id = p.country_id AND pobs.project_id = p.project_id
         ORDER BY p.name;
     """
     with get_db() as conn:
@@ -2345,11 +2598,17 @@ async def set_soil_profile_publish(
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE soil_data.project SET is_published = %s WHERE project_id = %s",
+                """
+                UPDATE soil_data.layer l
+                SET is_published = %s
+                FROM soil_data.project p
+                WHERE l.layer_id = p.country_id || '-' || p.project_id
+                  AND p.project_id = %s
+                """,
                 (body.is_published, project_id),
             )
             if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Project not found")
+                raise HTTPException(status_code=404, detail="Project or stub layer not found")
             conn.commit()
     return {"project_id": project_id, "is_published": body.is_published}
 
@@ -2369,11 +2628,17 @@ async def set_soil_profile_limit(
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE soil_data.project SET profile_limit = %s WHERE project_id = %s",
+                """
+                UPDATE soil_data.mapset m
+                SET profile_limit = %s
+                FROM soil_data.project p
+                WHERE m.mapset_id = p.country_id || '-' || p.project_id
+                  AND p.project_id = %s
+                """,
                 (body.profile_limit, project_id),
             )
             if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Project not found")
+                raise HTTPException(status_code=404, detail="Project or stub mapset not found")
             conn.commit()
     return {"project_id": project_id, "profile_limit": body.profile_limit}
 
@@ -2393,11 +2658,17 @@ async def set_soil_profile_blur(
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE soil_data.project SET spatial_blur_m = %s WHERE project_id = %s",
+                """
+                UPDATE soil_data.mapset m
+                SET spatial_blur_m = %s
+                FROM soil_data.project p
+                WHERE m.mapset_id = p.country_id || '-' || p.project_id
+                  AND p.project_id = %s
+                """,
                 (body.spatial_blur_m, project_id),
             )
             if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Project not found")
+                raise HTTPException(status_code=404, detail="Project or stub mapset not found")
             conn.commit()
     return {"project_id": project_id, "spatial_blur_m": body.spatial_blur_m}
 
@@ -2631,6 +2902,806 @@ async def glosis_disable_and_delete(current_user: dict = Depends(get_current_adm
     log_audit(current_user["user_id"], None,
               "glosis_federation_disabled_and_deleted", None, None)
     return {"message": "GloSIS federation disabled and token deleted"}
+
+
+# ==================== Decision Support Tool (DST) ====================
+# See RASTER-AND-DST-PLAN.md for the full design.
+# v1 (this slice): recipe CRUD only. Validate / run / engine come next.
+
+def _dst_recipe_row_to_dict(row):
+    return {
+        "recipe_id": row["recipe_id"],
+        "name": row["name"],
+        "description": row["description"],
+        "recipe": row["recipe"],
+        "output_layer_id": row["output_layer_id"],
+        "created_by": row["created_by"],
+        "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+        "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+    }
+
+
+@app.get("/api/dst/recipes")
+async def list_dst_recipes(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT r.*,
+                       (SELECT row_to_json(t) FROM (
+                           SELECT run_id, status, started_at, finished_at, output_layer_id
+                           FROM api.dst_run
+                           WHERE recipe_id = r.recipe_id
+                           ORDER BY started_at DESC NULLS LAST LIMIT 1
+                       ) t) AS latest_run
+                FROM api.dst_recipe r
+                ORDER BY r.updated_at DESC
+            """)
+            return [{**_dst_recipe_row_to_dict(r), "latest_run": r["latest_run"]}
+                    for r in cur.fetchall()]
+
+
+@app.post("/api/dst/recipes", status_code=status.HTTP_201_CREATED)
+async def create_dst_recipe(
+    payload: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    recipe_id = (payload.get("recipe_id") or "").strip()
+    name = (payload.get("name") or "").strip()
+    if not recipe_id:
+        raise HTTPException(status_code=400, detail="recipe_id is required")
+    if not name:
+        raise HTTPException(status_code=400, detail="name is required")
+    recipe = payload.get("recipe") or {}
+    if not isinstance(recipe, dict) or "steps" not in recipe:
+        raise HTTPException(status_code=400, detail="recipe must be an object with a 'steps' array")
+
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                INSERT INTO api.dst_recipe (recipe_id, name, description, recipe, created_by)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (recipe_id) DO NOTHING
+                RETURNING *
+            """, (recipe_id, name, payload.get("description"),
+                  psycopg2.extras.Json(recipe), current_user["user_id"]))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=409, detail=f"recipe_id '{recipe_id}' already exists")
+            log_audit(current_user["user_id"], None, "dst_recipe_created",
+                      {"recipe_id": recipe_id, "name": name}, None)
+            return _dst_recipe_row_to_dict(row)
+
+
+@app.get("/api/dst/recipes/{recipe_id}")
+async def get_dst_recipe(recipe_id: str, current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT * FROM api.dst_recipe WHERE recipe_id = %s", (recipe_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Recipe not found")
+            cur.execute("""
+                SELECT run_id, status, started_at, finished_at, output_layer_id,
+                       error_message, metadata_status
+                FROM api.dst_run
+                WHERE recipe_id = %s
+                ORDER BY started_at DESC NULLS LAST
+                LIMIT 20
+            """, (recipe_id,))
+            runs = cur.fetchall()
+            return {**_dst_recipe_row_to_dict(row), "recent_runs": runs}
+
+
+@app.put("/api/dst/recipes/{recipe_id}")
+async def update_dst_recipe(
+    recipe_id: str,
+    payload: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    name = (payload.get("name") or "").strip()
+    recipe = payload.get("recipe") or {}
+    if not name:
+        raise HTTPException(status_code=400, detail="name is required")
+    if not isinstance(recipe, dict) or "steps" not in recipe:
+        raise HTTPException(status_code=400, detail="recipe must be an object with a 'steps' array")
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                UPDATE api.dst_recipe
+                SET name = %s, description = %s, recipe = %s, updated_at = now()
+                WHERE recipe_id = %s
+                RETURNING *
+            """, (name, payload.get("description"),
+                  psycopg2.extras.Json(recipe), recipe_id))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Recipe not found")
+            log_audit(current_user["user_id"], None, "dst_recipe_updated",
+                      {"recipe_id": recipe_id}, None)
+            return _dst_recipe_row_to_dict(row)
+
+
+@app.delete("/api/dst/recipes/{recipe_id}")
+async def delete_dst_recipe(recipe_id: str, current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM api.dst_recipe WHERE recipe_id = %s", (recipe_id,))
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Recipe not found")
+    log_audit(current_user["user_id"], None, "dst_recipe_deleted", {"recipe_id": recipe_id}, None)
+    return {"message": "Recipe deleted"}
+
+
+# ==================== DST: validate / run / runs ====================
+
+def _output_layer_id_for_recipe(recipe_id: str, recipe: dict) -> str:
+    """Derive the output layer_id from the recipe's metadata block, falling
+    back to the recipe_id itself. The result must satisfy the SIS layer_id
+    convention well enough that _parse_layer_id can decompose it.
+    """
+    md = (recipe or {}).get("metadata", {}) or {}
+    country = (os.getenv("COUNTRY_CODE") or "XX").upper()
+    proj = md.get("spatial_metadata_project_id") or "DST"
+    prop = md.get("spatial_metadata_property_id") or "SUITABILITY"
+    safe_id = re.sub(r"[^A-Za-z0-9]+", "", recipe_id).upper() or "OUT"
+    return f"{country}-{proj}-{prop}-{safe_id}"
+
+
+def _execute_dst_run(run_id: int, recipe_id: str, triggered_by: str):
+    """Background worker: load recipe, run engine, register output, update run row.
+
+    Owns its own DB connection (separate from the request that spawned it).
+    """
+    from raster_registry.dst_engine import execute_recipe
+    from raster_registry.register import register_raster, ContactRef  # noqa: F401
+
+    def _mark(conn, **fields):
+        if not fields:
+            return
+        cols = ", ".join(f"{k} = %s" for k in fields)
+        vals = list(fields.values()) + [run_id]
+        with conn.cursor() as cur:
+            cur.execute(f"UPDATE api.dst_run SET {cols} WHERE run_id = %s", vals)
+        conn.commit()
+
+    out_path: Optional[str] = None
+    try:
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT * FROM api.dst_recipe WHERE recipe_id = %s",
+                            (recipe_id,))
+                recipe_row = cur.fetchone()
+            if not recipe_row:
+                _mark(conn, status="failed",
+                      error_message="recipe vanished mid-run",
+                      finished_at=datetime.utcnow())
+                return
+            recipe = recipe_row["recipe"]
+
+            _mark(conn, status="running")
+
+            output_layer_id = _output_layer_id_for_recipe(recipe_id, recipe)
+            out_path = execute_recipe(
+                conn, recipe, output_layer_id=output_layer_id)
+
+            md = (recipe or {}).get("metadata", {}) or {}
+            try:
+                registered = register_raster(
+                    conn, out_path,
+                    title=md.get("title_override") or recipe_row["name"],
+                    abstract=md.get("abstract_override") or recipe_row["description"],
+                    keywords=md.get("keywords"),
+                    publish=bool(md.get("publish_to_catalogue", True)),
+                    dst_recipe_id=recipe_id,
+                )
+                conn.commit()
+                metadata_status = "succeeded" if registered.xml_published else "failed"
+                metadata_error = (
+                    "; ".join(registered.warnings) if registered.warnings else None
+                )
+            except Exception as e:
+                conn.rollback()
+                log.exception("DST run %s: registrar failed", run_id)
+                metadata_status = "failed"
+                metadata_error = f"{type(e).__name__}: {e}"
+
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE api.dst_recipe SET output_layer_id = %s WHERE recipe_id = %s",
+                    (output_layer_id, recipe_id))
+            _mark(conn,
+                  status="succeeded",
+                  metadata_status=metadata_status,
+                  metadata_error=metadata_error,
+                  output_layer_id=output_layer_id,
+                  finished_at=datetime.utcnow())
+    except Exception as e:
+        log.exception("DST run %s failed", run_id)
+        try:
+            with get_db() as conn2:
+                _mark(conn2, status="failed",
+                      error_message=f"{type(e).__name__}: {e}",
+                      finished_at=datetime.utcnow())
+        except Exception:
+            log.exception("DST run %s: also failed to record failure", run_id)
+        if out_path and os.path.exists(out_path):
+            try:
+                os.remove(out_path)
+            except OSError:
+                pass
+
+
+@app.post("/api/dst/recipes/{recipe_id}/validate")
+async def validate_dst_recipe(
+    recipe_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    from raster_registry.dst_engine import validate_recipe
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT recipe FROM api.dst_recipe WHERE recipe_id = %s",
+                        (recipe_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Recipe not found")
+        return validate_recipe(conn, row["recipe"])
+
+
+@app.post("/api/dst/recipes/{recipe_id}/run", status_code=status.HTTP_202_ACCEPTED)
+async def run_dst_recipe(
+    recipe_id: str,
+    background: BackgroundTasks,
+    current_user: dict = Depends(get_current_user),
+):
+    from raster_registry.dst_engine import validate_recipe
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT recipe FROM api.dst_recipe WHERE recipe_id = %s",
+                        (recipe_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Recipe not found")
+        report = validate_recipe(conn, row["recipe"])
+        if not report["ok"]:
+            raise HTTPException(status_code=400,
+                                detail={"message": "recipe failed validation",
+                                        "report": report})
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                INSERT INTO api.dst_run (recipe_id, status, triggered_by)
+                VALUES (%s, 'queued', %s)
+                RETURNING run_id, status, started_at
+            """, (recipe_id, current_user["user_id"]))
+            run = cur.fetchone()
+
+    background.add_task(_execute_dst_run, run["run_id"], recipe_id, current_user["user_id"])
+    log_audit(current_user["user_id"], None, "dst_run_queued",
+              {"recipe_id": recipe_id, "run_id": run["run_id"]}, None)
+    return {
+        "run_id": run["run_id"],
+        "status": run["status"],
+        "started_at": run["started_at"].isoformat() if run["started_at"] else None,
+    }
+
+
+@app.post("/api/dst/recipes/{recipe_id}/regenerate_metadata")
+async def regenerate_dst_metadata(
+    recipe_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Re-render XML + reload pyCSW for the current output without re-running
+    the engine. Cheap path when only catalogue fields changed."""
+    from raster_registry.xml_render import render_xml
+    from raster_registry.pycsw_load import write_xml_and_load
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT output_layer_id FROM api.dst_recipe WHERE recipe_id = %s",
+                        (recipe_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Recipe not found")
+            if not row["output_layer_id"]:
+                raise HTTPException(status_code=409,
+                                    detail="Recipe has no output yet — run it first")
+            output_layer_id = row["output_layer_id"]
+        xml_content = render_xml(conn, output_layer_id)
+        conn.commit()
+    result = write_xml_and_load(output_layer_id, xml_content)
+    log_audit(current_user["user_id"], None, "dst_metadata_regenerated",
+              {"recipe_id": recipe_id, "output_layer_id": output_layer_id}, None)
+    return {
+        "output_layer_id": output_layer_id,
+        "xml_path": result.get("xml_path"),
+        "transaction_ok": result.get("transaction_ok"),
+        "transaction_error": result.get("transaction_error"),
+    }
+
+
+@app.get("/api/dst/runs")
+async def list_dst_runs(
+    recipe_id: Optional[str] = None,
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user),
+):
+    limit = max(1, min(int(limit), 500))
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            if recipe_id:
+                cur.execute("""
+                    SELECT run_id, recipe_id, status, metadata_status,
+                           started_at, finished_at, output_layer_id,
+                           error_message, triggered_by
+                    FROM api.dst_run
+                    WHERE recipe_id = %s
+                    ORDER BY started_at DESC NULLS LAST
+                    LIMIT %s
+                """, (recipe_id, limit))
+            else:
+                cur.execute("""
+                    SELECT run_id, recipe_id, status, metadata_status,
+                           started_at, finished_at, output_layer_id,
+                           error_message, triggered_by
+                    FROM api.dst_run
+                    ORDER BY started_at DESC NULLS LAST
+                    LIMIT %s
+                """, (limit,))
+            rows = cur.fetchall()
+    for r in rows:
+        for k in ("started_at", "finished_at"):
+            if r.get(k):
+                r[k] = r[k].isoformat()
+    return rows
+
+
+@app.get("/api/dst/runs/{run_id}")
+async def get_dst_run(run_id: int, current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT * FROM api.dst_run WHERE run_id = %s", (run_id,))
+            row = cur.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Run not found")
+    for k in ("started_at", "finished_at"):
+        if row.get(k):
+            row[k] = row[k].isoformat()
+    return row
+
+
+@app.delete("/api/dst/runs/{run_id}")
+async def delete_dst_run(
+    run_id: int,
+    current_user: dict = Depends(get_current_admin_user),
+):
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM api.dst_run WHERE run_id = %s", (run_id,))
+            if cur.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Run not found")
+    log_audit(current_user["user_id"], None, "dst_run_deleted",
+              {"run_id": run_id}, None)
+    return {"message": "Run deleted"}
+
+
+# ==================== Raster registry — inspect ====================
+# Given a TIFF path inside the sis-web-services volume (or uploaded as
+# multipart), return everything soil_data.layer would store. Does NOT
+# write to the DB — used by the Add-Raster UI to populate the form.
+
+@app.post("/api/raster/inspect")
+async def inspect_raster(
+    file: Optional[UploadFile] = File(None),
+    path: Optional[str] = Form(None),
+    current_user: dict = Depends(get_current_user),
+):
+    """Inspect a GeoTIFF. Either upload via multipart (`file`) OR pass a
+    path inside the sis-web-services volume (`path`)."""
+    from raster_registry.inspect import inspect_geotiff
+
+    tmp_path = None
+    try:
+        if file is not None:
+            # Stream to /tmp so rasterio can open by path.
+            import tempfile
+            suffix = os.path.splitext(file.filename or "")[1] or ".tif"
+            fd, tmp_path = tempfile.mkstemp(suffix=suffix, prefix="raster_inspect_")
+            with os.fdopen(fd, "wb") as out:
+                while chunk := await file.read(1 << 20):  # 1 MB chunks
+                    out.write(chunk)
+            tif_path = tmp_path
+        elif path:
+            # Allow only paths inside the MapServer volume — this prevents an
+            # admin from reading arbitrary files on disk via this endpoint.
+            base = "/srv/rasters"   # bind-mount target inside sis-api (see compose)
+            tif_path = os.path.realpath(os.path.join(base, path))
+            if not tif_path.startswith(base + os.sep) and tif_path != base:
+                raise HTTPException(status_code=400, detail="path must resolve inside /srv/rasters")
+            if not os.path.exists(tif_path):
+                raise HTTPException(status_code=404, detail=f"File not found: {path}")
+        else:
+            raise HTTPException(status_code=400,
+                                detail="Provide either `file` (multipart) or `path` (form)")
+        try:
+            meta = inspect_geotiff(tif_path)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to inspect raster: {e}")
+        return meta.model_dump()
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            try: os.unlink(tmp_path)
+            except OSError: pass
+
+
+# ==================== Raster registry — register ====================
+# Calls raster_registry.register_raster() end-to-end: inspect → populate
+# soil_data.* (triggers .map/.sld) → upsert api.layer.
+# XML / pyCSW load still TODO — see RASTER-AND-DST-PLAN.md.
+
+@app.post("/api/raster/register", status_code=status.HTTP_201_CREATED)
+async def register_raster_endpoint(
+    file: Optional[UploadFile] = File(None),
+    path: Optional[str] = Form(None),
+    project_name: Optional[str] = Form(None),
+    title: Optional[str] = Form(None),
+    abstract: Optional[str] = Form(None),
+    keywords: Optional[str] = Form(None),         # comma-separated
+    license: Optional[str] = Form(None),
+    publish: bool = Form(True),
+    publication_date: Optional[str] = Form(None), # YYYY-MM-DD
+    property_num_id: Optional[str] = Form(None),  # FK on soil_data.mapped_property
+    unit_of_measure_id: Optional[str] = Form(None),  # FK on soil_data.mapset
+    time_period_begin: Optional[str] = Form(None),  # YYYY-MM-DD
+    time_period_end: Optional[str] = Form(None),    # YYYY-MM-DD
+    file_orig_name: Optional[str] = Form(None),     # filename as picked by the user
+    current_user: dict = Depends(get_current_user),
+):
+    """Register a GeoTIFF as a SIS layer.
+
+    Either upload via multipart (`file`) — the TIFF is moved into the
+    MapServer volume at `<layer_id>.tif` — OR pass `path=<filename>` for a
+    file already in `/srv/rasters/`.
+
+    Returns the new layer record. Note: XML / pyCSW step is not yet wired,
+    so the metadata catalogue won't show the new layer until that lands.
+    """
+    from raster_registry import register_raster
+    from raster_registry.inspect import inspect_geotiff
+    import shutil
+
+    base = "/srv/rasters"
+    target_path: Optional[str] = None
+    moved_from_tmp: Optional[str] = None
+    try:
+        if file is not None:
+            # Stream the upload to a temp file, inspect to determine the
+            # layer_id, then move into /srv/rasters/<layer_id>.tif.
+            import tempfile
+            suffix = os.path.splitext(file.filename or "")[1] or ".tif"
+            fd, tmp_path = tempfile.mkstemp(suffix=suffix, prefix="raster_register_")
+            moved_from_tmp = tmp_path
+            with os.fdopen(fd, "wb") as out:
+                while chunk := await file.read(1 << 20):
+                    out.write(chunk)
+            # Derive layer_id from filename — uploaded name is authoritative
+            layer_id = os.path.splitext(file.filename or "")[0]
+            target_path = os.path.join(base, f"{layer_id}.tif")
+            shutil.move(tmp_path, target_path)
+            moved_from_tmp = None
+        elif path:
+            cand = os.path.realpath(os.path.join(base, path))
+            if not (cand == base or cand.startswith(base + os.sep)):
+                raise HTTPException(status_code=400, detail="path must resolve inside /srv/rasters")
+            if not os.path.exists(cand):
+                raise HTTPException(status_code=404, detail=f"File not found: {path}")
+            target_path = cand
+        else:
+            raise HTTPException(status_code=400,
+                                detail="Provide either `file` (multipart) or `path` (form)")
+
+        keyword_list = [k.strip() for k in (keywords or "").split(",") if k.strip()] or None
+
+        with get_db() as conn:
+            try:
+                result = register_raster(
+                    conn, target_path,
+                    project_name=project_name,
+                    title=title,
+                    abstract=abstract,
+                    keywords=keyword_list,
+                    license=license,
+                    publish=publish,
+                    publication_date=publication_date,
+                    property_num_id=property_num_id,
+                    unit_of_measure_id=unit_of_measure_id,
+                    time_period_begin=time_period_begin,
+                    time_period_end=time_period_end,
+                    file_orig_name=file_orig_name,
+                )
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=str(e))
+
+        log_audit(current_user["user_id"], None, "raster_registered",
+                  {"layer_id": result.layer_id, "warnings": result.warnings},
+                  None)
+        return result.model_dump()
+
+    finally:
+        if moved_from_tmp and os.path.exists(moved_from_tmp):
+            try: os.unlink(moved_from_tmp)
+            except OSError: pass
+
+
+# ==================== Raster registry — codelists ====================
+# Read endpoints over soil_data.* tables, for the Add-Raster /
+# DST UI to populate project/property/individual/organisation pickers.
+
+@app.get("/api/raster/projects")
+async def list_smd_projects(
+    country_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            if country_id:
+                cur.execute("""
+                    SELECT country_id, project_id, name, description
+                    FROM soil_data.project
+                    WHERE country_id = %s
+                    ORDER BY project_id
+                """, (country_id,))
+            else:
+                cur.execute("""
+                    SELECT country_id, project_id, name, description
+                    FROM soil_data.project
+                    ORDER BY country_id, project_id
+                """)
+            return cur.fetchall()
+
+
+@app.post("/api/raster/projects", status_code=status.HTTP_201_CREATED)
+async def create_smd_project(payload: dict, current_user: dict = Depends(get_current_user)):
+    country_id = (payload.get("country_id") or "").strip()
+    project_id = (payload.get("project_id") or "").strip()
+    if not country_id or not project_id:
+        raise HTTPException(status_code=400, detail="country_id and project_id are required")
+    # soil_data.project.name is NOT NULL UNIQUE — fall back to project_id.
+    name = (payload.get("project_name") or "").strip() or project_id
+    description = (payload.get("description") or "").strip() or None
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO soil_data.project (country_id, project_id, name, description)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (country_id, project_id) DO UPDATE SET
+                    description = COALESCE(EXCLUDED.description, soil_data.project.description)
+            """, (country_id, project_id, name, description))
+    log_audit(current_user["user_id"], None, "smd_project_created",
+              {"country_id": country_id, "project_id": project_id}, None)
+    return {"country_id": country_id, "project_id": project_id, "description": description}
+
+
+@app.get("/api/raster/properties")
+async def list_smd_properties(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT mapped_property_id, name, property_num_id,
+                       min, max, property_type
+                FROM soil_data.mapped_property
+                ORDER BY mapped_property_id
+            """)
+            return cur.fetchall()
+
+
+@app.get("/api/raster/metadata/{layer_id}")
+async def get_raster_metadata(
+    layer_id: str,
+    api_client: dict = Depends(verify_api_key),
+):
+    """Rich metadata for a raster layer — used by the SPA's info popup.
+
+    Pulls from soil_data.layer, mapset, project, country, mapped_property,
+    property_num, unit_of_measure, proj_x_org_x_ind, individual, organisation,
+    url. Returns a flat JSON with sections the SPA can render.
+    """
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT
+                  l.layer_id,
+                  l.file_extension, l.file_size, l.file_size_pretty, l.file_orig_name,
+                  l.dimension_depth, l.dimension_stats, l.is_default, l.is_published,
+                  l.stats_minimum, l.stats_maximum, l.stats_mean, l.stats_std_dev,
+                  l.distance, l.distance_uom,
+                  l.reference_system_identifier_code AS epsg,
+                  l.spatial_reference,
+                  l.west_bound_longitude, l.east_bound_longitude,
+                  l.south_bound_latitude, l.north_bound_latitude,
+                  l.costum_name,
+                  l.no_data_value, l.data_type, l.raster_size_x, l.raster_size_y,
+                  m.mapset_id, m.title, m.abstract,
+                  m.file_identifier::text AS file_identifier,
+                  m.creation_date, m.publication_date, m.revision_date,
+                  m.time_period_begin, m.time_period_end,
+                  m.access_constraints, m.use_constraints, m.other_constraints,
+                  m.spatial_representation_type_code, m.presentation_form,
+                  m.scope_code, m.status, m.update_frequency,
+                  m.lineage_statement, m.topic_category, m.keyword_theme,
+                  m.keyword_place, m.keyword_discipline, m.costum_group,
+                  m.unit_of_measure_id, m.md_browse_graphic,
+                  c.en AS country_name, m.country_id,
+                  p.project_id, p.name AS project_name, p.description AS project_description,
+                  mp.mapped_property_id, mp.name AS mapped_property_name,
+                  pn.property_num_id, pn.property_name
+                FROM soil_data.layer l
+                LEFT JOIN soil_data.mapset m  ON m.mapset_id = l.mapset_id
+                LEFT JOIN soil_data.country c ON c.country_id = m.country_id
+                LEFT JOIN soil_data.project p ON p.country_id = m.country_id AND p.project_id = m.project_id
+                LEFT JOIN soil_data.mapped_property mp ON mp.mapped_property_id = m.mapped_property_id
+                LEFT JOIN soil_data.property_num pn ON pn.property_num_id = mp.property_num_id
+                WHERE l.layer_id = %s
+            """, (layer_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Layer not found")
+            mapset_id = row["mapset_id"]
+
+            cur.execute("""
+                SELECT x.organisation_id, x.individual_id, x.position, x.tag, x.role,
+                       i.email AS individual_email,
+                       o.country AS organisation_country, o.city AS organisation_city,
+                       o.email AS organisation_email
+                FROM soil_data.proj_x_org_x_ind x
+                LEFT JOIN soil_data.individual   i ON i.individual_id   = x.individual_id
+                LEFT JOIN soil_data.organisation o ON o.organisation_id = x.organisation_id
+                LEFT JOIN soil_data.mapset       m2
+                       ON x.country_id = m2.country_id AND x.project_id = m2.project_id
+                WHERE m2.mapset_id = %s
+                ORDER BY x.tag, x.role, i.individual_id
+            """, (mapset_id,))
+            contacts = cur.fetchall()
+
+            cur.execute("""
+                SELECT protocol, url, url_name, url_description
+                FROM soil_data.url WHERE mapset_id = %s ORDER BY protocol
+            """, (mapset_id,))
+            urls = cur.fetchall()
+
+    # Stringify dates so JSON serialises cleanly.
+    for k in ("creation_date","publication_date","revision_date",
+              "time_period_begin","time_period_end"):
+        if row.get(k):
+            row[k] = row[k].isoformat()
+    row["contacts"] = contacts
+    row["online_resources"] = urls
+    return row
+
+
+@app.get("/api/raster/countries")
+async def list_smd_countries(current_user: dict = Depends(get_current_user)):
+    """List countries with `en` name. The country matching the
+    COUNTRY_CODE setting (api.setting) is returned first; the rest follow
+    alphabetically by `en`."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT value FROM api.setting WHERE key = 'COUNTRY_CODE'")
+            row = cur.fetchone()
+            default_cc = (row["value"] if row else "").strip().upper() or None
+            cur.execute("""
+                SELECT country_id, en FROM soil_data.country
+                WHERE en IS NOT NULL
+                ORDER BY (country_id = %s) DESC, en
+            """, (default_cc,))
+            return cur.fetchall()
+
+
+@app.get("/api/raster/units_for_property/{property_num_id}")
+async def list_smd_units_for_property(
+    property_num_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Units valid for a given property: every canonical unit attached to
+    observation_num rows for that property, plus every unit that can be
+    converted to any of those canonicals via soil_data.unit_conversion.
+    No conversion is applied — just the broader pickable set."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                WITH canonicals AS (
+                  SELECT DISTINCT unit_of_measure_id
+                  FROM soil_data.observation_num
+                  WHERE property_num_id = %s AND unit_of_measure_id IS NOT NULL
+                ),
+                source_convertible AS (
+                  SELECT DISTINCT c.unit_from AS unit_of_measure_id
+                  FROM soil_data.unit_conversion c
+                  JOIN canonicals k ON k.unit_of_measure_id = c.unit_to
+                )
+                SELECT u.unit_of_measure_id, u.unit_name
+                FROM soil_data.unit_of_measure u
+                WHERE u.unit_of_measure_id IN (
+                  SELECT unit_of_measure_id FROM canonicals
+                  UNION
+                  SELECT unit_of_measure_id FROM source_convertible
+                )
+                ORDER BY u.unit_name NULLS LAST, u.unit_of_measure_id
+            """, (property_num_id,))
+            return cur.fetchall()
+
+
+@app.get("/api/raster/mapped_soil_properties")
+async def list_smd_mapped_soil_properties(current_user: dict = Depends(get_current_user)):
+    """property_num catalogue — used by Add-Raster to pick the PROP component
+    of the layer id (filename convention <CC>-<PROJ>-<PROP>-...)."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT property_num_id, property_name FROM soil_data.property_num
+                WHERE property_name IS NOT NULL ORDER BY property_name
+            """)
+            return cur.fetchall()
+
+
+@app.get("/api/raster/individuals")
+async def list_smd_individuals(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT individual_id, email FROM soil_data.individual
+                ORDER BY individual_id
+            """)
+            return cur.fetchall()
+
+
+@app.post("/api/raster/individuals", status_code=status.HTTP_201_CREATED)
+async def create_smd_individual(payload: dict, current_user: dict = Depends(get_current_user)):
+    iid = (payload.get("individual_id") or "").strip()
+    if not iid:
+        raise HTTPException(status_code=400, detail="individual_id is required")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO soil_data.individual (individual_id, email)
+                VALUES (%s, %s)
+                ON CONFLICT (individual_id) DO NOTHING
+            """, (iid, payload.get("email")))
+    log_audit(current_user["user_id"], None, "smd_individual_created",
+              {"individual_id": iid}, None)
+    return {"individual_id": iid}
+
+
+@app.get("/api/raster/organisations")
+async def list_smd_organisations(current_user: dict = Depends(get_current_user)):
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT organisation_id, url, email, country, city, postal_code,
+                       delivery_point, phone, facsimile
+                FROM soil_data.organisation
+                ORDER BY organisation_id
+            """)
+            return cur.fetchall()
+
+
+@app.post("/api/raster/organisations", status_code=status.HTTP_201_CREATED)
+async def create_smd_organisation(payload: dict, current_user: dict = Depends(get_current_user)):
+    oid = (payload.get("organisation_id") or "").strip()
+    if not oid:
+        raise HTTPException(status_code=400, detail="organisation_id is required")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO soil_data.organisation
+                    (organisation_id, url, email, country, city, postal_code,
+                     delivery_point, phone, facsimile)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (organisation_id) DO NOTHING
+            """, (oid, payload.get("url"), payload.get("email"),
+                  payload.get("country"), payload.get("city"),
+                  payload.get("postal_code"), payload.get("delivery_point"),
+                  payload.get("phone"), payload.get("facsimile")))
+    log_audit(current_user["user_id"], None, "smd_organisation_created",
+              {"organisation_id": oid}, None)
+    return {"organisation_id": oid}
 
 
 @app.get("/")

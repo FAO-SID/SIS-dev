@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Set working directory
 PROJECT_DIR="/home/carva014/Work/Code/FAO/SIS-dev"      # << EDIT THIS LINE!
-COUNTRY=BT                                              # ISO 3166-1 alpha-2; full name and centroid are looked up from spatial_metadata.country
+COUNTRY=BT                                              # ISO 3166-1 alpha-2; full name and centroid are looked up from soil_data.country
 ORG_LOGO_URL="https://tse4.mm.bing.net/th/id/OIP.hV37F63PxOkqMwTAlCNnvQAAAA?r=0&pid=Api"
 
 cd "$PROJECT_DIR"
@@ -107,28 +107,16 @@ docker exec -i sis-database psql -d sis -U sis \
   -v glosis_pw="$POSTGRES_GLOSIS_PASSWORD" \
   <<< "ALTER ROLE sis_glosis WITH PASSWORD :'glosis_pw';"
 
-# insert dummy data for test
-docker exec sis-database psql -U sis -d sis -c "SELECT api.insert_dummy_data(
-                                                    p_project_id := 'DUMMY_DATA_1',
-                                                    p_project_name := 'Dummy data 1',
-                                                    p_num_plots := 200,
-                                                    p_observation_ids := ARRAY[911,912,913],
-                                                    p_xmin := 89.11,
-                                                    p_xmax := 92.12,
-                                                    p_ymin := 26.71,
-                                                    p_ymax := 28.28
-                                                )"
-
-# Pull country-specific values from spatial_metadata.country:
+# Pull country-specific values from soil_data.country:
 #  - en           → English country name, used to build APP_TITLE
 #  - geom_centroid → Point geometry, used as the default map centre
 # Fall back to neutral defaults if the row or column is missing so the
 # deploy still completes — the operator can fix the seed afterwards.
 COUNTRY_NAME=$(docker exec sis-database psql -U sis -d sis -tAc \
-  "SELECT en FROM spatial_metadata.country WHERE country_id = '$COUNTRY';" 2>/dev/null || true)
+  "SELECT en FROM soil_data.country WHERE country_id = '$COUNTRY';" 2>/dev/null || true)
 COUNTRY_CENTROID=$(docker exec sis-database psql -U sis -d sis -tAc \
   "SELECT ST_X(geom_centroid)::text || '|' || ST_Y(geom_centroid)::text
-   FROM spatial_metadata.country WHERE country_id = '$COUNTRY';" 2>/dev/null || true)
+   FROM soil_data.country WHERE country_id = '$COUNTRY';" 2>/dev/null || true)
 COUNTRY_LON=$(echo "$COUNTRY_CENTROID" | cut -d'|' -f1)
 COUNTRY_LAT=$(echo "$COUNTRY_CENTROID" | cut -d'|' -f2)
 [ -z "$COUNTRY_NAME" ] && COUNTRY_NAME="$COUNTRY"
@@ -215,11 +203,11 @@ docker compose up sis-nginx -d
 #     sis-web-services    #
 ###########################
 
-# Copy .tif and .map files
-rm -f $PROJECT_DIR/sis-web-services/volume/*.map
-rm -f $PROJECT_DIR/sis-web-services/volume/*.tif
-cp /home/carva014/Downloads/FAO/AFACI/$COUNTRY/output/*.tif $PROJECT_DIR/sis-web-services/volume
-cp /home/carva014/Downloads/FAO/AFACI/$COUNTRY/output/*.map $PROJECT_DIR/sis-web-services/volume
+# # Copy .tif and .map files
+# rm -f $PROJECT_DIR/sis-web-services/volume/*.map
+# rm -f $PROJECT_DIR/sis-web-services/volume/*.tif
+# cp /home/carva014/Downloads/FAO/AFACI/$COUNTRY/output/*.tif $PROJECT_DIR/sis-web-services/volume
+# cp /home/carva014/Downloads/FAO/AFACI/$COUNTRY/output/*.map $PROJECT_DIR/sis-web-services/volume
 
 # Build and start MapServer container
 docker compose up --build sis-web-services -d
@@ -244,18 +232,18 @@ docker exec sis-metadata sed -i "s/pycsw website/${COUNTRY_NAME} SIS metadata/g"
 docker exec sis-metadata sed -i "s|https://pycsw.org/img/pycsw-logo-vertical.png|${ORG_LOGO_URL}|g" pycsw/pycsw/ogc/api/templates/_base.html
 docker exec sis-metadata sed -i "s/https:\/\/pycsw.org/http:\/\/$HOST_SIS_METADATA\/collections\/metadata:main\/items/g" pycsw/pycsw/ogc/api/templates/_base.html
 
-# Load records — table only exists after pyCSW has been initialized at least
-# once, so the DELETE is best-effort on a fresh deploy.
-docker exec sis-database psql -U sis -d sis \
-  -c "DELETE FROM spatial_metadata.records;" 2>/dev/null || true
-rm -f $PROJECT_DIR/sis-metadata/volume/*.xml
-cp /home/carva014/Downloads/FAO/AFACI/$COUNTRY/output/*.xml $PROJECT_DIR/sis-metadata/volume
-docker exec sis-metadata ls -l /records
-rm -f $PROJECT_DIR/sis-metadata/volume/*.tif.aux.xml
-docker exec sis-metadata pycsw-admin.py load-records -c /etc/pycsw/pycsw.yml -p /records -r -y
+# # Load records — table only exists after pyCSW has been initialized at least
+# # once, so the DELETE is best-effort on a fresh deploy.
+# docker exec sis-database psql -U sis -d sis \
+#   -c "DELETE FROM soil_data.records;" 2>/dev/null || true
+# rm -f $PROJECT_DIR/sis-metadata/volume/*.xml
+# cp /home/carva014/Downloads/FAO/AFACI/$COUNTRY/output/*.xml $PROJECT_DIR/sis-metadata/volume
+# docker exec sis-metadata ls -l /records
+# rm -f $PROJECT_DIR/sis-metadata/volume/*.tif.aux.xml
+# docker exec sis-metadata pycsw-admin.py load-records -c /etc/pycsw/pycsw.yml -p /records -r -y
 
-# Verify if records were loaded
-docker exec sis-database psql -U sis -d sis -c "SELECT identifier, title FROM spatial_metadata.records ORDER BY title LIMIT 5;"
+# # Verify if records were loaded
+# docker exec sis-database psql -U sis -d sis -c "SELECT identifier, title FROM soil_data.records ORDER BY title LIMIT 5;"
 
 
 ##########################

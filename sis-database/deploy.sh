@@ -55,8 +55,8 @@ psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/owl2sql/out
 psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/owl2sql/output/unit_of_measure.sql
 psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/owl2sql/output/observation_num.sql
 psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/owl2sql/fix.sql
-psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-private/Metadata/backups/data_country_latest.sql
-psql -h localhost -p 5432 -d sis -U sis -f /home/carva014/Work/Code/FAO/GloSIS-private/Metadata/backups/data_property_latest.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/data_country.sql
+psql -h localhost -p 5432 -d sis -U sis -f $PROJECT_DIR/sis-database/data_mapped_property.sql
 
 
 #################

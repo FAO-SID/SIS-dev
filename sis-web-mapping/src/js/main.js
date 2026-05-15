@@ -445,166 +445,187 @@ function safeMailto(addr) {
   return /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(addr) ? `mailto:${addr}` : '#';
 }
 
-function formatMetadata(metadata) {
-  // Source data is XML records served by pyCSW — escape every interpolation
-  // since records can contain attacker-controlled markup.
+function formatMetadata(m) {
+  // m is the rich JSON from /api/raster/metadata/<layer_id>. Every value
+  // round-trips from soil_data.* so escape on output as a precaution.
   const e = escapeHtml;
   let html = '';
 
-  // Title
-  if (metadata.properties?.title) {
-    html += `<h3 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">${e(metadata.properties.title)}</h3>`;
+  const title = m.title || m.costum_name || m.layer_id;
+  if (title) {
+    // Route through the nginx gateway (api.baseURL) so the link works when
+    // the SPA is served from a port that doesn't itself proxy /collections/.
+    const xmlHref = m.file_identifier
+      ? `${api.baseURL}/collections/metadata:main/items/${encodeURIComponent(m.file_identifier)}?f=xml`
+      : null;
+    const xmlBtn = xmlHref
+      ? `<a href="${e(xmlHref)}" download="${e((m.layer_id || 'metadata') + '.xml')}"
+            style="font-size:13px;font-weight:normal;padding:4px 10px;background:var(--color-primary,#2c5f2d);color:#fff;border-radius:4px;text-decoration:none;margin-left:12px;white-space:nowrap;"
+            title="Download ISO 19139 XML">⬇ XML</a>`
+      : '';
+    html += `<h3 style="margin-top:0;color:#2c3e50;border-bottom:2px solid #3498db;padding-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <span style="flex:1;">${e(title)}</span>${xmlBtn}
+    </h3>`;
   }
 
-  // Description
-  if (metadata.properties?.description) {
-    html += `<div style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-left: 3px solid #3498db; border-radius: 3px;">
-      <strong>Description:</strong><br/>
-      <p style="margin: 8px 0 0 0; line-height: 1.6;">${e(metadata.properties.description)}</p>
+  if (m.abstract || m.project_description) {
+    const text = m.abstract || m.project_description;
+    html += `<div style="margin:15px 0;padding:10px;background:#f8f9fa;border-left:3px solid #3498db;border-radius:3px;">
+      <strong>Abstract</strong>
+      <p style="margin:8px 0 0 0;line-height:1.6;white-space:pre-line;">${e(text)}</p>
     </div>`;
   }
 
-  // Basic Information
-  html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Basic Information</h4>';
-  html += '<table style="width: 100%; border-collapse: collapse;">';
+  // Browse-graphic / thumbnail (WMS GetMap JPEG)
+  if (m.md_browse_graphic) {
+    const safe = safeUrl(m.md_browse_graphic);
+    html += `<div style="margin:15px 0;text-align:center;">
+      <a href="${e(safe)}" target="_blank" rel="noopener noreferrer" title="Open preview">
+        <img src="${e(safe)}" alt="Preview"
+             style="max-width:100%;max-height:320px;border:1px solid #ddd;border-radius:4px;background:#fff;">
+      </a>
+    </div>`;
+  }
 
-  const basicInfo = [
-    { label: 'Type', value: metadata.properties?.type },
-    { label: 'Language', value: metadata.properties?.language },
-    { label: 'Created', value: metadata.properties?.created },
-    { label: 'Updated', value: metadata.properties?.updated },
-    { label: 'ID', value: metadata.id }
+  // ---------- Identification ----------
+  const idRows = [
+    ['Layer id',        m.layer_id],
+    ['Mapset id',       m.mapset_id],
+    ['Country',         m.country_name ? `${m.country_name} (${m.country_id || ''})` : m.country_id],
+    ['Project',         m.project_name ? `${m.project_name} (${m.project_id || ''})` : m.project_id],
+    ['Soil property',   m.property_name ? `${m.property_name} (${m.property_num_id || ''})` : m.property_num_id],
+    ['Unit',            m.unit_of_measure_id],
+    ['Depth',           m.dimension_depth ? `${m.dimension_depth} cm` : ''],
+    ['Statistic',       m.dimension_stats],
+    ['Status',          m.status],
+    ['Update frequency', m.update_frequency],
+    ['Spatial type',    m.spatial_representation_type_code],
+    ['Presentation',    m.presentation_form],
+    ['Scope',           m.scope_code],
+    ['Topic categories', Array.isArray(m.topic_category) ? m.topic_category.join(', ') : m.topic_category],
+  ].filter(r => r[1] != null && r[1] !== '');
+  html += sectionTable('Identification', idRows, e);
+
+  // ---------- Dates ----------
+  const dateRows = [
+    ['Created on',     m.publication_date || m.creation_date],
+    ['Period start',   m.time_period_begin],
+    ['Period end',     m.time_period_end],
+    ['Revision date',  m.revision_date],
+  ].filter(r => r[1]);
+  if (dateRows.length) html += sectionTable('Dates', dateRows, e);
+
+  // ---------- Spatial ----------
+  const bbox = (m.west_bound_longitude != null) ? `
+    <div style="font-family:monospace;font-size:13px;">
+      W ${e(String(m.west_bound_longitude))}° / E ${e(String(m.east_bound_longitude))}°<br>
+      S ${e(String(m.south_bound_latitude))}° / N ${e(String(m.north_bound_latitude))}°
+    </div>` : '';
+  const spatialRows = [
+    ['CRS',        m.epsg ? `EPSG:${m.epsg}` : m.spatial_reference],
+    ['Resolution', (m.distance != null) ? `${m.distance} ${m.distance_uom || ''}` : ''],
+    ['Bounding box', bbox],
+    ['Raster size', (m.raster_size_x && m.raster_size_y) ? `${m.raster_size_x} × ${m.raster_size_y} px` : ''],
+    ['Data type',  m.data_type],
+    ['NoData',     m.no_data_value != null ? String(m.no_data_value) : ''],
+  ].filter(r => r[1]);
+  if (spatialRows.length) html += sectionTable('Spatial', spatialRows, e, /*raw=*/true);
+
+  // ---------- Statistics ----------
+  if (m.stats_minimum != null || m.stats_maximum != null) {
+    const statsRows = [
+      ['Min',  m.stats_minimum],
+      ['Max',  m.stats_maximum],
+      ['Mean', m.stats_mean],
+      ['Std',  m.stats_std_dev],
+    ].filter(r => r[1] != null);
+    html += sectionTable('Statistics', statsRows, e);
+  }
+
+  // ---------- Keywords ----------
+  const kw = (arr) => Array.isArray(arr) ? arr : (arr ? [arr] : []);
+  const allKw = [
+    ...kw(m.keyword_theme).map(k => ['theme', k]),
+    ...kw(m.keyword_discipline).map(k => ['discipline', k]),
+    ...kw(m.keyword_place).map(k => ['place', k]),
   ];
-
-  basicInfo.forEach(item => {
-    if (item.value) {
-      html += `<tr style="border-bottom: 1px solid #eee;">
-        <td style="padding: 8px; font-weight: bold; width: 30%; color: #555;">${e(item.label)}:</td>
-        <td style="padding: 8px;">${e(item.value)}</td>
-      </tr>`;
-    }
-  });
-  html += '</table></div>';
-
-  // Keywords
-  if (metadata.properties?.keywords && metadata.properties.keywords.length > 0) {
-    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Keywords</h4>';
-    html += '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
-    metadata.properties.keywords.forEach(keyword => {
-      html += `<span style="background: #e8f4f8; color: #2980b9; padding: 5px 12px; border-radius: 15px; font-size: 13px;">${e(keyword)}</span>`;
-    });
-    html += '</div></div>';
+  if (allKw.length) {
+    html += `<div style="margin:18px 0;"><h4 style="color:#2c3e50;margin-bottom:8px;">Keywords</h4>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">`
+      + allKw.map(([type, k]) =>
+          `<span style="background:#e8f4f8;color:#2980b9;padding:4px 10px;border-radius:14px;font-size:12px;" title="${e(type)}">${e(k)}</span>`
+        ).join('')
+      + `</div></div>`;
   }
 
-  // Themes
-  if (metadata.properties?.themes && metadata.properties.themes.length > 0) {
-    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Themes</h4>';
-    metadata.properties.themes.forEach(theme => {
-      if (theme.concepts && theme.concepts.length > 0) {
-        html += `<div style="margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 3px;">`;
-        if (theme.scheme) {
-          html += `<div style="font-size: 12px; color: #666; margin-bottom: 5px;">${e(theme.scheme)}</div>`;
-        }
-        theme.concepts.forEach(concept => {
-          html += `<span style="background: #fff; border: 1px solid #ddd; padding: 4px 10px; border-radius: 3px; margin-right: 8px; display: inline-block; margin-bottom: 5px;">${e(concept.id)}</span>`;
-        });
-        html += '</div>';
-      }
-    });
-    html += '</div>';
+  // ---------- Constraints / license ----------
+  const constrRows = [
+    ['License (other constraints)', m.other_constraints],
+    ['Access constraints',          m.access_constraints],
+    ['Use constraints',             m.use_constraints],
+  ].filter(r => r[1]);
+  if (constrRows.length) html += sectionTable('Constraints', constrRows, e);
+
+  // ---------- Lineage ----------
+  if (m.lineage_statement) {
+    html += `<div style="margin:18px 0;"><h4 style="color:#2c3e50;margin-bottom:8px;">Lineage</h4>
+      <div style="padding:10px;background:#f8f9fa;border-radius:3px;line-height:1.5;">${e(m.lineage_statement)}</div></div>`;
   }
 
-  // Contacts
-  if (metadata.properties?.contacts && metadata.properties.contacts.length > 0) {
-    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Contacts</h4>';
-    metadata.properties.contacts.forEach((contact) => {
-      html += `<div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 5px; border-left: 3px solid #27ae60;">`;
-      if (contact.name) html += `<div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">${e(contact.name)}</div>`;
-      if (contact.organization) html += `<div style="margin-bottom: 3px;"><strong>Organization:</strong> ${e(contact.organization)}</div>`;
-      if (contact.position) html += `<div style="margin-bottom: 3px;"><strong>Position:</strong> ${e(contact.position)}</div>`;
-      if (contact.roles && contact.roles.length > 0) html += `<div style="margin-bottom: 3px;"><strong>Role:</strong> ${e(contact.roles.join(', '))}</div>`;
-      if (contact.emails && contact.emails.length > 0 && contact.emails[0].value) {
-        const email = contact.emails[0].value;
-        html += `<div style="margin-bottom: 3px;"><strong>Email:</strong> <a href="${e(safeMailto(email))}" style="color: #3498db;">${e(email)}</a></div>`;
-      }
-      if (contact.addresses && contact.addresses.length > 0) {
-        const addr = contact.addresses[0];
-        let addressParts = [];
-        if (addr.deliveryPoint && addr.deliveryPoint.length > 0) addressParts.push(addr.deliveryPoint.join(', '));
-        if (addr.city) addressParts.push(addr.city);
-        if (addr.postalCode) addressParts.push(addr.postalCode);
-        if (addr.country) addressParts.push(addr.country);
-        if (addressParts.length > 0) {
-          html += `<div style="margin-top: 5px; font-size: 13px; color: #555;">${e(addressParts.join(', '))}</div>`;
-        }
-      }
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // Geometry/Extent
-  if (metadata.geometry) {
-    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Spatial Extent</h4>';
-    if (metadata.geometry.type === 'Polygon' && metadata.geometry.coordinates) {
-      const coords = metadata.geometry.coordinates[0];
-      const [minLon, minLat] = coords[0];
-      const [maxLon, maxLat] = coords[2];
-      html += `<div style="padding: 10px; background: #f8f9fa; border-radius: 3px; font-family: monospace; font-size: 13px;">
-        West: ${e(String(minLon))}° | East: ${e(String(maxLon))}°<br/>
-        South: ${e(String(minLat))}° | North: ${e(String(maxLat))}°
+  // ---------- Contacts ----------
+  if (Array.isArray(m.contacts) && m.contacts.length) {
+    html += `<div style="margin:18px 0;"><h4 style="color:#2c3e50;margin-bottom:8px;">Contacts</h4>`;
+    m.contacts.forEach(c => {
+      html += `<div style="margin-bottom:10px;padding:10px;background:#f8f9fa;border-radius:5px;border-left:3px solid #27ae60;">
+        <div style="font-weight:bold;color:#2c3e50;">${e(c.individual_id || '')} · ${e(c.organisation_id || '')}</div>
+        ${c.position ? `<div><strong>Position:</strong> ${e(c.position)}</div>` : ''}
+        ${c.role ? `<div><strong>Role:</strong> ${e(c.role)}${c.tag ? ' / ' + e(c.tag) : ''}</div>` : ''}
+        ${c.organisation_country || c.organisation_city ? `<div style="color:#555;font-size:13px;">${e([c.organisation_city, c.organisation_country].filter(Boolean).join(', '))}</div>` : ''}
+        ${c.individual_email ? `<div><strong>Email:</strong> <a href="${e(safeMailto(c.individual_email))}" style="color:#3498db;">${e(c.individual_email)}</a></div>` : ''}
       </div>`;
-    }
-    html += '</div>';
-  }
-
-  // Time Period
-  if (metadata.time?.interval) {
-    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Temporal Extent</h4>';
-    html += `<div style="padding: 10px; background: #f8f9fa; border-radius: 3px;">
-      From: <strong>${e(metadata.time.interval[0])}</strong> to <strong>${e(metadata.time.interval[1])}</strong>
-    </div></div>`;
-  }
-
-  // Formats
-  if (metadata.properties?.formats && metadata.properties.formats.length > 0) {
-    html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Available Formats</h4>';
-    html += '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
-    metadata.properties.formats.forEach(format => {
-      html += `<span style="background: #e8f4f8; padding: 5px 12px; border-radius: 3px; font-size: 13px; border: 1px solid #3498db;">${e(format.name)}</span>`;
     });
-    html += '</div></div>';
+    html += `</div>`;
   }
 
-  // Links
-  if (metadata.links && metadata.links.length > 0) {
-    const dataLinks = metadata.links.filter(link =>
-      link.rel === 'information' || link.rel === 'download'
-    );
-
-    if (dataLinks.length > 0) {
-      html += '<div style="margin: 20px 0;"><h4 style="color: #2c3e50; margin-bottom: 10px;">Data Access Links</h4>';
-      html += '<div style="display: flex; flex-direction: column; gap: 8px;">';
-
-      dataLinks.forEach(link => {
-        const linkType = link.rel === 'download' ? '📥' : '🔗';
-        const linkName = link.name || link.title || link.rel;
-        const safeHref = safeUrl(link.href);
-        html += `<a href="${e(safeHref)}" target="_blank" rel="noopener noreferrer" style="padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; color: #2c3e50; display: flex; align-items: center; gap: 10px; transition: all 0.2s;"
-          onmouseover="this.style.background='#f0f0f0'; this.style.borderColor='#3498db';"
-          onmouseout="this.style.background='#fff'; this.style.borderColor='#ddd';">
-          <span style="font-size: 20px;">${linkType}</span>
-          <div style="flex: 1;">
-            <div style="font-weight: bold;">${e(linkName)}</div>
-            ${link.protocol ? `<div style="font-size: 12px; color: #666;">${e(link.protocol)}</div>` : ''}
-          </div>
-        </a>`;
-      });
-
-      html += '</div></div>';
-    }
+  // ---------- Online resources ----------
+  if (Array.isArray(m.online_resources) && m.online_resources.length) {
+    html += `<div style="margin:18px 0;"><h4 style="color:#2c3e50;margin-bottom:8px;">Online resources</h4>
+      <div style="display:flex;flex-direction:column;gap:6px;">`
+      + m.online_resources.map(u => {
+          const icon = u.protocol?.startsWith('WWW:LINK') || u.protocol?.startsWith('WWW:DOWNLOAD') ? '📥' : '🔗';
+          return `<a href="${e(safeUrl(u.url))}" target="_blank" rel="noopener noreferrer" style="padding:8px;background:#fff;border:1px solid #ddd;border-radius:4px;text-decoration:none;color:#2c3e50;display:flex;gap:10px;align-items:center;">
+            <span style="font-size:18px;">${icon}</span>
+            <div style="flex:1;">
+              <div style="font-weight:600;">${e(u.url_name || u.protocol)}</div>
+              <div style="font-size:12px;color:#666;">${e(u.protocol)}</div>
+              ${u.url_description ? `<div style="font-size:12px;color:#666;">${e(u.url_description)}</div>` : ''}
+            </div>
+          </a>`;
+        }).join('')
+      + `</div></div>`;
   }
 
+  // ---------- Footer: file identifier ----------
+  if (m.file_identifier) {
+    html += `<div style="margin-top:20px;font-size:11px;color:#888;font-family:monospace;">file identifier: ${e(m.file_identifier)}</div>`;
+  }
+
+  return html;
+}
+
+// Helper: 2-column section with rows, with optional raw HTML in value cell.
+function sectionTable(title, rows, e, raw = false) {
+  if (!rows.length) return '';
+  let html = `<div style="margin:18px 0;"><h4 style="color:#2c3e50;margin-bottom:8px;">${e(title)}</h4>
+    <table style="width:100%;border-collapse:collapse;">`;
+  rows.forEach(([k, v]) => {
+    const valueCell = raw ? v : e(String(v));
+    html += `<tr style="border-bottom:1px solid #eee;">
+      <td style="padding:6px 8px;font-weight:bold;color:#555;width:32%;vertical-align:top;">${e(k)}</td>
+      <td style="padding:6px 8px;">${valueCell}</td>
+    </tr>`;
+  });
+  html += `</table></div>`;
   return html;
 }
 
@@ -617,84 +638,32 @@ function escapeHtml(text) {
 
 
 async function showMetadataPopup(metadataUrl) {
-  // Create modal overlay
   const modal = document.createElement('div');
   modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;';
-  
   modal.innerHTML = `
-    <div style="background: white; padding: 20px; border-radius: 8px; max-width: 800px; max-height: 90vh; overflow-y: auto; position: relative; width: 100%;">
+    <div style="background: white; padding: 20px; border-radius: 8px; max-width: 880px; max-height: 90vh; overflow-y: auto; position: relative; width: 100%;">
       <button id="metadata-close" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
       <h2 style="margin-top: 0;">Metadata</h2>
-      <div id="metadata-content" style="margin-top: 20px;">Loading...</div>
+      <div id="metadata-content" style="margin-top: 20px;">Loading…</div>
     </div>
   `;
-  
   document.body.appendChild(modal);
-  
-  // Close button handler
-  document.getElementById('metadata-close').addEventListener('click', () => {
-    document.body.removeChild(modal);
-  });
-  
-  // Close on background click
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      document.body.removeChild(modal);
-    }
-  });
-  
-  // Fetch metadata — always route through nginx (api.baseURL) so it works
-  // whether the page is served via nginx or directly from the Parcel dev port.
-  try {
-    let jsonUrl;
-    if (metadataUrl.startsWith('http://') || metadataUrl.startsWith('https://')) {
-      const url = new URL(metadataUrl);
-      jsonUrl = `${api.baseURL}${url.pathname}?f=json`;
-    } else {
-      jsonUrl = `${api.baseURL}${metadataUrl}${metadataUrl.includes('?') ? '&' : '?'}f=json`;
-    }
+  document.getElementById('metadata-close').addEventListener('click', () => document.body.removeChild(modal));
+  modal.addEventListener('click', (e) => { if (e.target === modal) document.body.removeChild(modal); });
 
-    const response = await fetch(jsonUrl);
-    const contentType = response.headers.get('content-type');
-    
-    console.log('Response content-type:', contentType);
-    console.log('Response status:', response.status);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    // Always try to parse as JSON first, regardless of content-type
-    const text = await response.text();
-    
-    try {
-      // Try to parse as JSON
-      const metadata = JSON.parse(text);
-      console.log('Metadata received:', metadata);
-      
-      // Format and display
-      const content = formatMetadata(metadata);
-      document.getElementById('metadata-content').innerHTML = content;
-      
-    } catch (jsonError) {
-      // Not valid JSON - display as text
-      console.log('Response is not valid JSON, displaying as text');
-      console.log('Response text:', text.substring(0, 200));
-      
-      document.getElementById('metadata-content').innerHTML = `
-        <div style="background: #f8f8f8; padding: 15px; border-radius: 4px; overflow-x: auto;">
-          <pre style="white-space: pre-wrap; word-wrap: break-word; font-size: 12px;">${escapeHtml(text)}</pre>
-        </div>
-      `;
-    }
-    
+  try {
+    // metadataUrl is now `/api/raster/metadata/<layer_id>` — needs the SPA's API key.
+    const url = metadataUrl.startsWith('http')
+      ? metadataUrl
+      : `${api.baseURL}${metadataUrl}`;
+    const response = await fetch(url, { headers: { 'X-API-Key': api.apiKey } });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const metadata = await response.json();
+    document.getElementById('metadata-content').innerHTML = formatMetadata(metadata);
   } catch (error) {
     console.error('Failed to load metadata:', error);
-    document.getElementById('metadata-content').innerHTML = `
-      <p style="color: red;">Failed to load metadata: ${error.message}</p>
-      <p>URL attempted: ${metadataUrl}?f=json</p>
-      <p><a href="${metadataUrl}" target="_blank">Open metadata in new tab</a></p>
-    `;
+    document.getElementById('metadata-content').innerHTML =
+      `<p style="color: red;">Failed to load metadata: ${escapeHtml(error.message)}</p>`;
   }
 }
 

@@ -73,6 +73,7 @@ class AdminDashboard {
 
     const dashboard = document.getElementById('admin-dashboard');
     dashboard.classList.add('active');
+    document.body.classList.toggle('is-admin', !!this.isAdmin);
 
     // Gate the Administration tab by admin status
     const adminTabBtn = document.querySelector('.tab-btn[data-tab="administration"]');
@@ -185,8 +186,10 @@ class AdminDashboard {
           <ul class="dashboard-tabs">
             <li><button class="tab-btn" data-tab="account">My Account</button></li>
             <li><button class="tab-btn active" data-tab="administration">Administration</button></li>
-            <li><button class="tab-btn" data-tab="layers">Layers</button></li>
+            <li><button class="tab-btn" data-tab="layers">Soil profiles</button></li>
             <li><button class="tab-btn" data-tab="etl">ETL</button></li>
+            <li><button class="tab-btn" data-tab="add-raster">Rasters</button></li>
+            <li><button class="tab-btn" data-tab="dst">DST</button></li>
             <li><button class="tab-btn" data-tab="dashboard">Dashboard</button></li>
           </ul>
 
@@ -346,34 +349,6 @@ class AdminDashboard {
                 </div>
               </section>
 
-              <!-- Maps section -->
-              <section class="layers-section" style="margin-top: var(--sp-6, 24px);">
-                <h3 class="layers-section-title">Rasters</h3>
-                <div class="sync-bar" style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
-                  <button type="button" class="btn btn-primary" id="sync-layers-btn">Sync from Metadata</button>
-                  <button type="button" class="btn btn-primary" id="check-wms-btn">Check WMS</button>
-                  <span id="sync-status" style="font-size: 0.9em; color: #555;"></span>
-                </div>
-
-                <div id="layers-table-container">
-                  <table class="admin-table" id="layers-table">
-                    <thead>
-                      <tr>
-                        <th>Raster ID</th>
-                        <th style="width:120px;">Group</th>
-                        <th>Raster name</th>
-                        <th>Published</th>
-                        <th>Default</th>
-                        <th>WMS</th>
-                        <th>Download</th>
-                      </tr>
-                    </thead>
-                    <tbody id="layers-tbody">
-                      <tr><td colspan="7" class="loading">Loading layers...</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </section>
             </div>
 
             <!-- ETL Tab -->
@@ -425,6 +400,9 @@ class AdminDashboard {
                           <div id="etl-new-project" class="etl-new-entry" style="display:none;">
                             <input type="text" id="etl-new-project-id" placeholder="Project ID" style="margin-top:4px;">
                             <input type="text" id="etl-new-project-name" placeholder="Project Name" style="margin-top:4px;">
+                            <textarea id="etl-new-project-description"
+                                      placeholder="Project description" rows="2"
+                                      style="margin-top:4px;width:100%;"></textarea>
                             <button type="button" class="btn btn-primary btn-sm" style="margin-top:4px;" onclick="adminDashboard.addNewProject()">Add</button>
                             <button type="button" class="btn btn-secondary btn-sm" style="margin-top:4px;" onclick="adminDashboard.cancelNew('project')">Cancel</button>
                           </div>
@@ -456,7 +434,6 @@ class AdminDashboard {
                         <div class="etl-author-field"><label>Organisation</label></div>
                         <div class="etl-author-field"><label>Author</label></div>
                         <div class="etl-author-field etl-author-field-sm"><label>Position</label></div>
-                        <div class="etl-author-field etl-author-field-sm"><label>Tag</label></div>
                         <div class="etl-author-field etl-author-field-sm"><label>Role</label></div>
                       </div>
                       <div id="etl-author-rows"></div>
@@ -515,6 +492,240 @@ class AdminDashboard {
                 </div>
 
               </div>
+            </div>
+
+            <!-- Rasters Tab (formerly "Add Raster"; now also holds the rasters list moved from the Layers tab) -->
+            <div id="add-raster-tab" class="tab-pane">
+
+              <div style="display:flex;gap:var(--sp-5);align-items:flex-start;flex-wrap:wrap;">
+              <section class="admin-form" style="flex:0 0 820px;max-width:820px;">
+                <h3>Add GeoTIFF</h3>
+
+                <div style="display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-3);align-items:center;">
+                  <label>File</label>
+                  <div>
+                    <input type="file" id="raster-file-input" accept=".tif,.tiff">
+                    <button type="button" class="btn btn-sm" id="raster-inspect-btn" style="margin-left:8px;">Inspect</button>
+                  </div>
+
+                  <label>Country</label>
+                  <select id="raster-country" style="width:320px;"><option value="">Loading...</option></select>
+
+                  <label>Project</label>
+                  <div>
+                    <select id="raster-project">
+                      <option value="">-- Select --</option>
+                      <option value="__new__">+ Add new project…</option>
+                    </select>
+                    <div id="raster-project-new" style="display:none;margin-top:6px;">
+                      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                        <input type="text" id="raster-new-project-id"
+                               placeholder="Project ID (CAPS, A-Z 0-9 _)"
+                               pattern="[A-Z0-9_]+"
+                               title="Letters A-Z, digits, underscore. No spaces or symbols."
+                               style="width:200px;text-transform:uppercase;">
+                        <input type="text" id="raster-new-project-name" placeholder="Project name" style="width:240px;">
+                        <button type="button" class="btn btn-sm btn-primary" id="raster-add-project-btn">Add</button>
+                        <span id="raster-new-project-status" style="font-size:var(--fs-sm);"></span>
+                      </div>
+                      <textarea id="raster-new-project-description"
+                                placeholder="Project description (used as raster Abstract)"
+                                rows="2" style="width:100%;margin-top:4px;"></textarea>
+                    </div>
+                  </div>
+
+                  <label>Mapped soil property</label>
+                  <select id="raster-property-num" style="width:320px;"><option value="">Loading...</option></select>
+
+                  <label>Unit</label>
+                  <select id="raster-unit" style="width:140px;"><option value="">-- pick a property first --</option></select>
+
+                  <label>Created on</label>
+                  <div style="display:flex;align-items:center;gap:var(--sp-3);">
+                    <input type="text" id="raster-publication-date"
+                           placeholder="YYYY-MM-DD"
+                           pattern="\d{4}-\d{2}-\d{2}"
+                           maxlength="10"
+                           title="Format: YYYY-MM-DD"
+                           style="width:140px;">
+                    <span style="color:#666;font-size:var(--fs-sm);">Date when this map was produced.</span>
+                  </div>
+
+                  <label>Period start</label>
+                  <div style="display:flex;align-items:center;gap:var(--sp-3);">
+                    <input type="text" id="raster-time-period-begin"
+                           placeholder="YYYY-MM-DD"
+                           pattern="\d{4}-\d{2}-\d{2}"
+                           maxlength="10"
+                           title="Format: YYYY-MM-DD"
+                           style="width:140px;">
+                    <span style="color:#666;font-size:var(--fs-sm);">The oldest date of the data used to create this map.</span>
+                  </div>
+
+                  <label>Period end</label>
+                  <div style="display:flex;align-items:center;gap:var(--sp-3);">
+                    <input type="text" id="raster-time-period-end"
+                           placeholder="YYYY-MM-DD"
+                           pattern="\d{4}-\d{2}-\d{2}"
+                           maxlength="10"
+                           title="Format: YYYY-MM-DD"
+                           style="width:140px;">
+                    <span style="color:#666;font-size:var(--fs-sm);">The most recent date of the data used to create this map.</span>
+                  </div>
+
+                  <label>Depth (cm)</label>
+                  <div style="display:flex;gap:6px;align-items:center;">
+                    <input type="number" id="raster-depth-upper" placeholder="upper" min="0" max="1000" step="1" class="no-spinner" style="width:90px;">
+                    <span>to</span>
+                    <input type="number" id="raster-depth-lower" placeholder="lower" min="0" max="1000" step="1" class="no-spinner" style="width:90px;">
+                  </div>
+
+                  <label>Stats</label>
+                  <select id="raster-stats" style="width:140px;">
+                    <option value="">-- Select --</option>
+                    <option value="MEAN">MEAN</option>
+                    <option value="SDEV">SDEV</option>
+                    <option value="UNCT">UNCT</option>
+                  </select>
+
+                  <label>License</label>
+                  <select id="raster-license" style="width:220px;">
+                    <option value="">-- Select --</option>
+                    <option value="CC BY">CC BY</option>
+                    <option value="CC BY-SA">CC BY-SA</option>
+                    <option value="CC BY-NC">CC BY-NC</option>
+                    <option value="CC BY-NC-SA">CC BY-NC-SA</option>
+                    <option value="CC BY-ND">CC BY-ND</option>
+                    <option value="CC BY-NC-ND">CC BY-NC-ND</option>
+                    <option value="CC0">CC0</option>
+                    <option value="Public Domain Mark">Public Domain Mark</option>
+                  </select>
+
+                  <label>Publish to catalogue</label>
+                  <div><input type="checkbox" id="raster-publish" checked></div>
+
+                  <div style="grid-column:1 / -1;margin-top:var(--sp-2);">
+                    <div style="font-weight:600;margin-bottom:var(--sp-2);">Authors</div>
+                    <div class="etl-author-row etl-author-header">
+                      <div class="etl-author-field"><label>Organisation</label></div>
+                      <div class="etl-author-field"><label>Author</label></div>
+                      <div class="etl-author-field etl-author-field-sm"><label>Position</label></div>
+                      <div class="etl-author-field etl-author-field-sm"><label>Role</label></div>
+                    </div>
+                    <div id="raster-author-rows"></div>
+
+                    <div id="raster-new-org-block" class="etl-new-entry" style="display:none;margin-top:var(--sp-2);">
+                      <strong style="font-size:var(--fs-xs);">New Organisation</strong>
+                      <div style="display:flex;gap:var(--sp-2);margin-top:4px;flex-wrap:wrap;">
+                        <input type="text" id="raster-new-org-id" placeholder="Organisation" style="flex:1;min-width:100px;">
+                        <select id="raster-new-org-country" style="flex:1;min-width:120px;"><option value="">-- Country --</option></select>
+                        <input type="text" id="raster-new-org-city" placeholder="City" style="flex:1;min-width:80px;">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="adminDashboard.addNewRasterOrganisation()">Add</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.cancelRasterNew('organisation')">Cancel</button>
+                      </div>
+                    </div>
+                    <div id="raster-new-ind-block" class="etl-new-entry" style="display:none;">
+                      <strong style="font-size:var(--fs-xs);">New Author</strong>
+                      <div style="display:flex;gap:var(--sp-2);margin-top:4px;flex-wrap:wrap;">
+                        <input type="text" id="raster-new-ind-id" placeholder="Name" style="flex:1;min-width:100px;">
+                        <input type="email" id="raster-new-ind-email" placeholder="Email" style="flex:1;min-width:100px;">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="adminDashboard.addNewRasterIndividual()">Add</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.cancelRasterNew('individual')">Cancel</button>
+                      </div>
+                    </div>
+
+                    <div style="margin-top:var(--sp-2);">
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.addRasterAuthorRow()">+ Add Author</button>
+                    </div>
+                  </div>
+
+                  <label>Generated filename</label>
+                  <code id="raster-filename-preview" style="font-size:var(--fs-sm);color:#444;background:#f7f7f7;padding:4px 8px;border-radius:4px;">—</code>
+                </div>
+
+                <div style="margin-top:var(--sp-4);display:flex;align-items:center;gap:var(--sp-3);">
+                  <button type="button" class="btn btn-primary" id="raster-register-btn">Register</button>
+                  <button type="button" class="btn btn-secondary" id="raster-clear-btn">Clear</button>
+                  <span id="raster-status" style="font-size:var(--fs-sm);"></span>
+                </div>
+
+              </section>
+
+              <pre id="raster-inspect-output" style="flex:1 1 380px;min-width:340px;max-height:80vh;overflow:auto;background:#f7f7f7;padding:8px;font-size:11px;display:none;margin:0;"></pre>
+              </div>
+
+              <!-- Rasters list (moved here from the old Layers tab) -->
+              <section class="layers-section" style="margin-top: var(--sp-6, 24px);">
+                <h3 class="layers-section-title">GeoTIFF's</h3>
+                <div class="sync-bar" style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                  <button type="button" class="btn btn-primary" id="sync-layers-btn">Sync from Metadata</button>
+                  <button type="button" class="btn btn-primary" id="check-wms-btn">Check WMS</button>
+                  <span id="sync-status" style="font-size: 0.9em; color: #555;"></span>
+                </div>
+
+                <div id="layers-table-container">
+                  <table class="admin-table" id="layers-table">
+                    <thead>
+                      <tr>
+                        <th>Raster ID</th>
+                        <th style="width:120px;">Group</th>
+                        <th>Raster name</th>
+                        <th>Published</th>
+                        <th>Default</th>
+                        <th>WMS</th>
+                        <th class="raster-delete-col" style="width:90px;">Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody id="layers-tbody">
+                      <tr><td colspan="7" class="loading">Loading layers...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+
+            <!-- DST Tab -->
+            <div id="dst-tab" class="tab-pane">
+              <section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);">
+                <div>
+                  <h3>Recipes</h3>
+                  <button type="button" class="btn btn-sm btn-primary" id="dst-new-btn" style="margin-bottom:var(--sp-3);">+ New Recipe</button>
+                  <table class="admin-table" id="dst-recipes-table" style="width:100%;">
+                    <thead><tr><th>ID</th><th>Name</th><th>Last run</th><th></th></tr></thead>
+                    <tbody id="dst-recipes-tbody"><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
+                  </table>
+                </div>
+                <div>
+                  <h3>Editor <span id="dst-editor-id" style="font-weight:normal;color:#666;font-size:var(--fs-sm);"></span></h3>
+                  <div id="dst-editor" style="display:none;">
+                    <div style="display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-3);align-items:center;">
+                      <label>recipe_id</label>
+                      <input type="text" id="dst-recipe-id" placeholder="e.g. potato-suitability">
+                      <label>name</label>
+                      <input type="text" id="dst-recipe-name">
+                      <label>description</label>
+                      <textarea id="dst-recipe-description" rows="2"></textarea>
+                    </div>
+                    <p style="font-size:var(--fs-sm);margin-top:var(--sp-3);">
+                      Recipe JSON (steps + aggregation + metadata):
+                    </p>
+                    <textarea id="dst-recipe-json" rows="14" style="width:100%;font-family:monospace;font-size:12px;"></textarea>
+                    <div style="margin-top:var(--sp-3);display:flex;gap:var(--sp-2);align-items:center;">
+                      <button type="button" class="btn btn-sm btn-primary" id="dst-save-btn">Save</button>
+                      <button type="button" class="btn btn-sm" id="dst-validate-btn">Validate</button>
+                      <button type="button" class="btn btn-sm" id="dst-run-btn" style="background:#28a745;color:#fff;">Run</button>
+                      <button type="button" class="btn btn-sm" id="dst-delete-btn" style="background:#dc3545;color:#fff;">Delete</button>
+                      <span id="dst-status" style="font-size:var(--fs-sm);"></span>
+                    </div>
+                    <pre id="dst-output" style="margin-top:var(--sp-3);max-height:200px;overflow:auto;background:#f7f7f7;padding:8px;font-size:11px;"></pre>
+                  </div>
+                  <h3 style="margin-top:var(--sp-4);">Recent runs</h3>
+                  <table class="admin-table" id="dst-runs-table" style="width:100%;">
+                    <thead><tr><th>run_id</th><th>recipe</th><th>status</th><th>started</th><th>output</th></tr></thead>
+                    <tbody id="dst-runs-tbody"><tr><td colspan="5" class="empty-state">No runs yet</td></tr></tbody>
+                  </table>
+                </div>
+              </section>
             </div>
 
             <!-- My Account Tab -->
@@ -830,6 +1041,717 @@ class AdminDashboard {
     if (tab === 'dashboard') {
       this.loadDashboard();
     }
+
+    if (tab === 'add-raster' && !this.rasterInited) {
+      this.initAddRasterTab();
+      this.rasterInited = true;
+    }
+    if (tab === 'dst' && !this.dstInited) {
+      this.initDstTab();
+      this.dstInited = true;
+    }
+  }
+
+  // ==================== Add Raster ====================
+
+  async initAddRasterTab() {
+    // Load codelists in parallel.
+    const [countries, projects, properties, organisations, individuals] = await Promise.all([
+      api.listRasterCountries().catch(e => { console.warn('countries:', e.message); return []; }),
+      api.listRasterProjects().catch(e => { console.warn('projects:', e.message); return []; }),
+      api.listRasterMappedSoilProperties().catch(e => { console.warn('properties:', e.message); return []; }),
+      api.listRasterOrganisations().catch(e => { console.warn('orgs:', e.message); return []; }),
+      api.listRasterIndividuals().catch(e => { console.warn('inds:', e.message); return []; }),
+    ]);
+    this._rasterOrganisations = organisations;
+    this._rasterIndividuals = individuals;
+
+    // First entry in the list is the configured default (COUNTRY_CODE on
+    // api.setting — server already sorted it that way). Preselect it.
+    this._rasterCountries = countries;
+    const countrySel = document.getElementById('raster-country');
+    countrySel.innerHTML = '<option value="">-- Select --</option>' +
+      countries.map(c => `<option value="${c.country_id}">${this.escapeHtml(c.en)} (${c.country_id})</option>`).join('');
+    if (countries.length > 0) countrySel.value = countries[0].country_id;
+
+    // Country dropdown for the New Organisation subform — same source, but
+    // the option *value* is the English name (saved into soil_data.organisation.country)
+    // rather than the country_id.
+    const orgCountrySel = document.getElementById('raster-new-org-country');
+    orgCountrySel.innerHTML = '<option value="">-- Country --</option>' +
+      countries.map(c => `<option value="${this.escapeHtml(c.en)}">${this.escapeHtml(c.en)} (${c.country_id})</option>`).join('');
+    if (countries.length > 0) orgCountrySel.value = countries[0].en;
+
+    this._rasterProjects = projects;
+    this._renderRasterProjectOptions();
+
+    // Cache the property list for name lookups (used when building title/abstract).
+    this._rasterPropertyNums = properties;
+    const propSel = document.getElementById('raster-property-num');
+    propSel.innerHTML = '<option value="">-- Select --</option>' +
+      properties.map(p => `<option value="${p.property_num_id}">${this.escapeHtml(p.property_name)} (${p.property_num_id})</option>`).join('');
+
+    // When property changes, fetch its valid units.
+    propSel.addEventListener('change', () => this._loadRasterUnitsForCurrentProperty());
+
+    // When project changes, load its existing authors (only for real ids).
+    document.getElementById('raster-project').addEventListener('change', () => this._loadRasterAuthorsForCurrentProject());
+
+    // Recompute filename preview on every input/change of any field.
+    const refresh = () => this._updateRasterFilenamePreview();
+    ['raster-country','raster-project','raster-property-num','raster-unit','raster-publication-date',
+     'raster-time-period-begin','raster-time-period-end',
+     'raster-depth-upper','raster-depth-lower','raster-stats','raster-license']
+      .forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', refresh);
+        el.addEventListener('change', refresh);
+      });
+
+    // New-project id: uppercase + strip invalid chars as the user types.
+    const newPid = document.getElementById('raster-new-project-id');
+    newPid.addEventListener('input', () => {
+      newPid.value = newPid.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+    });
+
+    // Date fields: accept forgiving input. Replace `/` with `-` as the
+    // user types; on blur, also zero-pad single-digit month/day so
+    // `2025/10/5` ends up as `2025-10-05`.
+    ['raster-publication-date','raster-time-period-begin','raster-time-period-end']
+      .forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', () => {
+          if (el.value.includes('/')) el.value = el.value.replace(/\//g, '-');
+          refresh();
+        });
+        el.addEventListener('blur', () => {
+          const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(el.value.trim());
+          if (m) {
+            el.value = `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+            refresh();
+          }
+        });
+      });
+
+    // Project select: show new-project subform when __new__ chosen.
+    document.getElementById('raster-project').addEventListener('change', e => {
+      document.getElementById('raster-project-new').style.display =
+        e.target.value === '__new__' ? 'block' : 'none';
+    });
+    document.getElementById('raster-add-project-btn').addEventListener('click', () => this.rasterAddProject());
+
+    document.getElementById('raster-inspect-btn').addEventListener('click', () => this.rasterInspect());
+    document.getElementById('raster-register-btn').addEventListener('click', () => this.rasterRegister());
+    document.getElementById('raster-clear-btn').addEventListener('click', () => this.rasterClear());
+  }
+
+  rasterClear() {
+    const ids = ['raster-file-input','raster-publication-date',
+                 'raster-time-period-begin','raster-time-period-end',
+                 'raster-depth-upper','raster-depth-lower',
+                 'raster-new-project-id','raster-new-project-name','raster-new-project-description'];
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+
+    // Selects: reset to the first option (-- Select --) except Country, which
+    // keeps the configured default (first entry).
+    document.getElementById('raster-project').value = '';
+    document.getElementById('raster-property-num').value = '';
+    document.getElementById('raster-stats').value = '';
+    document.getElementById('raster-license').value = '';
+    const countrySel = document.getElementById('raster-country');
+    if (countrySel.options.length > 1) countrySel.selectedIndex = 1;
+    // Unit dropdown depends on property — reset its placeholder.
+    document.getElementById('raster-unit').innerHTML =
+      '<option value="">-- pick a property first --</option>';
+
+    document.getElementById('raster-publish').checked = true;
+    document.getElementById('raster-project-new').style.display = 'none';
+    document.getElementById('raster-author-rows').innerHTML = '';
+    document.getElementById('raster-new-org-block').style.display = 'none';
+    document.getElementById('raster-new-ind-block').style.display = 'none';
+    document.getElementById('raster-status').textContent = '';
+    const out = document.getElementById('raster-inspect-output');
+    out.style.display = 'none'; out.textContent = '';
+    this._updateRasterFilenamePreview();
+  }
+
+  _renderRasterProjectOptions(selectId) {
+    const sel = document.getElementById('raster-project');
+    const current = selectId || sel.value;
+    sel.innerHTML = '<option value="">-- Select --</option>'
+      + (this._rasterProjects || []).map(p =>
+          `<option value="${p.project_id}" data-country="${p.country_id}">${this.escapeHtml(p.project_id)}</option>`
+        ).join('')
+      + '<option value="__new__">+ Add new project…</option>';
+    if (current) sel.value = current;
+  }
+
+  async rasterAddProject() {
+    const status = document.getElementById('raster-new-project-status');
+    const country = document.getElementById('raster-country').value.trim();
+    const pid = document.getElementById('raster-new-project-id').value.trim();
+    const pname = document.getElementById('raster-new-project-name').value.trim();
+    const descr = document.getElementById('raster-new-project-description').value.trim();
+    if (!country) { status.textContent = 'Pick a Country first.'; return; }
+    if (!pid)     { status.textContent = 'Project ID required.';  return; }
+    if (!/^[A-Z0-9_]+$/.test(pid)) {
+      status.textContent = 'Project ID must be CAPS (A-Z, 0-9, _).'; return;
+    }
+    status.textContent = 'Adding…';
+    try {
+      await api.createRasterProject({
+        country_id: country, project_id: pid,
+        project_name: pname || pid, description: descr || null,
+      });
+      this._rasterProjects = await api.listRasterProjects();
+      this._renderRasterProjectOptions(pid);
+      document.getElementById('raster-project').value = pid;
+      document.getElementById('raster-project-new').style.display = 'none';
+      document.getElementById('raster-new-project-id').value = '';
+      document.getElementById('raster-new-project-name').value = '';
+      document.getElementById('raster-new-project-description').value = '';
+      status.textContent = '';
+      this._updateRasterFilenamePreview();
+    } catch (e) { status.textContent = 'Add failed: ' + e.message; }
+  }
+
+  async _loadRasterUnitsForCurrentProperty() {
+    const propId = document.getElementById('raster-property-num').value;
+    const unitSel = document.getElementById('raster-unit');
+    if (!propId) {
+      unitSel.innerHTML = '<option value="">-- pick a property first --</option>';
+      return;
+    }
+    unitSel.innerHTML = '<option value="">Loading…</option>';
+    try {
+      const units = await api.listRasterUnitsForProperty(propId);
+      if (!units.length) {
+        unitSel.innerHTML = '<option value="">(no units defined for this property)</option>';
+        return;
+      }
+      unitSel.innerHTML = '<option value="">-- Select --</option>' +
+        units.map(u => `<option value="${u.unit_of_measure_id}">${this.escapeHtml(u.unit_of_measure_id)}</option>`).join('');
+    } catch (e) {
+      unitSel.innerHTML = `<option value="">(error: ${this.escapeHtml(e.message)})</option>`;
+    }
+  }
+
+  // ---------- Add Raster: Authors ----------
+  _refreshRasterAuthorDropdowns() {
+    const orgOpts = '<option value="">-- Select --</option>'
+      + (this._rasterOrganisations || []).map(o =>
+          `<option value="${this.escapeHtml(o.organisation_id)}">${this.escapeHtml(o.organisation_id + (o.country ? ' (' + o.country + ')' : ''))}</option>`
+        ).join('')
+      + '<option value="__new__">+ Add new...</option>';
+    const indOpts = '<option value="">-- Select --</option>'
+      + (this._rasterIndividuals || []).map(i =>
+          `<option value="${this.escapeHtml(i.individual_id)}">${this.escapeHtml(i.individual_id + (i.email ? ' — ' + i.email : ''))}</option>`
+        ).join('')
+      + '<option value="__new__">+ Add new...</option>';
+    document.querySelectorAll('.raster-org-sel').forEach(sel => {
+      const prev = sel.value;
+      sel.innerHTML = orgOpts;
+      if (prev && prev !== '__new__') sel.value = prev;
+      sel.onchange = () => {
+        document.getElementById('raster-new-org-block').style.display = sel.value === '__new__' ? '' : 'none';
+      };
+    });
+    document.querySelectorAll('.raster-ind-sel').forEach(sel => {
+      const prev = sel.value;
+      sel.innerHTML = indOpts;
+      if (prev && prev !== '__new__') sel.value = prev;
+      sel.onchange = () => {
+        document.getElementById('raster-new-ind-block').style.display = sel.value === '__new__' ? '' : 'none';
+      };
+    });
+  }
+
+  addRasterAuthorRow() {
+    const container = document.getElementById('raster-author-rows');
+    const row = document.createElement('div');
+    row.className = 'etl-author-row';
+    row.innerHTML = `
+      <div class="etl-author-field">
+        <select class="raster-org-sel"><option value="">Loading...</option></select>
+      </div>
+      <div class="etl-author-field">
+        <select class="raster-ind-sel"><option value="">Loading...</option></select>
+      </div>
+      <div class="etl-author-field etl-author-field-sm">
+        <input type="text" class="raster-pos-input" placeholder="e.g. Researcher">
+      </div>
+      <div class="etl-author-field etl-author-field-sm">
+        <select class="raster-role-sel">
+          <option value="author">author</option>
+          <option value="custodian">custodian</option>
+          <option value="distributor">distributor</option>
+          <option value="originator">originator</option>
+          <option value="owner">owner</option>
+          <option value="pointOfContact">pointOfContact</option>
+          <option value="principalInvestigator">principalInvestigator</option>
+          <option value="processor">processor</option>
+          <option value="publisher">publisher</option>
+          <option value="resourceProvider">resourceProvider</option>
+          <option value="user">user</option>
+        </select>
+      </div>
+      <button type="button" class="btn btn-danger btn-sm etl-remove-author" title="Remove" onclick="this.closest('.etl-author-row').remove()">×</button>
+    `;
+    container.appendChild(row);
+    this._refreshRasterAuthorDropdowns();
+  }
+
+  cancelRasterNew(type) {
+    if (type === 'organisation') {
+      document.getElementById('raster-new-org-block').style.display = 'none';
+      document.querySelectorAll('.raster-org-sel').forEach(s => { if (s.value === '__new__') s.value = ''; });
+    } else if (type === 'individual') {
+      document.getElementById('raster-new-ind-block').style.display = 'none';
+      document.querySelectorAll('.raster-ind-sel').forEach(s => { if (s.value === '__new__') s.value = ''; });
+    }
+  }
+
+  async addNewRasterOrganisation() {
+    const oid = document.getElementById('raster-new-org-id').value.trim();
+    const countrySel = document.getElementById('raster-new-org-country');
+    const country = countrySel.value.trim();   // English name, not country_id
+    const city = document.getElementById('raster-new-org-city').value.trim();
+    if (!oid) { alert('Organisation is required'); return; }
+    try {
+      await api.createOrganisation({ organisation_id: oid, country, city });
+      this._rasterOrganisations.push({ organisation_id: oid, country, city });
+      this._refreshRasterAuthorDropdowns();
+      document.querySelectorAll('.raster-org-sel').forEach(s => { if (s.value === '__new__' || !s.value) s.value = oid; });
+      document.getElementById('raster-new-org-block').style.display = 'none';
+      document.getElementById('raster-new-org-id').value = '';
+      document.getElementById('raster-new-org-city').value = '';
+      // Reset country to the default (first option after the placeholder).
+      if (this._rasterCountries && this._rasterCountries.length > 0) {
+        countrySel.value = this._rasterCountries[0].en;
+      } else {
+        countrySel.value = '';
+      }
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+
+  async addNewRasterIndividual() {
+    const iid = document.getElementById('raster-new-ind-id').value.trim();
+    const email = document.getElementById('raster-new-ind-email').value.trim();
+    if (!iid) { alert('Name / ID is required'); return; }
+    try {
+      await api.createIndividual({ individual_id: iid, email });
+      this._rasterIndividuals.push({ individual_id: iid, email });
+      this._refreshRasterAuthorDropdowns();
+      document.querySelectorAll('.raster-ind-sel').forEach(s => { if (s.value === '__new__' || !s.value) s.value = iid; });
+      document.getElementById('raster-new-ind-block').style.display = 'none';
+      document.getElementById('raster-new-ind-id').value = '';
+      document.getElementById('raster-new-ind-email').value = '';
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+
+  async _loadRasterAuthorsForCurrentProject() {
+    const projectId = document.getElementById('raster-project').value;
+    const country = document.getElementById('raster-country').value;
+    const container = document.getElementById('raster-author-rows');
+    container.innerHTML = '';
+    if (!projectId || projectId === '__new__' || !country) return;
+    try {
+      const authors = await api.getProjectAuthors(projectId, country);
+      for (const a of authors) {
+        this.addRasterAuthorRow();
+        const row = container.lastElementChild;
+        row.querySelector('.raster-org-sel').value = a.organisation_id || '';
+        row.querySelector('.raster-ind-sel').value = a.individual_id || '';
+        row.querySelector('.raster-pos-input').value = a.position || '';
+        if (a.role) row.querySelector('.raster-role-sel').value = a.role;
+      }
+    } catch (e) {
+      console.warn('Failed to load raster authors:', e);
+    }
+  }
+
+  _collectRasterAuthors() {
+    const rows = document.querySelectorAll('#raster-author-rows .etl-author-row');
+    const out = [];
+    for (const r of rows) {
+      const org = r.querySelector('.raster-org-sel')?.value;
+      const ind = r.querySelector('.raster-ind-sel')?.value;
+      if (!org || org === '__new__' || !ind || ind === '__new__') {
+        return { error: 'Pick organisation and author for every row, or remove the row.' };
+      }
+      out.push({
+        organisation_id: org,
+        individual_id: ind,
+        position: r.querySelector('.raster-pos-input')?.value.trim() || '',
+        tag: 'pointOfContact',
+        role: r.querySelector('.raster-role-sel')?.value || 'author',
+      });
+    }
+    return { authors: out };
+  }
+
+  // Parse YYYY-MM-DD → {iso: 'YYYY-MM-DD', yyyy: 'YYYY'} or null.
+  _parseRasterDate(raw) {
+    const s = (raw || '').trim();
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    if (!m) return null;
+    const [, yyyy, mm, dd] = m;
+    const d = new Date(`${yyyy}-${mm}-${dd}T00:00:00Z`);
+    if (isNaN(d.getTime())
+        || d.getUTCFullYear() !== Number(yyyy)
+        || (d.getUTCMonth() + 1) !== Number(mm)
+        || d.getUTCDate() !== Number(dd)) return null;
+    return { iso: `${yyyy}-${mm}-${dd}`, yyyy };
+  }
+
+  // Returns the layer_id (no extension) when every field is filled, or
+  // a { missing: [...] } object listing only the empty fields.
+  _rasterFormState() {
+    const country = document.getElementById('raster-country').value.trim();
+    const projSel = document.getElementById('raster-project');
+    const project = (projSel.value && projSel.value !== '__new__') ? projSel.value : '';
+    const prop    = document.getElementById('raster-property-num').value.trim();
+    const unit    = document.getElementById('raster-unit').value.trim();
+    const dateRaw = document.getElementById('raster-publication-date').value;
+    const date    = this._parseRasterDate(dateRaw);
+    const begRaw  = document.getElementById('raster-time-period-begin').value;
+    const begin   = this._parseRasterDate(begRaw);
+    const endRaw  = document.getElementById('raster-time-period-end').value;
+    const end     = this._parseRasterDate(endRaw);
+    const upper   = document.getElementById('raster-depth-upper').value.trim();
+    const lower   = document.getElementById('raster-depth-lower').value.trim();
+    const stats   = document.getElementById('raster-stats').value.trim();
+    const license = document.getElementById('raster-license').value.trim();
+    const today   = new Date().toISOString().slice(0, 10);
+
+    const missing = [];
+    const rules = [];
+    if (!country) missing.push('country');
+    if (!project) missing.push('project');
+    if (!prop)    missing.push('property');
+    if (!unit)    missing.push('unit');
+    if (!date)    missing.push('created on (YYYY-MM-DD)');
+    if (!begin)   missing.push('period start (YYYY-MM-DD)');
+    if (!end)     missing.push('period end (YYYY-MM-DD)');
+    if (begin && end && begin.iso >= end.iso) {
+      rules.push('period start must be earlier than period end');
+    }
+    if (date && end && date.iso <= end.iso) {
+      rules.push('created on must be later than period end');
+    }
+    if (date && date.iso > today) {
+      rules.push('created on cannot be in the future');
+    }
+    if (!upper && upper !== '0') missing.push('upper depth');
+    if (!lower && lower !== '0') missing.push('lower depth');
+    if ((upper !== '' || upper === '0') && (lower !== '' || lower === '0')
+        && Number(upper) >= Number(lower)) {
+      rules.push('upper depth must be less than lower depth');
+    }
+    if (!stats)   missing.push('stats');
+    if (!license) missing.push('license');
+    return {
+      country, project, prop, unit, upper, lower, stats,
+      date_iso: date ? date.iso : '',
+      yyyy: date ? date.yyyy : '',
+      time_period_begin: begin ? begin.iso : '',
+      time_period_end: end ? end.iso : '',
+      missing,
+      rules,
+    };
+  }
+
+  _formatRasterIssues(s) {
+    const parts = [];
+    if (s.missing.length) parts.push(`Missing: ${s.missing.join(', ')}.`);
+    if (s.rules.length)   parts.push(`Rule: ${s.rules.join(', ')}.`);
+    return parts.join(' ');
+  }
+
+  _updateRasterFilenamePreview() {
+    const s = this._rasterFormState();
+    if (s.missing.length === 0 && s.rules.length === 0) {
+      const layerId = [s.country, s.project, s.prop, s.yyyy, s.upper, s.lower, s.stats].join('-');
+      document.getElementById('raster-filename-preview').textContent = `${layerId}.tif`;
+      return layerId;
+    }
+    document.getElementById('raster-filename-preview').textContent = this._formatRasterIssues(s);
+    return null;
+  }
+
+  async rasterInspect() {
+    const f = document.getElementById('raster-file-input').files[0];
+    const status = document.getElementById('raster-status');
+    const out = document.getElementById('raster-inspect-output');
+    if (!f) { status.textContent = 'Choose a file first.'; return; }
+    status.textContent = 'Inspecting...';
+    try {
+      const meta = await api.inspectRaster(f);
+      out.style.display = 'block';
+      out.textContent = JSON.stringify(meta, null, 2);
+      status.textContent = 'Inspected.';
+    } catch (e) {
+      status.textContent = 'Inspect failed: ' + e.message;
+    }
+  }
+
+  async rasterRegister() {
+    const f = document.getElementById('raster-file-input').files[0];
+    const status = document.getElementById('raster-status');
+    if (!f) { status.textContent = 'Choose a file first.'; return; }
+
+    const s = this._rasterFormState();
+    if (s.missing.length > 0 || s.rules.length > 0) {
+      status.textContent = this._formatRasterIssues(s);
+      return;
+    }
+    const layerId = [s.country, s.project, s.prop, s.yyyy, s.upper, s.lower, s.stats].join('-');
+    document.getElementById('raster-filename-preview').textContent = `${layerId}.tif`;
+
+    // Collect authors first so we can fail-fast before uploading bytes.
+    const authorsResult = this._collectRasterAuthors();
+    if (authorsResult.error) { status.textContent = authorsResult.error; return; }
+
+    status.textContent = 'Registering…';
+    try {
+      // Persist authors for this (country, project) before registering the raster.
+      try {
+        await api.saveEtlMetadata({
+          country_id: s.country, project_id: s.project, authors: authorsResult.authors,
+        });
+      } catch (e) {
+        status.textContent = 'Saving authors failed: ' + e.message;
+        return;
+      }
+
+      const projSel = document.getElementById('raster-project');
+      // Look up labels for the title / abstract templates.
+      const propRow = (this._rasterPropertyNums || []).find(p => p.property_num_id === s.prop);
+      const propName = propRow ? propRow.property_name : s.prop;
+      const projRow = (this._rasterProjects || []).find(p => p.project_id === s.project);
+
+      // title : "<PROJ> - <property_name> (<YYYY>)"
+      const title = `${s.project} - ${propName} (${s.yyyy})`;
+      // abstract = soil_data.project.description (set on project creation).
+      const abstract = projRow && projRow.description ? projRow.description : '';
+
+      const fields = {
+        title,
+        abstract,
+        project_name: projSel.value !== '__new__' ? projSel.value : '',
+        property_num_id: document.getElementById('raster-property-num').value,
+        unit_of_measure_id: s.unit,
+        file_orig_name: f.name,
+        publication_date: s.date_iso,
+        time_period_begin: s.time_period_begin,
+        time_period_end: s.time_period_end,
+        license: document.getElementById('raster-license').value,
+        publish: document.getElementById('raster-publish').checked ? 'true' : 'false',
+      };
+      // Rename via FormData filename arg — avoids constructing a new File()
+      // for large blobs (which can cause Firefox "NetworkError" on upload).
+      const res = await api.registerRaster(f, fields, `${layerId}.tif`);
+      status.textContent = `Registered: ${res.layer_id}` +
+        (res.warnings && res.warnings.length ? ` (${res.warnings.length} warning(s))` : '');
+      document.getElementById('raster-inspect-output').style.display = 'block';
+      document.getElementById('raster-inspect-output').textContent = JSON.stringify(res, null, 2);
+      // Refresh the rasters list table now that a new layer exists.
+      if (typeof this.loadLayers === 'function') {
+        await this.loadLayers();
+        if (typeof this.renderLayers === 'function') this.renderLayers();
+      }
+    } catch (e) {
+      status.textContent = 'Register failed: ' + e.message;
+    }
+  }
+
+  // ==================== DST ====================
+
+  async initDstTab() {
+    document.getElementById('dst-new-btn').addEventListener('click', () => this.dstNewRecipe());
+    document.getElementById('dst-save-btn').addEventListener('click', () => this.dstSaveRecipe());
+    document.getElementById('dst-validate-btn').addEventListener('click', () => this.dstValidate());
+    document.getElementById('dst-run-btn').addEventListener('click', () => this.dstRun());
+    document.getElementById('dst-delete-btn').addEventListener('click', () => this.dstDelete());
+    await this.dstReloadRecipes();
+    await this.dstReloadRuns();
+  }
+
+  async dstReloadRecipes() {
+    const tb = document.getElementById('dst-recipes-tbody');
+    try {
+      const recipes = await api.listDstRecipes();
+      if (!recipes.length) {
+        tb.innerHTML = '<tr><td colspan="4" class="empty-state">No recipes yet</td></tr>';
+        return;
+      }
+      tb.innerHTML = recipes.map(r => `
+        <tr>
+          <td><a href="#" data-recipe="${r.recipe_id}">${r.recipe_id}</a></td>
+          <td>${r.name || ''}</td>
+          <td>${r.latest_run ? `${r.latest_run.status} (${r.latest_run.started_at || ''})` : '—'}</td>
+          <td></td>
+        </tr>`).join('');
+      tb.querySelectorAll('a[data-recipe]').forEach(a =>
+        a.addEventListener('click', ev => {
+          ev.preventDefault();
+          this.dstLoadRecipe(a.dataset.recipe);
+        }));
+    } catch (e) {
+      tb.innerHTML = `<tr><td colspan="4">${e.message}</td></tr>`;
+    }
+  }
+
+  async dstReloadRuns() {
+    const tb = document.getElementById('dst-runs-tbody');
+    try {
+      const runs = await api.listDstRuns();
+      if (!runs.length) {
+        tb.innerHTML = '<tr><td colspan="5" class="empty-state">No runs yet</td></tr>';
+        return;
+      }
+      tb.innerHTML = runs.slice(0, 20).map(r => `
+        <tr>
+          <td>${r.run_id}</td>
+          <td>${r.recipe_id}</td>
+          <td>${r.status}${r.metadata_status ? ` / ${r.metadata_status}` : ''}</td>
+          <td>${r.started_at || ''}</td>
+          <td>${r.output_layer_id || ''}</td>
+        </tr>`).join('');
+    } catch (e) {
+      tb.innerHTML = `<tr><td colspan="5">${e.message}</td></tr>`;
+    }
+  }
+
+  dstNewRecipe() {
+    document.getElementById('dst-editor').style.display = 'block';
+    document.getElementById('dst-editor-id').textContent = '(new)';
+    document.getElementById('dst-recipe-id').value = '';
+    document.getElementById('dst-recipe-id').disabled = false;
+    document.getElementById('dst-recipe-name').value = '';
+    document.getElementById('dst-recipe-description').value = '';
+    document.getElementById('dst-recipe-json').value = JSON.stringify({
+      steps: [
+        { step_id: 1, layer_id: 'BT-GSNM-PHX-2024-0-30-MEAN',
+          op: 'between', low: 5.5, high: 7.0,
+          true_score: 1, false_score: 0, weight: 1 }
+      ],
+      aggregation: 'sum',
+      no_data_handling: 'propagate',
+      metadata: { publish_to_catalogue: true,
+                  spatial_metadata_project_id: 'DST',
+                  spatial_metadata_property_id: 'SUITABILITY' }
+    }, null, 2);
+    document.getElementById('dst-status').textContent = '';
+    document.getElementById('dst-output').textContent = '';
+  }
+
+  async dstLoadRecipe(id) {
+    try {
+      const r = await api.getDstRecipe(id);
+      document.getElementById('dst-editor').style.display = 'block';
+      document.getElementById('dst-editor-id').textContent = id;
+      document.getElementById('dst-recipe-id').value = r.recipe_id;
+      document.getElementById('dst-recipe-id').disabled = true;
+      document.getElementById('dst-recipe-name').value = r.name || '';
+      document.getElementById('dst-recipe-description').value = r.description || '';
+      document.getElementById('dst-recipe-json').value = JSON.stringify(r.recipe, null, 2);
+      document.getElementById('dst-status').textContent = '';
+      document.getElementById('dst-output').textContent = '';
+    } catch (e) {
+      document.getElementById('dst-status').textContent = e.message;
+    }
+  }
+
+  _dstReadEditor() {
+    const recipeJson = document.getElementById('dst-recipe-json').value;
+    let recipe;
+    try { recipe = JSON.parse(recipeJson); }
+    catch (e) { throw new Error('Recipe JSON is invalid: ' + e.message); }
+    return {
+      recipe_id: document.getElementById('dst-recipe-id').value.trim(),
+      name: document.getElementById('dst-recipe-name').value.trim(),
+      description: document.getElementById('dst-recipe-description').value || null,
+      recipe,
+    };
+  }
+
+  async dstSaveRecipe() {
+    const status = document.getElementById('dst-status');
+    try {
+      const payload = this._dstReadEditor();
+      if (!payload.recipe_id) throw new Error('recipe_id required');
+      if (!payload.name) throw new Error('name required');
+      let saved;
+      if (document.getElementById('dst-recipe-id').disabled) {
+        saved = await api.updateDstRecipe(payload.recipe_id, payload);
+        status.textContent = 'Updated.';
+      } else {
+        saved = await api.createDstRecipe(payload);
+        document.getElementById('dst-recipe-id').disabled = true;
+        document.getElementById('dst-editor-id').textContent = saved.recipe_id;
+        status.textContent = 'Created.';
+      }
+      await this.dstReloadRecipes();
+    } catch (e) { status.textContent = e.message; }
+  }
+
+  async dstValidate() {
+    const status = document.getElementById('dst-status');
+    const out = document.getElementById('dst-output');
+    const id = document.getElementById('dst-recipe-id').value.trim();
+    if (!id) { status.textContent = 'Save the recipe first.'; return; }
+    status.textContent = 'Validating...';
+    try {
+      const report = await api.validateDstRecipe(id);
+      out.textContent = JSON.stringify(report, null, 2);
+      status.textContent = report.ok ? 'Valid.' : `${report.errors.length} error(s).`;
+    } catch (e) { status.textContent = 'Validate failed: ' + e.message; }
+  }
+
+  async dstRun() {
+    const status = document.getElementById('dst-status');
+    const out = document.getElementById('dst-output');
+    const id = document.getElementById('dst-recipe-id').value.trim();
+    if (!id) { status.textContent = 'Save the recipe first.'; return; }
+    status.textContent = 'Queuing run...';
+    try {
+      const run = await api.runDstRecipe(id);
+      out.textContent = JSON.stringify(run, null, 2);
+      status.textContent = `Queued run #${run.run_id}; polling...`;
+      this._dstPollRun(run.run_id);
+    } catch (e) { status.textContent = 'Run failed: ' + e.message; }
+  }
+
+  async _dstPollRun(runId) {
+    const status = document.getElementById('dst-status');
+    const out = document.getElementById('dst-output');
+    for (let i = 0; i < 60; i++) {
+      await new Promise(r => setTimeout(r, 2000));
+      try {
+        const r = await api.getDstRun(runId);
+        out.textContent = JSON.stringify(r, null, 2);
+        status.textContent = `run #${runId}: ${r.status}`;
+        if (r.status === 'succeeded' || r.status === 'failed' || r.status === 'cancelled') {
+          await this.dstReloadRecipes();
+          await this.dstReloadRuns();
+          return;
+        }
+      } catch (e) { /* keep polling */ }
+    }
+    status.textContent = `run #${runId}: still running (stopped polling)`;
+  }
+
+  async dstDelete() {
+    const id = document.getElementById('dst-recipe-id').value.trim();
+    if (!id || !confirm(`Delete recipe ${id}?`)) return;
+    try {
+      await api.deleteDstRecipe(id);
+      document.getElementById('dst-editor').style.display = 'none';
+      await this.dstReloadRecipes();
+    } catch (e) {
+      document.getElementById('dst-status').textContent = e.message;
+    }
   }
 
   // ==================== Settings Management ====================
@@ -1109,14 +2031,14 @@ class AdminDashboard {
         : (layer.publish
             ? `<button class="btn btn-primary" onclick="adminDashboard.setDefaultLayer('${idJs}')">Set Default</button>`
             : '-');
-      const downloadUrl = layer.download_url
-        || (downloadBase.replace(/\/$/, '') + '/' + layer.layer_id + '.tif');
-      const downloadCell = `<a class="btn btn-sm btn-secondary" href="${this.escapeHtml(downloadUrl)}" download title="Download GeoTIFF">GeoTIFF</a>`;
+      const deleteCell = this.isAdmin
+        ? `<td class="raster-delete-col"><button class="btn btn-sm" style="background:#dc3545;color:#fff;" title="Delete raster + map + catalogue + DB" onclick="adminDashboard.deleteRasterLayer('${idJs}')">Delete</button></td>`
+        : `<td class="raster-delete-col"></td>`;
       return `
       <tr${layer.is_default ? ' style="background:#fff8d6;"' : ''}>
         <td><strong>${id}</strong></td>
-        <td style="width:120px;"><input class="layer-edit" data-layer-id="${id}" data-field="project_name" value="${this.escapeHtml(layer.project_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit"></td>
-        <td><input class="layer-edit" data-layer-id="${id}" data-field="property_name" value="${this.escapeHtml(layer.property_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit"></td>
+        <td style="width:120px;"><input class="layer-edit" data-layer-id="${id}" data-field="project_name" value="${this.escapeHtml(layer.project_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit (saved to mapset.costum_group)"></td>
+        <td><input class="layer-edit" data-layer-id="${id}" data-field="property_name" value="${this.escapeHtml(layer.property_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit (saved to layer.costum_name)"></td>
         <td>
           <button class="btn ${layer.publish ? 'btn-secondary' : 'btn-success'}"
                   onclick="adminDashboard.toggleLayerPublish('${idJs}', ${!layer.publish})">
@@ -1125,7 +2047,7 @@ class AdminDashboard {
         </td>
         <td>${defaultCell}</td>
         <td id="wms-status-${id}">-</td>
-        <td>${downloadCell}</td>
+        ${deleteCell}
       </tr>
     `;
     }).join('');
@@ -1142,9 +2064,8 @@ class AdminDashboard {
         const layer = this.layers.find(l => l.layer_id === layerId);
         if (!layer) return;
         if ((layer[field] || null) === newValue) return;
-        const updated = { ...layer, [field]: newValue };
         try {
-          await api.updateLayer(layerId, updated);
+          await api.updateLayerCustom(layerId, { [field]: newValue });
           layer[field] = newValue;
         } catch (e) {
           alert('Failed to save: ' + e.message);
@@ -1181,6 +2102,27 @@ class AdminDashboard {
       this.renderLayers();
     } catch (error) {
       alert('Error toggling layer publish status: ' + error.message);
+    }
+  }
+
+  async deleteRasterLayer(layerId) {
+    if (!this.isAdmin) return;
+    const ok = confirm(
+      `Delete raster "${layerId}"?\n\nThis removes:\n` +
+      `• the GeoTIFF and MapServer .map file on disk\n` +
+      `• the pyCSW catalogue record\n` +
+      `• the soil_data and api.layer rows\n\nThis cannot be undone.`
+    );
+    if (!ok) return;
+    try {
+      const res = await api.deleteLayer(layerId);
+      if (res && res.warnings && res.warnings.length) {
+        console.warn('deleteLayer warnings:', res.warnings);
+      }
+      await this.loadLayers();
+      this.renderLayers();
+    } catch (e) {
+      alert('Delete failed: ' + e.message);
     }
   }
 
@@ -1681,7 +2623,6 @@ class AdminDashboard {
         row.querySelector('.etl-org-sel').value = a.organisation_id || '';
         row.querySelector('.etl-ind-sel').value = a.individual_id || '';
         row.querySelector('.etl-pos-input').value = a.position || '';
-        if (a.tag) row.querySelector('.etl-tag-sel').value = a.tag;
         if (a.role) row.querySelector('.etl-role-sel').value = a.role;
       }
     } catch (e) {
@@ -1715,12 +2656,6 @@ class AdminDashboard {
       </div>
       <div class="etl-author-field etl-author-field-sm">
         <input type="text" class="etl-pos-input" placeholder="e.g. Researcher">
-      </div>
-      <div class="etl-author-field etl-author-field-sm">
-        <select class="etl-tag-sel">
-          <option value="contact">contact</option>
-          <option value="pointOfContact">pointOfContact</option>
-        </select>
       </div>
       <div class="etl-author-field etl-author-field-sm">
         <select class="etl-role-sel">
@@ -1759,13 +2694,15 @@ class AdminDashboard {
   async addNewProject() {
     const pid = document.getElementById('etl-new-project-id').value.trim();
     const name = document.getElementById('etl-new-project-name').value.trim();
+    const description = document.getElementById('etl-new-project-description').value.trim() || null;
     if (!pid || !name) { alert('Project ID and Name are required'); return; }
     try {
-      await api.createProject({ project_id: pid, name });
-      this.etlCodelists.projects.push({ project_id: pid, name });
+      await api.createProject({ project_id: pid, name, description });
+      this.etlCodelists.projects.push({ project_id: pid, name, description });
       this.populateEtlDropdowns();
       document.getElementById('etl-project').value = pid;
       document.getElementById('etl-new-project').style.display = 'none';
+      document.getElementById('etl-new-project-description').value = '';
     } catch (e) { alert('Error: ' + e.message); }
   }
 
@@ -1817,14 +2754,13 @@ class AdminDashboard {
         const orgId = row.querySelector('.etl-org-sel')?.value;
         const indId = row.querySelector('.etl-ind-sel')?.value;
         const position = row.querySelector('.etl-pos-input')?.value.trim();
-        const tag = row.querySelector('.etl-tag-sel')?.value;
         const role = row.querySelector('.etl-role-sel')?.value;
         if (!orgId || orgId === '__new__' || !indId || indId === '__new__') {
           statusEl.textContent = 'Please select organisation and author for every row.';
           statusEl.style.color = '#c33';
           return;
         }
-        authors.push({ organisation_id: orgId, individual_id: indId, position, tag, role });
+        authors.push({ organisation_id: orgId, individual_id: indId, position, tag: 'pointOfContact', role });
       }
 
       await api.saveEtlMetadata({ project_id: projectId, authors });
@@ -2094,7 +3030,7 @@ class AdminDashboard {
   formatCountryBoundsBlock(cb) {
     const e = (s) => this.escapeHtml(String(s));
     if (!cb || !cb.checked) {
-      return `<div style="color:#777;font-size:0.9em;">Skipped — needs both Longitude and Latitude mapped, plus a <code>COUNTRY_CODE</code> setting and a non-null <code>spatial_metadata.country.geom_convexhull</code>.</div>`;
+      return `<div style="color:#777;font-size:0.9em;">Skipped — needs both Longitude and Latitude mapped, plus a <code>COUNTRY_CODE</code> setting and a non-null <code>soil_data.country.geom_convexhull</code>.</div>`;
     }
     const ok = cb.status === 'OK';
     const icon = ok ? '✅' : '❌';
@@ -2105,7 +3041,7 @@ class AdminDashboard {
     return `
       <div style="border:1px solid #e1e4e8;border-radius:4px;padding:8px;">
         <div style="font-weight:bold;color:${color};">${icon} ${e(cb.percent_inside)}% of points inside ${e(cb.country_code)} convex hull (need ≥${e(cb.threshold)}%)</div>
-        <div style="font-size:0.85em;color:#555;margin-top:2px;">Rule: ≥95% of mapped (longitude, latitude) points must fall within <code>spatial_metadata.country.geom_convexhull</code> for the configured COUNTRY_CODE.</div>
+        <div style="font-size:0.85em;color:#555;margin-top:2px;">Rule: ≥95% of mapped (longitude, latitude) points must fall within <code>soil_data.country.geom_convexhull</code> for the configured COUNTRY_CODE.</div>
         <div style="font-size:0.85em;color:#555;margin-top:2px;">${e(cb.checked_rows)} rows checked · ${e(cb.inside)} inside · ${e(cb.outside)} outside</div>
         ${previewRows}
       </div>`;

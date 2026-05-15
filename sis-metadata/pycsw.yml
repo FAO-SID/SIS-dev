@@ -24,9 +24,15 @@ federatedcatalogues:
     - http://catalog.data.gov/csw
 
 manager:
-    transactions: false
+    # Transactions enabled so sis-api can publish ISO 19139 records over
+    # CSW-T. Restricted to the docker bridge network — pycsw is not
+    # publicly writable.
+    transactions: true
     allowed_ips:
         - 127.0.0.1
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+        - 10.0.0.0/8
 #    csw_harvest_pagesize: 10
 
 metadata:
@@ -83,8 +89,8 @@ metadata:
             end: YYYY-MM-DD
  
 repository:
-    database: 'postgresql://sis:3vTdlCqepukXVh6eyMzycuIIhUgH5irH@sis-database:5432/sis'
-    table: spatial_metadata.records
+    database: 'postgresql://sis:3vTdlCqepukXVh6eyMzycuIIhUgH5irH@sis-database:5432/sis?options=-csearch_path%3Dsoil_data,public'
+    table: soil_data.records
     facets:
         - type
         - date
