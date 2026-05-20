@@ -106,34 +106,40 @@ def populate_spatial_metadata(
 
         # 2. mapset — created on demand. mapset.mapped_property_id is the FK
         #    column referencing soil_data.mapped_property(mapped_property_id).
+        # "Created on" date (publication_date arg) goes into creation_date
+        # and revision_date. The mapset.publication_date column tracks when
+        # the file was uploaded into the SIS — that's CURRENT_DATE here.
         cur.execute("""
             INSERT INTO soil_data.mapset
                 (country_id, project_id, mapped_property_id, mapset_id, title, abstract,
                  other_constraints, publication_date, revision_date, creation_date,
-                 unit_of_measure_id, time_period_begin, time_period_end)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 unit_of_measure_id, time_period_begin, time_period_end,
+                 costum_group)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (mapset_id) DO UPDATE SET
                 title              = COALESCE(EXCLUDED.title,              soil_data.mapset.title),
                 abstract           = COALESCE(EXCLUDED.abstract,           soil_data.mapset.abstract),
                 other_constraints  = COALESCE(EXCLUDED.other_constraints,  soil_data.mapset.other_constraints),
-                publication_date   = COALESCE(EXCLUDED.publication_date,   soil_data.mapset.publication_date),
+                publication_date   = EXCLUDED.publication_date,
                 revision_date      = COALESCE(EXCLUDED.revision_date,      soil_data.mapset.revision_date),
                 creation_date      = COALESCE(EXCLUDED.creation_date,      soil_data.mapset.creation_date),
                 unit_of_measure_id = COALESCE(EXCLUDED.unit_of_measure_id, soil_data.mapset.unit_of_measure_id),
                 time_period_begin  = COALESCE(EXCLUDED.time_period_begin,  soil_data.mapset.time_period_begin),
-                time_period_end    = COALESCE(EXCLUDED.time_period_end,    soil_data.mapset.time_period_end)
+                time_period_end    = COALESCE(EXCLUDED.time_period_end,    soil_data.mapset.time_period_end),
+                costum_group       = COALESCE(EXCLUDED.costum_group,       soil_data.mapset.costum_group)
         """, (meta.country_id, meta.project_id, meta.property_id, meta.mapset_id,
               title, abstract, other_constraints,
-              publication_date, publication_date, publication_date,
-              unit_of_measure_id, time_period_begin, time_period_end))
+              publication_date, publication_date,
+              unit_of_measure_id, time_period_begin, time_period_end,
+              meta.project_id))
 
         # 3. layer — identity row first (upsert)
         cur.execute("""
             INSERT INTO soil_data.layer
                 (mapset_id, layer_id, file_path, file_extension,
                  dimension_depth, dimension_stats, file_size, file_size_pretty,
-                 file_orig_name)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 file_orig_name, costum_name)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (layer_id) DO UPDATE SET
                 mapset_id        = EXCLUDED.mapset_id,
                 file_path        = EXCLUDED.file_path,
@@ -142,10 +148,11 @@ def populate_spatial_metadata(
                 dimension_stats  = EXCLUDED.dimension_stats,
                 file_size        = EXCLUDED.file_size,
                 file_size_pretty = EXCLUDED.file_size_pretty,
-                file_orig_name   = COALESCE(EXCLUDED.file_orig_name, soil_data.layer.file_orig_name)
+                file_orig_name   = COALESCE(EXCLUDED.file_orig_name, soil_data.layer.file_orig_name),
+                costum_name      = COALESCE(EXCLUDED.costum_name,    soil_data.layer.costum_name)
         """, (meta.mapset_id, meta.layer_id, meta.file_path, meta.file_extension,
               meta.dimension_depth, dim_stats, meta.file_size, meta.file_size_pretty,
-              file_orig_name))
+              file_orig_name, title))
 
         # 4. layer — GDAL/rasterio-extracted fields. We update in two passes:
         #    first the non-trigger columns, then the trigger-sensitive ones

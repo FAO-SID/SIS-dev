@@ -177,20 +177,6 @@ class SISApiClient {
     return this.authenticatedRequest('/api/layer/all');
   }
 
-  async createLayer(layerData) {
-    return this.authenticatedRequest('/api/layer', {
-      method: 'POST',
-      body: JSON.stringify(layerData)
-    });
-  }
-
-  async updateLayer(layerId, layerData) {
-    return this.authenticatedRequest(`/api/layer/${layerId}`, {
-      method: 'PUT',
-      body: JSON.stringify(layerData)
-    });
-  }
-
   async updateLayerCustom(layerId, fields) {
     return this.authenticatedRequest(`/api/layer/${encodeURIComponent(layerId)}/custom`, {
       method: 'PATCH',
@@ -208,12 +194,6 @@ class SISApiClient {
   async deleteLayer(layerId) {
     return this.authenticatedRequest(`/api/layer/${layerId}`, {
       method: 'DELETE'
-    });
-  }
-
-  async syncLayers() {
-    return this.authenticatedRequest('/api/sync/layers', {
-      method: 'POST'
     });
   }
 
@@ -472,13 +452,31 @@ class SISApiClient {
   async listRasterOrganisations() { return this.authenticatedRequest('/api/raster/organisations'); }
   async listRasterCountries() { return this.authenticatedRequest('/api/raster/countries'); }
   async listRasterMappedSoilProperties() { return this.authenticatedRequest('/api/raster/mapped_soil_properties'); }
+  async rasterFileExists(fileOrigName) {
+    return this.authenticatedRequest(
+      `/api/raster/file_exists?file_orig_name=${encodeURIComponent(fileOrigName)}`);
+  }
+
   async listRasterUnitsForProperty(propertyNumId) {
     return this.authenticatedRequest(`/api/raster/units_for_property/${encodeURIComponent(propertyNumId)}`);
+  }
+  async getRasterObservationLimits(propertyNumId, unitId) {
+    return this.authenticatedRequest(
+      `/api/raster/observation_limits/${encodeURIComponent(propertyNumId)}/${encodeURIComponent(unitId)}`);
   }
   async createRasterProject(payload) {
     return this.authenticatedRequest('/api/raster/projects', {
       method: 'POST', body: JSON.stringify(payload)
     });
+  }
+
+  // Treat a 401 the same way authenticatedRequest does: clear the cached
+  // JWT, fire auth:expired so the SPA reopens the login modal, and throw
+  // a clear message instead of leaking "Could not validate credentials".
+  _handle401() {
+    this.jwtToken = null;
+    localStorage.removeItem('jwt_token');
+    window.dispatchEvent(new Event('auth:expired'));
   }
 
   async inspectRaster(file) {
@@ -489,6 +487,10 @@ class SISApiClient {
       headers: { 'Authorization': `Bearer ${this.jwtToken}` },
       body: fd
     });
+    if (r.status === 401) {
+      this._handle401();
+      throw new Error('Session expired. Please login again.');
+    }
     if (!r.ok) {
       const err = await r.json().catch(() => ({ detail: r.statusText }));
       throw new Error(err.detail || `Inspect failed: ${r.status}`);
@@ -514,6 +516,10 @@ class SISApiClient {
       headers: { 'Authorization': `Bearer ${this.jwtToken}` },
       body: fd
     });
+    if (r.status === 401) {
+      this._handle401();
+      throw new Error('Session expired. Please login again.');
+    }
     if (!r.ok) {
       const err = await r.json().catch(() => ({ detail: r.statusText }));
       throw new Error(typeof err.detail === 'string' ? err.detail : `Register failed: ${r.status}`);

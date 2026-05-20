@@ -341,56 +341,11 @@ async def delete_api_client(
             return {"message": "API client deleted successfully"}
 
 # ==================== Layer Management ====================
-
-@app.post("/api/layer", status_code=status.HTTP_201_CREATED)
-async def create_layer(layer: LayerCreate, current_user: dict = Depends(get_current_user)):
-    """Create a new layer."""
-    with get_db() as conn:
-        with conn.cursor() as cur:
-            try:
-                cur.execute(
-                    """
-                    INSERT INTO api.layer
-                    (project_id, project_name, layer_id, publish, property_name,
-                     dimension, version, unit_of_measure_id, metadata_url,
-                     download_url, get_map_url, get_legend_url, get_feature_info_url)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    """,
-                    (layer.project_id, layer.project_name, layer.layer_id,
-                     str(layer.publish).lower(),
-                     layer.property_name, layer.dimension, layer.version,
-                     layer.unit_of_measure_id, layer.metadata_url, layer.download_url,
-                     layer.get_map_url, layer.get_legend_url, layer.get_feature_info_url)
-                )
-                log_audit(current_user['user_id'], None, "layer_created", {"layer_id": layer.layer_id}, None)
-                return {"message": "Layer created successfully", "layer_id": layer.layer_id}
-            except psycopg2.IntegrityError:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Layer already exists")
-
-@app.put("/api/layer/{layer_id}")
-async def update_layer(layer_id: str, layer: Layer, current_user: dict = Depends(get_current_user)):
-    """Update a layer."""
-    with get_db() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                UPDATE api.layer SET
-                    project_id = %s, project_name = %s, publish = %s,
-                    property_name = %s, dimension = %s, version = %s,
-                    unit_of_measure_id = %s, metadata_url = %s, download_url = %s,
-                    get_map_url = %s, get_legend_url = %s, get_feature_info_url = %s
-                WHERE layer_id = %s
-                """,
-                (layer.project_id, layer.project_name, str(layer.publish).lower(),
-                 layer.property_name, layer.dimension, layer.version,
-                 layer.unit_of_measure_id, layer.metadata_url, layer.download_url,
-                 layer.get_map_url, layer.get_legend_url, layer.get_feature_info_url,
-                 layer_id)
-            )
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Layer not found")
-            log_audit(current_user['user_id'], None, "layer_updated", {"layer_id": layer_id}, None)
-            return {"message": "Layer updated successfully"}
+# Legacy CRUD endpoints over api.layer (POST /api/layer, PUT /api/layer/{id},
+# POST /api/sync/layers) were removed when soil_data.layer became the source
+# of truth. The active layer endpoints (PATCH .../custom|publish|default,
+# DELETE /api/layer/{id}, GET /api/layer/all, GET /api/layer) all read/write
+# soil_data.layer + soil_data.mapset.
 
 @app.patch("/api/layer/{layer_id}/custom")
 async def update_layer_custom(
@@ -543,8 +498,6 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_a
                                 (mapset_id,))
                     mapset_deleted = (cur.rowcount > 0)
 
-            cur.execute("DELETE FROM api.layer WHERE layer_id = %s", (layer_id,))
-
     pycsw_deleted = False
     if mapset_deleted and file_identifier:
         result = pycsw_delete_record(file_identifier)
@@ -586,7 +539,8 @@ async def get_all_layers(current_user: dict = Depends(get_current_user)):
 
     Sourced from soil_data.layer + mapset + project + mapped_property +
     property_num. Vector stubs (mapset.mapped_property_id IS NULL OR
-    layer.file_path empty) are excluded.
+    layer.file_path empty) are excluded. WMS URLs are computed per-row so
+    the admin "Check WMS" button can probe them.
     """
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -595,6 +549,7 @@ async def get_all_layers(current_user: dict = Depends(get_current_user)):
                   l.layer_id,
                   l.is_published       AS publish,
                   l.is_default,
+                  l.file_orig_name,
                   m.country_id,
                   m.project_id,
                   m.mapset_id,
@@ -610,7 +565,16 @@ async def get_all_layers(current_user: dict = Depends(get_current_user)):
                 WHERE l.file_path IS NOT NULL AND l.file_path <> ''
                 ORDER BY l.layer_id
             """)
-            return cur.fetchall()
+            rows = cur.fetchall()
+
+    map_dir = "/etc/mapserver"
+    for r in rows:
+        map_path = f"{map_dir}/{r['layer_id']}.map"
+        gm, gl, gf = _build_wms_urls(map_path, r["layer_id"])
+        r["get_map_url"] = gm
+        r["get_legend_url"] = gl
+        r["get_feature_info_url"] = gf
+    return rows
 
 # ==================== Settings Management ====================
 
@@ -886,135 +850,6 @@ def _to_relative_path(href: Optional[str]) -> Optional[str]:
 def _parse_property_name(title: str) -> str:
     return title.strip() if title else title
 
-
-@app.post("/api/sync/layers")
-async def sync_layers_from_metadata(current_user: dict = Depends(get_current_user)):
-    """Sync api.layer with records from the sis-metadata (pyCSW) server.
-
-    Preserves manually-curated fields (project_name, unit_of_measure_id) on existing rows.
-    """
-    try:
-        _validate_pycsw_url(PYCSW_URL)
-        resp = http_requests.get(
-            f"{PYCSW_URL}/collections/metadata:main/items?f=json&limit=1000",
-            timeout=30, allow_redirects=False)
-        resp.raise_for_status()
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY,
-                            detail=f"Could not reach metadata server: {e}")
-
-    features = resp.json().get("features", [])
-    added, updated = 0, 0
-    seen_layer_ids = set()
-
-    # Resolve local download base URL from the Settings table so that a change
-    # in DOWNLOAD_BASE_URL takes effect on the next Sync.
-    with get_db() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT value FROM api.setting WHERE key = 'DOWNLOAD_BASE_URL'")
-            row = cur.fetchone()
-    download_base = (row[0] if row else "/downloads/") or "/downloads/"
-    if not download_base.endswith("/"):
-        download_base += "/"
-
-    for feature in features:
-        props = feature.get("properties", {})
-        links = feature.get("links", [])
-        title = props.get("title", "")
-        version = props.get("updated", "")
-        property_name = _parse_property_name(title)
-        # pyCSW mixes all keywords in `properties.keywords` and groups the
-        # thesaurus-backed ones (discipline, place, topic category) under
-        # `themes[].concepts[].id`. The ones we want (ISO keyword type=theme)
-        # are the ones present in `keywords` but NOT in any theme concept.
-        all_keywords = [str(k).strip() for k in (props.get("keywords") or []) if str(k).strip()]
-        themed_ids = set()
-        for theme in props.get("themes") or []:
-            for concept in theme.get("concepts") or []:
-                cid = concept.get("id")
-                if cid:
-                    themed_ids.add(str(cid).strip())
-        seen_kw = set()
-        keywords = []
-        for k in all_keywords:
-            if k in themed_ids or k in seen_kw:
-                continue
-            seen_kw.add(k)
-            keywords.append(k)
-        metadata_url = _to_relative_path(
-            next((l["href"] for l in links if l.get("rel") == "self"), None))
-        download_links = [l for l in links if l.get("rel") == "download"]
-        info_links = [l for l in links
-                      if l.get("rel") == "information" and "map=" in l.get("href", "")]
-
-        for info_link in info_links:
-            layer_id, map_path = _parse_layer_id(info_link["href"])
-            if not layer_id or not map_path:
-                continue
-            parts = layer_id.split("-")
-            if len(parts) < 7:
-                continue
-            seen_layer_ids.add(layer_id)
-            project_id = parts[1]
-            stat = parts[-1]
-            dimension = f"{parts[-3]}-{parts[-2]}-{parts[-1]}"
-            # Always point download_url at the local raster served by sis-nginx,
-            # regardless of what the upstream metadata record advertises.
-            download_url = f"{download_base}{layer_id}.tif"
-            get_map_url, get_legend_url, get_feature_info_url = _build_wms_urls(map_path, layer_id)
-
-            with get_db() as conn:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT layer_id FROM api.layer WHERE layer_id = %s", (layer_id,))
-                    exists = cur.fetchone()
-                    if exists:
-                        # Preserve manually-curated property_name on existing rows
-                        cur.execute("""
-                            UPDATE api.layer SET
-                                project_id = %s, dimension = %s,
-                                version = %s, metadata_url = %s, download_url = %s,
-                                get_map_url = %s, get_legend_url = %s, get_feature_info_url = %s,
-                                keywords = %s
-                            WHERE layer_id = %s
-                            """,
-                            (project_id, dimension, version,
-                             metadata_url, download_url, get_map_url,
-                             get_legend_url, get_feature_info_url, keywords, layer_id))
-                        updated += 1
-                    else:
-                        cur.execute("""
-                            INSERT INTO api.layer
-                                (layer_id, project_id, property_name, dimension, version,
-                                 publish, metadata_url, download_url,
-                                 get_map_url, get_legend_url, get_feature_info_url, keywords)
-                            VALUES (%s, %s, %s, %s, %s, 'true', %s, %s, %s, %s, %s, %s)
-                            """,
-                            (layer_id, project_id, property_name, dimension, version,
-                             metadata_url, download_url, get_map_url,
-                             get_legend_url, get_feature_info_url, keywords))
-                        added += 1
-
-    deleted = 0
-    with get_db() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT layer_id FROM api.layer")
-            existing_ids = {row[0] for row in cur.fetchall()}
-            orphans = existing_ids - seen_layer_ids
-            if orphans:
-                cur.execute(
-                    "DELETE FROM api.layer WHERE layer_id = ANY(%s)",
-                    (list(orphans),))
-                deleted = cur.rowcount
-
-    log_audit(current_user['user_id'], None, "layers_synced_from_metadata",
-              {"added": added, "updated": updated, "deleted": deleted}, None)
-    return {
-        "message": "Sync complete",
-        "added": added,
-        "updated": updated,
-        "deleted": deleted,
-        "total_metadata_records": len(features)
-    }
 
 # ==================== Codelists (any authenticated user) ====================
 
@@ -1344,11 +1179,17 @@ async def upload_csv(
                     padded = (row + [''] * len(headers))[:len(headers)]
                     cur.execute(insert_sql, padded)
 
-            # Register in api.uploaded_dataset
+            # Register in api.uploaded_dataset. country_id is required since
+            # the spatial_metadata → soil_data merge made project's PK composite.
+            country_id = os.getenv("COUNTRY_CODE", "BT").upper()
             cur.execute("""
-                INSERT INTO api.uploaded_dataset (table_name, file_name, user_id, status, n_rows, n_col, project_id)
-                VALUES (%s, %s, %s, 'Uploaded', %s, %s, %s)
-            """, (table_name, file.filename, current_user['user_id'], len(data_rows), len(headers), project_id))
+                INSERT INTO api.uploaded_dataset
+                    (table_name, file_name, user_id, status, n_rows, n_col,
+                     country_id, project_id)
+                VALUES (%s, %s, %s, 'Uploaded', %s, %s, %s, %s)
+            """, (table_name, file.filename, current_user['user_id'],
+                  len(data_rows), len(headers),
+                  country_id, project_id))
 
             # Initialize column entries in api.uploaded_dataset_column
             for i, h in enumerate(headers):
@@ -1480,6 +1321,7 @@ async def ingest_dataset(
                 raise HTTPException(status_code=404, detail="Dataset not found")
 
             project_id = dataset.get("project_id")
+            country_id = dataset.get("country_id") or os.getenv("COUNTRY_CODE", "BT").upper()
             epsg = dataset.get("cords_epsg") or "4326"
 
             # Get column mappings (non-ignored)
@@ -1555,9 +1397,29 @@ async def ingest_dataset(
                 ON CONFLICT (site_id) DO NOTHING
             """, (site_id,))
             cur.execute("""
-                INSERT INTO soil_data.project_site (project_id, site_id)
-                VALUES (%s, %s) ON CONFLICT DO NOTHING
-            """, (project_id, site_id))
+                INSERT INTO soil_data.project_site (country_id, project_id, site_id)
+                VALUES (%s, %s, %s) ON CONFLICT DO NOTHING
+            """, (country_id, project_id, site_id))
+
+            # Ensure a stub mapset + layer exists for this project so the
+            # Soil profiles tab can hang policy fields (is_published,
+            # profile_limit, spatial_blur_m) off them. ID convention:
+            #   mapset_id == layer_id == <CC>-<PROJ>
+            stub_id = f"{country_id}-{project_id}"
+            cur.execute("""
+                INSERT INTO soil_data.mapset
+                    (country_id, project_id, mapped_property_id, mapset_id)
+                VALUES (%s, %s, NULL, %s)
+                ON CONFLICT (mapset_id) DO NOTHING
+            """, (country_id, project_id, stub_id))
+            # file_orig_name has NOT NULL + UNIQUE — use the stub_id as a
+            # placeholder so each stub row gets a unique non-null value.
+            cur.execute("""
+                INSERT INTO soil_data.layer
+                    (mapset_id, layer_id, file_path, is_published, file_orig_name)
+                VALUES (%s, %s, '', TRUE, %s)
+                ON CONFLICT (layer_id) DO NOTHING
+            """, (stub_id, stub_id, f"(stub) {stub_id}"))
             sites_inserted.add(site_id)
             project_sites_inserted.add((project_id, site_id))
 
@@ -2527,7 +2389,9 @@ async def list_soil_profile_layers(current_user: dict = Depends(get_current_user
             ON pm.mapset_id = p.country_id || '-' || p.project_id
           LEFT JOIN soil_data.layer pl
             ON pl.layer_id = p.country_id || '-' || p.project_id
-          WHERE pl.is_published = TRUE
+          -- Treat a missing stub layer as "published by default" so
+          -- ETL-created projects don't silently get 0 profile counts.
+          WHERE COALESCE(pl.is_published, TRUE) = TRUE
             AND (pm.profile_limit IS NULL OR pr.rn <= pm.profile_limit)
         ),
         published_profile_counts AS (
@@ -3418,6 +3282,15 @@ async def register_raster_endpoint(
                 )
             except ValueError as e:
                 raise HTTPException(status_code=400, detail=str(e))
+            except psycopg2.errors.UniqueViolation:
+                # e.g. soil_data.layer.file_orig_name UNIQUE constraint —
+                # the same file has already been registered.
+                conn.rollback()
+                raise HTTPException(status_code=409,
+                                    detail="This file has already been uploaded.")
+            except psycopg2.IntegrityError as e:
+                conn.rollback()
+                raise HTTPException(status_code=409, detail=f"Integrity error: {e}")
 
         log_audit(current_user["user_id"], None, "raster_registered",
                   {"layer_id": result.layer_id, "warnings": result.warnings},
@@ -3592,6 +3465,107 @@ async def list_smd_countries(current_user: dict = Depends(get_current_user)):
                 ORDER BY (country_id = %s) DESC, en
             """, (default_cc,))
             return cur.fetchall()
+
+
+@app.get("/api/raster/file_exists")
+async def raster_file_exists(
+    file_orig_name: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Cheap up-front check before the user fills the form: is there
+    already a soil_data.layer row with this `file_orig_name`?"""
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT layer_id FROM soil_data.layer WHERE file_orig_name = %s LIMIT 1",
+                (file_orig_name,),
+            )
+            row = cur.fetchone()
+            return {"exists": bool(row), "layer_id": row[0] if row else None}
+
+
+@app.get("/api/raster/observation_limits/{property_num_id}/{unit_id}")
+async def observation_limits(
+    property_num_id: str,
+    unit_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Plausible value range for a property in a given unit.
+
+    Aggregates min(value_min) / max(value_max) across all
+    soil_data.observation_num rows for the property, then converts the
+    result to the requested unit via soil_data.unit_conversion (forward
+    or reverse). Returns {value_min, value_max, canonical_unit, converted}.
+    The caller adds its own tolerance band.
+    """
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT MIN(value_min) AS lo, MAX(value_max) AS hi
+                FROM soil_data.observation_num
+                WHERE property_num_id = %s
+                  AND value_min IS NOT NULL AND value_max IS NOT NULL
+            """, (property_num_id,))
+            row = cur.fetchone()
+            if not row or row[0] is None or row[1] is None:
+                return {"value_min": None, "value_max": None,
+                        "canonical_unit": None, "converted": False}
+            lo, hi = float(row[0]), float(row[1])
+
+            cur.execute("""
+                SELECT unit_of_measure_id
+                FROM soil_data.observation_num
+                WHERE property_num_id = %s
+                  AND unit_of_measure_id IS NOT NULL
+                GROUP BY unit_of_measure_id
+                ORDER BY count(*) DESC
+                LIMIT 1
+            """, (property_num_id,))
+            row = cur.fetchone()
+            canonical = row[0] if row else None
+
+            if not canonical or canonical == unit_id:
+                return {"value_min": lo, "value_max": hi,
+                        "canonical_unit": canonical, "converted": False}
+
+            # Forward conversion: canonical → user
+            cur.execute("""
+                SELECT operation, value
+                FROM soil_data.unit_conversion
+                WHERE unit_from = %s AND unit_to = %s
+                LIMIT 1
+            """, (canonical, unit_id))
+            row = cur.fetchone()
+            if row:
+                op, val = row[0], float(row[1])
+                if op == "*":   lo, hi = lo * val, hi * val
+                elif op == "/": lo, hi = lo / val, hi / val
+                else:
+                    return {"value_min": None, "value_max": None,
+                            "canonical_unit": canonical, "converted": False}
+                return {"value_min": lo, "value_max": hi,
+                        "canonical_unit": canonical, "converted": True}
+
+            # Reverse conversion: user → canonical, invert it
+            cur.execute("""
+                SELECT operation, value
+                FROM soil_data.unit_conversion
+                WHERE unit_from = %s AND unit_to = %s
+                LIMIT 1
+            """, (unit_id, canonical))
+            row = cur.fetchone()
+            if row:
+                op, val = row[0], float(row[1])
+                if op == "*":   lo, hi = lo / val, hi / val      # invert *
+                elif op == "/": lo, hi = lo * val, hi * val      # invert /
+                else:
+                    return {"value_min": None, "value_max": None,
+                            "canonical_unit": canonical, "converted": False}
+                return {"value_min": lo, "value_max": hi,
+                        "canonical_unit": canonical, "converted": True}
+
+            return {"value_min": None, "value_max": None,
+                    "canonical_unit": canonical, "converted": False}
 
 
 @app.get("/api/raster/units_for_property/{property_num_id}")

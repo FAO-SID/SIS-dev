@@ -499,13 +499,12 @@ class AdminDashboard {
 
               <div style="display:flex;gap:var(--sp-5);align-items:flex-start;flex-wrap:wrap;">
               <section class="admin-form" style="flex:0 0 820px;max-width:820px;">
-                <h3>Add GeoTIFF</h3>
+                <h3>Upload GeoTIFF</h3>
 
                 <div style="display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-3);align-items:center;">
                   <label>File</label>
                   <div>
                     <input type="file" id="raster-file-input" accept=".tif,.tiff">
-                    <button type="button" class="btn btn-sm" id="raster-inspect-btn" style="margin-left:8px;">Inspect</button>
                   </div>
 
                   <label>Country</label>
@@ -544,7 +543,7 @@ class AdminDashboard {
                   <div style="display:flex;align-items:center;gap:var(--sp-3);">
                     <input type="text" id="raster-publication-date"
                            placeholder="YYYY-MM-DD"
-                           pattern="\d{4}-\d{2}-\d{2}"
+                           pattern="\d{4}-\d{1,2}-\d{1,2}"
                            maxlength="10"
                            title="Format: YYYY-MM-DD"
                            style="width:140px;">
@@ -555,7 +554,7 @@ class AdminDashboard {
                   <div style="display:flex;align-items:center;gap:var(--sp-3);">
                     <input type="text" id="raster-time-period-begin"
                            placeholder="YYYY-MM-DD"
-                           pattern="\d{4}-\d{2}-\d{2}"
+                           pattern="\d{4}-\d{1,2}-\d{1,2}"
                            maxlength="10"
                            title="Format: YYYY-MM-DD"
                            style="width:140px;">
@@ -566,7 +565,7 @@ class AdminDashboard {
                   <div style="display:flex;align-items:center;gap:var(--sp-3);">
                     <input type="text" id="raster-time-period-end"
                            placeholder="YYYY-MM-DD"
-                           pattern="\d{4}-\d{2}-\d{2}"
+                           pattern="\d{4}-\d{1,2}-\d{1,2}"
                            maxlength="10"
                            title="Format: YYYY-MM-DD"
                            style="width:140px;">
@@ -644,7 +643,7 @@ class AdminDashboard {
                 </div>
 
                 <div style="margin-top:var(--sp-4);display:flex;align-items:center;gap:var(--sp-3);">
-                  <button type="button" class="btn btn-primary" id="raster-register-btn">Register</button>
+                  <button type="button" class="btn btn-primary" id="raster-register-btn">Upload</button>
                   <button type="button" class="btn btn-secondary" id="raster-clear-btn">Clear</button>
                   <span id="raster-status" style="font-size:var(--fs-sm);"></span>
                 </div>
@@ -658,7 +657,6 @@ class AdminDashboard {
               <section class="layers-section" style="margin-top: var(--sp-6, 24px);">
                 <h3 class="layers-section-title">GeoTIFF's</h3>
                 <div class="sync-bar" style="margin: 10px 0; display: flex; align-items: center; gap: 10px;">
-                  <button type="button" class="btn btn-primary" id="sync-layers-btn">Sync from Metadata</button>
                   <button type="button" class="btn btn-primary" id="check-wms-btn">Check WMS</button>
                   <span id="sync-status" style="font-size: 0.9em; color: #555;"></span>
                 </div>
@@ -668,6 +666,7 @@ class AdminDashboard {
                     <thead>
                       <tr>
                         <th>Raster ID</th>
+                        <th>Original file</th>
                         <th style="width:120px;">Group</th>
                         <th>Raster name</th>
                         <th>Published</th>
@@ -677,7 +676,7 @@ class AdminDashboard {
                       </tr>
                     </thead>
                     <tbody id="layers-tbody">
-                      <tr><td colspan="7" class="loading">Loading layers...</td></tr>
+                      <tr><td colspan="8" class="loading">Loading layers...</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -801,10 +800,6 @@ class AdminDashboard {
 
     document.getElementById('cancel-user').addEventListener('click', () => {
       document.getElementById('user-form').reset();
-    });
-
-    document.getElementById('sync-layers-btn').addEventListener('click', () => {
-      this.handleSyncLayers();
     });
 
     document.getElementById('check-wms-btn').addEventListener('click', () => {
@@ -985,30 +980,6 @@ class AdminDashboard {
     btn.textContent = originalText;
   }
 
-  async handleSyncLayers() {
-    const btn = document.getElementById('sync-layers-btn');
-    const statusEl = document.getElementById('sync-status');
-
-    btn.disabled = true;
-    const originalText = btn.textContent;
-    btn.textContent = 'Syncing...';
-    statusEl.textContent = '';
-
-    try {
-      const result = await api.syncLayers();
-      statusEl.textContent = `Added: ${result.added} · Updated: ${result.updated} · Deleted: ${result.deleted} (of ${result.total_metadata_records} metadata records)`;
-      statusEl.style.color = '#2a7';
-      await this.loadLayers();
-      this.renderLayers();
-    } catch (error) {
-      statusEl.textContent = 'Sync failed: ' + error.message;
-      statusEl.style.color = '#c33';
-    } finally {
-      btn.disabled = false;
-      btn.textContent = originalText;
-    }
-  }
-
   /**
    * Switch between tabs
    */
@@ -1040,6 +1011,12 @@ class AdminDashboard {
 
     if (tab === 'dashboard') {
       this.loadDashboard();
+    }
+
+    // Soil profiles counts can be stale after an ETL ingest/prune from
+    // another tab — always refresh when opening this tab.
+    if (tab === 'layers') {
+      this.loadSoilProfileLayers().then(() => this.renderSoilProfileLayers());
     }
 
     if (tab === 'add-raster' && !this.rasterInited) {
@@ -1091,14 +1068,47 @@ class AdminDashboard {
     propSel.innerHTML = '<option value="">-- Select --</option>' +
       properties.map(p => `<option value="${p.property_num_id}">${this.escapeHtml(p.property_name)} (${p.property_num_id})</option>`).join('');
 
-    // When property changes, fetch its valid units.
-    propSel.addEventListener('change', () => this._loadRasterUnitsForCurrentProperty());
+    // Recompute filename preview on every input/change of any field.
+    const refresh = () => this._updateRasterFilenamePreview();
+
+    // When property changes, fetch its valid units (clears unit) and refresh limits.
+    propSel.addEventListener('change', async () => {
+      await this._loadRasterUnitsForCurrentProperty();
+      this._refreshRasterLimits();
+    });
+    // When unit changes, refresh observation_num limits.
+    document.getElementById('raster-unit').addEventListener('change', () => this._refreshRasterLimits());
 
     // When project changes, load its existing authors (only for real ids).
     document.getElementById('raster-project').addEventListener('change', () => this._loadRasterAuthorsForCurrentProject());
 
-    // Recompute filename preview on every input/change of any field.
-    const refresh = () => this._updateRasterFilenamePreview();
+    // Re-evaluate the missing-fields preview whenever an author row is
+    // added / removed / its selects change.
+    const authorsBox = document.getElementById('raster-author-rows');
+    authorsBox.addEventListener('change', refresh);
+    authorsBox.addEventListener('click', () => setTimeout(refresh, 0));  // remove-button click
+
+    // Auto-inspect on file pick so the metadata is shown immediately and
+    // the no-NoData / stats-in-range rules can fire. Also check up-front
+    // that the file isn't already registered — saves the user from filling
+    // the whole form only to hit the unique constraint on Upload.
+    document.getElementById('raster-file-input').addEventListener('change', async () => {
+      this._rasterInspectMeta = null;
+      const f = document.getElementById('raster-file-input').files[0];
+      const status = document.getElementById('raster-status');
+      if (!f) return;
+      try {
+        const r = await api.rasterFileExists(f.name);
+        if (r.exists) {
+          status.innerHTML =
+            `<span style="color:#c0392b;font-weight:bold;">This file has already been uploaded (layer: ${this.escapeHtml(r.layer_id)}).</span>`;
+          document.getElementById('raster-file-input').value = '';
+          return;
+        }
+      } catch (e) { /* network blip — fall through to inspect */ }
+      this.rasterInspect();
+    });
+
     ['raster-country','raster-project','raster-property-num','raster-unit','raster-publication-date',
      'raster-time-period-begin','raster-time-period-end',
      'raster-depth-upper','raster-depth-lower','raster-stats','raster-license']
@@ -1115,22 +1125,20 @@ class AdminDashboard {
     });
 
     // Date fields: accept forgiving input. Replace `/` with `-` as the
-    // user types; on blur, also zero-pad single-digit month/day so
-    // `2025/10/5` ends up as `2025-10-05`.
+    // user types, and zero-pad single-digit month/day so `2025/10/5`
+    // becomes `2025-10-05` as soon as the value matches a full date.
+    const normaliseDate = (el) => {
+      let v = el.value;
+      if (v.includes('/')) v = v.replace(/\//g, '-');
+      const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(v.trim());
+      if (m) v = `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+      if (v !== el.value) el.value = v;
+    };
     ['raster-publication-date','raster-time-period-begin','raster-time-period-end']
       .forEach(id => {
         const el = document.getElementById(id);
-        el.addEventListener('input', () => {
-          if (el.value.includes('/')) el.value = el.value.replace(/\//g, '-');
-          refresh();
-        });
-        el.addEventListener('blur', () => {
-          const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(el.value.trim());
-          if (m) {
-            el.value = `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
-            refresh();
-          }
-        });
+        el.addEventListener('input', () => { normaliseDate(el); refresh(); });
+        el.addEventListener('blur',  () => { normaliseDate(el); refresh(); });
       });
 
     // Project select: show new-project subform when __new__ chosen.
@@ -1140,7 +1148,6 @@ class AdminDashboard {
     });
     document.getElementById('raster-add-project-btn').addEventListener('click', () => this.rasterAddProject());
 
-    document.getElementById('raster-inspect-btn').addEventListener('click', () => this.rasterInspect());
     document.getElementById('raster-register-btn').addEventListener('click', () => this.rasterRegister());
     document.getElementById('raster-clear-btn').addEventListener('click', () => this.rasterClear());
   }
@@ -1166,6 +1173,8 @@ class AdminDashboard {
 
     document.getElementById('raster-publish').checked = true;
     document.getElementById('raster-project-new').style.display = 'none';
+    this._rasterInspectMeta = null;
+    this._rasterLimits = null;
     document.getElementById('raster-author-rows').innerHTML = '';
     document.getElementById('raster-new-org-block').style.display = 'none';
     document.getElementById('raster-new-ind-block').style.display = 'none';
@@ -1218,6 +1227,7 @@ class AdminDashboard {
   async _loadRasterUnitsForCurrentProperty() {
     const propId = document.getElementById('raster-property-num').value;
     const unitSel = document.getElementById('raster-unit');
+    this._rasterLimits = null;          // invalidate cached limits
     if (!propId) {
       unitSel.innerHTML = '<option value="">-- pick a property first --</option>';
       return;
@@ -1234,6 +1244,22 @@ class AdminDashboard {
     } catch (e) {
       unitSel.innerHTML = `<option value="">(error: ${this.escapeHtml(e.message)})</option>`;
     }
+  }
+
+  async _refreshRasterLimits() {
+    const propId = document.getElementById('raster-property-num').value;
+    const unitId = document.getElementById('raster-unit').value;
+    if (!propId || !unitId) { this._rasterLimits = null; }
+    else {
+      try {
+        this._rasterLimits = await api.getRasterObservationLimits(propId, unitId);
+      } catch (e) {
+        console.warn('observation_limits:', e.message);
+        this._rasterLimits = null;
+      }
+    }
+    this._updateRasterFilenamePreview();
+    this._renderRasterInspectOutput();
   }
 
   // ---------- Add Raster: Authors ----------
@@ -1299,6 +1325,14 @@ class AdminDashboard {
     `;
     container.appendChild(row);
     this._refreshRasterAuthorDropdowns();
+    // Refresh the missing-fields preview whenever this row's selects change
+    // or it gets removed via the × button.
+    row.addEventListener('change', () => this._updateRasterFilenamePreview());
+    row.querySelector('.etl-remove-author')?.addEventListener('click', () => {
+      // Defer until the row is detached so the count is correct.
+      setTimeout(() => this._updateRasterFilenamePreview(), 0);
+    });
+    this._updateRasterFilenamePreview();
   }
 
   cancelRasterNew(type) {
@@ -1368,6 +1402,7 @@ class AdminDashboard {
     } catch (e) {
       console.warn('Failed to load raster authors:', e);
     }
+    this._updateRasterFilenamePreview();
   }
 
   _collectRasterAuthors() {
@@ -1390,12 +1425,16 @@ class AdminDashboard {
     return { authors: out };
   }
 
-  // Parse YYYY-MM-DD → {iso: 'YYYY-MM-DD', yyyy: 'YYYY'} or null.
+  // Parse YYYY-M-D (any 1-2 digit month/day) → {iso: 'YYYY-MM-DD', yyyy} or null.
+  // Forgives missing zero-pad so the missing-fields check passes before
+  // the input has blurred.
   _parseRasterDate(raw) {
     const s = (raw || '').trim();
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+    const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
     if (!m) return null;
-    const [, yyyy, mm, dd] = m;
+    const [, yyyy, mmRaw, ddRaw] = m;
+    const mm = mmRaw.padStart(2, '0');
+    const dd = ddRaw.padStart(2, '0');
     const d = new Date(`${yyyy}-${mm}-${dd}T00:00:00Z`);
     if (isNaN(d.getTime())
         || d.getUTCFullYear() !== Number(yyyy)
@@ -1450,6 +1489,45 @@ class AdminDashboard {
     }
     if (!stats)   missing.push('stats');
     if (!license) missing.push('license');
+
+    // Authors — at least one fully-specified row (org + individual picked).
+    const authorRows = document.querySelectorAll('#raster-author-rows .etl-author-row');
+    let validAuthors = 0, badAuthors = 0;
+    authorRows.forEach(r => {
+      const org = r.querySelector('.raster-org-sel')?.value;
+      const ind = r.querySelector('.raster-ind-sel')?.value;
+      const orgOk = org && org !== '__new__';
+      const indOk = ind && ind !== '__new__';
+      if (orgOk && indOk) validAuthors++;
+      else if (org || ind) badAuthors++;
+    });
+    if (validAuthors === 0) missing.push('authors');
+    if (badAuthors > 0) rules.push('pick organisation and author for every row');
+
+    // upper depth ≥ 0 — combined with `upper < lower` (above), this also
+    // forces lower > 0, so no separate lower-depth rule is needed.
+    if (upper !== '' && Number(upper) < 0) rules.push('upper depth must be ≥ 0');
+
+    // Rules that depend on the Inspect result.
+    const meta = this._rasterInspectMeta;
+    const band = meta && meta.bands && meta.bands[0];
+    if (meta && (band == null || band.no_data_value == null)) {
+      rules.push('raster has no NoData value defined');
+    }
+    if (meta && band && this._rasterLimits
+        && this._rasterLimits.value_min != null
+        && this._rasterLimits.value_max != null) {
+      const span = this._rasterLimits.value_max - this._rasterLimits.value_min;
+      const tol = 0.1 * span;
+      const lo = this._rasterLimits.value_min - tol;
+      const hi = this._rasterLimits.value_max + tol;
+      if (band.stats_minimum != null && band.stats_minimum < lo) {
+        rules.push(`stats_minimum ${band.stats_minimum} < allowed ${lo.toFixed(4)} (${this._rasterLimits.value_min}±10%)`);
+      }
+      if (band.stats_maximum != null && band.stats_maximum > hi) {
+        rules.push(`stats_maximum ${band.stats_maximum} > allowed ${hi.toFixed(4)} (${this._rasterLimits.value_max}±10%)`);
+      }
+    }
     return {
       country, project, prop, unit, upper, lower, stats,
       date_iso: date ? date.iso : '',
@@ -1461,10 +1539,24 @@ class AdminDashboard {
     };
   }
 
+  // Plain-text formatter (used by error toasts etc. that already style themselves).
   _formatRasterIssues(s) {
     const parts = [];
     if (s.missing.length) parts.push(`Missing: ${s.missing.join(', ')}.`);
     if (s.rules.length)   parts.push(`Rule: ${s.rules.join(', ')}.`);
+    return parts.join(' ');
+  }
+
+  // HTML formatter — broken rules / missing fields rendered bold red.
+  _formatRasterIssuesHtml(s) {
+    const e = this.escapeHtml.bind(this);
+    const parts = [];
+    if (s.missing.length) {
+      parts.push(`<span style="color:#c0392b;font-weight:bold;">Missing: ${e(s.missing.join(', '))}.</span>`);
+    }
+    if (s.rules.length) {
+      parts.push(`<span style="color:#c0392b;font-weight:bold;">Rule: ${e(s.rules.join(', '))}.</span>`);
+    }
     return parts.join(' ');
   }
 
@@ -1475,7 +1567,7 @@ class AdminDashboard {
       document.getElementById('raster-filename-preview').textContent = `${layerId}.tif`;
       return layerId;
     }
-    document.getElementById('raster-filename-preview').textContent = this._formatRasterIssues(s);
+    document.getElementById('raster-filename-preview').innerHTML = this._formatRasterIssuesHtml(s);
     return null;
   }
 
@@ -1487,12 +1579,50 @@ class AdminDashboard {
     status.textContent = 'Inspecting...';
     try {
       const meta = await api.inspectRaster(f);
+      this._rasterInspectMeta = meta;
       out.style.display = 'block';
-      out.textContent = JSON.stringify(meta, null, 2);
+      this._renderRasterInspectOutput();
       status.textContent = 'Inspected.';
+      this._updateRasterFilenamePreview();
     } catch (e) {
+      this._rasterInspectMeta = null;
       status.textContent = 'Inspect failed: ' + e.message;
     }
+  }
+
+  // Render the inspect JSON to the <pre>, wrapping the lines that violate
+  // a rule in a bold-red span (no_data_value=null, stats_min/max out of
+  // allowed range).
+  _renderRasterInspectOutput() {
+    const out = document.getElementById('raster-inspect-output');
+    const meta = this._rasterInspectMeta;
+    if (!meta) { out.style.display = 'none'; out.innerHTML = ''; return; }
+
+    const band = meta.bands && meta.bands[0];
+    const noDataBad = !!band && band.no_data_value == null;
+
+    let minBad = false, maxBad = false;
+    const lim = this._rasterLimits;
+    if (band && lim && lim.value_min != null && lim.value_max != null) {
+      const tol = 0.1 * (lim.value_max - lim.value_min);
+      const lo = lim.value_min - tol, hi = lim.value_max + tol;
+      if (band.stats_minimum != null && band.stats_minimum < lo) minBad = true;
+      if (band.stats_maximum != null && band.stats_maximum > hi) maxBad = true;
+    }
+
+    const e = this.escapeHtml.bind(this);
+    const lines = JSON.stringify(meta, null, 2).split('\n');
+    const flag = (line) =>
+      `<span style="color:#c0392b;font-weight:bold;">${e(line)}</span>`;
+
+    out.style.display = 'block';
+    out.innerHTML = lines.map(line => {
+      const trimmed = line.trimStart();
+      if (noDataBad && trimmed.startsWith('"no_data_value":')) return flag(line);
+      if (minBad    && trimmed.startsWith('"stats_minimum":')) return flag(line);
+      if (maxBad    && trimmed.startsWith('"stats_maximum":')) return flag(line);
+      return e(line);
+    }).join('\n');
   }
 
   async rasterRegister() {
@@ -1500,9 +1630,20 @@ class AdminDashboard {
     const status = document.getElementById('raster-status');
     if (!f) { status.textContent = 'Choose a file first.'; return; }
 
+    // Auto-inspect so the no-NoData / stats-in-range rules can fire even
+    // if the user didn't click Inspect.
+    if (!this._rasterInspectMeta) {
+      status.textContent = 'Inspecting…';
+      await this.rasterInspect();
+      if (!this._rasterInspectMeta) return;   // inspect failed → status already set
+    }
+    if (!this._rasterLimits) await this._refreshRasterLimits();
+
     const s = this._rasterFormState();
     if (s.missing.length > 0 || s.rules.length > 0) {
-      status.textContent = this._formatRasterIssues(s);
+      // The Generated filename row already lists the issues — don't duplicate
+      // them here. A short pointer is enough.
+      status.innerHTML = '<span style="color:#c0392b;font-weight:bold;">Fix the issues listed above.</span>';
       return;
     }
     const layerId = [s.country, s.project, s.prop, s.yyyy, s.upper, s.lower, s.stats].join('-');
@@ -1530,10 +1671,12 @@ class AdminDashboard {
       const propName = propRow ? propRow.property_name : s.prop;
       const projRow = (this._rasterProjects || []).find(p => p.project_id === s.project);
 
-      // title : "<PROJ> - <property_name> (<YYYY>)"
-      const title = `${s.project} - ${propName} (${s.yyyy})`;
-      // abstract = soil_data.project.description (set on project creation).
-      const abstract = projRow && projRow.description ? projRow.description : '';
+      // title : "<property_name> (<YYYY>)"  — also stored on layer.costum_name.
+      // Project goes to mapset.costum_group via the registrar.
+      const title = `${propName} (${s.yyyy})`;
+      // abstract: "<title> in <unit>.\n\n<project.description>"
+      const descr = projRow && projRow.description ? projRow.description : '';
+      const abstract = `${title} in ${s.unit}.` + (descr ? `\n\n${descr}` : '');
 
       const fields = {
         title,
@@ -2015,7 +2158,7 @@ class AdminDashboard {
     const tbody = document.getElementById('layers-tbody');
 
     if (this.layers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No layers found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No layers found</td></tr>';
       return;
     }
 
@@ -2037,6 +2180,7 @@ class AdminDashboard {
       return `
       <tr${layer.is_default ? ' style="background:#fff8d6;"' : ''}>
         <td><strong>${id}</strong></td>
+        <td title="${this.escapeHtml(layer.file_orig_name || '')}" style="font-size:var(--fs-sm);color:#555;">${this.escapeHtml(layer.file_orig_name || '-')}</td>
         <td style="width:120px;"><input class="layer-edit" data-layer-id="${id}" data-field="project_name" value="${this.escapeHtml(layer.project_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit (saved to mapset.costum_group)"></td>
         <td><input class="layer-edit" data-layer-id="${id}" data-field="property_name" value="${this.escapeHtml(layer.property_name || '')}" placeholder="-" style="${editStyle}" title="Click to edit (saved to layer.costum_name)"></td>
         <td>
@@ -2111,7 +2255,7 @@ class AdminDashboard {
       `Delete raster "${layerId}"?\n\nThis removes:\n` +
       `• the GeoTIFF and MapServer .map file on disk\n` +
       `• the pyCSW catalogue record\n` +
-      `• the soil_data and api.layer rows\n\nThis cannot be undone.`
+      `• the soil_data.layer and soil_data.mapset rows\n\nThis cannot be undone.`
     );
     if (!ok) return;
     try {
@@ -3263,6 +3407,9 @@ class AdminDashboard {
       }
       this.setRowResult(tableName, this.escapeHtml(msg), false);
       this.loadEtlDatasets();
+      // Soil profile counts are stale — refresh.
+      await this.loadSoilProfileLayers();
+      this.renderSoilProfileLayers();
     } catch (e) {
       this.setRowResult(tableName, this.escapeHtml(e.message), true);
     }
@@ -3274,6 +3421,9 @@ class AdminDashboard {
       const result = await api.pruneDataset(tableName);
       this.setRowResult(tableName, this.escapeHtml(result.message), false);
       this.loadEtlDatasets();
+      // Profile counts on the Soil profiles tab are now stale — refresh.
+      await this.loadSoilProfileLayers();
+      this.renderSoilProfileLayers();
     } catch (e) {
       this.setRowResult(tableName, this.escapeHtml(e.message), true);
     }
