@@ -67,7 +67,7 @@ def populate_spatial_metadata(
     class). All-or-nothing transaction.
 
     The caller owns the connection. We don't commit — the orchestrator
-    does that once the XML / pyCSW / api.layer side has also succeeded.
+    does that once the XML / pyCSW side has also succeeded.
     """
     if not (meta.country_id and meta.project_id
             and meta.property_id and meta.mapset_id):
@@ -109,13 +109,20 @@ def populate_spatial_metadata(
         # "Created on" date (publication_date arg) goes into creation_date
         # and revision_date. The mapset.publication_date column tracks when
         # the file was uploaded into the SIS — that's CURRENT_DATE here.
+        # keyword_theme is taken from soil_data.mapped_property.keyword_theme
+        # via a subquery so the catalogue inherits the property's keywords.
         cur.execute("""
             INSERT INTO soil_data.mapset
                 (country_id, project_id, mapped_property_id, mapset_id, title, abstract,
                  other_constraints, publication_date, revision_date, creation_date,
                  unit_of_measure_id, time_period_begin, time_period_end,
-                 costum_group)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s)
+                 costum_group, keyword_theme, keyword_place)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s,
+                    (SELECT keyword_theme FROM soil_data.mapped_property
+                     WHERE mapped_property_id = %s),
+                    (SELECT ARRAY_REMOVE(ARRAY[un_reg, en], NULL)
+                     FROM soil_data.country
+                     WHERE country_id = (SELECT value FROM api.setting WHERE key='COUNTRY_CODE')))
             ON CONFLICT (mapset_id) DO UPDATE SET
                 title              = COALESCE(EXCLUDED.title,              soil_data.mapset.title),
                 abstract           = COALESCE(EXCLUDED.abstract,           soil_data.mapset.abstract),
@@ -126,12 +133,14 @@ def populate_spatial_metadata(
                 unit_of_measure_id = COALESCE(EXCLUDED.unit_of_measure_id, soil_data.mapset.unit_of_measure_id),
                 time_period_begin  = COALESCE(EXCLUDED.time_period_begin,  soil_data.mapset.time_period_begin),
                 time_period_end    = COALESCE(EXCLUDED.time_period_end,    soil_data.mapset.time_period_end),
-                costum_group       = COALESCE(EXCLUDED.costum_group,       soil_data.mapset.costum_group)
+                costum_group       = COALESCE(EXCLUDED.costum_group,       soil_data.mapset.costum_group),
+                keyword_theme      = COALESCE(EXCLUDED.keyword_theme,      soil_data.mapset.keyword_theme),
+                keyword_place      = COALESCE(EXCLUDED.keyword_place,      soil_data.mapset.keyword_place)
         """, (meta.country_id, meta.project_id, meta.property_id, meta.mapset_id,
               title, abstract, other_constraints,
               publication_date, publication_date,
               unit_of_measure_id, time_period_begin, time_period_end,
-              meta.project_id))
+              meta.project_id, meta.property_id))
 
         # 3. layer — identity row first (upsert)
         cur.execute("""

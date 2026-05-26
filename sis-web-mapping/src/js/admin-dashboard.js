@@ -187,7 +187,6 @@ class AdminDashboard {
             <li><button class="tab-btn" data-tab="account">My Account</button></li>
             <li><button class="tab-btn active" data-tab="administration">Administration</button></li>
             <li><button class="tab-btn" data-tab="layers">Soil profiles</button></li>
-            <li><button class="tab-btn" data-tab="etl">ETL</button></li>
             <li><button class="tab-btn" data-tab="add-raster">Rasters</button></li>
             <li><button class="tab-btn" data-tab="dst">DST</button></li>
             <li><button class="tab-btn" data-tab="dashboard">Dashboard</button></li>
@@ -327,6 +326,150 @@ class AdminDashboard {
             <!-- Layers Tab -->
             <div id="layers-tab" class="tab-pane">
 
+              <!-- Upload CSV (formerly the standalone ETL tab) -->
+              <section class="layers-section">
+                <h3 class="layers-section-title">Upload CSV</h3>
+                <div class="etl-steps">
+
+                  <!-- List view (always visible unless detail panel open) -->
+                  <div id="etl-list-view">
+                    <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+                      <input type="file" id="etl-file-input" accept=".csv">
+                      <button type="button" class="btn btn-primary btn-sm" id="etl-upload-btn">Upload CSV</button>
+                      <span id="etl-upload-status" style="font-size:var(--fs-sm);"></span>
+                    </div>
+                    <div id="etl-datasets-list"></div>
+                  </div>
+
+                  <!-- Detail panel (hidden until Open is clicked) -->
+                  <div id="etl-detail-panel" style="display:none;">
+
+                    <div style="margin-bottom:var(--sp-4);">
+                      <button type="button" class="btn btn-secondary btn-sm" id="etl-back-btn">&larr; Back to list</button>
+                      <span id="etl-detail-title" style="font-weight:600;margin-left:var(--sp-3);"></span>
+                    </div>
+
+                    <!-- Preview -->
+                    <details id="etl-preview-section" class="etl-section" open>
+                      <summary class="etl-section-title" style="cursor:pointer;">Preview <span id="etl-preview-info" style="font-weight:normal;font-size:var(--fs-sm);color:#555;"></span></summary>
+                      <div class="etl-preview-scroll" style="margin-top:var(--sp-3);">
+                        <table class="admin-table" id="etl-preview-table">
+                          <thead id="etl-preview-thead"></thead>
+                          <tbody id="etl-preview-tbody"></tbody>
+                        </table>
+                      </div>
+                      <div id="etl-preview-pager" style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--fs-sm);margin-bottom:var(--sp-3);">
+                        <button type="button" class="btn btn-sm" id="etl-preview-prev">Previous</button>
+                        <span id="etl-preview-page-info"></span>
+                        <button type="button" class="btn btn-sm" id="etl-preview-next">Next</button>
+                      </div>
+                    </details>
+
+                    <!-- Metadata -->
+                    <div id="etl-section-metadata" class="etl-section">
+                      <h3 class="etl-section-title">Metadata</h3>
+                      <form id="etl-metadata-form">
+                        <div class="etl-metadata-grid" style="margin-bottom:var(--sp-4);">
+                          <label for="etl-project">Project</label>
+                          <div>
+                            <select id="etl-project" required><option value="">Loading...</option></select>
+                            <div id="etl-new-project" class="etl-new-entry" style="display:none;">
+                              <input type="text" id="etl-new-project-id" placeholder="Project ID" style="margin-top:4px;">
+                              <input type="text" id="etl-new-project-name" placeholder="Project Name" style="margin-top:4px;">
+                              <textarea id="etl-new-project-description"
+                                        placeholder="Project description" rows="2"
+                                        style="margin-top:4px;width:100%;"></textarea>
+                              <button type="button" class="btn btn-primary btn-sm" style="margin-top:4px;" onclick="adminDashboard.addNewProject()">Add</button>
+                              <button type="button" class="btn btn-secondary btn-sm" style="margin-top:4px;" onclick="adminDashboard.cancelNew('project')">Cancel</button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="etl-metadata-grid" style="margin-bottom:var(--sp-4);">
+                          <label for="etl-abstract">Abstract</label>
+                          <div><textarea id="etl-abstract" rows="3" style="width:100%;font-family:inherit;font-size:var(--fs-sm);padding:4px 8px;border:1px solid var(--color-border-strong);border-radius:var(--radius-sm);" placeholder="Project description..."></textarea></div>
+                          <label for="etl-license">License</label>
+                          <div>
+                            <select id="etl-license" style="width:100%;">
+                              <option value="">-- Select --</option>
+                              <option value="CC BY">CC BY</option>
+                              <option value="CC BY-SA">CC BY-SA</option>
+                              <option value="CC BY-NC">CC BY-NC</option>
+                              <option value="CC BY-NC-SA">CC BY-NC-SA</option>
+                              <option value="CC BY-ND">CC BY-ND</option>
+                              <option value="CC BY-NC-ND">CC BY-NC-ND</option>
+                              <option value="CC0">CC0</option>
+                              <option value="Public Domain Mark">Public Domain Mark</option>
+                            </select>
+                          </div>
+                          <label for="etl-epsg">EPSG code of the coordinates</label>
+                          <div><input type="text" id="etl-epsg" value="4326" style="width:80px;padding:2px 6px;font-size:var(--fs-sm);"></div>
+                        </div>
+
+                        <div class="etl-author-row etl-author-header">
+                          <div class="etl-author-field"><label>Organisation</label></div>
+                          <div class="etl-author-field"><label>Author</label></div>
+                          <div class="etl-author-field etl-author-field-sm"><label>Position</label></div>
+                          <div class="etl-author-field etl-author-field-sm"><label>Role</label></div>
+                        </div>
+                        <div id="etl-author-rows"></div>
+
+                        <div id="etl-new-org-block" class="etl-new-entry" style="display:none;margin-top:var(--sp-2);margin-bottom:var(--sp-2);">
+                          <strong style="font-size:var(--fs-xs);">New Organisation</strong>
+                          <div style="display:flex;gap:var(--sp-2);margin-top:4px;flex-wrap:wrap;">
+                            <input type="text" id="etl-new-org-id" placeholder="Organisation ID" style="flex:1;min-width:100px;">
+                            <input type="text" id="etl-new-org-country" placeholder="Country" style="flex:1;min-width:80px;">
+                            <input type="text" id="etl-new-org-city" placeholder="City" style="flex:1;min-width:80px;">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="adminDashboard.addNewOrganisation()">Add</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.cancelNew('organisation')">Cancel</button>
+                          </div>
+                        </div>
+                        <div id="etl-new-ind-block" class="etl-new-entry" style="display:none;margin-bottom:var(--sp-2);">
+                          <strong style="font-size:var(--fs-xs);">New Author</strong>
+                          <div style="display:flex;gap:var(--sp-2);margin-top:4px;flex-wrap:wrap;">
+                            <input type="text" id="etl-new-ind-id" placeholder="Name / ID" style="flex:1;min-width:100px;">
+                            <input type="email" id="etl-new-ind-email" placeholder="Email" style="flex:1;min-width:100px;">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="adminDashboard.addNewIndividual()">Add</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.cancelNew('individual')">Cancel</button>
+                          </div>
+                        </div>
+
+                        <div style="margin-top:var(--sp-3);">
+                          <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.addAuthorRow()">+ Add Author</button>
+                        </div>
+                      </form>
+                    </div>
+
+                    <!-- Standardization -->
+                    <div id="etl-mapping-section" class="etl-section">
+                      <h3 class="etl-section-title">Standardization</h3>
+                      <table class="admin-table" id="etl-mapping-table">
+                        <thead>
+                          <tr>
+                            <th>CSV column</th>
+                            <th>Destination</th>
+                            <th>Property</th>
+                            <th>Procedure</th>
+                            <th>Unit</th>
+                            <th>Validation</th>
+                          </tr>
+                        </thead>
+                        <tbody id="etl-mapping-tbody"></tbody>
+                      </table>
+                    </div>
+
+                    <!-- Save / Validate -->
+                    <div style="margin-top:var(--sp-5);display:flex;align-items:center;gap:var(--sp-3);">
+                      <button type="button" class="btn btn-primary" id="etl-save-btn">Save</button>
+                      <button type="button" class="btn" id="etl-validate-btn" style="background:#17a2b8;color:#fff;">Validate</button>
+                      <span id="etl-save-status" style="font-size:var(--fs-sm);"></span>
+                    </div>
+
+                  </div>
+
+                </div>
+              </section>
+
               <!-- Soil profiles section -->
               <section class="layers-section">
                 <h3 class="layers-section-title">Soil profiles</h3>
@@ -351,155 +494,12 @@ class AdminDashboard {
 
             </div>
 
-            <!-- ETL Tab -->
-            <div id="etl-tab" class="tab-pane">
-              <div class="etl-steps">
-
-                <!-- List view (always visible unless detail panel open) -->
-                <div id="etl-list-view">
-                  <div style="display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-4);">
-                    <input type="file" id="etl-file-input" accept=".csv">
-                    <button type="button" class="btn btn-primary btn-sm" id="etl-upload-btn">Upload CSV</button>
-                    <span id="etl-upload-status" style="font-size:var(--fs-sm);"></span>
-                  </div>
-                  <div id="etl-datasets-list"></div>
-                </div>
-
-                <!-- Detail panel (hidden until Open is clicked) -->
-                <div id="etl-detail-panel" style="display:none;">
-
-                  <div style="margin-bottom:var(--sp-4);">
-                    <button type="button" class="btn btn-secondary btn-sm" id="etl-back-btn">&larr; Back to list</button>
-                    <span id="etl-detail-title" style="font-weight:600;margin-left:var(--sp-3);"></span>
-                  </div>
-
-                  <!-- Preview -->
-                  <details id="etl-preview-section" class="etl-section" open>
-                    <summary class="etl-section-title" style="cursor:pointer;">Preview <span id="etl-preview-info" style="font-weight:normal;font-size:var(--fs-sm);color:#555;"></span></summary>
-                    <div class="etl-preview-scroll" style="margin-top:var(--sp-3);">
-                      <table class="admin-table" id="etl-preview-table">
-                        <thead id="etl-preview-thead"></thead>
-                        <tbody id="etl-preview-tbody"></tbody>
-                      </table>
-                    </div>
-                    <div id="etl-preview-pager" style="display:flex;align-items:center;gap:var(--sp-3);font-size:var(--fs-sm);margin-bottom:var(--sp-3);">
-                      <button type="button" class="btn btn-sm" id="etl-preview-prev">Previous</button>
-                      <span id="etl-preview-page-info"></span>
-                      <button type="button" class="btn btn-sm" id="etl-preview-next">Next</button>
-                    </div>
-                  </details>
-
-                  <!-- Metadata -->
-                  <div id="etl-section-metadata" class="etl-section">
-                    <h3 class="etl-section-title">Metadata</h3>
-                    <form id="etl-metadata-form">
-                      <div class="etl-metadata-grid" style="margin-bottom:var(--sp-4);">
-                        <label for="etl-project">Project</label>
-                        <div>
-                          <select id="etl-project" required><option value="">Loading...</option></select>
-                          <div id="etl-new-project" class="etl-new-entry" style="display:none;">
-                            <input type="text" id="etl-new-project-id" placeholder="Project ID" style="margin-top:4px;">
-                            <input type="text" id="etl-new-project-name" placeholder="Project Name" style="margin-top:4px;">
-                            <textarea id="etl-new-project-description"
-                                      placeholder="Project description" rows="2"
-                                      style="margin-top:4px;width:100%;"></textarea>
-                            <button type="button" class="btn btn-primary btn-sm" style="margin-top:4px;" onclick="adminDashboard.addNewProject()">Add</button>
-                            <button type="button" class="btn btn-secondary btn-sm" style="margin-top:4px;" onclick="adminDashboard.cancelNew('project')">Cancel</button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="etl-metadata-grid" style="margin-bottom:var(--sp-4);">
-                        <label for="etl-abstract">Abstract</label>
-                        <div><textarea id="etl-abstract" rows="3" style="width:100%;font-family:inherit;font-size:var(--fs-sm);padding:4px 8px;border:1px solid var(--color-border-strong);border-radius:var(--radius-sm);" placeholder="Project description..."></textarea></div>
-                        <label for="etl-license">License</label>
-                        <div>
-                          <select id="etl-license" style="width:100%;">
-                            <option value="">-- Select --</option>
-                            <option value="CC BY">CC BY</option>
-                            <option value="CC BY-SA">CC BY-SA</option>
-                            <option value="CC BY-NC">CC BY-NC</option>
-                            <option value="CC BY-NC-SA">CC BY-NC-SA</option>
-                            <option value="CC BY-ND">CC BY-ND</option>
-                            <option value="CC BY-NC-ND">CC BY-NC-ND</option>
-                            <option value="CC0">CC0</option>
-                            <option value="Public Domain Mark">Public Domain Mark</option>
-                          </select>
-                        </div>
-                        <label for="etl-epsg">EPSG code of the coordinates</label>
-                        <div><input type="text" id="etl-epsg" value="4326" style="width:80px;padding:2px 6px;font-size:var(--fs-sm);"></div>
-                      </div>
-
-                      <div class="etl-author-row etl-author-header">
-                        <div class="etl-author-field"><label>Organisation</label></div>
-                        <div class="etl-author-field"><label>Author</label></div>
-                        <div class="etl-author-field etl-author-field-sm"><label>Position</label></div>
-                        <div class="etl-author-field etl-author-field-sm"><label>Role</label></div>
-                      </div>
-                      <div id="etl-author-rows"></div>
-
-                      <div id="etl-new-org-block" class="etl-new-entry" style="display:none;margin-top:var(--sp-2);margin-bottom:var(--sp-2);">
-                        <strong style="font-size:var(--fs-xs);">New Organisation</strong>
-                        <div style="display:flex;gap:var(--sp-2);margin-top:4px;flex-wrap:wrap;">
-                          <input type="text" id="etl-new-org-id" placeholder="Organisation ID" style="flex:1;min-width:100px;">
-                          <input type="text" id="etl-new-org-country" placeholder="Country" style="flex:1;min-width:80px;">
-                          <input type="text" id="etl-new-org-city" placeholder="City" style="flex:1;min-width:80px;">
-                          <button type="button" class="btn btn-primary btn-sm" onclick="adminDashboard.addNewOrganisation()">Add</button>
-                          <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.cancelNew('organisation')">Cancel</button>
-                        </div>
-                      </div>
-                      <div id="etl-new-ind-block" class="etl-new-entry" style="display:none;margin-bottom:var(--sp-2);">
-                        <strong style="font-size:var(--fs-xs);">New Author</strong>
-                        <div style="display:flex;gap:var(--sp-2);margin-top:4px;flex-wrap:wrap;">
-                          <input type="text" id="etl-new-ind-id" placeholder="Name / ID" style="flex:1;min-width:100px;">
-                          <input type="email" id="etl-new-ind-email" placeholder="Email" style="flex:1;min-width:100px;">
-                          <button type="button" class="btn btn-primary btn-sm" onclick="adminDashboard.addNewIndividual()">Add</button>
-                          <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.cancelNew('individual')">Cancel</button>
-                        </div>
-                      </div>
-
-                      <div style="margin-top:var(--sp-3);">
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="adminDashboard.addAuthorRow()">+ Add Author</button>
-                      </div>
-                    </form>
-                  </div>
-
-                  <!-- Standardization -->
-                  <div id="etl-mapping-section" class="etl-section">
-                    <h3 class="etl-section-title">Standardization</h3>
-                    <table class="admin-table" id="etl-mapping-table">
-                      <thead>
-                        <tr>
-                          <th>CSV column</th>
-                          <th>Destination</th>
-                          <th>Property</th>
-                          <th>Procedure</th>
-                          <th>Unit</th>
-                          <th>Validation</th>
-                        </tr>
-                      </thead>
-                      <tbody id="etl-mapping-tbody"></tbody>
-                    </table>
-                  </div>
-
-                  <!-- Save / Validate -->
-                  <div style="margin-top:var(--sp-5);display:flex;align-items:center;gap:var(--sp-3);">
-                    <button type="button" class="btn btn-primary" id="etl-save-btn">Save</button>
-                    <button type="button" class="btn" id="etl-validate-btn" style="background:#17a2b8;color:#fff;">Validate</button>
-                    <span id="etl-save-status" style="font-size:var(--fs-sm);"></span>
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
-
             <!-- Rasters Tab (formerly "Add Raster"; now also holds the rasters list moved from the Layers tab) -->
             <div id="add-raster-tab" class="tab-pane">
 
               <div style="display:flex;gap:var(--sp-5);align-items:flex-start;flex-wrap:wrap;">
-              <section class="admin-form" style="flex:0 0 820px;max-width:820px;">
-                <h3>Upload GeoTIFF</h3>
+              <section class="layers-section" style="flex:0 0 820px;max-width:820px;">
+                <h3 class="layers-section-title">Upload GeoTIFF</h3>
 
                 <div style="display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-3);align-items:center;">
                   <label>File</label>
@@ -1004,18 +1004,17 @@ class AdminDashboard {
     });
     document.getElementById(`${tab}-tab`).classList.add('active');
 
-    // Load ETL codelists when tab is first opened
-    if (tab === 'etl' && !this.etlCodelistsLoaded) {
-      this.loadEtlCodelists();
-    }
-
     if (tab === 'dashboard') {
       this.loadDashboard();
     }
 
-    // Soil profiles counts can be stale after an ETL ingest/prune from
-    // another tab — always refresh when opening this tab.
+    // Soil profiles tab now hosts the ETL "Upload profiles" section too.
+    // Load ETL codelists lazily on first open, and refresh profile counts
+    // every time (they can be stale after an ingest/prune).
     if (tab === 'layers') {
+      if (!this.etlCodelistsLoaded) {
+        this.loadEtlCodelists();
+      }
       this.loadSoilProfileLayers().then(() => this.renderSoilProfileLayers());
     }
 
@@ -3400,7 +3399,11 @@ class AdminDashboard {
   async ingestDataset(tableName) {
     this.setRowResult(tableName, 'Ingesting...', false);
     try {
-      const result = await api.ingestDataset(tableName);
+      // Send the currently-picked license from the ETL form so the stub
+      // mapset can record it as other_constraints. Empty string → null.
+      const licenseEl = document.getElementById('etl-license');
+      const license = (licenseEl && licenseEl.value || '').trim() || null;
+      const result = await api.ingestDataset(tableName, license ? { license } : undefined);
       let msg = result.message || `Ingested ${result.ingested}/${result.total} rows`;
       if (result.errors && result.errors.length) {
         msg += `\nErrors: ${result.errors.length}`;

@@ -18,6 +18,7 @@ let appConfig = {};
 let currentLayers = {};
 let profileLayers = {};
 let profileColors = {};
+let profileMapsetIds = {};
 let activeLayer = null;
 
 // ==================== Initialization ====================
@@ -701,9 +702,19 @@ async function loadProfiles() {
     // Get unique project names
     const projectNames = [...new Set(profiles.map(p => p.project_name || 'Unknown Project'))];
     console.log('Projects found:', projectNames);
-    
+
     // Generate colors for each project
     profileColors = generateProjectColors(projectNames);
+
+    // Map project_name → mapset_id so the layer-control row can link to the
+    // ISO 19139 metadata popup (the stub mapset_id is also the catalogue id).
+    profileMapsetIds = {};
+    profiles.forEach(p => {
+      const name = p.project_name || 'Unknown Project';
+      if (p.mapset_id && !profileMapsetIds[name]) {
+        profileMapsetIds[name] = p.mapset_id;
+      }
+    });
     
     // Create GeoJSON format parser
     const geoJsonFormat = new GeoJSON();
@@ -890,16 +901,6 @@ function addProfileLayerControl() {
   });
   header.appendChild(showDataBtn);
 
-  const csvIcons = document.createElement('div');
-  csvIcons.className = 'layer-icons';
-  csvIcons.innerHTML = `<a href="#" title="Download CSV"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z'/%3E%3C/svg%3E" alt="Download"></a>`;
-  csvIcons.querySelector('a').addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    downloadProfilesCsv();
-  });
-  header.appendChild(csvIcons);
-
   profileGroup.appendChild(header);
   
   // Create content container
@@ -962,6 +963,40 @@ function addProfileLayerControl() {
     
     layerItem.appendChild(checkbox);
     layerItem.appendChild(label);
+
+    // Metadata "i" icon — same style as the raster layer items. The stub
+    // mapset_id IS the catalogue identifier, so /api/raster/metadata/<id>
+    // resolves for both grid and vector layers.
+    const mapsetId = profileMapsetIds[projectName];
+    if (mapsetId) {
+      const infoIcons = document.createElement('div');
+      infoIcons.className = 'layer-icons';
+      infoIcons.innerHTML = `<a href="#" class="metadata-link" title="Metadata"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z'/%3E%3C/svg%3E" alt="Info"></a>`;
+      infoIcons.querySelector('a').addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        await showMetadataPopup(`/api/raster/metadata/${encodeURIComponent(mapsetId)}`);
+      });
+      layerItem.appendChild(infoIcons);
+    }
+
+    // Per-project download — exports the profiles belonging to this project
+    // (in the same CSV columns the data panel uses).
+    const dlIcons = document.createElement('div');
+    dlIcons.className = 'layer-icons';
+    dlIcons.innerHTML = `<a href="#" title="Download CSV"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z'/%3E%3C/svg%3E" alt="Download"></a>`;
+    dlIcons.querySelector('a').addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      try {
+        await downloadProjectProfilesCsv(projectName);
+      } catch (err) {
+        console.error('Profile CSV download failed:', err);
+        alert('Profile CSV download failed: ' + (err && err.message ? err.message : err));
+      }
+    });
+    layerItem.appendChild(dlIcons);
+
     layerItem.appendChild(colorWrapper);
     content.appendChild(layerItem);
     
@@ -1462,17 +1497,19 @@ async function refreshVisibleProfilesData() {
         console.warn('Failed to load observation bounds:', e);
       }
     }
-    const profileInfoByCode = new Map();
+    // Plain object — this module imports OpenLayers' Map class, so
+    // `new Map()` would build an OL Map, not a JS Map.
+    const profileInfoByCode = {};
     allFeatures.forEach(f => {
       const code = f.get('profile_code');
-      if (code) profileInfoByCode.set(code, {
+      if (code) profileInfoByCode[code] = {
         profile_id: f.get('profile_id'),
         project_name: f.get('project_name') || '',
         latitude: f.get('latitude'),
         longitude: f.get('longitude'),
         altitude: f.get('altitude'),
         sampling_date: f.get('sampling_date') || f.get('date') || ''
-      });
+      };
     });
 
     const baseCols = ['project_name', 'profile_id', 'profile_code', 'latitude', 'longitude', 'altitude', 'sampling_date', 'upper_depth', 'lower_depth'];
@@ -1486,7 +1523,7 @@ async function refreshVisibleProfilesData() {
           (o.lower_depth == null ? '' : o.lower_depth);
         let row = groups[key];
         if (!row) {
-          const info = profileInfoByCode.get(o.profile_code) || {};
+          const info = profileInfoByCode[o.profile_code] || {};
           row = {
             profile_id: info.profile_id != null ? info.profile_id : '',
             project_name: info.project_name || '',
@@ -1702,6 +1739,123 @@ function renderProfilesColumnsPopover() {
     renderProfilesColumnsPopover();
     renderProfilesDataTable();
   });
+}
+
+// Per-project download — same rich CSV the Data panel produces, but
+// filtered to one project. Builds rows from `allFeatures` (the source of
+// truth before clustering) joined with the observations cache.
+async function downloadProjectProfilesCsv(projectName) {
+  const unifiedLayer = profileLayers['all'];
+  const allFeatures = (unifiedLayer && unifiedLayer.get('allFeatures')) || [];
+  const projectFeatures = allFeatures.filter(
+    f => (f.get('project_name') || '') === projectName
+  );
+  if (!projectFeatures.length) {
+    alert(`No profiles loaded for "${projectName}".`);
+    return;
+  }
+
+  if (!_allObservationsCache) {
+    try {
+      _allObservationsCache = await api.getObservations();
+    } catch (e) {
+      alert('Failed to load observations: ' + (e && e.message ? e.message : e));
+      return;
+    }
+  }
+
+  // Plain object keyed by profile_code (NOT `new Map()` — this module
+  // imports OpenLayers' Map class, which would shadow the JS built-in).
+  const profileInfoByCode = {};
+  projectFeatures.forEach(f => {
+    const code = f.get('profile_code');
+    if (!code) return;
+    profileInfoByCode[code] = {
+      profile_id: f.get('profile_id'),
+      project_name: f.get('project_name') || '',
+      latitude: f.get('latitude'),
+      longitude: f.get('longitude'),
+      altitude: f.get('altitude'),
+      sampling_date: f.get('sampling_date') || f.get('date') || '',
+    };
+  });
+  const codes = new Set(Object.keys(profileInfoByCode));
+
+  const baseCols = ['project_name', 'profile_id', 'profile_code', 'latitude',
+                    'longitude', 'altitude', 'sampling_date',
+                    'upper_depth', 'lower_depth'];
+  const groups = {};
+  const propColsSet = {};
+  _allObservationsCache
+    .filter(o => codes.has(o.profile_code))
+    .forEach(o => {
+      const key = o.profile_code + '|' +
+        (o.upper_depth == null ? '' : o.upper_depth) + '|' +
+        (o.lower_depth == null ? '' : o.lower_depth);
+      let row = groups[key];
+      if (!row) {
+        const info = profileInfoByCode[o.profile_code] || {};
+        row = {
+          profile_id: info.profile_id != null ? info.profile_id : '',
+          project_name: info.project_name || '',
+          profile_code: o.profile_code,
+          latitude: info.latitude != null ? Number(info.latitude).toFixed(5) : '',
+          longitude: info.longitude != null ? Number(info.longitude).toFixed(5) : '',
+          altitude: info.altitude != null ? info.altitude : '',
+          sampling_date: info.sampling_date || '',
+          upper_depth: o.upper_depth,
+          lower_depth: o.lower_depth,
+        };
+        groups[key] = row;
+      }
+      const prop = o.property_num_id || o.property_phys_chem_id || '';
+      const proc = o.procedure_num_id || o.procedure_phys_chem_id || '';
+      const unit = o.unit_of_measure_id || '';
+      const colKey = [prop, proc, unit].filter(Boolean).join('.');
+      if (!colKey) return;
+      if (!propColsSet[colKey]) propColsSet[colKey] = true;
+      row[colKey] = o.value;
+    });
+
+  const rows = Object.keys(groups).map(k => groups[k]);
+  if (!rows.length) {
+    // No observations for any of this project's profiles — fall back to a
+    // profile-only dump so the user still gets something useful.
+    projectFeatures.forEach(f => {
+      const code = f.get('profile_code');
+      if (!code) return;
+      const info = profileInfoByCode[code] || {};
+      rows.push({
+        profile_id: info.profile_id != null ? info.profile_id : '',
+        project_name: info.project_name || '',
+        profile_code: code,
+        latitude: info.latitude != null ? Number(info.latitude).toFixed(5) : '',
+        longitude: info.longitude != null ? Number(info.longitude).toFixed(5) : '',
+        altitude: info.altitude != null ? info.altitude : '',
+        sampling_date: info.sampling_date || '',
+        upper_depth: '',
+        lower_depth: '',
+      });
+    });
+  }
+  const propCols = Object.keys(propColsSet).sort();
+  const columns = baseCols.concat(propCols);
+
+  const defuse = (s) => /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
+  const csv = [columns.join(',')].concat(
+    rows.map(r => columns.map(c => {
+      const raw = r[c] == null ? '' : String(r[c]);
+      const v = defuse(raw);
+      return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    }).join(','))
+  ).join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safe = projectName.replace(/[^A-Za-z0-9._-]+/g, '_');
+  a.href = url; a.download = `${safe}_observations.csv`; a.click();
+  URL.revokeObjectURL(url);
 }
 
 function downloadProfilesCsv() {

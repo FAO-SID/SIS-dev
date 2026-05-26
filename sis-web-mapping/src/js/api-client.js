@@ -395,9 +395,10 @@ class SISApiClient {
     });
   }
 
-  async ingestDataset(tableName) {
+  async ingestDataset(tableName, body) {
     return this.authenticatedRequest(`/api/etl/datasets/${encodeURIComponent(tableName)}/ingest`, {
-      method: 'POST'
+      method: 'POST',
+      body: body ? JSON.stringify(body) : undefined,
     });
   }
 

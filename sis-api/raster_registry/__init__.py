@@ -1,6 +1,6 @@
 """
 Raster registry — shared service that turns a GeoTIFF on disk into a
-fully-registered SIS layer (soil_data.* rows + XML in pyCSW + api.layer).
+fully-registered SIS layer (soil_data.* rows + XML in pyCSW).
 
 Used by:
   - Add Raster (operator uploads a TIFF)

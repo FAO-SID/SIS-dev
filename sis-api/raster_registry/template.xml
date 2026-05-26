@@ -166,10 +166,7 @@
       <gmd:presentationForm>
         <gmd:MD_PresentationFormCode codeList="https://schemas.isotc211.org/19139/resources/codeList.xml#MD_PresentationFormCode" codeListValue="***presentation_form***"/>
       </gmd:presentationForm>
-      <gmd:spatialResolution>
-        <gmd:MD_Resolution>***resolution***
-        </gmd:MD_Resolution>
-      </gmd:spatialResolution>
+***spatial_resolution_xml***
       <gmd:language>
         <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="***language_code***" />
       </gmd:language>***topic_category_xml***

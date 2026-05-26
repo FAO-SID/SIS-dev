@@ -135,6 +135,18 @@ the one hand, soil nutrient maps will provide a baseline for identifying areas w
       </gmd:graphicOverview>
       <gmd:descriptiveKeywords>
         <gmd:MD_Keywords>
+          <gmd:keyword>
+            <gco:CharacterString>soil</gco:CharacterString>
+          </gmd:keyword>
+          <gmd:keyword>
+            <gco:CharacterString>digital soil mapping</gco:CharacterString>
+          </gmd:keyword>
+          <gmd:keyword>
+            <gco:CharacterString>potassium</gco:CharacterString>
+          </gmd:keyword>
+          <gmd:keyword>
+            <gco:CharacterString>nutrient</gco:CharacterString>
+          </gmd:keyword>
           <gmd:type>
             <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme" />
           </gmd:type>
@@ -160,6 +172,12 @@ the one hand, soil nutrient maps will provide a baseline for identifying areas w
       </gmd:descriptiveKeywords>
       <gmd:descriptiveKeywords>
         <gmd:MD_Keywords>
+          <gmd:keyword>
+            <gco:CharacterString>Southern Asia</gco:CharacterString>
+          </gmd:keyword>
+          <gmd:keyword>
+            <gco:CharacterString>Bhutan</gco:CharacterString>
+          </gmd:keyword>
           <gmd:type>
             <gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="place" />
           </gmd:type>

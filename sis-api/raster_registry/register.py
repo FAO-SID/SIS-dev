@@ -3,9 +3,8 @@
 Steps:
   1. inspect (extract metadata)
   2. populate soil_data.*  → DB triggers generate .map / .sld
-  3. render XML  (stubbed until xml_render is fully implemented)
-  4. load into pyCSW  (stubbed)
-  5. upsert api.layer  → SPA picks it up immediately
+  3. render XML
+  4. load into pyCSW
 
 The caller passes a *committed* connection-or-not? — currently we expect
 the caller to manage transactions. The orchestrator does NOT call commit
@@ -39,7 +38,6 @@ class ContactRef(BaseModel):
 class RegisteredLayer(BaseModel):
     layer_id: str
     spatial_metadata_layer_inserted: bool
-    api_layer_inserted: bool
     xml_published: bool
     xml_path: Optional[str] = None
     map_path: Optional[str] = None
@@ -244,15 +242,11 @@ def register_raster(
                 log.exception("pycsw_load failed for %s", meta.layer_id)
                 warnings.append(f"pycsw_load failed: {e}")
 
-    # Source of truth post-merge is soil_data.layer + soil_data.mapset.
-    # Old api.layer shadow writes have been retired — the table will be
-    # dropped soon. WMS URLs are built per-request by /api/layer/all.
     map_path_on_disk = f"/etc/mapserver/{meta.layer_id}.map"
 
     return RegisteredLayer(
         layer_id=meta.layer_id,
         spatial_metadata_layer_inserted=True,
-        api_layer_inserted=False,
         xml_published=xml_published,
         xml_path=xml_path,
         map_path=map_path_on_disk,

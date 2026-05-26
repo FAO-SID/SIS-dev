@@ -459,7 +459,6 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_a
       2. soil_data.mapset row if no other layers reference it
       3. pyCSW record (CSW-T Delete by file_identifier)
       4. on-disk artifacts in /srv/rasters and /srv/pycsw-records
-      5. api.layer row
 
     Best-effort on filesystem + pyCSW — DB state is authoritative. Failures
     in those steps are returned as warnings, not 5xx.
@@ -469,8 +468,6 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_a
     warnings: list = []
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            # Source of truth is soil_data.layer (post-merge). api.layer is
-            # legacy and may not have the row even when the raster exists.
             cur.execute("SELECT layer_id FROM soil_data.layer WHERE layer_id = %s", (layer_id,))
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Layer not found")
@@ -562,7 +559,7 @@ async def get_all_layers(current_user: dict = Depends(get_current_user)):
                   ) AS property_name
                 FROM soil_data.layer l
                 LEFT JOIN soil_data.mapset       m  ON m.mapset_id          = l.mapset_id
-                WHERE l.file_path IS NOT NULL AND l.file_path <> ''
+                WHERE m.spatial_representation_type_code = 'grid'
                 ORDER BY l.layer_id
             """)
             rows = cur.fetchall()
@@ -638,9 +635,10 @@ async def get_published_layers(
 ):
     """Published raster layers for the public web-mapping SPA.
 
-    Sourced from soil_data.layer + soil_data.mapset (no api.layer reads).
-    Vector stubs (no on-disk raster) are excluded by `l.file_path <> ''`.
-    URLs are built per-request from the configured MapServer / download base.
+    Sourced from soil_data.layer + soil_data.mapset, filtered to
+    spatial_representation_type_code = 'grid' so vector stubs (ETL profile
+    datasets) don't surface here. URLs are built per-request from the
+    configured MapServer / download base.
     """
     download_base = "/downloads/"
     map_dir = "/etc/mapserver"
@@ -674,7 +672,7 @@ async def get_published_layers(
                 FROM soil_data.layer l
                 LEFT JOIN soil_data.mapset m ON m.mapset_id = l.mapset_id
                 WHERE l.is_published = TRUE
-                  AND l.file_path IS NOT NULL AND l.file_path <> ''
+                  AND m.spatial_representation_type_code = 'grid'
                 ORDER BY l.layer_id
             """)
             rows = cur.fetchall()
@@ -1000,7 +998,9 @@ async def create_project(payload: dict, current_user: dict = Depends(get_current
 
 @app.patch("/api/codelist/projects/{project_id}")
 async def update_project(project_id: str, payload: dict, current_user: dict = Depends(get_current_user)):
-    description = payload.get("description")
+    # Accept either `description` or the legacy ETL key `abstract` from
+    # callers that still POST the old shape.
+    description = payload.get("description") if "description" in payload else payload.get("abstract")
     with get_db() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -1309,9 +1309,15 @@ async def save_dataset_columns(
 @app.post("/api/etl/datasets/{table_name}/ingest")
 async def ingest_dataset(
     table_name: str,
+    payload: Optional[dict] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """Ingest staged CSV data into soil_data tables based on column mappings."""
+    """Ingest staged CSV data into soil_data tables based on column mappings.
+
+    Optional JSON body: { "license": "<CC BY-NC-SA-4.0|...>" } — copied to the
+    stub mapset's other_constraints.
+    """
+    license_val = (payload or {}).get("license") if isinstance(payload, dict) else None
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             # Get dataset metadata
@@ -1408,18 +1414,43 @@ async def ingest_dataset(
             stub_id = f"{country_id}-{project_id}"
             cur.execute("""
                 INSERT INTO soil_data.mapset
-                    (country_id, project_id, mapped_property_id, mapset_id)
-                VALUES (%s, %s, NULL, %s)
-                ON CONFLICT (mapset_id) DO NOTHING
-            """, (country_id, project_id, stub_id))
+                    (country_id, project_id, mapped_property_id, mapset_id,
+                     keyword_theme, keyword_place, costum_group, title,
+                     spatial_representation_type_code)
+                VALUES (%s, %s, NULL, %s, ARRAY['soil profile'],
+                        (SELECT ARRAY_REMOVE(ARRAY[un_reg, en], NULL)
+                         FROM soil_data.country
+                         WHERE country_id = (SELECT value FROM api.setting WHERE key='COUNTRY_CODE')),
+                        %s,
+                        (SELECT name FROM soil_data.project
+                         WHERE country_id = %s AND project_id = %s),
+                        'vector')
+                ON CONFLICT (mapset_id) DO UPDATE SET
+                    keyword_theme = COALESCE(EXCLUDED.keyword_theme,
+                                             soil_data.mapset.keyword_theme),
+                    keyword_place = COALESCE(EXCLUDED.keyword_place,
+                                             soil_data.mapset.keyword_place),
+                    costum_group  = COALESCE(EXCLUDED.costum_group,
+                                             soil_data.mapset.costum_group),
+                    title         = COALESCE(EXCLUDED.title,
+                                             soil_data.mapset.title),
+                    spatial_representation_type_code = 'vector'
+            """, (country_id, project_id, stub_id, project_id,
+                  country_id, project_id))
             # file_orig_name has NOT NULL + UNIQUE — use the stub_id as a
             # placeholder so each stub row gets a unique non-null value.
+            # costum_name mirrors soil_data.project.name (same source the
+            # stub mapset's title uses).
             cur.execute("""
                 INSERT INTO soil_data.layer
-                    (mapset_id, layer_id, file_path, is_published, file_orig_name)
-                VALUES (%s, %s, '', TRUE, %s)
-                ON CONFLICT (layer_id) DO NOTHING
-            """, (stub_id, stub_id, f"(stub) {stub_id}"))
+                    (mapset_id, layer_id, file_path, is_published, file_orig_name, costum_name)
+                VALUES (%s, %s, '', TRUE, %s,
+                        (SELECT name FROM soil_data.project
+                         WHERE country_id = %s AND project_id = %s))
+                ON CONFLICT (layer_id) DO UPDATE SET
+                    costum_name = COALESCE(EXCLUDED.costum_name,
+                                           soil_data.layer.costum_name)
+            """, (stub_id, stub_id, f"(stub) {stub_id}", country_id, project_id))
             sites_inserted.add(site_id)
             project_sites_inserted.add((project_id, site_id))
 
@@ -1614,6 +1645,84 @@ async def ingest_dataset(
                     if len(errors) > 50:
                         errors.append("... too many errors, stopping")
                         break
+
+            # Update the stub mapset's catalogue fields from the data we
+            # just ingested:
+            #   abstract            ← soil_data.project.description
+            #   other_constraints   ← license picked in the ETL form
+            #   creation_date       ← max(plot.sampling_date) for this csv
+            #   revision_date       ← CURRENT_DATE
+            #   publication_date    ← CURRENT_DATE
+            #   time_period_begin   ← min(plot.sampling_date)
+            #   time_period_end     ← max(plot.sampling_date)
+            cur.execute("""
+                UPDATE soil_data.mapset m
+                SET
+                  abstract          = COALESCE(p.description, m.abstract),
+                  other_constraints = COALESCE(%s, m.other_constraints),
+                  publication_date  = CURRENT_DATE,
+                  revision_date     = CURRENT_DATE,
+                  creation_date     = COALESCE(d.max_date, m.creation_date),
+                  time_period_begin = COALESCE(d.min_date, m.time_period_begin),
+                  time_period_end   = COALESCE(d.max_date, m.time_period_end)
+                FROM soil_data.project p,
+                     (SELECT MIN(sampling_date) AS min_date,
+                             MAX(sampling_date) AS max_date
+                      FROM soil_data.plot WHERE csv = %s) d
+                WHERE m.mapset_id = %s
+                  AND p.country_id = m.country_id AND p.project_id = m.project_id
+            """, (license_val, table_name, stub_id))
+
+            # Stub layer geometry-derived fields. The plot points just
+            # inserted carry an SRID — copy that to the layer, plus the
+            # native extent and a WGS84 bbox for the catalogue's
+            # gmd:EX_GeographicBoundingBox.
+            cur.execute("""
+                UPDATE soil_data.layer l
+                SET
+                  reference_system_identifier_code = b.epsg::text,
+                  spatial_reference  = 'EPSG:' || b.epsg::text,
+                  extent             = b.extent_native,
+                  west_bound_longitude = b.minx,
+                  east_bound_longitude = b.maxx,
+                  south_bound_latitude = b.miny,
+                  north_bound_latitude = b.maxy,
+                  distribution_format  = 'PostGIS',
+                  file_size            = pg_total_relation_size(('soil_data_upload.' || %s)::regclass),
+                  file_size_pretty     = pg_size_pretty(pg_total_relation_size(('soil_data_upload.' || %s)::regclass)),
+                  file_orig_name       = COALESCE(
+                                            (SELECT file_name FROM api.uploaded_dataset
+                                             WHERE table_name = %s),
+                                            l.file_orig_name),
+                  file_path            = 'soil_data_upload.' || %s
+                FROM (
+                  SELECT
+                    MIN(ST_SRID(geom)) AS epsg,
+                    ST_XMin(ST_Extent(geom))::text || ' ' ||
+                    ST_YMin(ST_Extent(geom))::text || ' ' ||
+                    ST_XMax(ST_Extent(geom))::text || ' ' ||
+                    ST_YMax(ST_Extent(geom))::text AS extent_native,
+                    ST_XMin(ST_Extent(ST_Transform(geom, 4326))) AS minx,
+                    ST_XMax(ST_Extent(ST_Transform(geom, 4326))) AS maxx,
+                    ST_YMin(ST_Extent(ST_Transform(geom, 4326))) AS miny,
+                    ST_YMax(ST_Extent(ST_Transform(geom, 4326))) AS maxy
+                  FROM soil_data.plot
+                  WHERE csv = %s AND geom IS NOT NULL
+                ) b
+                WHERE l.layer_id = %s AND b.epsg IS NOT NULL
+            """, (table_name, table_name, table_name, table_name, table_name, stub_id))
+
+            # Render ISO 19139 XML for the stub mapset and load into pyCSW.
+            # render_xml handles vector vs grid (spatialResolution omitted
+            # for vector point datasets). Best-effort: catalogue failures
+            # shouldn't roll back the data ingest.
+            try:
+                from raster_registry.xml_render import render_xml as _render_xml
+                from raster_registry.pycsw_load import write_xml_and_load as _write_xml_and_load
+                xml_content = _render_xml(conn, stub_id)
+                _write_xml_and_load(stub_id, xml_content)
+            except Exception as e:
+                log.warning("ETL xml/pycsw publish failed for %s: %s", stub_id, e)
 
             # Update dataset status and note
             status = "Ingested" if not errors else "Partial"
@@ -3197,8 +3306,7 @@ async def inspect_raster(
 
 # ==================== Raster registry — register ====================
 # Calls raster_registry.register_raster() end-to-end: inspect → populate
-# soil_data.* (triggers .map/.sld) → upsert api.layer.
-# XML / pyCSW load still TODO — see RASTER-AND-DST-PLAN.md.
+# soil_data.* (triggers .map/.sld) → render ISO 19139 XML → load into pyCSW.
 
 @app.post("/api/raster/register", status_code=status.HTTP_201_CREATED)
 async def register_raster_endpoint(

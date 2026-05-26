@@ -312,18 +312,20 @@ def render_xml(conn, layer_id: str) -> str:
            </gmd:MD_Identifier>
           </gmd:identifier>"""
 
+        # MD_Resolution must contain either equivalentScale or distance.
+        # Raster (grid) → pixel distance + uom. Vector point data has no
+        # uniform resolution, so emit no <gmd:spatialResolution> at all
+        # (the element is optional [0..*] in MD_DataIdentification).
         if spatial_representation_type_code == "vector":
-            resolution = f"""
-          <gmd:equivalentScale>
-            <gmd:MD_RepresentativeFraction>
-              <gmd:denominator><gco:Integer>{_x(distance_uom)}</gco:Integer></gmd:denominator>
-            </gmd:MD_RepresentativeFraction>
-          </gmd:equivalentScale>"""
+            spatial_resolution_xml = ""
         else:
-            resolution = f"""
+            spatial_resolution_xml = f"""      <gmd:spatialResolution>
+        <gmd:MD_Resolution>
           <gmd:distance>
             <gco:Distance uom="{_x(distance_uom)}">{_x(distance)}</gco:Distance>
-          </gmd:distance>"""
+          </gmd:distance>
+        </gmd:MD_Resolution>
+      </gmd:spatialResolution>"""
 
         keyword_theme_xml = _build_keyword_block(keyword_theme)
         keyword_discipline_xml = _build_keyword_block(keyword_discipline)
@@ -360,7 +362,7 @@ def render_xml(conn, layer_id: str) -> str:
             "***other_constraints***": _x(other_constraints),
             "***spatial_representation_type_code***": _x(spatial_representation_type_code),
             "***presentation_form***": _x(presentation_form),
-            "***resolution***": resolution,
+            "***spatial_resolution_xml***": spatial_resolution_xml,
             "***topic_category_xml***": topic_category_xml,
             "***time_period_begin***": _x(time_period_begin),
             "***time_period_end***": _x(time_period_end),
