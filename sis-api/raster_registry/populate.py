@@ -91,18 +91,18 @@ def populate_spatial_metadata(
               f"{meta.country_id}-{meta.project_id}"))
 
         # 1b. mapped_property — created on demand with quantitative defaults.
-        # Add-Raster passes an existing id (no-op here); DST runs may
-        # mint a fresh one (e.g. DST/SUITABILITY) so we create a stub row.
-        # If a property_num_id is supplied (Add-Raster form), set/update the
-        # FK so the mapped_property links back to the property_num catalogue.
+        # Upload GeoTIFF passes an existing mapped_property_id from the
+        # soil_data.mapped_property catalogue (no-op here on conflict).
+        # DST runs may mint a fresh id (e.g. DST/SUITABILITY) so we still
+        # need the INSERT branch. We do NOT touch property_num_id — the
+        # catalogue is the source of truth for that FK; new stubs get NULL.
         cur.execute("""
             INSERT INTO soil_data.mapped_property
-                (mapped_property_id, name, property_num_id, property_type, num_intervals,
+                (mapped_property_id, name, property_type, num_intervals,
                  start_color, end_color)
-            VALUES (%s, %s, %s, 'quantitative', 5, '#a50026', '#1a9850')
-            ON CONFLICT (mapped_property_id) DO UPDATE SET
-                property_num_id = COALESCE(EXCLUDED.property_num_id, soil_data.mapped_property.property_num_id)
-        """, (meta.property_id, meta.property_id, property_num_id))
+            VALUES (%s, %s, 'quantitative', 5, '#a50026', '#1a9850')
+            ON CONFLICT (mapped_property_id) DO NOTHING
+        """, (meta.property_id, meta.property_id))
 
         # 2. mapset — created on demand. mapset.mapped_property_id is the FK
         #    column referencing soil_data.mapped_property(mapped_property_id).

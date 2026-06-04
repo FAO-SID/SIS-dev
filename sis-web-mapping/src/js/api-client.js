@@ -286,9 +286,23 @@ class SISApiClient {
   async getProperties() {
     return this.authenticatedRequest('/api/codelist/properties');
   }
+  async createProperty(body) {
+    return this.authenticatedRequest('/api/codelist/properties', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  }
 
   async getProcedures() {
     return this.authenticatedRequest('/api/codelist/procedures');
+  }
+  async createProcedure(body) {
+    return this.authenticatedRequest('/api/codelist/procedures', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
   }
 
   async getUnits() {
@@ -453,6 +467,13 @@ class SISApiClient {
   async listRasterOrganisations() { return this.authenticatedRequest('/api/raster/organisations'); }
   async listRasterCountries() { return this.authenticatedRequest('/api/raster/countries'); }
   async listRasterMappedSoilProperties() { return this.authenticatedRequest('/api/raster/mapped_soil_properties'); }
+  async createRasterMappedSoilProperty(body) {
+    return this.authenticatedRequest('/api/raster/mapped_soil_properties', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  }
   async rasterFileExists(fileOrigName) {
     return this.authenticatedRequest(
       `/api/raster/file_exists?file_orig_name=${encodeURIComponent(fileOrigName)}`);
@@ -530,6 +551,7 @@ class SISApiClient {
 
   // ==================== DST ====================
 
+  async listDstInputs() { return this.authenticatedRequest('/api/dst/inputs'); }
   async listDstRecipes() { return this.authenticatedRequest('/api/dst/recipes'); }
   async getDstRecipe(id) { return this.authenticatedRequest(`/api/dst/recipes/${encodeURIComponent(id)}`); }
   async createDstRecipe(payload) {

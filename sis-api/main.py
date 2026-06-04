@@ -869,7 +869,21 @@ async def get_individuals(current_user: dict = Depends(get_current_user)):
 async def get_projects(current_user: dict = Depends(get_current_user)):
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT country_id, project_id, name, description FROM soil_data.project ORDER BY project_id")
+            # `abstract` and `license` come from the stub mapset (the same
+            # row the ETL ingest writes to). Falling back to project.description
+            # keeps things sensible for projects that have only been used for
+            # raster uploads. Both let the "Upload CSV" form auto-fill on
+            # project selection.
+            cur.execute("""
+                SELECT p.country_id, p.project_id, p.name,
+                       p.description,
+                       COALESCE(m.abstract, p.description) AS abstract,
+                       m.other_constraints                  AS license
+                FROM soil_data.project p
+                LEFT JOIN soil_data.mapset m
+                       ON m.mapset_id = p.country_id || '-' || p.project_id
+                ORDER BY p.project_id
+            """)
             return cur.fetchall()
 
 @app.get("/api/codelist/properties")
@@ -879,12 +893,102 @@ async def get_properties(current_user: dict = Depends(get_current_user)):
             cur.execute("SELECT property_num_id, property_name, uri FROM soil_data.property_num ORDER BY property_name")
             return cur.fetchall()
 
+
+@app.post("/api/codelist/properties", status_code=status.HTTP_201_CREATED)
+async def create_property(
+    payload: dict,
+    current_user: dict = Depends(get_current_user),
+):
+    """Add a row to soil_data.property_num from the ETL standardization
+    table's inline '+ Add Property…' temp row."""
+    pid = (payload.get("property_num_id") or "").strip().upper()
+    pname = (payload.get("property_name") or "").strip()
+    definition = (payload.get("definition") or "").strip() or None
+    uri = (payload.get("uri") or "").strip() or None
+    if not pid:
+        raise HTTPException(status_code=400, detail="property_num_id is required")
+    if not re.fullmatch(r"[A-Z0-9_]+", pid):
+        raise HTTPException(status_code=400,
+                            detail="property_num_id must be CAPS (A-Z, 0-9, _)")
+    if not pname:
+        raise HTTPException(status_code=400, detail="property_name is required")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    INSERT INTO soil_data.property_num
+                        (property_num_id, property_name, definition, uri)
+                    VALUES (%s, %s, %s, %s)
+                """, (pid, pname, definition, uri))
+            except psycopg2.errors.UniqueViolation:
+                raise HTTPException(status_code=409,
+                                    detail=f"property_num_id '{pid}' already exists")
+    log_audit(current_user['user_id'], None, "property_num_created",
+              {"property_num_id": pid, "property_name": pname,
+               "definition": definition, "uri": uri}, None)
+    return {"property_num_id": pid, "property_name": pname,
+            "definition": definition, "uri": uri}
+
 @app.get("/api/codelist/procedures")
 async def get_procedures(current_user: dict = Depends(get_current_user)):
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT procedure_num_id, procedure_name, uri FROM soil_data.procedure_num ORDER BY procedure_name")
             return cur.fetchall()
+
+
+@app.post("/api/codelist/procedures", status_code=status.HTTP_201_CREATED)
+async def create_procedure(
+    payload: dict,
+    current_user: dict = Depends(get_current_user),
+):
+    """Add a row to soil_data.procedure_num from the ETL standardization
+    table's inline '+ Add Procedure…' temp row.
+
+    When `property_num_id` is supplied the endpoint also inserts an
+    observation_num link (property × this procedure × 'dimensionless' unit)
+    so the new procedure immediately appears in that property's procedure
+    dropdown without manual catalogue surgery."""
+    pid = (payload.get("procedure_num_id") or "").strip().upper()
+    pname = (payload.get("procedure_name") or "").strip()
+    # `definition` is the user-facing label; stored in `reference` (the
+    # closest free-text column on soil_data.procedure_num).
+    reference = (payload.get("definition") or "").strip() or None
+    uri = (payload.get("uri") or "").strip() or None
+    property_num_id = (payload.get("property_num_id") or "").strip() or None
+    if not pid:
+        raise HTTPException(status_code=400, detail="procedure_num_id is required")
+    if not re.fullmatch(r"[A-Z0-9_]+", pid):
+        raise HTTPException(status_code=400,
+                            detail="procedure_num_id must be CAPS (A-Z, 0-9, _)")
+    if not pname:
+        raise HTTPException(status_code=400, detail="procedure_name is required")
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    INSERT INTO soil_data.procedure_num
+                        (procedure_num_id, procedure_name, reference, uri)
+                    VALUES (%s, %s, %s, %s)
+                """, (pid, pname, reference, uri))
+            except psycopg2.errors.UniqueViolation:
+                raise HTTPException(status_code=409,
+                                    detail=f"procedure_num_id '{pid}' already exists")
+            if property_num_id:
+                # observation_num needs a unit; default to 'dimensionless'
+                # so the row is valid. The user can switch the unit later.
+                cur.execute("""
+                    INSERT INTO soil_data.observation_num
+                        (property_num_id, procedure_num_id, unit_of_measure_id)
+                    VALUES (%s, %s, 'dimensionless')
+                    ON CONFLICT (property_num_id, procedure_num_id) DO NOTHING
+                """, (property_num_id, pid))
+    log_audit(current_user['user_id'], None, "procedure_num_created",
+              {"procedure_num_id": pid, "procedure_name": pname,
+               "definition": reference, "uri": uri,
+               "linked_property_num_id": property_num_id}, None)
+    return {"procedure_num_id": pid, "procedure_name": pname,
+            "definition": reference, "uri": uri}
 
 @app.get("/api/codelist/units")
 async def get_units(current_user: dict = Depends(get_current_user)):
@@ -953,6 +1057,25 @@ async def get_source_units(
                 ORDER BY c.unit_from
             """, (canonical,))
             convs = cur.fetchall()
+
+            # Procedures added inline via '+ Add Procedure…' get an
+            # observation_num row with 'dimensionless' as a placeholder unit
+            # (the user hasn't picked one yet). When that placeholder has no
+            # conversions pointing to it, fall back to the full unit
+            # catalogue so the user can pick any unit.
+            if canonical == "dimensionless" and not convs:
+                cur.execute("""
+                    SELECT unit_of_measure_id, uri FROM soil_data.unit_of_measure
+                    ORDER BY unit_of_measure_id
+                """)
+                return [{
+                    "unit_of_measure_id": u["unit_of_measure_id"],
+                    "operation": None,
+                    "value": None,
+                    "unit_to": None,
+                    "is_canonical": False,
+                    "uri": u["uri"],
+                } for u in cur.fetchall()]
 
             cur.execute("SELECT uri FROM soil_data.unit_of_measure WHERE unit_of_measure_id = %s", (canonical,))
             canonical_uri_row = cur.fetchone()
@@ -1270,6 +1393,28 @@ async def save_dataset_columns(
             project_id = payload.get("project_id")
 
             for col in columns:
+                # If the (property, procedure) pair was added inline via
+                # '+ Add Procedure…', observation_num was created with a
+                # 'dimensionless' placeholder unit. Now that the user has
+                # picked a real one, promote it to canonical — but only
+                # when nothing depends on the old canonical yet (no
+                # result_num rows referencing this observation_num).
+                prop_id = col.get("property_num_id")
+                proc_id = col.get("procedure_num_id")
+                unit_id = col.get("unit_of_measure_id")
+                if prop_id and proc_id and unit_id and unit_id != "dimensionless":
+                    cur.execute("""
+                        UPDATE soil_data.observation_num o
+                        SET unit_of_measure_id = %s
+                        WHERE o.property_num_id = %s
+                          AND o.procedure_num_id = %s
+                          AND o.unit_of_measure_id = 'dimensionless'
+                          AND NOT EXISTS (
+                              SELECT 1 FROM soil_data.result_num r
+                              WHERE r.observation_num_id = o.observation_num_id
+                          )
+                    """, (unit_id, prop_id, proc_id))
+
                 cur.execute("""
                     UPDATE api.uploaded_dataset_column
                     SET destination_table = %s,
@@ -1726,7 +1871,14 @@ async def ingest_dataset(
 
             # Update dataset status and note
             status = "Ingested" if not errors else "Partial"
-            note = f"Ingested {ingested}/{len(rows)} rows, {result_num_count} results"
+            profile_count = len(profiles_cache)
+            property_count = len({prop for (prop, _proc) in obs_num_cache.keys()})
+            note = (
+                f"Ingested {ingested}/{len(rows)} CSV rows, "
+                f"{profile_count} profiles, "
+                f"{property_count} soil properties, "
+                f"{result_num_count} measurements"
+            )
             if errors:
                 note += f", {len(errors)} errors"
             cur.execute("""
@@ -2550,6 +2702,7 @@ async def list_soil_profile_layers(current_user: dict = Depends(get_current_user
                ON tobs.country_id = p.country_id AND tobs.project_id = p.project_id
         LEFT JOIN published_obs pobs
                ON pobs.country_id = p.country_id AND pobs.project_id = p.project_id
+        WHERE COALESCE(pt.total_profiles, 0) > 0
         ORDER BY p.name;
     """
     with get_db() as conn:
@@ -2894,6 +3047,33 @@ def _dst_recipe_row_to_dict(row):
     }
 
 
+@app.get("/api/dst/inputs")
+async def list_dst_inputs(current_user: dict = Depends(get_current_user)):
+    """Candidate input rasters for the DST recipe builder.
+
+    Returns published grid layers (the same set that surfaces in the SPA's
+    Rasters list) with their stats_minimum / stats_maximum so the builder
+    can show the value range next to each row without an extra fetch."""
+    with get_db() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT
+                  l.layer_id,
+                  l.stats_minimum,
+                  l.stats_maximum,
+                  m.unit_of_measure_id,
+                  l.dimension_depth,
+                  l.dimension_stats,
+                  COALESCE(l.costum_name, m.title, l.layer_id) AS label
+                FROM soil_data.layer l
+                LEFT JOIN soil_data.mapset m ON m.mapset_id = l.mapset_id
+                WHERE l.is_published = TRUE
+                  AND m.spatial_representation_type_code = 'grid'
+                ORDER BY l.layer_id
+            """)
+            return cur.fetchall()
+
+
 @app.get("/api/dst/recipes")
 async def list_dst_recipes(current_user: dict = Depends(get_current_user)):
     with get_db() as conn:
@@ -3007,13 +3187,27 @@ async def delete_dst_recipe(recipe_id: str, current_user: dict = Depends(get_cur
 
 # ==================== DST: validate / run / runs ====================
 
-def _output_layer_id_for_recipe(recipe_id: str, recipe: dict) -> str:
+def _output_layer_id_for_recipe(recipe_id: str, recipe: dict, conn=None) -> str:
     """Derive the output layer_id from the recipe's metadata block, falling
     back to the recipe_id itself. The result must satisfy the SIS layer_id
     convention well enough that _parse_layer_id can decompose it.
+
+    Country comes from api.setting.COUNTRY_CODE (which is what every other
+    write path reads); falls back to the COUNTRY_CODE env var, then "XX".
     """
     md = (recipe or {}).get("metadata", {}) or {}
-    country = (os.getenv("COUNTRY_CODE") or "XX").upper()
+    country = None
+    if conn is not None:
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT value FROM api.setting WHERE key = 'COUNTRY_CODE'")
+                row = cur.fetchone()
+                if row and row[0]:
+                    country = row[0].strip().upper()
+        except Exception:
+            pass
+    if not country:
+        country = (os.getenv("COUNTRY_CODE") or "XX").upper()
     proj = md.get("spatial_metadata_project_id") or "DST"
     prop = md.get("spatial_metadata_property_id") or "SUITABILITY"
     safe_id = re.sub(r"[^A-Za-z0-9]+", "", recipe_id).upper() or "OUT"
@@ -3053,12 +3247,15 @@ def _execute_dst_run(run_id: int, recipe_id: str, triggered_by: str):
 
             _mark(conn, status="running")
 
-            output_layer_id = _output_layer_id_for_recipe(recipe_id, recipe)
+            output_layer_id = _output_layer_id_for_recipe(recipe_id, recipe, conn)
             out_path = execute_recipe(
                 conn, recipe, output_layer_id=output_layer_id)
 
             md = (recipe or {}).get("metadata", {}) or {}
             try:
+                # DST outputs have no upstream user-picked filename. Synthesise
+                # one from the output_layer_id so soil_data.layer.file_orig_name
+                # (NOT NULL UNIQUE) is satisfied.
                 registered = register_raster(
                     conn, out_path,
                     title=md.get("title_override") or recipe_row["name"],
@@ -3066,6 +3263,7 @@ def _execute_dst_run(run_id: int, recipe_id: str, triggered_by: str):
                     keywords=md.get("keywords"),
                     publish=bool(md.get("publish_to_catalogue", True)),
                     dst_recipe_id=recipe_id,
+                    file_orig_name=f"{output_layer_id}.tif",
                 )
                 conn.commit()
                 metadata_status = "succeeded" if registered.xml_published else "failed"
@@ -3681,12 +3879,35 @@ async def list_smd_units_for_property(
     property_num_id: str,
     current_user: dict = Depends(get_current_user),
 ):
-    """Units valid for a given property: every canonical unit attached to
-    observation_num rows for that property, plus every unit that can be
-    converted to any of those canonicals via soil_data.unit_conversion.
-    No conversion is applied — just the broader pickable set."""
+    """Units valid for a given mapped_property: every canonical unit attached
+    to observation_num rows for the property_num the mapped_property points
+    at, plus every unit convertible to any of those canonicals. When the
+    mapped_property has no property_num_id link (e.g. freshly added via the
+    Upload GeoTIFF form), fall back to returning ALL units so the user can
+    pick any. The path param is named `property_num_id` for back-compat — it
+    accepts either a property_num_id or a mapped_property_id."""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            # Resolve the canonical property_num_id. If the path value is a
+            # mapped_property_id, follow its FK; otherwise treat it as a
+            # property_num_id directly.
+            cur.execute("""
+                SELECT property_num_id FROM soil_data.mapped_property
+                WHERE mapped_property_id = %s
+            """, (property_num_id,))
+            row = cur.fetchone()
+            is_mapped_property = row is not None
+            resolved_prop = row["property_num_id"] if row else property_num_id
+
+            # No property_num link → return the full unit catalogue.
+            if is_mapped_property and resolved_prop is None:
+                cur.execute("""
+                    SELECT unit_of_measure_id, unit_name
+                    FROM soil_data.unit_of_measure
+                    ORDER BY unit_name NULLS LAST, unit_of_measure_id
+                """)
+                return cur.fetchall()
+
             cur.execute("""
                 WITH canonicals AS (
                   SELECT DISTINCT unit_of_measure_id
@@ -3706,21 +3927,76 @@ async def list_smd_units_for_property(
                   SELECT unit_of_measure_id FROM source_convertible
                 )
                 ORDER BY u.unit_name NULLS LAST, u.unit_of_measure_id
-            """, (property_num_id,))
+            """, (resolved_prop,))
             return cur.fetchall()
 
 
 @app.get("/api/raster/mapped_soil_properties")
 async def list_smd_mapped_soil_properties(current_user: dict = Depends(get_current_user)):
-    """property_num catalogue — used by Add-Raster to pick the PROP component
-    of the layer id (filename convention <CC>-<PROJ>-<PROP>-...)."""
+    """mapped_property catalogue — used by Upload GeoTIFF to pick the PROP
+    component of the layer id (filename convention <CC>-<PROJ>-<PROP>-...)."""
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
-                SELECT property_num_id, property_name FROM soil_data.property_num
-                WHERE property_name IS NOT NULL ORDER BY property_name
+                SELECT mapped_property_id, name
+                FROM soil_data.mapped_property
+                WHERE name IS NOT NULL
+                ORDER BY name
             """)
             return cur.fetchall()
+
+
+@app.post("/api/raster/mapped_soil_properties", status_code=status.HTTP_201_CREATED)
+async def create_smd_mapped_soil_property(
+    payload: dict,
+    current_user: dict = Depends(get_current_user),
+):
+    """Add a row to soil_data.mapped_property from the Upload GeoTIFF form's
+    inline "+ Add new mapped soil property…" panel. Only id + name are
+    accepted; the rest of the row gets the same quantitative defaults the
+    raster registrar uses for DST-minted stubs."""
+    mpid = (payload.get("mapped_property_id") or "").strip().upper()
+    name = (payload.get("name") or "").strip()
+    min_val = payload.get("min")
+    max_val = payload.get("max")
+    property_type = (payload.get("property_type") or "quantitative").strip().lower()
+    if property_type not in ("quantitative", "categorical"):
+        raise HTTPException(status_code=400,
+                            detail="property_type must be 'quantitative' or 'categorical'")
+    if not mpid:
+        raise HTTPException(status_code=400, detail="mapped_property_id is required")
+    if not re.fullmatch(r"[A-Z0-9_]+", mpid):
+        raise HTTPException(status_code=400,
+                            detail="mapped_property_id must be CAPS (A-Z, 0-9, _)")
+    if not name:
+        raise HTTPException(status_code=400, detail="name is required")
+    # Both ramps default to 10 buckets; colour ramps differ to match the
+    # convention in the seed data.
+    num_intervals = 10
+    if property_type == "quantitative":
+        start_color, end_color = "#a50026", "#1a9850"
+    else:
+        start_color, end_color = "#CA0020", "#3F68E2"
+    with get_db() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    INSERT INTO soil_data.mapped_property
+                        (mapped_property_id, name, min, max, property_type,
+                         num_intervals, start_color, end_color)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (mpid, name, min_val, max_val, property_type,
+                      num_intervals, start_color, end_color))
+            except psycopg2.errors.UniqueViolation:
+                raise HTTPException(status_code=409,
+                                    detail=f"mapped_property_id '{mpid}' already exists")
+    log_audit(current_user['user_id'], None, "mapped_property_created",
+              {"mapped_property_id": mpid, "name": name,
+               "min": min_val, "max": max_val,
+               "property_type": property_type}, None)
+    return {"mapped_property_id": mpid, "name": name,
+            "min": min_val, "max": max_val,
+            "property_type": property_type}
 
 
 @app.get("/api/raster/individuals")

@@ -387,7 +387,7 @@ class AdminDashboard {
 
                         <div class="etl-metadata-grid" style="margin-bottom:var(--sp-4);">
                           <label for="etl-abstract">Abstract</label>
-                          <div><textarea id="etl-abstract" rows="3" style="width:100%;font-family:inherit;font-size:var(--fs-sm);padding:4px 8px;border:1px solid var(--color-border-strong);border-radius:var(--radius-sm);" placeholder="Project description..."></textarea></div>
+                          <div><textarea id="etl-abstract" rows="6" style="width:400px;max-width:none;font-family:inherit;font-size:var(--fs-sm);padding:4px 8px;border:1px solid var(--color-border-strong);border-radius:var(--radius-sm);" placeholder="Project description..."></textarea></div>
                           <label for="etl-license">License</label>
                           <div>
                             <select id="etl-license" style="width:100%;">
@@ -483,10 +483,11 @@ class AdminDashboard {
                         <th>Public limit</th>
                         <th title="Random coordinate offset in meters. Blank = precise coords.">Spatial blur (meters)</th>
                         <th>Published</th>
+                        <th>Delete</th>
                       </tr>
                     </thead>
                     <tbody id="soil-profile-layers-tbody">
-                      <tr><td colspan="6" class="loading">Loading soil profile layers...</td></tr>
+                      <tr><td colspan="7" class="loading">Loading soil profile layers...</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -534,7 +535,27 @@ class AdminDashboard {
                   </div>
 
                   <label>Mapped soil property</label>
-                  <select id="raster-property-num" style="width:320px;"><option value="">Loading...</option></select>
+                  <div>
+                    <select id="raster-property-num" style="width:320px;"><option value="">Loading...</option></select>
+                    <div id="raster-property-new" style="display:none;margin-top:6px;">
+                      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                        <input type="text" id="raster-new-property-id"
+                               placeholder="ID (CAPS, A-Z 0-9 _)"
+                               pattern="[A-Z0-9_]+"
+                               title="Letters A-Z, digits, underscore. No spaces or symbols."
+                               style="width:160px;text-transform:uppercase;">
+                        <input type="text" id="raster-new-property-name"
+                               placeholder="Display name"
+                               style="width:200px;">
+                        <select id="raster-new-property-type" style="width:140px;" title="Property type">
+                          <option value="quantitative">quantitative</option>
+                          <option value="categorical">categorical</option>
+                        </select>
+                        <button type="button" class="btn btn-sm btn-primary" id="raster-add-property-btn">Add</button>
+                        <span id="raster-new-property-status" style="font-size:var(--fs-sm);"></span>
+                      </div>
+                    </div>
+                  </div>
 
                   <label>Unit</label>
                   <select id="raster-unit" style="width:140px;"><option value="">-- pick a property first --</option></select>
@@ -704,11 +725,83 @@ class AdminDashboard {
                       <input type="text" id="dst-recipe-name">
                       <label>description</label>
                       <textarea id="dst-recipe-description" rows="2"></textarea>
+                      <label>Project</label>
+                      <div>
+                        <select id="dst-output-project" style="width:320px;"><option value="DST">DST</option></select>
+                        <div id="dst-output-project-new" style="display:none;margin-top:6px;">
+                          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                            <input type="text" id="dst-new-output-project-id"
+                                   placeholder="Project ID (CAPS, A-Z 0-9 _)"
+                                   pattern="[A-Z0-9_]+"
+                                   title="Letters A-Z, digits, underscore. No spaces or symbols."
+                                   style="width:200px;text-transform:uppercase;">
+                            <input type="text" id="dst-new-output-project-name" placeholder="Project name" style="width:240px;">
+                            <button type="button" class="btn btn-sm btn-primary" id="dst-add-output-project-btn">Add</button>
+                            <span id="dst-new-output-project-status" style="font-size:var(--fs-sm);"></span>
+                          </div>
+                          <textarea id="dst-new-output-project-description"
+                                    placeholder="Project description"
+                                    rows="2" style="width:100%;margin-top:4px;"></textarea>
+                        </div>
+                      </div>
+                      <label>Mapped property</label>
+                      <div>
+                        <select id="dst-output-property" style="width:320px;"><option value="SUITABILITY">SUITABILITY</option></select>
+                        <div id="dst-output-property-new" style="display:none;margin-top:6px;">
+                          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                            <input type="text" id="dst-new-output-property-id"
+                                   placeholder="ID (CAPS, A-Z 0-9 _)"
+                                   pattern="[A-Z0-9_]+"
+                                   title="Letters A-Z, digits, underscore. No spaces or symbols."
+                                   style="width:160px;text-transform:uppercase;">
+                            <input type="text" id="dst-new-output-property-name"
+                                   placeholder="Display name"
+                                   style="width:200px;">
+                            <select id="dst-new-output-property-type" style="width:140px;" title="Property type">
+                              <option value="quantitative">quantitative</option>
+                              <option value="categorical">categorical</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-primary" id="dst-add-output-property-btn">Add</button>
+                            <span id="dst-new-output-property-status" style="font-size:var(--fs-sm);"></span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <p style="font-size:var(--fs-sm);margin-top:var(--sp-3);">
-                      Recipe JSON (steps + aggregation + metadata):
+                    <h4 style="margin-top:var(--sp-4);margin-bottom:var(--sp-2);">Input layers</h4>
+                    <p style="font-size:var(--fs-xs);color:#666;margin:0 0 var(--sp-2) 0;">
+                      Pick a raster per row. The threshold splits each layer: pixels at or above
+                      become the <em>above</em> value, below become the <em>below</em> value.
+                      Defaults are 0 / 1 — overwrite for custom scoring.
                     </p>
-                    <textarea id="dst-recipe-json" rows="14" style="width:100%;font-family:monospace;font-size:12px;"></textarea>
+                    <table class="admin-table" id="dst-rows-table" style="width:100%;font-size:var(--fs-sm);">
+                      <thead>
+                        <tr>
+                          <th>Layer</th>
+                          <th style="text-align:right;">Min</th>
+                          <th style="text-align:right;">Max</th>
+                          <th>Threshold</th>
+                          <th>Below</th>
+                          <th>Above</th>
+                          <th style="width:30px;"></th>
+                        </tr>
+                      </thead>
+                      <tbody id="dst-rows-tbody">
+                        <tr><td colspan="7" class="empty-state">No inputs yet — click "+ Add layer".</td></tr>
+                      </tbody>
+                    </table>
+                    <div style="margin-top:var(--sp-2);">
+                      <button type="button" class="btn btn-sm btn-secondary" id="dst-add-row-btn">+ Add layer</button>
+                    </div>
+                    <div style="margin-top:var(--sp-3);display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-3);align-items:center;">
+                      <label>Aggregation</label>
+                      <select id="dst-aggregation" style="width:160px;">
+                        <option value="sum" selected>sum</option>
+                        <option value="min">min</option>
+                        <option value="max">max</option>
+                        <option value="mean">mean</option>
+                        <option value="product">product</option>
+                      </select>
+                    </div>
                     <div style="margin-top:var(--sp-3);display:flex;gap:var(--sp-2);align-items:center;">
                       <button type="button" class="btn btn-sm btn-primary" id="dst-save-btn">Save</button>
                       <button type="button" class="btn btn-sm" id="dst-validate-btn">Validate</button>
@@ -1064,17 +1157,27 @@ class AdminDashboard {
     // Cache the property list for name lookups (used when building title/abstract).
     this._rasterPropertyNums = properties;
     const propSel = document.getElementById('raster-property-num');
-    propSel.innerHTML = '<option value="">-- Select --</option>' +
-      properties.map(p => `<option value="${p.property_num_id}">${this.escapeHtml(p.property_name)} (${p.property_num_id})</option>`).join('');
+    this._renderRasterPropertyOptions();
 
     // Recompute filename preview on every input/change of any field.
     const refresh = () => this._updateRasterFilenamePreview();
 
     // When property changes, fetch its valid units (clears unit) and refresh limits.
     propSel.addEventListener('change', async () => {
+      const isNew = propSel.value === '__new__';
+      document.getElementById('raster-property-new').style.display = isNew ? '' : 'none';
+      if (isNew) {
+        // Suggest the next free MAP#### id so the user doesn't have to
+        // think one up; they can still type their own.
+        const idInput = document.getElementById('raster-new-property-id');
+        if (!idInput.value) idInput.value = this._nextRasterMapPropertyId();
+        return;  // no units/limits to load yet
+      }
       await this._loadRasterUnitsForCurrentProperty();
       this._refreshRasterLimits();
     });
+    document.getElementById('raster-add-property-btn')
+      .addEventListener('click', () => this.rasterAddMappedProperty());
     // When unit changes, refresh observation_num limits.
     document.getElementById('raster-unit').addEventListener('change', () => this._refreshRasterLimits());
 
@@ -1192,6 +1295,163 @@ class AdminDashboard {
         ).join('')
       + '<option value="__new__">+ Add new project…</option>';
     if (current) sel.value = current;
+  }
+
+  _renderRasterPropertyOptions(selectId) {
+    const sel = document.getElementById('raster-property-num');
+    const current = selectId || sel.value;
+    sel.innerHTML = '<option value="">-- Select --</option>'
+      + (this._rasterPropertyNums || []).map(p =>
+          `<option value="${p.mapped_property_id}">${this.escapeHtml(p.name)} (${p.mapped_property_id})</option>`
+        ).join('')
+      + '<option value="__new__">+ Add new mapped soil property…</option>';
+    if (current) sel.value = current;
+  }
+
+  // Suggest the next free MAP#### id from the cached catalogue. Scans
+  // existing mapped_property_id values matching MAP<digits>, picks max+1
+  // (zero-padded to 4 digits), MAP0001 if nothing matches yet.
+  _nextRasterMapPropertyId() {
+    const re = /^MAP(\d+)$/;
+    let max = 0;
+    for (const p of (this._rasterPropertyNums || [])) {
+      const m = re.exec(p.mapped_property_id || '');
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (Number.isFinite(n) && n > max) max = n;
+      }
+    }
+    return 'MAP' + String(max + 1).padStart(4, '0');
+  }
+
+  // DST "output project" dropdown — same catalogue as the Upload GeoTIFF
+  // form's Project picker. New projects are created against the configured
+  // COUNTRY_CODE country (first entry in this._rasterCountries).
+  _dstRenderOutputProjectOptions(selectId) {
+    const sel = document.getElementById('dst-output-project');
+    if (!sel) return;
+    const current = selectId || sel.value || 'DST';
+    const projs = this._rasterProjects || [];
+    sel.innerHTML = projs.map(p =>
+        `<option value="${p.project_id}" data-country="${p.country_id}">${this.escapeHtml(p.project_id)}</option>`
+      ).join('')
+      + '<option value="__new__">+ Add new project…</option>';
+    if ([...sel.options].some(o => o.value === current)) sel.value = current;
+  }
+
+  async dstAddOutputProject() {
+    const status = document.getElementById('dst-new-output-project-status');
+    const country = (this._rasterCountries && this._rasterCountries[0])
+                      ? this._rasterCountries[0].country_id : null;
+    const pid = document.getElementById('dst-new-output-project-id').value.trim().toUpperCase();
+    const pname = document.getElementById('dst-new-output-project-name').value.trim();
+    const descr = document.getElementById('dst-new-output-project-description').value.trim();
+    if (!country) { status.textContent = 'COUNTRY_CODE setting missing.'; return; }
+    if (!pid)     { status.textContent = 'Project ID required.';  return; }
+    if (!/^[A-Z0-9_]+$/.test(pid)) {
+      status.textContent = 'Project ID must be CAPS (A-Z, 0-9, _).'; return;
+    }
+    status.textContent = 'Adding…';
+    try {
+      await api.createRasterProject({
+        country_id: country, project_id: pid,
+        project_name: pname || pid, description: descr || null,
+      });
+      this._rasterProjects = await api.listRasterProjects();
+      this._dstRenderOutputProjectOptions(pid);
+      document.getElementById('dst-output-project').value = pid;
+      document.getElementById('dst-output-project-new').style.display = 'none';
+      document.getElementById('dst-new-output-project-id').value = '';
+      document.getElementById('dst-new-output-project-name').value = '';
+      document.getElementById('dst-new-output-project-description').value = '';
+      status.textContent = '';
+      // Keep the Upload GeoTIFF dropdown in sync too if it's already rendered.
+      if (document.getElementById('raster-project')) {
+        this._renderRasterProjectOptions();
+      }
+    } catch (e) { status.textContent = 'Add failed: ' + e.message; }
+  }
+
+  // DST "output property" dropdown — same catalogue as the Upload GeoTIFF
+  // form's "Mapped soil property" picker.
+  _dstRenderOutputPropertyOptions(selectId) {
+    const sel = document.getElementById('dst-output-property');
+    if (!sel) return;
+    const current = selectId || sel.value || 'SUITABILITY';
+    const props = this._rasterPropertyNums || [];
+    sel.innerHTML = props.map(p =>
+        `<option value="${p.mapped_property_id}">${this.escapeHtml(p.name)} (${p.mapped_property_id})</option>`
+      ).join('')
+      + '<option value="__new__">+ Add new mapped soil property…</option>';
+    // Preselect current if present; otherwise leave the first option selected
+    // (no "SUITABILITY" fallback option — that lived in the static HTML only).
+    if ([...sel.options].some(o => o.value === current)) sel.value = current;
+  }
+
+  async dstAddOutputProperty() {
+    const status = document.getElementById('dst-new-output-property-status');
+    const pid = document.getElementById('dst-new-output-property-id').value.trim().toUpperCase();
+    const pname = document.getElementById('dst-new-output-property-name').value.trim();
+    if (!pid)   { status.textContent = 'ID required.'; return; }
+    if (!/^[A-Z0-9_]+$/.test(pid)) {
+      status.textContent = 'ID must be CAPS (A-Z, 0-9, _).'; return;
+    }
+    if (!pname) { status.textContent = 'Name required.'; return; }
+    const property_type =
+      document.getElementById('dst-new-output-property-type').value || 'quantitative';
+    status.textContent = 'Adding…';
+    try {
+      // DST outputs don't have an inspected raster yet — min/max stay NULL.
+      await api.createRasterMappedSoilProperty({
+        mapped_property_id: pid, name: pname, property_type,
+      });
+      this._rasterPropertyNums = await api.listRasterMappedSoilProperties();
+      this._dstRenderOutputPropertyOptions(pid);
+      document.getElementById('dst-output-property-new').style.display = 'none';
+      document.getElementById('dst-new-output-property-id').value = '';
+      document.getElementById('dst-new-output-property-name').value = '';
+      status.textContent = '';
+      // Keep the Upload GeoTIFF dropdown in sync too if it's already been
+      // rendered (it shares the cache).
+      if (document.getElementById('raster-property-num')) {
+        this._renderRasterPropertyOptions();
+      }
+    } catch (e) { status.textContent = 'Add failed: ' + e.message; }
+  }
+
+  async rasterAddMappedProperty() {
+    const status = document.getElementById('raster-new-property-status');
+    const pid = document.getElementById('raster-new-property-id').value.trim().toUpperCase();
+    const pname = document.getElementById('raster-new-property-name').value.trim();
+    if (!pid)   { status.textContent = 'ID required.'; return; }
+    if (!/^[A-Z0-9_]+$/.test(pid)) {
+      status.textContent = 'ID must be CAPS (A-Z, 0-9, _).'; return;
+    }
+    if (!pname) { status.textContent = 'Name required.'; return; }
+    // Pull stats min/max from the auto-inspect result (band 0). When the
+    // user adds a property before picking a file we have nothing — those
+    // stay NULL on the catalogue row.
+    const band0 = (this._rasterInspectMeta && this._rasterInspectMeta.bands && this._rasterInspectMeta.bands[0]) || null;
+    const min = band0 && band0.stats_minimum != null ? band0.stats_minimum : null;
+    const max = band0 && band0.stats_maximum != null ? band0.stats_maximum : null;
+    const property_type = document.getElementById('raster-new-property-type').value || 'quantitative';
+    status.textContent = 'Adding…';
+    try {
+      await api.createRasterMappedSoilProperty({
+        mapped_property_id: pid, name: pname, min, max, property_type,
+      });
+      this._rasterPropertyNums = await api.listRasterMappedSoilProperties();
+      this._renderRasterPropertyOptions(pid);
+      document.getElementById('raster-property-new').style.display = 'none';
+      document.getElementById('raster-new-property-id').value = '';
+      document.getElementById('raster-new-property-name').value = '';
+      status.textContent = '';
+      // Mirror the existing change handler: load units & limits for the
+      // freshly added property (it'll have no units yet — that's fine).
+      await this._loadRasterUnitsForCurrentProperty();
+      this._refreshRasterLimits();
+      this._updateRasterFilenamePreview();
+    } catch (e) { status.textContent = 'Add failed: ' + e.message; }
   }
 
   async rasterAddProject() {
@@ -1666,8 +1926,8 @@ class AdminDashboard {
 
       const projSel = document.getElementById('raster-project');
       // Look up labels for the title / abstract templates.
-      const propRow = (this._rasterPropertyNums || []).find(p => p.property_num_id === s.prop);
-      const propName = propRow ? propRow.property_name : s.prop;
+      const propRow = (this._rasterPropertyNums || []).find(p => p.mapped_property_id === s.prop);
+      const propName = propRow ? propRow.name : s.prop;
       const projRow = (this._rasterProjects || []).find(p => p.project_id === s.project);
 
       // title : "<property_name> (<YYYY>)"  — also stored on layer.costum_name.
@@ -1715,6 +1975,54 @@ class AdminDashboard {
     document.getElementById('dst-validate-btn').addEventListener('click', () => this.dstValidate());
     document.getElementById('dst-run-btn').addEventListener('click', () => this.dstRun());
     document.getElementById('dst-delete-btn').addEventListener('click', () => this.dstDelete());
+    document.getElementById('dst-add-row-btn').addEventListener('click', () => this.dstAddRow());
+    // Aggregation change → refresh the auto-description.
+    document.getElementById('dst-aggregation').addEventListener('change',
+      () => this._dstRefreshAutoDescription());
+
+    // Output project + property dropdowns — same catalogues + same "+ Add new"
+    // flows as the Upload GeoTIFF form so the user picks from soil_data.project
+    // / soil_data.mapped_property.
+    try {
+      [this._rasterPropertyNums, this._rasterProjects, this._rasterCountries] = await Promise.all([
+        api.listRasterMappedSoilProperties(),
+        api.listRasterProjects(),
+        api.listRasterCountries(),
+      ]);
+    } catch (e) {
+      this._rasterPropertyNums = this._rasterPropertyNums || [];
+      this._rasterProjects = this._rasterProjects || [];
+      this._rasterCountries = this._rasterCountries || [];
+      console.warn('dst catalogues:', e.message);
+    }
+    this._dstRenderOutputProjectOptions();
+    this._dstRenderOutputPropertyOptions();
+    const outProjSel = document.getElementById('dst-output-project');
+    outProjSel.addEventListener('change', () => {
+      document.getElementById('dst-output-project-new').style.display =
+        outProjSel.value === '__new__' ? '' : 'none';
+    });
+    document.getElementById('dst-add-output-project-btn')
+      .addEventListener('click', () => this.dstAddOutputProject());
+    const outPropSel = document.getElementById('dst-output-property');
+    outPropSel.addEventListener('change', () => {
+      const isNew = outPropSel.value === '__new__';
+      document.getElementById('dst-output-property-new').style.display = isNew ? '' : 'none';
+      if (isNew) {
+        const idInput = document.getElementById('dst-new-output-property-id');
+        if (!idInput.value) idInput.value = this._nextRasterMapPropertyId();
+      }
+    });
+    document.getElementById('dst-add-output-property-btn')
+      .addEventListener('click', () => this.dstAddOutputProperty());
+    // Preload available input rasters so the row builder's dropdowns can be
+    // filled instantly when the user adds the first row.
+    try {
+      this._dstInputs = await api.listDstInputs();
+    } catch (e) {
+      this._dstInputs = [];
+      console.warn('dst inputs:', e.message);
+    }
     await this.dstReloadRecipes();
     await this.dstReloadRuns();
   }
@@ -1771,21 +2079,62 @@ class AdminDashboard {
     document.getElementById('dst-recipe-id').value = '';
     document.getElementById('dst-recipe-id').disabled = false;
     document.getElementById('dst-recipe-name').value = '';
-    document.getElementById('dst-recipe-description').value = '';
-    document.getElementById('dst-recipe-json').value = JSON.stringify({
-      steps: [
-        { step_id: 1, layer_id: 'BT-GSNM-PHX-2024-0-30-MEAN',
-          op: 'between', low: 5.5, high: 7.0,
-          true_score: 1, false_score: 0, weight: 1 }
-      ],
-      aggregation: 'sum',
-      no_data_handling: 'propagate',
-      metadata: { publish_to_catalogue: true,
-                  spatial_metadata_project_id: 'DST',
-                  spatial_metadata_property_id: 'SUITABILITY' }
-    }, null, 2);
+    this._dstSetDescription('', /*resetAuto=*/true);
+    this._dstLastAutoDesc = '';
+    this._dstRenderOutputProjectOptions('DST');
+    document.getElementById('dst-output-project-new').style.display = 'none';
+    this._dstRenderOutputPropertyOptions('SUITABILITY');
+    document.getElementById('dst-output-property-new').style.display = 'none';
+    document.getElementById('dst-aggregation').value = 'sum';
+    // Wipe rows back to the empty state.
+    document.getElementById('dst-rows-tbody').innerHTML =
+      '<tr><td colspan="7" class="empty-state">No inputs yet — click "+ Add layer".</td></tr>';
     document.getElementById('dst-status').textContent = '';
     document.getElementById('dst-output').textContent = '';
+  }
+
+  // Programmatically set the description and remember the auto-generated
+  // string so we can detect whether the user has customised it on the
+  // next refresh.
+  _dstSetDescription(text, resetAuto) {
+    const el = document.getElementById('dst-recipe-description');
+    el.value = text;
+    this._dstLastAutoDesc = text;
+    if (resetAuto) this._dstLastAutoDesc = text;  // keep symmetry
+  }
+
+  // Build a plain-text summary of the current recipe shape, e.g.
+  //   sum of:
+  //   - BT-GSNM-PHX-2024-0-30-MEAN: reclass to 1 when value ≥ 6.5, else 0
+  //   - BT-GSNM-NTOT-2024-0-30-MEAN: reclass to 1 when value ≥ 0.2, else 0
+  _dstAutoDescription() {
+    const tbody = document.getElementById('dst-rows-tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr.dst-row'));
+    if (!rows.length) return '';
+    const agg = document.getElementById('dst-aggregation').value || 'sum';
+    const lines = [`${agg} of the following:`];
+    rows.forEach(tr => {
+      const layerSel = tr.querySelector('.dst-row-layer');
+      const layer = layerSel.value || '(no layer)';
+      const threshold = tr.querySelector('.dst-row-threshold').value;
+      const below = tr.querySelector('.dst-row-below').value;
+      const above = tr.querySelector('.dst-row-above').value;
+      const thrStr = threshold === '' || threshold == null ? '<threshold>' : threshold;
+      const belowStr = below === '' ? '0' : below;
+      const aboveStr = above === '' ? '1' : above;
+      lines.push(
+        `- ${layer}: reclass to ${aboveStr} when value ≥ ${thrStr}, else ${belowStr}`
+      );
+    });
+    return lines.join('\n');
+  }
+
+  _dstRefreshAutoDescription() {
+    const el = document.getElementById('dst-recipe-description');
+    // Only auto-fill when the field is empty or still equals the last
+    // generated string — i.e. the user hasn't typed anything custom.
+    if (el.value && el.value !== this._dstLastAutoDesc) return;
+    this._dstSetDescription(this._dstAutoDescription(), false);
   }
 
   async dstLoadRecipe(id) {
@@ -1796,8 +2145,20 @@ class AdminDashboard {
       document.getElementById('dst-recipe-id').value = r.recipe_id;
       document.getElementById('dst-recipe-id').disabled = true;
       document.getElementById('dst-recipe-name').value = r.name || '';
-      document.getElementById('dst-recipe-description').value = r.description || '';
-      document.getElementById('dst-recipe-json').value = JSON.stringify(r.recipe, null, 2);
+      // _dstLastAutoDesc is intentionally empty: if the recipe already had
+      // a description, the textarea value won't match the empty marker so
+      // the next refresh leaves it alone; if it was empty, the next
+      // refresh's "el.value &&" check fails and auto-fill kicks in.
+      const recipe = r.recipe || {};
+      this._dstSetDescription(r.description || '', false);
+      this._dstLastAutoDesc = '';
+      const md = recipe.metadata || {};
+      this._dstRenderOutputProjectOptions(md.spatial_metadata_project_id || 'DST');
+      document.getElementById('dst-output-project-new').style.display = 'none';
+      this._dstRenderOutputPropertyOptions(md.spatial_metadata_property_id || 'SUITABILITY');
+      document.getElementById('dst-output-property-new').style.display = 'none';
+      document.getElementById('dst-aggregation').value = recipe.aggregation || 'sum';
+      this._dstPopulateRows(recipe.steps || []);
       document.getElementById('dst-status').textContent = '';
       document.getElementById('dst-output').textContent = '';
     } catch (e) {
@@ -1805,11 +2166,108 @@ class AdminDashboard {
     }
   }
 
+  // Build a single <tr> for the row builder. The threshold splits the
+  // layer: pixels >= threshold get `above`, pixels < threshold get `below`.
+  // This maps to the engine's op:">=", true_score=above, false_score=below.
+  _dstRenderRow(step) {
+    const inputs = this._dstInputs || [];
+    const layerId = step.layer_id || '';
+    const match = inputs.find(i => i.layer_id === layerId);
+    const opts = ['<option value="">-- pick a layer --</option>']
+      .concat(inputs.map(i => {
+        const sel = i.layer_id === layerId ? ' selected' : '';
+        const label = (i.label && i.label !== i.layer_id)
+          ? `${i.layer_id} — ${i.label}`
+          : i.layer_id;
+        return `<option value="${this.escapeHtml(i.layer_id)}" data-min="${i.stats_minimum ?? ''}" data-max="${i.stats_maximum ?? ''}"${sel}>${this.escapeHtml(label)}</option>`;
+      })).join('');
+    const fmt = (v) => (v == null || v === '') ? '—' : Number(v).toFixed(3);
+    const tr = document.createElement('tr');
+    tr.className = 'dst-row';
+    tr.innerHTML = `
+      <td><select class="dst-row-layer" style="min-width:240px;">${opts}</select></td>
+      <td class="dst-row-min" style="text-align:right;color:#555;">${fmt(match?.stats_minimum)}</td>
+      <td class="dst-row-max" style="text-align:right;color:#555;">${fmt(match?.stats_maximum)}</td>
+      <td><input type="number" class="dst-row-threshold no-spinner" step="any" value="${step.threshold ?? ''}" style="width:90px;"></td>
+      <td><input type="number" class="dst-row-below no-spinner" step="any" value="${step.false_score ?? 0}" style="width:70px;"></td>
+      <td><input type="number" class="dst-row-above no-spinner" step="any" value="${step.true_score ?? 1}" style="width:70px;"></td>
+      <td><button type="button" class="btn btn-sm dst-row-remove" style="background:#dc3545;color:#fff;" title="Remove">×</button></td>
+    `;
+    // When the layer changes, refresh the min/max display.
+    tr.querySelector('.dst-row-layer').addEventListener('change', (e) => {
+      const opt = e.currentTarget.selectedOptions[0];
+      const mn = opt?.dataset.min;
+      const mx = opt?.dataset.max;
+      tr.querySelector('.dst-row-min').textContent = mn ? Number(mn).toFixed(3) : '—';
+      tr.querySelector('.dst-row-max').textContent = mx ? Number(mx).toFixed(3) : '—';
+      this._dstRefreshAutoDescription();
+    });
+    // Any threshold / below / above edit refreshes the auto-description.
+    ['.dst-row-threshold', '.dst-row-below', '.dst-row-above'].forEach(sel => {
+      tr.querySelector(sel).addEventListener('input', () => this._dstRefreshAutoDescription());
+    });
+    tr.querySelector('.dst-row-remove').addEventListener('click', () => {
+      tr.remove();
+      const tbody = document.getElementById('dst-rows-tbody');
+      if (!tbody.querySelector('tr.dst-row')) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No inputs yet — click "+ Add layer".</td></tr>';
+      }
+      this._dstRefreshAutoDescription();
+    });
+    return tr;
+  }
+
+  dstAddRow(step = {}) {
+    const tbody = document.getElementById('dst-rows-tbody');
+    // Drop the empty-state placeholder if present.
+    if (tbody.querySelector('.empty-state')) tbody.innerHTML = '';
+    tbody.appendChild(this._dstRenderRow(step));
+    this._dstRefreshAutoDescription();
+  }
+
+  _dstPopulateRows(steps) {
+    const tbody = document.getElementById('dst-rows-tbody');
+    tbody.innerHTML = '';
+    if (!steps.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No inputs yet — click "+ Add layer".</td></tr>';
+      return;
+    }
+    steps.forEach(s => tbody.appendChild(this._dstRenderRow(s)));
+  }
+
   _dstReadEditor() {
-    const recipeJson = document.getElementById('dst-recipe-json').value;
-    let recipe;
-    try { recipe = JSON.parse(recipeJson); }
-    catch (e) { throw new Error('Recipe JSON is invalid: ' + e.message); }
+    const tbody = document.getElementById('dst-rows-tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr.dst-row'));
+    const steps = rows.map((tr, idx) => {
+      const layer_id = tr.querySelector('.dst-row-layer').value;
+      const threshold = tr.querySelector('.dst-row-threshold').value;
+      const below = tr.querySelector('.dst-row-below').value;
+      const above = tr.querySelector('.dst-row-above').value;
+      if (!layer_id) throw new Error(`Row ${idx + 1}: pick a layer`);
+      if (threshold === '' || threshold == null) throw new Error(`Row ${idx + 1}: threshold required`);
+      return {
+        step_id: idx + 1,
+        layer_id,
+        op: '>=',
+        threshold: Number(threshold),
+        true_score: above === '' ? 1 : Number(above),
+        false_score: below === '' ? 0 : Number(below),
+        weight: 1,
+      };
+    });
+    if (!steps.length) throw new Error('Add at least one input layer');
+    const recipe = {
+      steps,
+      aggregation: document.getElementById('dst-aggregation').value || 'sum',
+      no_data_handling: 'propagate',
+      metadata: {
+        publish_to_catalogue: true,
+        spatial_metadata_project_id:
+          document.getElementById('dst-output-project').value.trim() || 'DST',
+        spatial_metadata_property_id:
+          document.getElementById('dst-output-property').value.trim() || 'SUITABILITY',
+      },
+    };
     return {
       recipe_id: document.getElementById('dst-recipe-id').value.trim(),
       name: document.getElementById('dst-recipe-name').value.trim(),
@@ -1856,6 +2314,17 @@ class AdminDashboard {
     const out = document.getElementById('dst-output');
     const id = document.getElementById('dst-recipe-id').value.trim();
     if (!id) { status.textContent = 'Save the recipe first.'; return; }
+    // Run reads from the saved recipe in the DB, so persist whatever the
+    // user has in the editor first — otherwise dropdown changes that
+    // weren't explicitly saved get silently ignored at run time.
+    status.textContent = 'Saving…';
+    try {
+      const payload = this._dstReadEditor();
+      await api.updateDstRecipe(id, payload);
+    } catch (e) {
+      status.textContent = 'Save failed: ' + e.message;
+      return;
+    }
     status.textContent = 'Queuing run...';
     try {
       const run = await api.runDstRecipe(id);
@@ -2286,7 +2755,7 @@ class AdminDashboard {
 
     const rows = this.soilProfileLayers || [];
     if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No projects found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No projects found</td></tr>';
       return;
     }
 
@@ -2330,6 +2799,12 @@ class AdminDashboard {
             ${r.is_published ? 'Unpublish' : 'Publish'}
           </button>
         </td>
+        <td>
+          <button class="btn btn-sm sp-delete-btn" style="background:#dc3545;color:#fff;"
+                  data-project-id="${pid}" data-project-name="${name}">
+            Delete
+          </button>
+        </td>
       </tr>`;
     }).join('');
 
@@ -2339,6 +2814,14 @@ class AdminDashboard {
         const publish = e.currentTarget.dataset.publish === '1';
         await this.flushPendingSoilProfileEdits();
         this.toggleSoilProfilePublish(projectId, publish);
+      });
+    });
+
+    tbody.querySelectorAll('.sp-delete-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const projectId = e.currentTarget.dataset.projectId;
+        const projectName = e.currentTarget.dataset.projectName || projectId;
+        await this.deleteProjectProfiles(projectId, projectName);
       });
     });
 
@@ -2677,6 +3160,211 @@ class AdminDashboard {
 
   etlDestValue(table, column) {
     return table && column ? `${table}|${column}` : '';
+  }
+
+  // Walk all .etl-prop dropdowns and append the new property option,
+  // preserving each row's current selection. The row whose change handler
+  // triggered the add is passed in `triggerSel` so we don't clobber its
+  // own selection (the caller sets it explicitly afterwards).
+  _refreshEtlPropertyDropdowns(newPropId, triggerSel) {
+    const props = this.etlCodelists.properties || [];
+    document.querySelectorAll('.etl-prop').forEach(sel => {
+      const keep = sel === triggerSel ? '' : sel.value;
+      sel.innerHTML = '<option value="">—</option>' + props.map(p =>
+        `<option value="${p.property_num_id}" data-uri="${this.escapeHtml(p.uri || '')}">${this.escapeHtml(p.property_name)}</option>`
+      ).join('') + '<option value="__new__">+ Add Property…</option>';
+      if (keep) sel.value = keep;
+    });
+  }
+
+  // Suggest the next free PROCEDURE#### id from the cached procedure catalogue.
+  _nextEtlProcedureId() {
+    const re = /^PROCEDURE(\d+)$/;
+    let max = 0;
+    for (const p of (this.etlCodelists.procedures || [])) {
+      const m = re.exec(p.procedure_num_id || '');
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (Number.isFinite(n) && n > max) max = n;
+      }
+    }
+    return 'PROCEDURE' + String(max + 1).padStart(4, '0');
+  }
+
+  // Inline-row variant of the "Add Procedure" flow. Same shape as
+  // etlPromptAddProperty — three inputs (ID, name, definition) plus Add /
+  // Cancel. Passes the current property_num_id so the backend can also
+  // insert the observation_num link that makes the new procedure visible
+  // in this property's procedure dropdown.
+  async etlPromptAddProcedure(propertyNumId) {
+    const tbody = document.getElementById('etl-mapping-tbody');
+    if (!tbody) return null;
+    const existing = tbody.querySelector('tr.etl-proc-add-row');
+    if (existing) {
+      existing.querySelector('.etl-new-proc-id').focus();
+      return null;
+    }
+
+    const tr = document.createElement('tr');
+    tr.className = 'etl-proc-add-row';
+    tr.innerHTML = `
+      <td colspan="6" style="background:#fafafa;border-top:2px solid var(--color-primary);padding:8px;">
+        <strong style="font-size:var(--fs-sm);">New Procedure</strong>
+        <div style="display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap;margin-top:6px;">
+          <input type="text" class="etl-new-proc-id"
+                 placeholder="ID (CAPS, A-Z 0-9 _)"
+                 pattern="[A-Z0-9_]+"
+                 title="Letters A-Z, digits, underscore. No spaces or symbols."
+                 style="width:170px;text-transform:uppercase;">
+          <input type="text" class="etl-new-proc-name"
+                 placeholder="Display name" style="width:220px;">
+          <textarea class="etl-new-proc-def" rows="2"
+                    placeholder="Definition (optional)"
+                    style="flex:1;min-width:260px;font-family:inherit;font-size:var(--fs-sm);"></textarea>
+          <button type="button" class="btn btn-sm btn-primary etl-new-proc-add">Add</button>
+          <button type="button" class="btn btn-sm btn-secondary etl-new-proc-cancel">Cancel</button>
+          <span class="etl-new-proc-status" style="font-size:var(--fs-sm);align-self:center;"></span>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+    const idIn   = tr.querySelector('.etl-new-proc-id');
+    const nameIn = tr.querySelector('.etl-new-proc-name');
+    const defIn  = tr.querySelector('.etl-new-proc-def');
+    const status = tr.querySelector('.etl-new-proc-status');
+    idIn.value = this._nextEtlProcedureId();
+    idIn.focus();
+    idIn.select();
+
+    return await new Promise((resolve) => {
+      tr.querySelector('.etl-new-proc-cancel').addEventListener('click', () => {
+        tr.remove();
+        resolve(null);
+      });
+      tr.querySelector('.etl-new-proc-add').addEventListener('click', async () => {
+        const pid = (idIn.value || '').trim().toUpperCase();
+        const pname = (nameIn.value || '').trim();
+        const def = (defIn.value || '').trim() || null;
+        if (!pid)   { status.textContent = 'ID required.'; return; }
+        if (!/^[A-Z0-9_]+$/.test(pid)) {
+          status.textContent = 'ID must be CAPS (A-Z, 0-9, _).'; return;
+        }
+        if (!pname) { status.textContent = 'Name required.'; return; }
+        status.textContent = 'Adding…';
+        try {
+          const created = await api.createProcedure({
+            procedure_num_id: pid, procedure_name: pname, definition: def,
+            property_num_id: propertyNumId,
+          });
+          // Keep the cached procedure list in sync.
+          this.etlCodelists.procedures = (this.etlCodelists.procedures || []).concat([{
+            procedure_num_id: created.procedure_num_id || pid,
+            procedure_name:   created.procedure_name   || pname,
+            uri:              created.uri || '',
+          }]);
+          tr.remove();
+          resolve({
+            procedure_num_id: created.procedure_num_id || pid,
+            procedure_name:   created.procedure_name   || pname,
+            uri:              created.uri || '',
+          });
+        } catch (e) {
+          status.textContent = 'Add failed: ' + (e && e.message ? e.message : e);
+        }
+      });
+    });
+  }
+
+  // Suggest the next free PROPERTY#### id from the cached property catalogue.
+  // Scans existing property_num_id values matching PROPERTY<digits>, picks
+  // max+1 zero-padded to 4 digits, PROPERTY0001 if nothing matches yet.
+  _nextEtlPropertyId() {
+    const re = /^PROPERTY(\d+)$/;
+    let max = 0;
+    for (const p of (this.etlCodelists.properties || [])) {
+      const m = re.exec(p.property_num_id || '');
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (Number.isFinite(n) && n > max) max = n;
+      }
+    }
+    return 'PROPERTY' + String(max + 1).padStart(4, '0');
+  }
+
+  // Inline-row variant of the "Add Property" flow. Inserts a temp row at
+  // the bottom of the standardization table with three inputs (ID, name,
+  // definition) and Add / Cancel buttons. Returns a promise that resolves
+  // to the new property (on Add success) or null (on Cancel / failure).
+  async etlPromptAddProperty() {
+    const tbody = document.getElementById('etl-mapping-tbody');
+    if (!tbody) return null;
+    // Only one temp row at a time.
+    const existing = tbody.querySelector('tr.etl-prop-add-row');
+    if (existing) {
+      existing.querySelector('.etl-new-prop-id').focus();
+      return null;
+    }
+
+    const tr = document.createElement('tr');
+    tr.className = 'etl-prop-add-row';
+    tr.innerHTML = `
+      <td colspan="6" style="background:#fafafa;border-top:2px solid var(--color-primary);padding:8px;">
+        <strong style="font-size:var(--fs-sm);">New Property</strong>
+        <div style="display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap;margin-top:6px;">
+          <input type="text" class="etl-new-prop-id"
+                 placeholder="ID (CAPS, A-Z 0-9 _)"
+                 pattern="[A-Z0-9_]+"
+                 title="Letters A-Z, digits, underscore. No spaces or symbols."
+                 style="width:170px;text-transform:uppercase;">
+          <input type="text" class="etl-new-prop-name"
+                 placeholder="Display name" style="width:220px;">
+          <textarea class="etl-new-prop-def" rows="2"
+                    placeholder="Definition (optional)"
+                    style="flex:1;min-width:260px;font-family:inherit;font-size:var(--fs-sm);"></textarea>
+          <button type="button" class="btn btn-sm btn-primary etl-new-prop-add">Add</button>
+          <button type="button" class="btn btn-sm btn-secondary etl-new-prop-cancel">Cancel</button>
+          <span class="etl-new-prop-status" style="font-size:var(--fs-sm);align-self:center;"></span>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+    const idIn   = tr.querySelector('.etl-new-prop-id');
+    const nameIn = tr.querySelector('.etl-new-prop-name');
+    const defIn  = tr.querySelector('.etl-new-prop-def');
+    const status = tr.querySelector('.etl-new-prop-status');
+    // Suggest the next free PROPERTY#### id from the cached catalogue.
+    idIn.value = this._nextEtlPropertyId();
+    idIn.focus();
+    idIn.select();
+
+    return await new Promise((resolve) => {
+      tr.querySelector('.etl-new-prop-cancel').addEventListener('click', () => {
+        tr.remove();
+        resolve(null);
+      });
+      tr.querySelector('.etl-new-prop-add').addEventListener('click', async () => {
+        const pid = (idIn.value || '').trim().toUpperCase();
+        const pname = (nameIn.value || '').trim();
+        const def = (defIn.value || '').trim() || null;
+        if (!pid)   { status.textContent = 'ID required.'; return; }
+        if (!/^[A-Z0-9_]+$/.test(pid)) {
+          status.textContent = 'ID must be CAPS (A-Z, 0-9, _).'; return;
+        }
+        if (!pname) { status.textContent = 'Name required.'; return; }
+        status.textContent = 'Adding…';
+        try {
+          const created = await api.createProperty({
+            property_num_id: pid, property_name: pname, definition: def,
+          });
+          tr.remove();
+          resolve({
+            property_num_id: created.property_num_id || pid,
+            property_name:   created.property_name   || pname,
+            uri:             created.uri || '',
+          });
+        } catch (e) {
+          status.textContent = 'Add failed: ' + (e && e.message ? e.message : e);
+        }
+      });
+    });
   }
 
   async loadEtlCodelists() {
@@ -3332,8 +4020,7 @@ class AdminDashboard {
             <td>
               <button class="btn btn-primary btn-sm" onclick="adminDashboard.openDataset('${tnJs}')">Open</button>
               <button class="btn btn-sm" style="background:#28a745;color:#fff;margin-left:4px;${ingested ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.ingestDataset('${tnJs}')"${ingested ? ' disabled' : ''}>Ingest</button>
-              <button class="btn btn-sm" style="background:#dc3545;color:#fff;margin-left:4px;${noPrune ? 'opacity:0.5;pointer-events:none;' : ''}" onclick="adminDashboard.pruneDataset('${tnJs}')"${noPrune ? ' disabled' : ''}>Prune DB</button>
-              ${this.isAdmin ? `<button class="btn btn-sm" style="background:#6c757d;color:#fff;margin-left:4px;" onclick="adminDashboard.deleteDataset('${tnJs}')">Delete</button>` : ''}
+              ${this.isAdmin ? `<button class="btn btn-sm" style="background:#dc3545;color:#fff;margin-left:4px;" onclick="adminDashboard.deleteDataset('${tnJs}')">Delete</button>` : ''}
             </td>
             <td class="etl-result" style="font-size:var(--fs-xs);max-width:300px;white-space:pre-wrap;">${this.escapeHtml(d.note || '')}</td>
           </tr>`;
@@ -3439,6 +4126,28 @@ class AdminDashboard {
       await this.loadEtlDatasets();
     } catch (e) {
       this.setRowResult(tableName, this.escapeHtml(e.message), true);
+    }
+  }
+
+  // Project-level delete (Soil profiles section). Fans out to the existing
+  // per-CSV prune endpoint for each uploaded dataset belonging to the project,
+  // so the soil_data rows for this project's profiles are removed without
+  // touching the uploaded CSV table itself.
+  async deleteProjectProfiles(projectId, projectName) {
+    try {
+      const datasets = (await api.getDatasets() || []).filter(d => d.project_id === projectId);
+      if (datasets.length === 0) {
+        alert('No ingested CSV uploads found for this project.');
+        return;
+      }
+      for (const d of datasets) {
+        await api.pruneDataset(d.table_name);
+      }
+      await this.loadEtlDatasets();
+      await this.loadSoilProfileLayers();
+      this.renderSoilProfileLayers();
+    } catch (e) {
+      alert('Delete failed: ' + (e && e.message ? e.message : e));
     }
   }
 
@@ -3650,7 +4359,7 @@ class AdminDashboard {
 
       const propOpts = '<option value="">—</option>' + (cl.properties || []).map(p =>
         `<option value="${p.property_num_id}" data-uri="${this.escapeHtml(p.uri || '')}"${existing.property_num_id == p.property_num_id ? ' selected' : ''}>${this.escapeHtml(p.property_name)}</option>`
-      ).join('');
+      ).join('') + '<option value="__new__">+ Add Property…</option>';
 
       const hideResult = isResult ? '' : 'display:none;';
 
@@ -3780,9 +4489,15 @@ class AdminDashboard {
         unitSel.innerHTML = '<option value="">—</option>' + opts.map(u => {
           const v = u.unit_of_measure_id;
           const sel = selectedUnit && selectedUnit === v ? ' selected' : '';
-          const label = u.is_canonical
-            ? `${v} (canonical)`
-            : `${v} → ${u.unit_to} (${u.operation}${u.value})`;
+          let label;
+          if (u.is_canonical) {
+            label = `${v} (canonical)`;
+          } else if (u.unit_to && u.operation) {
+            label = `${v} → ${u.unit_to} (${u.operation}${u.value})`;
+          } else {
+            // Fallback "show all" entry — no conversion info to display.
+            label = v;
+          }
           return `<option value="${v}"${sel}>${this.escapeHtml(label)}</option>`;
         }).join('');
       } catch (e) {
@@ -3795,11 +4510,23 @@ class AdminDashboard {
       procs.map(p => {
         const sel = selectedId && p.procedure_num_id === selectedId ? ' selected' : '';
         return `<option value="${p.procedure_num_id}" data-uri="${this.escapeHtml(p.uri || '')}"${sel}>${this.escapeHtml(p.procedure_name)}</option>`;
-      }).join('');
+      }).join('') + '<option value="__new__">+ Add Procedure…</option>';
 
     // Cascade: property changes → load procedures, clear units, update prop link
     tbody.querySelectorAll('.etl-prop').forEach(sel => {
       sel.addEventListener('change', async () => {
+        if (sel.value === '__new__') {
+          const added = await this.etlPromptAddProperty();
+          if (added) {
+            // Append to cached list and re-render this select (and every other
+            // .etl-prop) so the new entry is visible everywhere.
+            this.etlCodelists.properties = (this.etlCodelists.properties || []).concat([added]);
+            this._refreshEtlPropertyDropdowns(added.property_num_id, sel);
+            sel.value = added.property_num_id;
+          } else {
+            sel.value = '';
+          }
+        }
         updateRefLink(sel, '.etl-prop-link');
         const tr = sel.closest('tr');
         const procSel = tr.querySelector('.etl-proc');
@@ -3824,7 +4551,30 @@ class AdminDashboard {
 
     // Cascade: procedure changes → load source-unit options + update proc link
     tbody.querySelectorAll('.etl-proc').forEach(sel => {
-      sel.addEventListener('change', () => {
+      sel.addEventListener('change', async () => {
+        if (sel.value === '__new__') {
+          const tr = sel.closest('tr');
+          const propId = tr.querySelector('.etl-prop').value;
+          if (!propId) {
+            alert('Pick a Property first.');
+            sel.value = '';
+            return;
+          }
+          const added = await this.etlPromptAddProcedure(propId);
+          if (added) {
+            // Refresh just this row's procedure dropdown so the new entry
+            // (linked to the current property via observation_num) shows up.
+            try {
+              const procs = await api.getProceduresForProperty(propId);
+              sel.innerHTML = procOptionsHtml(procs, added.procedure_num_id);
+              sel.value = added.procedure_num_id;
+            } catch (e) {
+              sel.value = '';
+            }
+          } else {
+            sel.value = '';
+          }
+        }
         updateRefLink(sel, '.etl-proc-link');
         reloadUnits(sel.closest('tr'), null);
       });

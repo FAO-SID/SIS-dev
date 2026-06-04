@@ -490,9 +490,9 @@ function formatMetadata(m) {
 
   // ---------- Identification ----------
   const idRows = [
-    ['Layer id',        m.layer_id],
-    ['Mapset id',       m.mapset_id],
     ['Country',         m.country_name ? `${m.country_name} (${m.country_id || ''})` : m.country_id],
+    ['Mapset id',       m.mapset_id],
+    ['Layer id',        m.layer_id],
     ['Project',         m.project_name ? `${m.project_name} (${m.project_id || ''})` : m.project_id],
     ['Soil property',   m.property_name ? `${m.property_name} (${m.property_num_id || ''})` : m.property_num_id],
     ['Unit',            m.unit_of_measure_id],

@@ -189,27 +189,30 @@ def execute_recipe(
                 )
             layer_paths.append(path)
 
-    nodata_mask: Optional[np.ndarray] = None
     profile = None
     score_stack = []
 
+    # NULL (no-data) pixels are excluded per-layer from the aggregation
+    # rather than propagated. We carry a mask alongside each scored layer
+    # so np.ma.stack().sum()/.mean()/etc. naturally skips masked entries:
+    # the output is NULL only at pixels where EVERY input was NULL.
+    # `no_data_mode` is kept on the recipe for back-compat but is now a
+    # no-op — "skip" is the only mode.
     for step, path in zip(steps, layer_paths):
         with rasterio.open(path) as src:
             if profile is None:
                 profile = src.profile.copy()
             arr = src.read(1, masked=True)
-            if no_data_mode == "propagate":
-                m = np.ma.getmaskarray(arr)
-                nodata_mask = m if nodata_mask is None else (nodata_mask | m)
+            mask = np.ma.getmaskarray(arr)
             data = np.ma.filled(arr, fill_value=0).astype(np.float32)
-            score_stack.append(_apply_op(data, step))
+            scored = _apply_op(data, step)
+            score_stack.append(np.ma.array(scored, mask=mask))
 
-    stacked = np.stack(score_stack, axis=0)
-    result = _aggregate(stacked, agg).astype(np.float32)
+    stacked = np.ma.stack(score_stack, axis=0)
+    result_masked = _aggregate(stacked, agg).astype(np.float32)
 
     nodata_value = -9999.0
-    if no_data_mode == "propagate" and nodata_mask is not None:
-        result = np.where(nodata_mask, nodata_value, result).astype(np.float32)
+    result = np.ma.filled(result_masked, fill_value=nodata_value).astype(np.float32)
 
     os.makedirs(output_dir, exist_ok=True)
     out_path = os.path.join(output_dir, f"{output_layer_id}.tif")
