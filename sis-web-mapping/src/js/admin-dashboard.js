@@ -479,7 +479,7 @@ class AdminDashboard {
                       <tr>
                         <th>Project</th>
                         <th>Profiles</th>
-                        <th>Observations</th>
+                        <th>Measurements</th>
                         <th>Public limit</th>
                         <th title="Random coordinate offset in meters. Blank = precise coords.">Spatial blur (meters)</th>
                         <th>Published</th>
@@ -2974,11 +2974,11 @@ class AdminDashboard {
     if (!grid) return;
     const fmt = (n) => Number(n || 0).toLocaleString();
     const cards = [
-      { label: 'Profiles', value: fmt(t.profile_count), accent: 'a' },
-      { label: 'Observations', value: fmt(t.observation_count), accent: 'b' },
       { label: 'Projects', value: fmt(t.project_count), accent: 'c' },
-      { label: 'Properties', value: fmt(t.property_count), accent: 'd' },
       { label: 'Sites', value: fmt(t.site_count), accent: 'e' },
+      { label: 'Profiles', value: fmt(t.profile_count), accent: 'a' },
+      { label: 'Properties', value: fmt(t.property_count), accent: 'd' },
+      { label: 'Measurements', value: fmt(t.observation_count), accent: 'b' },
     ];
     grid.innerHTML = cards.map(c => `
       <div class="stat-card stat-card-${c.accent}">

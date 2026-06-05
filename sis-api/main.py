@@ -2811,7 +2811,12 @@ async def dashboard_stats(current_user: dict = Depends(get_current_user)):
                   (SELECT count(*) FROM soil_data.profile) AS profile_count,
                   (SELECT count(*) FROM soil_data.result_num) AS observation_count,
                   (SELECT count(*) FROM soil_data.project) AS project_count,
-                  (SELECT count(DISTINCT property_num_id) FROM soil_data.observation_num) AS property_count,
+                  -- Distinct properties that actually have measurements in
+                  -- this database (not the full catalogue of known ones).
+                  (SELECT count(DISTINCT o.property_num_id)
+                   FROM soil_data.observation_num o
+                   JOIN soil_data.result_num r
+                     ON r.observation_num_id = o.observation_num_id) AS property_count,
                   (SELECT count(*) FROM soil_data.site) AS site_count;
             """)
             out["totals"] = cur.fetchone()
@@ -3806,12 +3811,28 @@ async def observation_limits(
     """
     with get_db() as conn:
         with conn.cursor() as cur:
+            # The Upload GeoTIFF dropdown now sends a mapped_property_id —
+            # resolve it to the catalogue property_num_id. Falls back to
+            # treating the path value as a property_num_id directly so older
+            # callers still work. When the mapped_property has no FK link,
+            # there's nothing to compare against → return empty limits.
+            cur.execute("""
+                SELECT property_num_id FROM soil_data.mapped_property
+                WHERE mapped_property_id = %s
+            """, (property_num_id,))
+            row = cur.fetchone()
+            is_mapped_property = row is not None
+            resolved_prop = row[0] if row else property_num_id
+            if is_mapped_property and resolved_prop is None:
+                return {"value_min": None, "value_max": None,
+                        "canonical_unit": None, "converted": False}
+
             cur.execute("""
                 SELECT MIN(value_min) AS lo, MAX(value_max) AS hi
                 FROM soil_data.observation_num
                 WHERE property_num_id = %s
                   AND value_min IS NOT NULL AND value_max IS NOT NULL
-            """, (property_num_id,))
+            """, (resolved_prop,))
             row = cur.fetchone()
             if not row or row[0] is None or row[1] is None:
                 return {"value_min": None, "value_max": None,
@@ -3826,7 +3847,7 @@ async def observation_limits(
                 GROUP BY unit_of_measure_id
                 ORDER BY count(*) DESC
                 LIMIT 1
-            """, (property_num_id,))
+            """, (resolved_prop,))
             row = cur.fetchone()
             canonical = row[0] if row else None
 
