@@ -711,8 +711,8 @@ class AdminDashboard {
                   <h3>Recipes</h3>
                   <button type="button" class="btn btn-sm btn-primary" id="dst-new-btn" style="margin-bottom:var(--sp-3);">+ New Recipe</button>
                   <table class="admin-table" id="dst-recipes-table" style="width:100%;">
-                    <thead><tr><th>ID</th><th>Name</th><th>Last run</th><th></th></tr></thead>
-                    <tbody id="dst-recipes-tbody"><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
+                    <thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Output</th><th>Last run</th></tr></thead>
+                    <tbody id="dst-recipes-tbody"><tr><td colspan="5" class="loading">Loading...</td></tr></tbody>
                   </table>
                 </div>
                 <div>
@@ -811,11 +811,6 @@ class AdminDashboard {
                     </div>
                     <pre id="dst-output" style="margin-top:var(--sp-3);max-height:200px;overflow:auto;background:#f7f7f7;padding:8px;font-size:11px;"></pre>
                   </div>
-                  <h3 style="margin-top:var(--sp-4);">Recent runs</h3>
-                  <table class="admin-table" id="dst-runs-table" style="width:100%;">
-                    <thead><tr><th>run_id</th><th>recipe</th><th>status</th><th>started</th><th>output</th></tr></thead>
-                    <tbody id="dst-runs-tbody"><tr><td colspan="5" class="empty-state">No runs yet</td></tr></tbody>
-                  </table>
                 </div>
               </section>
             </div>
@@ -2024,7 +2019,6 @@ class AdminDashboard {
       console.warn('dst inputs:', e.message);
     }
     await this.dstReloadRecipes();
-    await this.dstReloadRuns();
   }
 
   async dstReloadRecipes() {
@@ -2032,46 +2026,34 @@ class AdminDashboard {
     try {
       const recipes = await api.listDstRecipes();
       if (!recipes.length) {
-        tb.innerHTML = '<tr><td colspan="4" class="empty-state">No recipes yet</td></tr>';
+        tb.innerHTML = '<tr><td colspan="5" class="empty-state">No recipes yet</td></tr>';
         return;
       }
-      tb.innerHTML = recipes.map(r => `
+      const fmtDate = (s) => s ? String(s).replace('T', ' ').slice(0, 16) : '';
+      tb.innerHTML = recipes.map(r => {
+        const lr = r.latest_run;
+        const status = lr ? this.escapeHtml(lr.status || '') : '—';
+        const output = lr && lr.output_layer_id ? this.escapeHtml(lr.output_layer_id) : '—';
+        const started = lr ? this.escapeHtml(fmtDate(lr.started_at)) : '—';
+        return `
         <tr>
-          <td><a href="#" data-recipe="${r.recipe_id}">${r.recipe_id}</a></td>
-          <td>${r.name || ''}</td>
-          <td>${r.latest_run ? `${r.latest_run.status} (${r.latest_run.started_at || ''})` : '—'}</td>
-          <td></td>
-        </tr>`).join('');
+          <td><a href="#" data-recipe="${this.escapeHtml(r.recipe_id)}">${this.escapeHtml(r.recipe_id)}</a></td>
+          <td>${this.escapeHtml(r.name || '')}</td>
+          <td>${status}</td>
+          <td>${output}</td>
+          <td>${started}</td>
+        </tr>`;
+      }).join('');
       tb.querySelectorAll('a[data-recipe]').forEach(a =>
         a.addEventListener('click', ev => {
           ev.preventDefault();
           this.dstLoadRecipe(a.dataset.recipe);
         }));
     } catch (e) {
-      tb.innerHTML = `<tr><td colspan="4">${e.message}</td></tr>`;
+      tb.innerHTML = `<tr><td colspan="5">${this.escapeHtml(e.message)}</td></tr>`;
     }
   }
 
-  async dstReloadRuns() {
-    const tb = document.getElementById('dst-runs-tbody');
-    try {
-      const runs = await api.listDstRuns();
-      if (!runs.length) {
-        tb.innerHTML = '<tr><td colspan="5" class="empty-state">No runs yet</td></tr>';
-        return;
-      }
-      tb.innerHTML = runs.slice(0, 20).map(r => `
-        <tr>
-          <td>${r.run_id}</td>
-          <td>${r.recipe_id}</td>
-          <td>${r.status}${r.metadata_status ? ` / ${r.metadata_status}` : ''}</td>
-          <td>${r.started_at || ''}</td>
-          <td>${r.output_layer_id || ''}</td>
-        </tr>`).join('');
-    } catch (e) {
-      tb.innerHTML = `<tr><td colspan="5">${e.message}</td></tr>`;
-    }
-  }
 
   dstNewRecipe() {
     document.getElementById('dst-editor').style.display = 'block';
@@ -2329,28 +2311,30 @@ class AdminDashboard {
     try {
       const run = await api.runDstRecipe(id);
       out.textContent = JSON.stringify(run, null, 2);
-      status.textContent = `Queued run #${run.run_id}; polling...`;
-      this._dstPollRun(run.run_id);
+      status.textContent = `Queued; polling…`;
+      this._dstPollRun(id);
     } catch (e) { status.textContent = 'Run failed: ' + e.message; }
   }
 
-  async _dstPollRun(runId) {
+  // Run state now lives on api.dst_recipe directly; poll the recipe
+  // endpoint until its latest_run.status hits a terminal value.
+  async _dstPollRun(recipeId) {
     const status = document.getElementById('dst-status');
     const out = document.getElementById('dst-output');
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 2000));
       try {
-        const r = await api.getDstRun(runId);
-        out.textContent = JSON.stringify(r, null, 2);
-        status.textContent = `run #${runId}: ${r.status}`;
-        if (r.status === 'succeeded' || r.status === 'failed' || r.status === 'cancelled') {
+        const r = await api.getDstRecipe(recipeId);
+        const lr = r.latest_run || {};
+        out.textContent = JSON.stringify(lr, null, 2);
+        status.textContent = `${recipeId}: ${lr.status || '?'}`;
+        if (lr.status === 'succeeded' || lr.status === 'failed' || lr.status === 'cancelled') {
           await this.dstReloadRecipes();
-          await this.dstReloadRuns();
           return;
         }
       } catch (e) { /* keep polling */ }
     }
-    status.textContent = `run #${runId}: still running (stopped polling)`;
+    status.textContent = `${recipeId}: still running (stopped polling)`;
   }
 
   async dstDelete() {

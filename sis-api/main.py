@@ -3040,6 +3040,23 @@ async def glosis_disable_and_delete(current_user: dict = Depends(get_current_adm
 # v1 (this slice): recipe CRUD only. Validate / run / engine come next.
 
 def _dst_recipe_row_to_dict(row):
+    # The run-state columns (run_status / run_started_at / …) live on
+    # api.dst_recipe now (api.dst_run was retired). Surface them under
+    # a `latest_run` sub-object so the SPA's existing shape still works.
+    started = row.get("run_started_at") if isinstance(row, dict) else row["run_started_at"]
+    finished = row.get("run_finished_at") if isinstance(row, dict) else row["run_finished_at"]
+    latest_run = None
+    if row.get("run_status") if isinstance(row, dict) else row["run_status"]:
+        latest_run = {
+            "status":          row["run_status"],
+            "started_at":      started.isoformat() if started else None,
+            "finished_at":     finished.isoformat() if finished else None,
+            "output_layer_id": row["output_layer_id"],
+            "metadata_status": row["metadata_status"],
+            "metadata_error":  row["metadata_error"],
+            "error_message":   row["run_error"],
+            "triggered_by":    row["run_triggered_by"],
+        }
     return {
         "recipe_id": row["recipe_id"],
         "name": row["name"],
@@ -3049,6 +3066,7 @@ def _dst_recipe_row_to_dict(row):
         "created_by": row["created_by"],
         "created_at": row["created_at"].isoformat() if row["created_at"] else None,
         "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+        "latest_run": latest_run,
     }
 
 
@@ -3084,18 +3102,10 @@ async def list_dst_recipes(current_user: dict = Depends(get_current_user)):
     with get_db() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
-                SELECT r.*,
-                       (SELECT row_to_json(t) FROM (
-                           SELECT run_id, status, started_at, finished_at, output_layer_id
-                           FROM api.dst_run
-                           WHERE recipe_id = r.recipe_id
-                           ORDER BY started_at DESC NULLS LAST LIMIT 1
-                       ) t) AS latest_run
-                FROM api.dst_recipe r
-                ORDER BY r.updated_at DESC
+                SELECT * FROM api.dst_recipe
+                ORDER BY updated_at DESC
             """)
-            return [{**_dst_recipe_row_to_dict(r), "latest_run": r["latest_run"]}
-                    for r in cur.fetchall()]
+            return [_dst_recipe_row_to_dict(r) for r in cur.fetchall()]
 
 
 @app.post("/api/dst/recipes", status_code=status.HTTP_201_CREATED)
@@ -3138,16 +3148,7 @@ async def get_dst_recipe(recipe_id: str, current_user: dict = Depends(get_curren
             row = cur.fetchone()
             if not row:
                 raise HTTPException(status_code=404, detail="Recipe not found")
-            cur.execute("""
-                SELECT run_id, status, started_at, finished_at, output_layer_id,
-                       error_message, metadata_status
-                FROM api.dst_run
-                WHERE recipe_id = %s
-                ORDER BY started_at DESC NULLS LAST
-                LIMIT 20
-            """, (recipe_id,))
-            runs = cur.fetchall()
-            return {**_dst_recipe_row_to_dict(row), "recent_runs": runs}
+            return _dst_recipe_row_to_dict(row)
 
 
 @app.put("/api/dst/recipes/{recipe_id}")
@@ -3219,8 +3220,10 @@ def _output_layer_id_for_recipe(recipe_id: str, recipe: dict, conn=None) -> str:
     return f"{country}-{proj}-{prop}-{safe_id}"
 
 
-def _execute_dst_run(run_id: int, recipe_id: str, triggered_by: str):
-    """Background worker: load recipe, run engine, register output, update run row.
+def _execute_dst_run(recipe_id: str, triggered_by: str):
+    """Background worker: load recipe, run engine, register output, update
+    the run-state columns on api.dst_recipe directly. Each recipe owns at
+    most one run; a rerun simply overwrites the prior state.
 
     Owns its own DB connection (separate from the request that spawned it).
     """
@@ -3231,9 +3234,10 @@ def _execute_dst_run(run_id: int, recipe_id: str, triggered_by: str):
         if not fields:
             return
         cols = ", ".join(f"{k} = %s" for k in fields)
-        vals = list(fields.values()) + [run_id]
+        vals = list(fields.values()) + [recipe_id]
         with conn.cursor() as cur:
-            cur.execute(f"UPDATE api.dst_run SET {cols} WHERE run_id = %s", vals)
+            cur.execute(
+                f"UPDATE api.dst_recipe SET {cols} WHERE recipe_id = %s", vals)
         conn.commit()
 
     out_path: Optional[str] = None
@@ -3244,13 +3248,13 @@ def _execute_dst_run(run_id: int, recipe_id: str, triggered_by: str):
                             (recipe_id,))
                 recipe_row = cur.fetchone()
             if not recipe_row:
-                _mark(conn, status="failed",
-                      error_message="recipe vanished mid-run",
-                      finished_at=datetime.utcnow())
+                _mark(conn, run_status="failed",
+                      run_error="recipe vanished mid-run",
+                      run_finished_at=datetime.utcnow())
                 return
             recipe = recipe_row["recipe"]
 
-            _mark(conn, status="running")
+            _mark(conn, run_status="running")
 
             output_layer_id = _output_layer_id_for_recipe(recipe_id, recipe, conn)
             out_path = execute_recipe(
@@ -3277,29 +3281,25 @@ def _execute_dst_run(run_id: int, recipe_id: str, triggered_by: str):
                 )
             except Exception as e:
                 conn.rollback()
-                log.exception("DST run %s: registrar failed", run_id)
+                log.exception("DST recipe %s: registrar failed", recipe_id)
                 metadata_status = "failed"
                 metadata_error = f"{type(e).__name__}: {e}"
 
-            with conn.cursor() as cur:
-                cur.execute(
-                    "UPDATE api.dst_recipe SET output_layer_id = %s WHERE recipe_id = %s",
-                    (output_layer_id, recipe_id))
             _mark(conn,
-                  status="succeeded",
+                  run_status="succeeded",
                   metadata_status=metadata_status,
                   metadata_error=metadata_error,
                   output_layer_id=output_layer_id,
-                  finished_at=datetime.utcnow())
+                  run_finished_at=datetime.utcnow())
     except Exception as e:
-        log.exception("DST run %s failed", run_id)
+        log.exception("DST recipe %s run failed", recipe_id)
         try:
             with get_db() as conn2:
-                _mark(conn2, status="failed",
-                      error_message=f"{type(e).__name__}: {e}",
-                      finished_at=datetime.utcnow())
+                _mark(conn2, run_status="failed",
+                      run_error=f"{type(e).__name__}: {e}",
+                      run_finished_at=datetime.utcnow())
         except Exception:
-            log.exception("DST run %s: also failed to record failure", run_id)
+            log.exception("DST recipe %s: also failed to record failure", recipe_id)
         if out_path and os.path.exists(out_path):
             try:
                 os.remove(out_path)
@@ -3342,21 +3342,28 @@ async def run_dst_recipe(
             raise HTTPException(status_code=400,
                                 detail={"message": "recipe failed validation",
                                         "report": report})
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        # Mark the recipe row as queued. Re-running overwrites whatever
+        # previous run state was on it; api.dst_run is gone.
+        with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO api.dst_run (recipe_id, status, triggered_by)
-                VALUES (%s, 'queued', %s)
-                RETURNING run_id, status, started_at
-            """, (recipe_id, current_user["user_id"]))
-            run = cur.fetchone()
+                UPDATE api.dst_recipe
+                SET run_status         = 'queued',
+                    run_started_at     = now(),
+                    run_finished_at    = NULL,
+                    run_error          = NULL,
+                    metadata_status    = NULL,
+                    metadata_error     = NULL,
+                    run_triggered_by   = %s
+                WHERE recipe_id = %s
+            """, (current_user["user_id"], recipe_id))
+        conn.commit()
 
-    background.add_task(_execute_dst_run, run["run_id"], recipe_id, current_user["user_id"])
+    background.add_task(_execute_dst_run, recipe_id, current_user["user_id"])
     log_audit(current_user["user_id"], None, "dst_run_queued",
-              {"recipe_id": recipe_id, "run_id": run["run_id"]}, None)
+              {"recipe_id": recipe_id}, None)
     return {
-        "run_id": run["run_id"],
-        "status": run["status"],
-        "started_at": run["started_at"].isoformat() if run["started_at"] else None,
+        "recipe_id": recipe_id,
+        "status": "queued",
     }
 
 
@@ -3391,71 +3398,6 @@ async def regenerate_dst_metadata(
         "transaction_ok": result.get("transaction_ok"),
         "transaction_error": result.get("transaction_error"),
     }
-
-
-@app.get("/api/dst/runs")
-async def list_dst_runs(
-    recipe_id: Optional[str] = None,
-    limit: int = 50,
-    current_user: dict = Depends(get_current_user),
-):
-    limit = max(1, min(int(limit), 500))
-    with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            if recipe_id:
-                cur.execute("""
-                    SELECT run_id, recipe_id, status, metadata_status,
-                           started_at, finished_at, output_layer_id,
-                           error_message, triggered_by
-                    FROM api.dst_run
-                    WHERE recipe_id = %s
-                    ORDER BY started_at DESC NULLS LAST
-                    LIMIT %s
-                """, (recipe_id, limit))
-            else:
-                cur.execute("""
-                    SELECT run_id, recipe_id, status, metadata_status,
-                           started_at, finished_at, output_layer_id,
-                           error_message, triggered_by
-                    FROM api.dst_run
-                    ORDER BY started_at DESC NULLS LAST
-                    LIMIT %s
-                """, (limit,))
-            rows = cur.fetchall()
-    for r in rows:
-        for k in ("started_at", "finished_at"):
-            if r.get(k):
-                r[k] = r[k].isoformat()
-    return rows
-
-
-@app.get("/api/dst/runs/{run_id}")
-async def get_dst_run(run_id: int, current_user: dict = Depends(get_current_user)):
-    with get_db() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT * FROM api.dst_run WHERE run_id = %s", (run_id,))
-            row = cur.fetchone()
-    if not row:
-        raise HTTPException(status_code=404, detail="Run not found")
-    for k in ("started_at", "finished_at"):
-        if row.get(k):
-            row[k] = row[k].isoformat()
-    return row
-
-
-@app.delete("/api/dst/runs/{run_id}")
-async def delete_dst_run(
-    run_id: int,
-    current_user: dict = Depends(get_current_admin_user),
-):
-    with get_db() as conn:
-        with conn.cursor() as cur:
-            cur.execute("DELETE FROM api.dst_run WHERE run_id = %s", (run_id,))
-            if cur.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Run not found")
-    log_audit(current_user["user_id"], None, "dst_run_deleted",
-              {"run_id": run_id}, None)
-    return {"message": "Run deleted"}
 
 
 # ==================== Raster registry — inspect ====================

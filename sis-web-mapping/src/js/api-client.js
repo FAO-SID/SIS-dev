@@ -573,11 +573,6 @@ class SISApiClient {
   async runDstRecipe(id) {
     return this.authenticatedRequest(`/api/dst/recipes/${encodeURIComponent(id)}/run`, { method: 'POST' });
   }
-  async listDstRuns(recipeId) {
-    const q = recipeId ? `?recipe_id=${encodeURIComponent(recipeId)}` : '';
-    return this.authenticatedRequest(`/api/dst/runs${q}`);
-  }
-  async getDstRun(runId) { return this.authenticatedRequest(`/api/dst/runs/${runId}`); }
 
   async updateOwnAccount(currentPassword, newUserId, newPassword) {
     const body = { current_password: currentPassword };
