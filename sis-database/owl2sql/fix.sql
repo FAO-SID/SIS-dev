@@ -41,6 +41,8 @@ UPDATE soil_data.unit_of_measure SET unit_of_measure_id = 'g/100g',     unit_nam
 -- Add units
 INSERT INTO soil_data.unit_of_measure (unit_of_measure_id, unit_name, unit_type, uri) VALUES
   ('t/(ha·a)',     'Tonne per hectare per year',              'Areal mass rate',   'https://qudt.org/vocab/unit/TONNE-PER-HA-YR'),
+  ('kg/(ha·a)',    'Kilogram per hectare per year',           'Areal mass rate',   'https://qudt.org/vocab/unit/KiloGM-PER-HA-YR'),
+  ('keq(ha.a)',    'Kilo-equivalents H+ per hectare per year','Areal mass rate',   'https://qudt.org/vocab/unit/keq(ha.a)'),
   ('class',        'Categorical',                             'Dimensionless',     'https://qudt.org/vocab/unit/class'),
   ('dimensionless','No dimension',                            'Dimensionless',     'https://qudt.org/vocab/unit/dimensionless'),
   ('cm',           'Centimetre',                              'Length',            'http://qudt.org/vocab/unit/CentiM'),
@@ -207,7 +209,9 @@ INSERT INTO soil_data.unit_conversion (unit_from, operation, value, unit_to) VAL
   ('mm/day',       '/',    240.0,  'cm/h'),
   ('cm/day',       '/',     24.0,  'cm/h'),
   ('m/day',        '*',   4.1667,  'cm/h'),
-  ('in/h',         '*',     2.54,  'cm/h');
+  ('in/h',         '*',     2.54,  'cm/h'),
+  ('t/(ha·a)',     '*',   1000.0,  'kg/(ha·a)'),
+  ('kg/(ha·a)',    '/',   1000.0,  't/(ha·a)');
 
 -- Add correct source reference
 UPDATE soil_data.observation_desc SET procedure_desc_id = 'ISRIC Report 2019/01' WHERE property_desc_id = 'fragmentsClassProperty';

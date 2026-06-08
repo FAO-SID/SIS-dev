@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict PcJR6awRK9llobKC9DCNadIRxlbpoIAYxSCHfX9q0aGjW8tx1vJAGIwsCn2EZEZ
+\restrict 98ZwR7TZmb6tx6Ti2Ulo8QGWE0HETMh9vWumjb0JXbiRnoOwZbkw2TX2cuOiO64
 
 -- Dumped from database version 12.22 (Ubuntu 12.22-3.pgdg22.04+1)
 -- Dumped by pg_dump version 18.4 (Ubuntu 18.4-1.pgdg22.04+1)
 
--- Started on 2026-05-26 12:32:51 CEST
+-- Started on 2026-06-08 11:28:48 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,7 +22,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 11 (class 2615 OID 55703682)
+-- TOC entry 11 (class 2615 OID 55706527)
 -- Name: api; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -32,7 +32,7 @@ CREATE SCHEMA api;
 ALTER SCHEMA api OWNER TO sis;
 
 --
--- TOC entry 5342 (class 0 OID 0)
+-- TOC entry 5296 (class 0 OID 0)
 -- Dependencies: 11
 -- Name: SCHEMA api; Type: COMMENT; Schema: -; Owner: sis
 --
@@ -41,7 +41,7 @@ COMMENT ON SCHEMA api IS 'REST API tables';
 
 
 --
--- TOC entry 12 (class 2615 OID 55703683)
+-- TOC entry 12 (class 2615 OID 55706528)
 -- Name: kobo; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -51,7 +51,7 @@ CREATE SCHEMA kobo;
 ALTER SCHEMA kobo OWNER TO sis;
 
 --
--- TOC entry 5344 (class 0 OID 0)
+-- TOC entry 5298 (class 0 OID 0)
 -- Dependencies: 12
 -- Name: SCHEMA kobo; Type: COMMENT; Schema: -; Owner: sis
 --
@@ -70,7 +70,7 @@ COMMENT ON SCHEMA kobo IS 'GloSIS data collection database schema';
 ALTER SCHEMA public OWNER TO sis;
 
 --
--- TOC entry 14 (class 2615 OID 55703684)
+-- TOC entry 14 (class 2615 OID 55706529)
 -- Name: soil_data; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -80,7 +80,7 @@ CREATE SCHEMA soil_data;
 ALTER SCHEMA soil_data OWNER TO sis;
 
 --
--- TOC entry 5347 (class 0 OID 0)
+-- TOC entry 5301 (class 0 OID 0)
 -- Dependencies: 14
 -- Name: SCHEMA soil_data; Type: COMMENT; Schema: -; Owner: sis
 --
@@ -89,7 +89,7 @@ COMMENT ON SCHEMA soil_data IS 'Core entities and relations from the ISO-28258 d
 
 
 --
--- TOC entry 15 (class 2615 OID 55703685)
+-- TOC entry 15 (class 2615 OID 55706530)
 -- Name: soil_data_upload; Type: SCHEMA; Schema: -; Owner: sis
 --
 
@@ -99,7 +99,7 @@ CREATE SCHEMA soil_data_upload;
 ALTER SCHEMA soil_data_upload OWNER TO sis;
 
 --
--- TOC entry 5349 (class 0 OID 0)
+-- TOC entry 5303 (class 0 OID 0)
 -- Dependencies: 15
 -- Name: SCHEMA soil_data_upload; Type: COMMENT; Schema: -; Owner: sis
 --
@@ -108,7 +108,7 @@ COMMENT ON SCHEMA soil_data_upload IS 'Schema to upload soil data';
 
 
 --
--- TOC entry 5 (class 3079 OID 55701947)
+-- TOC entry 5 (class 3079 OID 55704769)
 -- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -116,7 +116,7 @@ CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 
 
 --
--- TOC entry 5351 (class 0 OID 0)
+-- TOC entry 5305 (class 0 OID 0)
 -- Dependencies: 5
 -- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
 --
@@ -125,7 +125,7 @@ COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types an
 
 
 --
--- TOC entry 4 (class 3079 OID 55703033)
+-- TOC entry 4 (class 3079 OID 55705855)
 -- Name: postgis_raster; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -133,7 +133,7 @@ CREATE EXTENSION IF NOT EXISTS postgis_raster WITH SCHEMA public;
 
 
 --
--- TOC entry 5352 (class 0 OID 0)
+-- TOC entry 5306 (class 0 OID 0)
 -- Dependencies: 4
 -- Name: EXTENSION postgis_raster; Type: COMMENT; Schema: -; Owner: 
 --
@@ -142,7 +142,7 @@ COMMENT ON EXTENSION postgis_raster IS 'PostGIS raster types and functions';
 
 
 --
--- TOC entry 3 (class 3079 OID 55703594)
+-- TOC entry 3 (class 3079 OID 55706416)
 -- Name: postgis_sfcgal; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -150,7 +150,7 @@ CREATE EXTENSION IF NOT EXISTS postgis_sfcgal WITH SCHEMA public;
 
 
 --
--- TOC entry 5353 (class 0 OID 0)
+-- TOC entry 5307 (class 0 OID 0)
 -- Dependencies: 3
 -- Name: EXTENSION postgis_sfcgal; Type: COMMENT; Schema: -; Owner: 
 --
@@ -159,7 +159,7 @@ COMMENT ON EXTENSION postgis_sfcgal IS 'PostGIS SFCGAL functions';
 
 
 --
--- TOC entry 2 (class 3079 OID 55703671)
+-- TOC entry 2 (class 3079 OID 55706493)
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -167,7 +167,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
 --
--- TOC entry 5354 (class 0 OID 0)
+-- TOC entry 5308 (class 0 OID 0)
 -- Dependencies: 2
 -- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
 --
@@ -176,7 +176,7 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 
 
 --
--- TOC entry 1642 (class 1255 OID 55703686)
+-- TOC entry 1636 (class 1255 OID 55706531)
 -- Name: audit_no_modify(); Type: FUNCTION; Schema: api; Owner: sis
 --
 
@@ -200,7 +200,7 @@ $$;
 ALTER FUNCTION api.audit_no_modify() OWNER TO sis;
 
 --
--- TOC entry 1643 (class 1255 OID 55703687)
+-- TOC entry 1637 (class 1255 OID 55706532)
 -- Name: blur_geom(public.geometry, text, integer); Type: FUNCTION; Schema: api; Owner: sis
 --
 
@@ -226,7 +226,7 @@ $$;
 ALTER FUNCTION api.blur_geom(g public.geometry, seed text, radius_m integer) OWNER TO sis;
 
 --
--- TOC entry 1644 (class 1255 OID 55703688)
+-- TOC entry 1638 (class 1255 OID 55706533)
 -- Name: insert_dummy_data(text, text, text, integer, integer[], double precision, double precision, double precision, double precision); Type: FUNCTION; Schema: api; Owner: sis
 --
 
@@ -419,8 +419,8 @@ $$;
 ALTER FUNCTION api.insert_dummy_data(p_country_id text, p_project_id text, p_project_name text, p_num_plots integer, p_observation_ids integer[], p_xmin double precision, p_xmax double precision, p_ymin double precision, p_ymax double precision) OWNER TO sis;
 
 --
--- TOC entry 5355 (class 0 OID 0)
--- Dependencies: 1644
+-- TOC entry 5309 (class 0 OID 0)
+-- Dependencies: 1638
 -- Name: FUNCTION insert_dummy_data(p_country_id text, p_project_id text, p_project_name text, p_num_plots integer, p_observation_ids integer[], p_xmin double precision, p_xmax double precision, p_ymin double precision, p_ymax double precision); Type: COMMENT; Schema: api; Owner: sis
 --
 
@@ -438,7 +438,7 @@ COMMENT ON FUNCTION api.insert_dummy_data(p_country_id text, p_project_id text, 
 
 
 --
--- TOC entry 1645 (class 1255 OID 55703690)
+-- TOC entry 1639 (class 1255 OID 55706535)
 -- Name: check_result_value(); Type: FUNCTION; Schema: soil_data; Owner: sis
 --
 
@@ -465,8 +465,8 @@ $$;
 ALTER FUNCTION soil_data.check_result_value() OWNER TO sis;
 
 --
--- TOC entry 5356 (class 0 OID 0)
--- Dependencies: 1645
+-- TOC entry 5310 (class 0 OID 0)
+-- Dependencies: 1639
 -- Name: FUNCTION check_result_value(); Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -474,7 +474,7 @@ COMMENT ON FUNCTION soil_data.check_result_value() IS 'Checks if the value assig
 
 
 --
--- TOC entry 1646 (class 1255 OID 55703691)
+-- TOC entry 1640 (class 1255 OID 55706536)
 -- Name: class(); Type: FUNCTION; Schema: soil_data; Owner: sis
 --
 
@@ -558,8 +558,8 @@ $$;
 ALTER FUNCTION soil_data.class() OWNER TO sis;
 
 --
--- TOC entry 5358 (class 0 OID 0)
--- Dependencies: 1646
+-- TOC entry 5312 (class 0 OID 0)
+-- Dependencies: 1640
 -- Name: FUNCTION class(); Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -567,7 +567,7 @@ COMMENT ON FUNCTION soil_data.class() IS 'Trigger function that automatically ge
 
 
 --
--- TOC entry 1647 (class 1255 OID 55703692)
+-- TOC entry 1641 (class 1255 OID 55706537)
 -- Name: map(); Type: FUNCTION; Schema: soil_data; Owner: sis
 --
 
@@ -644,8 +644,8 @@ $$;
 ALTER FUNCTION soil_data.map() OWNER TO sis;
 
 --
--- TOC entry 5360 (class 0 OID 0)
--- Dependencies: 1647
+-- TOC entry 5314 (class 0 OID 0)
+-- Dependencies: 1641
 -- Name: FUNCTION map(); Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -653,7 +653,7 @@ COMMENT ON FUNCTION soil_data.map() IS 'Trigger function that generates MapServe
 
 
 --
--- TOC entry 1648 (class 1255 OID 55703693)
+-- TOC entry 1642 (class 1255 OID 55706538)
 -- Name: mapset_publication_not_future(); Type: FUNCTION; Schema: soil_data; Owner: sis
 --
 
@@ -672,7 +672,7 @@ $$;
 ALTER FUNCTION soil_data.mapset_publication_not_future() OWNER TO sis;
 
 --
--- TOC entry 1649 (class 1255 OID 55703694)
+-- TOC entry 1643 (class 1255 OID 55706539)
 -- Name: sld(); Type: FUNCTION; Schema: soil_data; Owner: sis
 --
 
@@ -739,8 +739,8 @@ $$;
 ALTER FUNCTION soil_data.sld() OWNER TO sis;
 
 --
--- TOC entry 5362 (class 0 OID 0)
--- Dependencies: 1649
+-- TOC entry 5316 (class 0 OID 0)
+-- Dependencies: 1643
 -- Name: FUNCTION sld(); Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -752,7 +752,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 225 (class 1259 OID 55703695)
+-- TOC entry 225 (class 1259 OID 55706540)
 -- Name: api_client; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -770,7 +770,7 @@ CREATE TABLE api.api_client (
 ALTER TABLE api.api_client OWNER TO sis;
 
 --
--- TOC entry 5364 (class 0 OID 0)
+-- TOC entry 5318 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: TABLE api_client; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -779,7 +779,7 @@ COMMENT ON TABLE api.api_client IS 'For server-to-server authentication';
 
 
 --
--- TOC entry 5365 (class 0 OID 0)
+-- TOC entry 5319 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN api_client.api_client_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -788,7 +788,7 @@ COMMENT ON COLUMN api.api_client.api_client_id IS 'Unique identifier for the API
 
 
 --
--- TOC entry 5366 (class 0 OID 0)
+-- TOC entry 5320 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN api_client.api_key; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -797,7 +797,7 @@ COMMENT ON COLUMN api.api_client.api_key IS 'Secret API key for authentication';
 
 
 --
--- TOC entry 5367 (class 0 OID 0)
+-- TOC entry 5321 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN api_client.is_active; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -806,7 +806,7 @@ COMMENT ON COLUMN api.api_client.is_active IS 'Flag indicating whether the clien
 
 
 --
--- TOC entry 5368 (class 0 OID 0)
+-- TOC entry 5322 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN api_client.created_at; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -815,7 +815,7 @@ COMMENT ON COLUMN api.api_client.created_at IS 'Date when the client was created
 
 
 --
--- TOC entry 5369 (class 0 OID 0)
+-- TOC entry 5323 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN api_client.expires_at; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -824,7 +824,7 @@ COMMENT ON COLUMN api.api_client.expires_at IS 'Date when the API key expires';
 
 
 --
--- TOC entry 5370 (class 0 OID 0)
+-- TOC entry 5324 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN api_client.last_login; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -833,7 +833,7 @@ COMMENT ON COLUMN api.api_client.last_login IS 'Timestamp of the last successful
 
 
 --
--- TOC entry 5371 (class 0 OID 0)
+-- TOC entry 5325 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: COLUMN api_client.description; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -842,7 +842,7 @@ COMMENT ON COLUMN api.api_client.description IS 'Description of the API client p
 
 
 --
--- TOC entry 226 (class 1259 OID 55703704)
+-- TOC entry 226 (class 1259 OID 55706549)
 -- Name: audit; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -860,7 +860,7 @@ CREATE TABLE api.audit (
 ALTER TABLE api.audit OWNER TO sis;
 
 --
--- TOC entry 5373 (class 0 OID 0)
+-- TOC entry 5327 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: TABLE audit; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -869,7 +869,7 @@ COMMENT ON TABLE api.audit IS 'Track authentication attempts and API usage';
 
 
 --
--- TOC entry 5374 (class 0 OID 0)
+-- TOC entry 5328 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: COLUMN audit.audit_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -878,7 +878,7 @@ COMMENT ON COLUMN api.audit.audit_id IS 'Synthetic primary key for the audit rec
 
 
 --
--- TOC entry 5375 (class 0 OID 0)
+-- TOC entry 5329 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: COLUMN audit.user_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -887,7 +887,7 @@ COMMENT ON COLUMN api.audit.user_id IS 'Reference to the user who performed the 
 
 
 --
--- TOC entry 5376 (class 0 OID 0)
+-- TOC entry 5330 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: COLUMN audit.api_client_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -896,7 +896,7 @@ COMMENT ON COLUMN api.audit.api_client_id IS 'Reference to the API client that p
 
 
 --
--- TOC entry 5377 (class 0 OID 0)
+-- TOC entry 5331 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: COLUMN audit.action; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -905,7 +905,7 @@ COMMENT ON COLUMN api.audit.action IS 'Type of action performed';
 
 
 --
--- TOC entry 5378 (class 0 OID 0)
+-- TOC entry 5332 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: COLUMN audit.details; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -914,7 +914,7 @@ COMMENT ON COLUMN api.audit.details IS 'JSON object with action details';
 
 
 --
--- TOC entry 5379 (class 0 OID 0)
+-- TOC entry 5333 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: COLUMN audit.ip_address; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -923,7 +923,7 @@ COMMENT ON COLUMN api.audit.ip_address IS 'IP address from which the action was 
 
 
 --
--- TOC entry 5380 (class 0 OID 0)
+-- TOC entry 5334 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: COLUMN audit.created_at; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -932,7 +932,7 @@ COMMENT ON COLUMN api.audit.created_at IS 'Timestamp when the action occurred';
 
 
 --
--- TOC entry 227 (class 1259 OID 55703711)
+-- TOC entry 227 (class 1259 OID 55706556)
 -- Name: audit_audit_id_seq; Type: SEQUENCE; Schema: api; Owner: sis
 --
 
@@ -947,7 +947,7 @@ ALTER TABLE api.audit ALTER COLUMN audit_id ADD GENERATED BY DEFAULT AS IDENTITY
 
 
 --
--- TOC entry 228 (class 1259 OID 55703713)
+-- TOC entry 228 (class 1259 OID 55706558)
 -- Name: dst_recipe; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -966,7 +966,7 @@ CREATE TABLE api.dst_recipe (
 ALTER TABLE api.dst_recipe OWNER TO sis;
 
 --
--- TOC entry 229 (class 1259 OID 55703721)
+-- TOC entry 229 (class 1259 OID 55706566)
 -- Name: dst_run; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -990,7 +990,7 @@ CREATE TABLE api.dst_run (
 ALTER TABLE api.dst_run OWNER TO sis;
 
 --
--- TOC entry 230 (class 1259 OID 55703730)
+-- TOC entry 230 (class 1259 OID 55706575)
 -- Name: dst_run_run_id_seq; Type: SEQUENCE; Schema: api; Owner: sis
 --
 
@@ -1005,7 +1005,7 @@ CREATE SEQUENCE api.dst_run_run_id_seq
 ALTER SEQUENCE api.dst_run_run_id_seq OWNER TO sis;
 
 --
--- TOC entry 5384 (class 0 OID 0)
+-- TOC entry 5338 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: dst_run_run_id_seq; Type: SEQUENCE OWNED BY; Schema: api; Owner: sis
 --
@@ -1014,7 +1014,7 @@ ALTER SEQUENCE api.dst_run_run_id_seq OWNED BY api.dst_run.run_id;
 
 
 --
--- TOC entry 231 (class 1259 OID 55703732)
+-- TOC entry 231 (class 1259 OID 55706577)
 -- Name: setting; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1027,7 +1027,7 @@ CREATE TABLE api.setting (
 ALTER TABLE api.setting OWNER TO sis;
 
 --
--- TOC entry 5385 (class 0 OID 0)
+-- TOC entry 5339 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: TABLE setting; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1036,7 +1036,7 @@ COMMENT ON TABLE api.setting IS 'Key-value store for API configuration settings'
 
 
 --
--- TOC entry 5386 (class 0 OID 0)
+-- TOC entry 5340 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: COLUMN setting.key; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1045,7 +1045,7 @@ COMMENT ON COLUMN api.setting.key IS 'Setting identifier key';
 
 
 --
--- TOC entry 5387 (class 0 OID 0)
+-- TOC entry 5341 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: COLUMN setting.value; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1054,7 +1054,7 @@ COMMENT ON COLUMN api.setting.value IS 'Setting value';
 
 
 --
--- TOC entry 232 (class 1259 OID 55703738)
+-- TOC entry 232 (class 1259 OID 55706583)
 -- Name: uploaded_dataset; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1081,7 +1081,7 @@ CREATE TABLE api.uploaded_dataset (
 ALTER TABLE api.uploaded_dataset OWNER TO sis;
 
 --
--- TOC entry 5389 (class 0 OID 0)
+-- TOC entry 5343 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: TABLE uploaded_dataset; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1090,7 +1090,7 @@ COMMENT ON TABLE api.uploaded_dataset IS 'Tracks datasets uploaded by users for 
 
 
 --
--- TOC entry 5390 (class 0 OID 0)
+-- TOC entry 5344 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.user_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1099,7 +1099,7 @@ COMMENT ON COLUMN api.uploaded_dataset.user_id IS 'Reference to the user who upl
 
 
 --
--- TOC entry 5391 (class 0 OID 0)
+-- TOC entry 5345 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.project_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1108,7 +1108,7 @@ COMMENT ON COLUMN api.uploaded_dataset.project_id IS 'Reference to the project t
 
 
 --
--- TOC entry 5392 (class 0 OID 0)
+-- TOC entry 5346 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.table_name; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1117,7 +1117,7 @@ COMMENT ON COLUMN api.uploaded_dataset.table_name IS 'Name of the staging table 
 
 
 --
--- TOC entry 5393 (class 0 OID 0)
+-- TOC entry 5347 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.file_name; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1126,7 +1126,7 @@ COMMENT ON COLUMN api.uploaded_dataset.file_name IS 'Original filename of the up
 
 
 --
--- TOC entry 5394 (class 0 OID 0)
+-- TOC entry 5348 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.upload_date; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1135,7 +1135,7 @@ COMMENT ON COLUMN api.uploaded_dataset.upload_date IS 'Date when the file was up
 
 
 --
--- TOC entry 5395 (class 0 OID 0)
+-- TOC entry 5349 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.ingestion_date; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1144,7 +1144,7 @@ COMMENT ON COLUMN api.uploaded_dataset.ingestion_date IS 'Date when the data was
 
 
 --
--- TOC entry 5396 (class 0 OID 0)
+-- TOC entry 5350 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.status; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1153,7 +1153,7 @@ COMMENT ON COLUMN api.uploaded_dataset.status IS 'Current status: Uploaded, Inge
 
 
 --
--- TOC entry 5397 (class 0 OID 0)
+-- TOC entry 5351 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.depth_if_topsoil; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1162,7 +1162,7 @@ COMMENT ON COLUMN api.uploaded_dataset.depth_if_topsoil IS 'Depth in cm if this 
 
 
 --
--- TOC entry 5398 (class 0 OID 0)
+-- TOC entry 5352 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.n_rows; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1171,7 +1171,7 @@ COMMENT ON COLUMN api.uploaded_dataset.n_rows IS 'Number of rows in the uploaded
 
 
 --
--- TOC entry 5399 (class 0 OID 0)
+-- TOC entry 5353 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.n_col; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1180,7 +1180,7 @@ COMMENT ON COLUMN api.uploaded_dataset.n_col IS 'Number of columns in the upload
 
 
 --
--- TOC entry 5400 (class 0 OID 0)
+-- TOC entry 5354 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.has_cords; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1189,7 +1189,7 @@ COMMENT ON COLUMN api.uploaded_dataset.has_cords IS 'Flag indicating whether the
 
 
 --
--- TOC entry 5401 (class 0 OID 0)
+-- TOC entry 5355 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.cords_epsg; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1198,7 +1198,7 @@ COMMENT ON COLUMN api.uploaded_dataset.cords_epsg IS 'EPSG code of the coordinat
 
 
 --
--- TOC entry 5402 (class 0 OID 0)
+-- TOC entry 5356 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.cords_check; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1207,7 +1207,7 @@ COMMENT ON COLUMN api.uploaded_dataset.cords_check IS 'Flag indicating whether c
 
 
 --
--- TOC entry 5403 (class 0 OID 0)
+-- TOC entry 5357 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: COLUMN uploaded_dataset.note; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1216,7 +1216,7 @@ COMMENT ON COLUMN api.uploaded_dataset.note IS 'Additional notes about the datas
 
 
 --
--- TOC entry 233 (class 1259 OID 55703747)
+-- TOC entry 233 (class 1259 OID 55706592)
 -- Name: uploaded_dataset_column; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1237,7 +1237,7 @@ CREATE TABLE api.uploaded_dataset_column (
 ALTER TABLE api.uploaded_dataset_column OWNER TO sis;
 
 --
--- TOC entry 5405 (class 0 OID 0)
+-- TOC entry 5359 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: TABLE uploaded_dataset_column; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1246,7 +1246,7 @@ COMMENT ON TABLE api.uploaded_dataset_column IS 'Column mapping configuration fo
 
 
 --
--- TOC entry 5406 (class 0 OID 0)
+-- TOC entry 5360 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN uploaded_dataset_column.table_name; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1255,7 +1255,7 @@ COMMENT ON COLUMN api.uploaded_dataset_column.table_name IS 'Reference to the up
 
 
 --
--- TOC entry 5407 (class 0 OID 0)
+-- TOC entry 5361 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN uploaded_dataset_column.column_name; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1264,7 +1264,7 @@ COMMENT ON COLUMN api.uploaded_dataset_column.column_name IS 'Name of the column
 
 
 --
--- TOC entry 5408 (class 0 OID 0)
+-- TOC entry 5362 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN uploaded_dataset_column.property_num_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1273,7 +1273,7 @@ COMMENT ON COLUMN api.uploaded_dataset_column.property_num_id IS 'Mapped soil pr
 
 
 --
--- TOC entry 5409 (class 0 OID 0)
+-- TOC entry 5363 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN uploaded_dataset_column.procedure_num_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1282,7 +1282,7 @@ COMMENT ON COLUMN api.uploaded_dataset_column.procedure_num_id IS 'Mapped analyt
 
 
 --
--- TOC entry 5410 (class 0 OID 0)
+-- TOC entry 5364 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN uploaded_dataset_column.unit_of_measure_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1291,7 +1291,7 @@ COMMENT ON COLUMN api.uploaded_dataset_column.unit_of_measure_id IS 'Mapped unit
 
 
 --
--- TOC entry 5411 (class 0 OID 0)
+-- TOC entry 5365 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN uploaded_dataset_column.ignore_column; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1300,7 +1300,7 @@ COMMENT ON COLUMN api.uploaded_dataset_column.ignore_column IS 'Flag to ignore t
 
 
 --
--- TOC entry 5412 (class 0 OID 0)
+-- TOC entry 5366 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: COLUMN uploaded_dataset_column.note; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1309,7 +1309,7 @@ COMMENT ON COLUMN api.uploaded_dataset_column.note IS 'Additional notes about th
 
 
 --
--- TOC entry 234 (class 1259 OID 55703754)
+-- TOC entry 234 (class 1259 OID 55706599)
 -- Name: uploaded_dataset_edit; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1328,7 +1328,7 @@ CREATE TABLE api.uploaded_dataset_edit (
 ALTER TABLE api.uploaded_dataset_edit OWNER TO sis;
 
 --
--- TOC entry 235 (class 1259 OID 55703761)
+-- TOC entry 235 (class 1259 OID 55706606)
 -- Name: uploaded_dataset_edit_edit_id_seq; Type: SEQUENCE; Schema: api; Owner: sis
 --
 
@@ -1344,7 +1344,7 @@ CREATE SEQUENCE api.uploaded_dataset_edit_edit_id_seq
 ALTER SEQUENCE api.uploaded_dataset_edit_edit_id_seq OWNER TO sis;
 
 --
--- TOC entry 5415 (class 0 OID 0)
+-- TOC entry 5369 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: uploaded_dataset_edit_edit_id_seq; Type: SEQUENCE OWNED BY; Schema: api; Owner: sis
 --
@@ -1353,7 +1353,7 @@ ALTER SEQUENCE api.uploaded_dataset_edit_edit_id_seq OWNED BY api.uploaded_datas
 
 
 --
--- TOC entry 236 (class 1259 OID 55703763)
+-- TOC entry 236 (class 1259 OID 55706608)
 -- Name: user; Type: TABLE; Schema: api; Owner: sis
 --
 
@@ -1374,7 +1374,7 @@ CREATE TABLE api."user" (
 ALTER TABLE api."user" OWNER TO sis;
 
 --
--- TOC entry 5416 (class 0 OID 0)
+-- TOC entry 5370 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: TABLE "user"; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1383,7 +1383,7 @@ COMMENT ON TABLE api."user" IS 'For human users who log in through the web appli
 
 
 --
--- TOC entry 5417 (class 0 OID 0)
+-- TOC entry 5371 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: COLUMN "user".user_id; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1392,7 +1392,7 @@ COMMENT ON COLUMN api."user".user_id IS 'Unique identifier for the user (typical
 
 
 --
--- TOC entry 5418 (class 0 OID 0)
+-- TOC entry 5372 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: COLUMN "user".password_hash; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1401,7 +1401,7 @@ COMMENT ON COLUMN api."user".password_hash IS 'Bcrypt hash of the user password'
 
 
 --
--- TOC entry 5419 (class 0 OID 0)
+-- TOC entry 5373 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: COLUMN "user".is_active; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1410,7 +1410,7 @@ COMMENT ON COLUMN api."user".is_active IS 'Flag indicating whether the user acco
 
 
 --
--- TOC entry 5420 (class 0 OID 0)
+-- TOC entry 5374 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: COLUMN "user".is_admin; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1419,7 +1419,7 @@ COMMENT ON COLUMN api."user".is_admin IS 'Flag indicating whether the user has a
 
 
 --
--- TOC entry 5421 (class 0 OID 0)
+-- TOC entry 5375 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: COLUMN "user".created_at; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1428,7 +1428,7 @@ COMMENT ON COLUMN api."user".created_at IS 'Timestamp when the user was created'
 
 
 --
--- TOC entry 5422 (class 0 OID 0)
+-- TOC entry 5376 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: COLUMN "user".updated_at; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1437,7 +1437,7 @@ COMMENT ON COLUMN api."user".updated_at IS 'Timestamp of the last update to the 
 
 
 --
--- TOC entry 5423 (class 0 OID 0)
+-- TOC entry 5377 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: COLUMN "user".last_login; Type: COMMENT; Schema: api; Owner: sis
 --
@@ -1446,7 +1446,7 @@ COMMENT ON COLUMN api."user".last_login IS 'Timestamp of the last successful log
 
 
 --
--- TOC entry 237 (class 1259 OID 55703775)
+-- TOC entry 237 (class 1259 OID 55706620)
 -- Name: element; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1469,7 +1469,7 @@ CREATE TABLE soil_data.element (
 ALTER TABLE soil_data.element OWNER TO sis;
 
 --
--- TOC entry 5425 (class 0 OID 0)
+-- TOC entry 5379 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: TABLE element; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1478,7 +1478,7 @@ COMMENT ON TABLE soil_data.element IS 'ProfileElement is the super-class of Hori
 
 
 --
--- TOC entry 5426 (class 0 OID 0)
+-- TOC entry 5380 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: COLUMN element.element_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1487,7 +1487,7 @@ COMMENT ON COLUMN soil_data.element.element_id IS 'Synthetic primary key.';
 
 
 --
--- TOC entry 5427 (class 0 OID 0)
+-- TOC entry 5381 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: COLUMN element.profile_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1496,7 +1496,7 @@ COMMENT ON COLUMN soil_data.element.profile_id IS 'Reference to the Profile to w
 
 
 --
--- TOC entry 5428 (class 0 OID 0)
+-- TOC entry 5382 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: COLUMN element.order_element; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1505,7 +1505,7 @@ COMMENT ON COLUMN soil_data.element.order_element IS 'Order of this element with
 
 
 --
--- TOC entry 5429 (class 0 OID 0)
+-- TOC entry 5383 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: COLUMN element.upper_depth; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1514,7 +1514,7 @@ COMMENT ON COLUMN soil_data.element.upper_depth IS 'Upper depth of this profile 
 
 
 --
--- TOC entry 5430 (class 0 OID 0)
+-- TOC entry 5384 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: COLUMN element.lower_depth; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1523,7 +1523,7 @@ COMMENT ON COLUMN soil_data.element.lower_depth IS 'Lower depth of this profile 
 
 
 --
--- TOC entry 5431 (class 0 OID 0)
+-- TOC entry 5385 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: COLUMN element.type; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1532,7 +1532,7 @@ COMMENT ON COLUMN soil_data.element.type IS 'Type of profile element, Horizon or
 
 
 --
--- TOC entry 238 (class 1259 OID 55703786)
+-- TOC entry 238 (class 1259 OID 55706631)
 -- Name: layer; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1585,7 +1585,7 @@ CREATE TABLE soil_data.layer (
 ALTER TABLE soil_data.layer OWNER TO sis;
 
 --
--- TOC entry 5433 (class 0 OID 0)
+-- TOC entry 5387 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: TABLE layer; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1594,7 +1594,7 @@ COMMENT ON TABLE soil_data.layer IS 'Raster layer metadata and file information 
 
 
 --
--- TOC entry 5434 (class 0 OID 0)
+-- TOC entry 5388 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.mapset_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1603,7 +1603,7 @@ COMMENT ON COLUMN soil_data.layer.mapset_id IS 'Reference to the parent mapset';
 
 
 --
--- TOC entry 5435 (class 0 OID 0)
+-- TOC entry 5389 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.dimension_depth; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1612,7 +1612,7 @@ COMMENT ON COLUMN soil_data.layer.dimension_depth IS 'Depth dimension value (e.g
 
 
 --
--- TOC entry 5436 (class 0 OID 0)
+-- TOC entry 5390 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.dimension_stats; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1621,7 +1621,7 @@ COMMENT ON COLUMN soil_data.layer.dimension_stats IS 'Statistical dimension: MEA
 
 
 --
--- TOC entry 5437 (class 0 OID 0)
+-- TOC entry 5391 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.layer_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1630,7 +1630,7 @@ COMMENT ON COLUMN soil_data.layer.layer_id IS 'Unique identifier for the layer';
 
 
 --
--- TOC entry 5438 (class 0 OID 0)
+-- TOC entry 5392 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.file_extension; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1639,7 +1639,7 @@ COMMENT ON COLUMN soil_data.layer.file_extension IS 'File extension (e.g., tif, 
 
 
 --
--- TOC entry 5439 (class 0 OID 0)
+-- TOC entry 5393 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.file_path; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1648,7 +1648,7 @@ COMMENT ON COLUMN soil_data.layer.file_path IS 'File system path to the raster f
 
 
 --
--- TOC entry 5440 (class 0 OID 0)
+-- TOC entry 5394 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.file_size; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1657,7 +1657,7 @@ COMMENT ON COLUMN soil_data.layer.file_size IS 'File size in bytes';
 
 
 --
--- TOC entry 5441 (class 0 OID 0)
+-- TOC entry 5395 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.file_size_pretty; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1666,7 +1666,7 @@ COMMENT ON COLUMN soil_data.layer.file_size_pretty IS 'Human-readable file size'
 
 
 --
--- TOC entry 5442 (class 0 OID 0)
+-- TOC entry 5396 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.reference_layer; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1675,7 +1675,7 @@ COMMENT ON COLUMN soil_data.layer.reference_layer IS 'Flag indicating if this is
 
 
 --
--- TOC entry 5443 (class 0 OID 0)
+-- TOC entry 5397 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.reference_system_identifier_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1684,7 +1684,7 @@ COMMENT ON COLUMN soil_data.layer.reference_system_identifier_code IS 'EPSG code
 
 
 --
--- TOC entry 5444 (class 0 OID 0)
+-- TOC entry 5398 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.distance; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1693,7 +1693,7 @@ COMMENT ON COLUMN soil_data.layer.distance IS 'Spatial resolution value';
 
 
 --
--- TOC entry 5445 (class 0 OID 0)
+-- TOC entry 5399 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.distance_uom; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1702,7 +1702,7 @@ COMMENT ON COLUMN soil_data.layer.distance_uom IS 'Unit of measure for distance:
 
 
 --
--- TOC entry 5446 (class 0 OID 0)
+-- TOC entry 5400 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.extent; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1711,7 +1711,7 @@ COMMENT ON COLUMN soil_data.layer.extent IS 'Bounding box extent as text';
 
 
 --
--- TOC entry 5447 (class 0 OID 0)
+-- TOC entry 5401 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.west_bound_longitude; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1720,7 +1720,7 @@ COMMENT ON COLUMN soil_data.layer.west_bound_longitude IS 'Western boundary long
 
 
 --
--- TOC entry 5448 (class 0 OID 0)
+-- TOC entry 5402 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.east_bound_longitude; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1729,7 +1729,7 @@ COMMENT ON COLUMN soil_data.layer.east_bound_longitude IS 'Eastern boundary long
 
 
 --
--- TOC entry 5449 (class 0 OID 0)
+-- TOC entry 5403 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.south_bound_latitude; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1738,7 +1738,7 @@ COMMENT ON COLUMN soil_data.layer.south_bound_latitude IS 'Southern boundary lat
 
 
 --
--- TOC entry 5450 (class 0 OID 0)
+-- TOC entry 5404 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.north_bound_latitude; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1747,7 +1747,7 @@ COMMENT ON COLUMN soil_data.layer.north_bound_latitude IS 'Northern boundary lat
 
 
 --
--- TOC entry 5451 (class 0 OID 0)
+-- TOC entry 5405 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.distribution_format; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1756,7 +1756,7 @@ COMMENT ON COLUMN soil_data.layer.distribution_format IS 'Data distribution form
 
 
 --
--- TOC entry 5452 (class 0 OID 0)
+-- TOC entry 5406 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.compression; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1765,7 +1765,7 @@ COMMENT ON COLUMN soil_data.layer.compression IS 'Compression type used';
 
 
 --
--- TOC entry 5453 (class 0 OID 0)
+-- TOC entry 5407 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.raster_size_x; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1774,7 +1774,7 @@ COMMENT ON COLUMN soil_data.layer.raster_size_x IS 'Number of columns in the ras
 
 
 --
--- TOC entry 5454 (class 0 OID 0)
+-- TOC entry 5408 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.raster_size_y; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1783,7 +1783,7 @@ COMMENT ON COLUMN soil_data.layer.raster_size_y IS 'Number of rows in the raster
 
 
 --
--- TOC entry 5455 (class 0 OID 0)
+-- TOC entry 5409 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.pixel_size_x; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1792,7 +1792,7 @@ COMMENT ON COLUMN soil_data.layer.pixel_size_x IS 'Pixel width in map units';
 
 
 --
--- TOC entry 5456 (class 0 OID 0)
+-- TOC entry 5410 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.pixel_size_y; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1801,7 +1801,7 @@ COMMENT ON COLUMN soil_data.layer.pixel_size_y IS 'Pixel height in map units';
 
 
 --
--- TOC entry 5457 (class 0 OID 0)
+-- TOC entry 5411 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.origin_x; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1810,7 +1810,7 @@ COMMENT ON COLUMN soil_data.layer.origin_x IS 'X coordinate of the raster origin
 
 
 --
--- TOC entry 5458 (class 0 OID 0)
+-- TOC entry 5412 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.origin_y; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1819,7 +1819,7 @@ COMMENT ON COLUMN soil_data.layer.origin_y IS 'Y coordinate of the raster origin
 
 
 --
--- TOC entry 5459 (class 0 OID 0)
+-- TOC entry 5413 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.spatial_reference; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1828,7 +1828,7 @@ COMMENT ON COLUMN soil_data.layer.spatial_reference IS 'Full spatial reference d
 
 
 --
--- TOC entry 5460 (class 0 OID 0)
+-- TOC entry 5414 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.data_type; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1837,7 +1837,7 @@ COMMENT ON COLUMN soil_data.layer.data_type IS 'Raster data type (e.g., Float32,
 
 
 --
--- TOC entry 5461 (class 0 OID 0)
+-- TOC entry 5415 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.no_data_value; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1846,7 +1846,7 @@ COMMENT ON COLUMN soil_data.layer.no_data_value IS 'NoData value for the raster'
 
 
 --
--- TOC entry 5462 (class 0 OID 0)
+-- TOC entry 5416 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.stats_minimum; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1855,7 +1855,7 @@ COMMENT ON COLUMN soil_data.layer.stats_minimum IS 'Minimum value in the raster'
 
 
 --
--- TOC entry 5463 (class 0 OID 0)
+-- TOC entry 5417 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.stats_maximum; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1864,7 +1864,7 @@ COMMENT ON COLUMN soil_data.layer.stats_maximum IS 'Maximum value in the raster'
 
 
 --
--- TOC entry 5464 (class 0 OID 0)
+-- TOC entry 5418 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.stats_mean; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1873,7 +1873,7 @@ COMMENT ON COLUMN soil_data.layer.stats_mean IS 'Mean value in the raster';
 
 
 --
--- TOC entry 5465 (class 0 OID 0)
+-- TOC entry 5419 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.stats_std_dev; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1882,7 +1882,7 @@ COMMENT ON COLUMN soil_data.layer.stats_std_dev IS 'Standard deviation of values
 
 
 --
--- TOC entry 5466 (class 0 OID 0)
+-- TOC entry 5420 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.scale; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1891,7 +1891,7 @@ COMMENT ON COLUMN soil_data.layer.scale IS 'Map scale (e.g., 1:250000)';
 
 
 --
--- TOC entry 5467 (class 0 OID 0)
+-- TOC entry 5421 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.n_bands; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1900,7 +1900,7 @@ COMMENT ON COLUMN soil_data.layer.n_bands IS 'Number of bands in the raster';
 
 
 --
--- TOC entry 5468 (class 0 OID 0)
+-- TOC entry 5422 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.metadata; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1909,7 +1909,7 @@ COMMENT ON COLUMN soil_data.layer.metadata IS 'Array of additional metadata stri
 
 
 --
--- TOC entry 5469 (class 0 OID 0)
+-- TOC entry 5423 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: COLUMN layer.map; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1918,7 +1918,7 @@ COMMENT ON COLUMN soil_data.layer.map IS 'Generated MapServer MAP file content';
 
 
 --
--- TOC entry 239 (class 1259 OID 55703797)
+-- TOC entry 239 (class 1259 OID 55706642)
 -- Name: mapset; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -1983,7 +1983,7 @@ CREATE TABLE soil_data.mapset (
 ALTER TABLE soil_data.mapset OWNER TO sis;
 
 --
--- TOC entry 5471 (class 0 OID 0)
+-- TOC entry 5425 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: TABLE mapset; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -1992,7 +1992,7 @@ COMMENT ON TABLE soil_data.mapset IS 'Mapset metadata container for organizing r
 
 
 --
--- TOC entry 5472 (class 0 OID 0)
+-- TOC entry 5426 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.country_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2001,7 +2001,7 @@ COMMENT ON COLUMN soil_data.mapset.country_id IS 'Reference to the country';
 
 
 --
--- TOC entry 5473 (class 0 OID 0)
+-- TOC entry 5427 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.project_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2010,7 +2010,7 @@ COMMENT ON COLUMN soil_data.mapset.project_id IS 'Reference to the project';
 
 
 --
--- TOC entry 5474 (class 0 OID 0)
+-- TOC entry 5428 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.mapped_property_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2019,7 +2019,7 @@ COMMENT ON COLUMN soil_data.mapset.mapped_property_id IS 'Reference to the soil 
 
 
 --
--- TOC entry 5475 (class 0 OID 0)
+-- TOC entry 5429 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.mapset_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2028,7 +2028,7 @@ COMMENT ON COLUMN soil_data.mapset.mapset_id IS 'Unique identifier for the mapse
 
 
 --
--- TOC entry 5476 (class 0 OID 0)
+-- TOC entry 5430 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.parent_identifier; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2037,7 +2037,7 @@ COMMENT ON COLUMN soil_data.mapset.parent_identifier IS 'UUID of a parent mapset
 
 
 --
--- TOC entry 5477 (class 0 OID 0)
+-- TOC entry 5431 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.file_identifier; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2046,7 +2046,7 @@ COMMENT ON COLUMN soil_data.mapset.file_identifier IS 'UUID for ISO 19139 metada
 
 
 --
--- TOC entry 5478 (class 0 OID 0)
+-- TOC entry 5432 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.language_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2055,7 +2055,7 @@ COMMENT ON COLUMN soil_data.mapset.language_code IS 'ISO 639-2 language code for
 
 
 --
--- TOC entry 5479 (class 0 OID 0)
+-- TOC entry 5433 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.metadata_standard_name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2064,7 +2064,7 @@ COMMENT ON COLUMN soil_data.mapset.metadata_standard_name IS 'Name of the metada
 
 
 --
--- TOC entry 5480 (class 0 OID 0)
+-- TOC entry 5434 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.metadata_standard_version; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2073,7 +2073,7 @@ COMMENT ON COLUMN soil_data.mapset.metadata_standard_version IS 'Version of the 
 
 
 --
--- TOC entry 5481 (class 0 OID 0)
+-- TOC entry 5435 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.reference_system_identifier_code_space; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2082,7 +2082,7 @@ COMMENT ON COLUMN soil_data.mapset.reference_system_identifier_code_space IS 'Co
 
 
 --
--- TOC entry 5482 (class 0 OID 0)
+-- TOC entry 5436 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.title; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2091,7 +2091,7 @@ COMMENT ON COLUMN soil_data.mapset.title IS 'Title of the mapset for display';
 
 
 --
--- TOC entry 5483 (class 0 OID 0)
+-- TOC entry 5437 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.unit_of_measure_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2100,7 +2100,7 @@ COMMENT ON COLUMN soil_data.mapset.unit_of_measure_id IS 'Reference to the unit 
 
 
 --
--- TOC entry 5484 (class 0 OID 0)
+-- TOC entry 5438 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.creation_date; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2109,7 +2109,7 @@ COMMENT ON COLUMN soil_data.mapset.creation_date IS 'Date when the mapset was cr
 
 
 --
--- TOC entry 5485 (class 0 OID 0)
+-- TOC entry 5439 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.publication_date; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2118,7 +2118,7 @@ COMMENT ON COLUMN soil_data.mapset.publication_date IS 'Date when the mapset was
 
 
 --
--- TOC entry 5486 (class 0 OID 0)
+-- TOC entry 5440 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.revision_date; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2127,7 +2127,7 @@ COMMENT ON COLUMN soil_data.mapset.revision_date IS 'Date of the last revision';
 
 
 --
--- TOC entry 5487 (class 0 OID 0)
+-- TOC entry 5441 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.edition; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2136,7 +2136,7 @@ COMMENT ON COLUMN soil_data.mapset.edition IS 'Edition or version identifier';
 
 
 --
--- TOC entry 5488 (class 0 OID 0)
+-- TOC entry 5442 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.citation_md_identifier_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2145,7 +2145,7 @@ COMMENT ON COLUMN soil_data.mapset.citation_md_identifier_code IS 'DOI or other 
 
 
 --
--- TOC entry 5489 (class 0 OID 0)
+-- TOC entry 5443 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.citation_md_identifier_code_space; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2154,7 +2154,7 @@ COMMENT ON COLUMN soil_data.mapset.citation_md_identifier_code_space IS 'Code sp
 
 
 --
--- TOC entry 5490 (class 0 OID 0)
+-- TOC entry 5444 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.abstract; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2163,7 +2163,7 @@ COMMENT ON COLUMN soil_data.mapset.abstract IS 'Abstract describing the mapset c
 
 
 --
--- TOC entry 5491 (class 0 OID 0)
+-- TOC entry 5445 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.status; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2172,7 +2172,7 @@ COMMENT ON COLUMN soil_data.mapset.status IS 'ISO 19115 MD_ProgressCode: complet
 
 
 --
--- TOC entry 5492 (class 0 OID 0)
+-- TOC entry 5446 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.update_frequency; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2181,7 +2181,7 @@ COMMENT ON COLUMN soil_data.mapset.update_frequency IS 'ISO 19115 MD_Maintenance
 
 
 --
--- TOC entry 5493 (class 0 OID 0)
+-- TOC entry 5447 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.md_browse_graphic; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2190,7 +2190,7 @@ COMMENT ON COLUMN soil_data.mapset.md_browse_graphic IS 'URL to a browse graphic
 
 
 --
--- TOC entry 5494 (class 0 OID 0)
+-- TOC entry 5448 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.keyword_theme; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2199,7 +2199,7 @@ COMMENT ON COLUMN soil_data.mapset.keyword_theme IS 'Array of thematic keywords'
 
 
 --
--- TOC entry 5495 (class 0 OID 0)
+-- TOC entry 5449 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.keyword_place; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2208,7 +2208,7 @@ COMMENT ON COLUMN soil_data.mapset.keyword_place IS 'Array of place keywords';
 
 
 --
--- TOC entry 5496 (class 0 OID 0)
+-- TOC entry 5450 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.keyword_discipline; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2217,7 +2217,7 @@ COMMENT ON COLUMN soil_data.mapset.keyword_discipline IS 'Array of discipline ke
 
 
 --
--- TOC entry 5497 (class 0 OID 0)
+-- TOC entry 5451 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.access_constraints; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2226,7 +2226,7 @@ COMMENT ON COLUMN soil_data.mapset.access_constraints IS 'ISO 19115 MD_Restricti
 
 
 --
--- TOC entry 5498 (class 0 OID 0)
+-- TOC entry 5452 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.use_constraints; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2235,7 +2235,7 @@ COMMENT ON COLUMN soil_data.mapset.use_constraints IS 'ISO 19115 MD_RestrictionC
 
 
 --
--- TOC entry 5499 (class 0 OID 0)
+-- TOC entry 5453 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.other_constraints; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2244,7 +2244,7 @@ COMMENT ON COLUMN soil_data.mapset.other_constraints IS 'Text description of oth
 
 
 --
--- TOC entry 5500 (class 0 OID 0)
+-- TOC entry 5454 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.spatial_representation_type_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2253,7 +2253,7 @@ COMMENT ON COLUMN soil_data.mapset.spatial_representation_type_code IS 'ISO 1911
 
 
 --
--- TOC entry 5501 (class 0 OID 0)
+-- TOC entry 5455 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.presentation_form; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2262,7 +2262,7 @@ COMMENT ON COLUMN soil_data.mapset.presentation_form IS 'ISO 19115 CI_Presentati
 
 
 --
--- TOC entry 5502 (class 0 OID 0)
+-- TOC entry 5456 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.topic_category; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2271,7 +2271,7 @@ COMMENT ON COLUMN soil_data.mapset.topic_category IS 'Array of ISO 19115 MD_Topi
 
 
 --
--- TOC entry 5503 (class 0 OID 0)
+-- TOC entry 5457 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.time_period_begin; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2280,7 +2280,7 @@ COMMENT ON COLUMN soil_data.mapset.time_period_begin IS 'Start date of the tempo
 
 
 --
--- TOC entry 5504 (class 0 OID 0)
+-- TOC entry 5458 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.time_period_end; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2289,7 +2289,7 @@ COMMENT ON COLUMN soil_data.mapset.time_period_end IS 'End date of the temporal 
 
 
 --
--- TOC entry 5505 (class 0 OID 0)
+-- TOC entry 5459 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.scope_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2298,7 +2298,7 @@ COMMENT ON COLUMN soil_data.mapset.scope_code IS 'ISO 19115 MD_ScopeCode';
 
 
 --
--- TOC entry 5506 (class 0 OID 0)
+-- TOC entry 5460 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.lineage_statement; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2307,7 +2307,7 @@ COMMENT ON COLUMN soil_data.mapset.lineage_statement IS 'Statement describing da
 
 
 --
--- TOC entry 5507 (class 0 OID 0)
+-- TOC entry 5461 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.lineage_source_uuidref; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2316,7 +2316,7 @@ COMMENT ON COLUMN soil_data.mapset.lineage_source_uuidref IS 'UUID reference to 
 
 
 --
--- TOC entry 5508 (class 0 OID 0)
+-- TOC entry 5462 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.lineage_source_title; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2325,7 +2325,7 @@ COMMENT ON COLUMN soil_data.mapset.lineage_source_title IS 'Title of source data
 
 
 --
--- TOC entry 5509 (class 0 OID 0)
+-- TOC entry 5463 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.xml; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2334,7 +2334,7 @@ COMMENT ON COLUMN soil_data.mapset.xml IS 'Generated ISO 19139 XML metadata';
 
 
 --
--- TOC entry 5510 (class 0 OID 0)
+-- TOC entry 5464 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: COLUMN mapset.sld; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2343,7 +2343,7 @@ COMMENT ON COLUMN soil_data.mapset.sld IS 'Generated SLD XML for styling';
 
 
 --
--- TOC entry 240 (class 1259 OID 55703830)
+-- TOC entry 240 (class 1259 OID 55706675)
 -- Name: observation_num; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2363,7 +2363,7 @@ CREATE TABLE soil_data.observation_num (
 ALTER TABLE soil_data.observation_num OWNER TO sis;
 
 --
--- TOC entry 5512 (class 0 OID 0)
+-- TOC entry 5466 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: TABLE observation_num; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2372,7 +2372,7 @@ COMMENT ON TABLE soil_data.observation_num IS 'Physio-chemical observations for 
 
 
 --
--- TOC entry 5513 (class 0 OID 0)
+-- TOC entry 5467 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: COLUMN observation_num.observation_num_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2381,7 +2381,7 @@ COMMENT ON COLUMN soil_data.observation_num.observation_num_id IS 'Synthetic pri
 
 
 --
--- TOC entry 5514 (class 0 OID 0)
+-- TOC entry 5468 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: COLUMN observation_num.property_num_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2390,7 +2390,7 @@ COMMENT ON COLUMN soil_data.observation_num.property_num_id IS 'Foreign key to t
 
 
 --
--- TOC entry 5515 (class 0 OID 0)
+-- TOC entry 5469 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: COLUMN observation_num.procedure_num_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2399,7 +2399,7 @@ COMMENT ON COLUMN soil_data.observation_num.procedure_num_id IS 'Foreign key to 
 
 
 --
--- TOC entry 5516 (class 0 OID 0)
+-- TOC entry 5470 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: COLUMN observation_num.unit_of_measure_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2408,7 +2408,7 @@ COMMENT ON COLUMN soil_data.observation_num.unit_of_measure_id IS 'Foreign key t
 
 
 --
--- TOC entry 5517 (class 0 OID 0)
+-- TOC entry 5471 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: COLUMN observation_num.value_min; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2417,7 +2417,7 @@ COMMENT ON COLUMN soil_data.observation_num.value_min IS 'Minimum admissable val
 
 
 --
--- TOC entry 5518 (class 0 OID 0)
+-- TOC entry 5472 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: COLUMN observation_num.value_max; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2426,7 +2426,7 @@ COMMENT ON COLUMN soil_data.observation_num.value_max IS 'Maximum admissable val
 
 
 --
--- TOC entry 241 (class 1259 OID 55703837)
+-- TOC entry 241 (class 1259 OID 55706682)
 -- Name: plot; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2449,7 +2449,7 @@ CREATE TABLE soil_data.plot (
 ALTER TABLE soil_data.plot OWNER TO sis;
 
 --
--- TOC entry 5520 (class 0 OID 0)
+-- TOC entry 5474 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: TABLE plot; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2458,7 +2458,7 @@ COMMENT ON TABLE soil_data.plot IS 'Elementary area or location where individual
 
 
 --
--- TOC entry 5521 (class 0 OID 0)
+-- TOC entry 5475 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: COLUMN plot.plot_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2467,7 +2467,7 @@ COMMENT ON COLUMN soil_data.plot.plot_id IS 'Synthetic primary key.';
 
 
 --
--- TOC entry 5522 (class 0 OID 0)
+-- TOC entry 5476 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: COLUMN plot.site_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2476,7 +2476,7 @@ COMMENT ON COLUMN soil_data.plot.site_id IS 'Foreign key to Site table.';
 
 
 --
--- TOC entry 242 (class 1259 OID 55703845)
+-- TOC entry 242 (class 1259 OID 55706690)
 -- Name: profile; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2490,7 +2490,7 @@ CREATE TABLE soil_data.profile (
 ALTER TABLE soil_data.profile OWNER TO sis;
 
 --
--- TOC entry 5524 (class 0 OID 0)
+-- TOC entry 5478 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: TABLE profile; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2499,7 +2499,7 @@ COMMENT ON TABLE soil_data.profile IS 'An abstract, ordered set of soil horizons
 
 
 --
--- TOC entry 5525 (class 0 OID 0)
+-- TOC entry 5479 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: COLUMN profile.profile_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2508,7 +2508,7 @@ COMMENT ON COLUMN soil_data.profile.profile_id IS 'Synthetic primary key.';
 
 
 --
--- TOC entry 5526 (class 0 OID 0)
+-- TOC entry 5480 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: COLUMN profile.plot_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2517,7 +2517,7 @@ COMMENT ON COLUMN soil_data.profile.plot_id IS 'Foreign key to Plot feature of i
 
 
 --
--- TOC entry 5527 (class 0 OID 0)
+-- TOC entry 5481 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: COLUMN profile.profile_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2526,7 +2526,7 @@ COMMENT ON COLUMN soil_data.profile.profile_code IS 'Natural primary key, if exi
 
 
 --
--- TOC entry 243 (class 1259 OID 55703851)
+-- TOC entry 243 (class 1259 OID 55706696)
 -- Name: project; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2541,7 +2541,7 @@ CREATE TABLE soil_data.project (
 ALTER TABLE soil_data.project OWNER TO sis;
 
 --
--- TOC entry 5529 (class 0 OID 0)
+-- TOC entry 5483 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: TABLE project; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2550,7 +2550,7 @@ COMMENT ON TABLE soil_data.project IS 'Provides the context of the data collecti
 
 
 --
--- TOC entry 5530 (class 0 OID 0)
+-- TOC entry 5484 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: COLUMN project.project_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2559,7 +2559,7 @@ COMMENT ON COLUMN soil_data.project.project_id IS 'Synthetic primary key.';
 
 
 --
--- TOC entry 5531 (class 0 OID 0)
+-- TOC entry 5485 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: COLUMN project.name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2568,7 +2568,7 @@ COMMENT ON COLUMN soil_data.project.name IS 'Natural key with project name.';
 
 
 --
--- TOC entry 244 (class 1259 OID 55703857)
+-- TOC entry 244 (class 1259 OID 55706702)
 -- Name: project_site; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2582,7 +2582,7 @@ CREATE TABLE soil_data.project_site (
 ALTER TABLE soil_data.project_site OWNER TO sis;
 
 --
--- TOC entry 5533 (class 0 OID 0)
+-- TOC entry 5487 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: TABLE project_site; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2591,7 +2591,7 @@ COMMENT ON TABLE soil_data.project_site IS 'Junction table linking projects to s
 
 
 --
--- TOC entry 5534 (class 0 OID 0)
+-- TOC entry 5488 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: COLUMN project_site.project_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2600,7 +2600,7 @@ COMMENT ON COLUMN soil_data.project_site.project_id IS 'Reference to the project
 
 
 --
--- TOC entry 5535 (class 0 OID 0)
+-- TOC entry 5489 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: COLUMN project_site.site_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2609,7 +2609,7 @@ COMMENT ON COLUMN soil_data.project_site.site_id IS 'Reference to the site';
 
 
 --
--- TOC entry 245 (class 1259 OID 55703863)
+-- TOC entry 245 (class 1259 OID 55706708)
 -- Name: result_num; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2623,7 +2623,7 @@ CREATE TABLE soil_data.result_num (
 ALTER TABLE soil_data.result_num OWNER TO sis;
 
 --
--- TOC entry 246 (class 1259 OID 55703866)
+-- TOC entry 246 (class 1259 OID 55706711)
 -- Name: site; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2636,7 +2636,7 @@ CREATE TABLE soil_data.site (
 ALTER TABLE soil_data.site OWNER TO sis;
 
 --
--- TOC entry 5537 (class 0 OID 0)
+-- TOC entry 5491 (class 0 OID 0)
 -- Dependencies: 246
 -- Name: TABLE site; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2645,7 +2645,7 @@ COMMENT ON TABLE soil_data.site IS 'Defined area which is subject to a soil qual
 
 
 --
--- TOC entry 5538 (class 0 OID 0)
+-- TOC entry 5492 (class 0 OID 0)
 -- Dependencies: 246
 -- Name: COLUMN site.site_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2654,7 +2654,7 @@ COMMENT ON COLUMN soil_data.site.site_id IS 'Synthetic primary key.';
 
 
 --
--- TOC entry 5539 (class 0 OID 0)
+-- TOC entry 5493 (class 0 OID 0)
 -- Dependencies: 246
 -- Name: COLUMN site.geom; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2663,14 +2663,13 @@ COMMENT ON COLUMN soil_data.site.geom IS 'Site extent expressed with geodetic co
 
 
 --
--- TOC entry 247 (class 1259 OID 55703872)
+-- TOC entry 247 (class 1259 OID 55706717)
 -- Name: specimen; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
 CREATE TABLE soil_data.specimen (
     specimen_id integer NOT NULL,
     element_id integer NOT NULL,
-    specimen_prep_process_id integer,
     code character varying
 );
 
@@ -2678,7 +2677,7 @@ CREATE TABLE soil_data.specimen (
 ALTER TABLE soil_data.specimen OWNER TO sis;
 
 --
--- TOC entry 5541 (class 0 OID 0)
+-- TOC entry 5495 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: TABLE specimen; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2687,7 +2686,7 @@ COMMENT ON TABLE soil_data.specimen IS 'Soil Specimen is defined in ISO-28258 as
 
 
 --
--- TOC entry 5542 (class 0 OID 0)
+-- TOC entry 5496 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: COLUMN specimen.specimen_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2696,7 +2695,7 @@ COMMENT ON COLUMN soil_data.specimen.specimen_id IS 'Synthetic primary key.';
 
 
 --
--- TOC entry 5543 (class 0 OID 0)
+-- TOC entry 5497 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: COLUMN specimen.element_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2705,16 +2704,7 @@ COMMENT ON COLUMN soil_data.specimen.element_id IS 'Foreign key to the associate
 
 
 --
--- TOC entry 5544 (class 0 OID 0)
--- Dependencies: 247
--- Name: COLUMN specimen.specimen_prep_process_id; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen.specimen_prep_process_id IS 'Foreign key to the preparation process used on this soil Specimen.';
-
-
---
--- TOC entry 5545 (class 0 OID 0)
+-- TOC entry 5498 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: COLUMN specimen.code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2723,7 +2713,7 @@ COMMENT ON COLUMN soil_data.specimen.code IS 'External code used to identify the
 
 
 --
--- TOC entry 248 (class 1259 OID 55703878)
+-- TOC entry 248 (class 1259 OID 55706723)
 -- Name: vw_api_manifest; Type: VIEW; Schema: api; Owner: sis
 --
 
@@ -2766,7 +2756,7 @@ CREATE VIEW api.vw_api_manifest AS
 ALTER VIEW api.vw_api_manifest OWNER TO sis;
 
 --
--- TOC entry 249 (class 1259 OID 55703883)
+-- TOC entry 249 (class 1259 OID 55706728)
 -- Name: vw_api_observation; Type: VIEW; Schema: api; Owner: sis
 --
 
@@ -2810,7 +2800,7 @@ CREATE VIEW api.vw_api_observation AS
 ALTER VIEW api.vw_api_observation OWNER TO sis;
 
 --
--- TOC entry 250 (class 1259 OID 55703888)
+-- TOC entry 250 (class 1259 OID 55706733)
 -- Name: vw_api_profile; Type: VIEW; Schema: api; Owner: sis
 --
 
@@ -2859,7 +2849,7 @@ CREATE VIEW api.vw_api_profile AS
 ALTER VIEW api.vw_api_profile OWNER TO sis;
 
 --
--- TOC entry 251 (class 1259 OID 55703893)
+-- TOC entry 251 (class 1259 OID 55706738)
 -- Name: vw_glosis_federation_token; Type: VIEW; Schema: api; Owner: sis
 --
 
@@ -2875,7 +2865,7 @@ CREATE VIEW api.vw_glosis_federation_token AS
 ALTER VIEW api.vw_glosis_federation_token OWNER TO sis;
 
 --
--- TOC entry 252 (class 1259 OID 55703897)
+-- TOC entry 252 (class 1259 OID 55706742)
 -- Name: category_desc; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2891,7 +2881,7 @@ CREATE TABLE soil_data.category_desc (
 ALTER TABLE soil_data.category_desc OWNER TO sis;
 
 --
--- TOC entry 5551 (class 0 OID 0)
+-- TOC entry 5504 (class 0 OID 0)
 -- Dependencies: 252
 -- Name: TABLE category_desc; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2900,7 +2890,7 @@ COMMENT ON TABLE soil_data.category_desc IS 'Controlled vocabulary categories fo
 
 
 --
--- TOC entry 5552 (class 0 OID 0)
+-- TOC entry 5505 (class 0 OID 0)
 -- Dependencies: 252
 -- Name: COLUMN category_desc.category_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2909,7 +2899,7 @@ COMMENT ON COLUMN soil_data.category_desc.category_desc_id IS 'Primary key ident
 
 
 --
--- TOC entry 253 (class 1259 OID 55703903)
+-- TOC entry 253 (class 1259 OID 55706748)
 -- Name: class; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -2927,7 +2917,7 @@ CREATE TABLE soil_data.class (
 ALTER TABLE soil_data.class OWNER TO sis;
 
 --
--- TOC entry 5554 (class 0 OID 0)
+-- TOC entry 5507 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: TABLE class; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2936,7 +2926,7 @@ COMMENT ON TABLE soil_data.class IS 'Legend classes for mapsets defining color a
 
 
 --
--- TOC entry 5555 (class 0 OID 0)
+-- TOC entry 5508 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: COLUMN class.mapset_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2945,7 +2935,7 @@ COMMENT ON COLUMN soil_data.class.mapset_id IS 'Reference to the mapset this cla
 
 
 --
--- TOC entry 5556 (class 0 OID 0)
+-- TOC entry 5509 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: COLUMN class.value; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2954,7 +2944,7 @@ COMMENT ON COLUMN soil_data.class.value IS 'Numeric value (for quantitative) or 
 
 
 --
--- TOC entry 5557 (class 0 OID 0)
+-- TOC entry 5510 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: COLUMN class.code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2963,7 +2953,7 @@ COMMENT ON COLUMN soil_data.class.code IS 'Short code for the class';
 
 
 --
--- TOC entry 5558 (class 0 OID 0)
+-- TOC entry 5511 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: COLUMN class.label; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2972,7 +2962,7 @@ COMMENT ON COLUMN soil_data.class.label IS 'Display label for the class in legen
 
 
 --
--- TOC entry 5559 (class 0 OID 0)
+-- TOC entry 5512 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: COLUMN class.color; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2981,7 +2971,7 @@ COMMENT ON COLUMN soil_data.class.color IS 'Hex color code for map display (e.g.
 
 
 --
--- TOC entry 5560 (class 0 OID 0)
+-- TOC entry 5513 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: COLUMN class.opacity; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2990,7 +2980,7 @@ COMMENT ON COLUMN soil_data.class.opacity IS 'Opacity value from 0 to 1';
 
 
 --
--- TOC entry 5561 (class 0 OID 0)
+-- TOC entry 5514 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: COLUMN class.publish; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -2999,7 +2989,7 @@ COMMENT ON COLUMN soil_data.class.publish IS 'Flag indicating whether this class
 
 
 --
--- TOC entry 254 (class 1259 OID 55703909)
+-- TOC entry 254 (class 1259 OID 55706754)
 -- Name: country; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3028,7 +3018,7 @@ CREATE TABLE soil_data.country (
 ALTER TABLE soil_data.country OWNER TO sis;
 
 --
--- TOC entry 5563 (class 0 OID 0)
+-- TOC entry 5516 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: TABLE country; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3037,7 +3027,7 @@ COMMENT ON TABLE soil_data.country IS 'Reference table of countries with ISO cod
 
 
 --
--- TOC entry 5564 (class 0 OID 0)
+-- TOC entry 5517 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.country_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3046,7 +3036,7 @@ COMMENT ON COLUMN soil_data.country.country_id IS 'ISO 3166-1 alpha-2 country co
 
 
 --
--- TOC entry 5565 (class 0 OID 0)
+-- TOC entry 5518 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.iso3_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3055,7 +3045,7 @@ COMMENT ON COLUMN soil_data.country.iso3_code IS 'ISO 3166-1 alpha-3 country cod
 
 
 --
--- TOC entry 5566 (class 0 OID 0)
+-- TOC entry 5519 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.gaul_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3064,7 +3054,7 @@ COMMENT ON COLUMN soil_data.country.gaul_code IS 'FAO GAUL country code';
 
 
 --
--- TOC entry 5567 (class 0 OID 0)
+-- TOC entry 5520 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.color_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3073,7 +3063,7 @@ COMMENT ON COLUMN soil_data.country.color_code IS 'Color code for map display';
 
 
 --
--- TOC entry 5568 (class 0 OID 0)
+-- TOC entry 5521 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.ar; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3082,7 +3072,7 @@ COMMENT ON COLUMN soil_data.country.ar IS 'Country name in Arabic';
 
 
 --
--- TOC entry 5569 (class 0 OID 0)
+-- TOC entry 5522 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.en; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3091,7 +3081,7 @@ COMMENT ON COLUMN soil_data.country.en IS 'Country name in English';
 
 
 --
--- TOC entry 5570 (class 0 OID 0)
+-- TOC entry 5523 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.es; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3100,7 +3090,7 @@ COMMENT ON COLUMN soil_data.country.es IS 'Country name in Spanish';
 
 
 --
--- TOC entry 5571 (class 0 OID 0)
+-- TOC entry 5524 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.fr; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3109,7 +3099,7 @@ COMMENT ON COLUMN soil_data.country.fr IS 'Country name in French';
 
 
 --
--- TOC entry 5572 (class 0 OID 0)
+-- TOC entry 5525 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.pt; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3118,7 +3108,7 @@ COMMENT ON COLUMN soil_data.country.pt IS 'Country name in Portuguese';
 
 
 --
--- TOC entry 5573 (class 0 OID 0)
+-- TOC entry 5526 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.ru; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3127,7 +3117,7 @@ COMMENT ON COLUMN soil_data.country.ru IS 'Country name in Russian';
 
 
 --
--- TOC entry 5574 (class 0 OID 0)
+-- TOC entry 5527 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.zh; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3136,7 +3126,7 @@ COMMENT ON COLUMN soil_data.country.zh IS 'Country name in Chinese';
 
 
 --
--- TOC entry 5575 (class 0 OID 0)
+-- TOC entry 5528 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.status; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3145,7 +3135,7 @@ COMMENT ON COLUMN soil_data.country.status IS 'Country status (e.g., Member Stat
 
 
 --
--- TOC entry 5576 (class 0 OID 0)
+-- TOC entry 5529 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.disp_area; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3154,7 +3144,7 @@ COMMENT ON COLUMN soil_data.country.disp_area IS 'Disputed area indicator';
 
 
 --
--- TOC entry 5577 (class 0 OID 0)
+-- TOC entry 5530 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.capital; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3163,7 +3153,7 @@ COMMENT ON COLUMN soil_data.country.capital IS 'Capital city name';
 
 
 --
--- TOC entry 5578 (class 0 OID 0)
+-- TOC entry 5531 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.continent; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3172,7 +3162,7 @@ COMMENT ON COLUMN soil_data.country.continent IS 'Continent name';
 
 
 --
--- TOC entry 5579 (class 0 OID 0)
+-- TOC entry 5532 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: COLUMN country.un_reg; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3181,7 +3171,7 @@ COMMENT ON COLUMN soil_data.country.un_reg IS 'UN region classification';
 
 
 --
--- TOC entry 255 (class 1259 OID 55703915)
+-- TOC entry 255 (class 1259 OID 55706760)
 -- Name: element_element_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3196,7 +3186,7 @@ ALTER TABLE soil_data.element ALTER COLUMN element_id ADD GENERATED BY DEFAULT A
 
 
 --
--- TOC entry 256 (class 1259 OID 55703917)
+-- TOC entry 256 (class 1259 OID 55706762)
 -- Name: individual; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3209,7 +3199,7 @@ CREATE TABLE soil_data.individual (
 ALTER TABLE soil_data.individual OWNER TO sis;
 
 --
--- TOC entry 5582 (class 0 OID 0)
+-- TOC entry 5535 (class 0 OID 0)
 -- Dependencies: 256
 -- Name: TABLE individual; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3218,7 +3208,7 @@ COMMENT ON TABLE soil_data.individual IS 'Individuals associated with soil data 
 
 
 --
--- TOC entry 5583 (class 0 OID 0)
+-- TOC entry 5536 (class 0 OID 0)
 -- Dependencies: 256
 -- Name: COLUMN individual.individual_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3227,7 +3217,7 @@ COMMENT ON COLUMN soil_data.individual.individual_id IS 'Unique identifier for t
 
 
 --
--- TOC entry 5584 (class 0 OID 0)
+-- TOC entry 5537 (class 0 OID 0)
 -- Dependencies: 256
 -- Name: COLUMN individual.email; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3236,7 +3226,7 @@ COMMENT ON COLUMN soil_data.individual.email IS 'Email address of the individual
 
 
 --
--- TOC entry 257 (class 1259 OID 55703923)
+-- TOC entry 257 (class 1259 OID 55706768)
 -- Name: languages; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3249,7 +3239,7 @@ CREATE TABLE soil_data.languages (
 ALTER TABLE soil_data.languages OWNER TO sis;
 
 --
--- TOC entry 5586 (class 0 OID 0)
+-- TOC entry 5539 (class 0 OID 0)
 -- Dependencies: 257
 -- Name: TABLE languages; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3258,7 +3248,7 @@ COMMENT ON TABLE soil_data.languages IS 'Reference table of supported languages 
 
 
 --
--- TOC entry 5587 (class 0 OID 0)
+-- TOC entry 5540 (class 0 OID 0)
 -- Dependencies: 257
 -- Name: COLUMN languages.language_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3267,7 +3257,7 @@ COMMENT ON COLUMN soil_data.languages.language_code IS 'ISO 639-1 two-letter lan
 
 
 --
--- TOC entry 5588 (class 0 OID 0)
+-- TOC entry 5541 (class 0 OID 0)
 -- Dependencies: 257
 -- Name: COLUMN languages.language_name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3276,13 +3266,13 @@ COMMENT ON COLUMN soil_data.languages.language_name IS 'Full name of the languag
 
 
 --
--- TOC entry 258 (class 1259 OID 55703929)
+-- TOC entry 258 (class 1259 OID 55706774)
 -- Name: mapped_property; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
 CREATE TABLE soil_data.mapped_property (
     mapped_property_id text NOT NULL,
-    name text,
+    name text NOT NULL,
     property_num_id text,
     min real,
     max real,
@@ -3298,7 +3288,7 @@ CREATE TABLE soil_data.mapped_property (
 ALTER TABLE soil_data.mapped_property OWNER TO sis;
 
 --
--- TOC entry 5590 (class 0 OID 0)
+-- TOC entry 5543 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: TABLE mapped_property; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3307,7 +3297,7 @@ COMMENT ON TABLE soil_data.mapped_property IS 'Soil properties for spatial data 
 
 
 --
--- TOC entry 5591 (class 0 OID 0)
+-- TOC entry 5544 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.mapped_property_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3316,7 +3306,7 @@ COMMENT ON COLUMN soil_data.mapped_property.mapped_property_id IS 'Unique identi
 
 
 --
--- TOC entry 5592 (class 0 OID 0)
+-- TOC entry 5545 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3325,7 +3315,7 @@ COMMENT ON COLUMN soil_data.mapped_property.name IS 'Human-readable name of the 
 
 
 --
--- TOC entry 5593 (class 0 OID 0)
+-- TOC entry 5546 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.property_num_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3334,7 +3324,7 @@ COMMENT ON COLUMN soil_data.mapped_property.property_num_id IS 'Reference to the
 
 
 --
--- TOC entry 5594 (class 0 OID 0)
+-- TOC entry 5547 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.min; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3343,7 +3333,7 @@ COMMENT ON COLUMN soil_data.mapped_property.min IS 'Expected minimum value for t
 
 
 --
--- TOC entry 5595 (class 0 OID 0)
+-- TOC entry 5548 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.max; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3352,7 +3342,7 @@ COMMENT ON COLUMN soil_data.mapped_property.max IS 'Expected maximum value for t
 
 
 --
--- TOC entry 5596 (class 0 OID 0)
+-- TOC entry 5549 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.property_type; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3361,7 +3351,7 @@ COMMENT ON COLUMN soil_data.mapped_property.property_type IS 'Type: quantitative
 
 
 --
--- TOC entry 5597 (class 0 OID 0)
+-- TOC entry 5550 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.num_intervals; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3370,7 +3360,7 @@ COMMENT ON COLUMN soil_data.mapped_property.num_intervals IS 'Number of classifi
 
 
 --
--- TOC entry 5598 (class 0 OID 0)
+-- TOC entry 5551 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.start_color; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3379,7 +3369,7 @@ COMMENT ON COLUMN soil_data.mapped_property.start_color IS 'Start color for grad
 
 
 --
--- TOC entry 5599 (class 0 OID 0)
+-- TOC entry 5552 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.end_color; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3388,7 +3378,7 @@ COMMENT ON COLUMN soil_data.mapped_property.end_color IS 'End color for gradient
 
 
 --
--- TOC entry 5600 (class 0 OID 0)
+-- TOC entry 5553 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: COLUMN mapped_property.keyword_theme; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3397,7 +3387,7 @@ COMMENT ON COLUMN soil_data.mapped_property.keyword_theme IS 'Array of thematic 
 
 
 --
--- TOC entry 259 (class 1259 OID 55703936)
+-- TOC entry 259 (class 1259 OID 55706781)
 -- Name: observation_desc; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3416,7 +3406,7 @@ CREATE TABLE soil_data.observation_desc (
 ALTER TABLE soil_data.observation_desc OWNER TO sis;
 
 --
--- TOC entry 260 (class 1259 OID 55703942)
+-- TOC entry 260 (class 1259 OID 55706787)
 -- Name: observation_num_observation_num_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3431,7 +3421,7 @@ ALTER TABLE soil_data.observation_num ALTER COLUMN observation_num_id ADD GENERA
 
 
 --
--- TOC entry 261 (class 1259 OID 55703944)
+-- TOC entry 261 (class 1259 OID 55706789)
 -- Name: organisation; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3451,7 +3441,7 @@ CREATE TABLE soil_data.organisation (
 ALTER TABLE soil_data.organisation OWNER TO sis;
 
 --
--- TOC entry 5603 (class 0 OID 0)
+-- TOC entry 5556 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: TABLE organisation; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3460,7 +3450,7 @@ COMMENT ON TABLE soil_data.organisation IS 'Organizations involved in soil data 
 
 
 --
--- TOC entry 5604 (class 0 OID 0)
+-- TOC entry 5557 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.organisation_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3469,7 +3459,7 @@ COMMENT ON COLUMN soil_data.organisation.organisation_id IS 'Unique identifier f
 
 
 --
--- TOC entry 5605 (class 0 OID 0)
+-- TOC entry 5558 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.url; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3478,7 +3468,7 @@ COMMENT ON COLUMN soil_data.organisation.url IS 'Website URL of the organization
 
 
 --
--- TOC entry 5606 (class 0 OID 0)
+-- TOC entry 5559 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.email; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3487,7 +3477,7 @@ COMMENT ON COLUMN soil_data.organisation.email IS 'Contact email for the organiz
 
 
 --
--- TOC entry 5607 (class 0 OID 0)
+-- TOC entry 5560 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.country; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3496,7 +3486,7 @@ COMMENT ON COLUMN soil_data.organisation.country IS 'Country where the organizat
 
 
 --
--- TOC entry 5608 (class 0 OID 0)
+-- TOC entry 5561 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.city; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3505,7 +3495,7 @@ COMMENT ON COLUMN soil_data.organisation.city IS 'City where the organization is
 
 
 --
--- TOC entry 5609 (class 0 OID 0)
+-- TOC entry 5562 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.postal_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3514,7 +3504,7 @@ COMMENT ON COLUMN soil_data.organisation.postal_code IS 'Postal code of the orga
 
 
 --
--- TOC entry 5610 (class 0 OID 0)
+-- TOC entry 5563 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.delivery_point; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3523,7 +3513,7 @@ COMMENT ON COLUMN soil_data.organisation.delivery_point IS 'Street address of th
 
 
 --
--- TOC entry 5611 (class 0 OID 0)
+-- TOC entry 5564 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.phone; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3532,7 +3522,7 @@ COMMENT ON COLUMN soil_data.organisation.phone IS 'Phone number of the organizat
 
 
 --
--- TOC entry 5612 (class 0 OID 0)
+-- TOC entry 5565 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: COLUMN organisation.facsimile; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3541,7 +3531,7 @@ COMMENT ON COLUMN soil_data.organisation.facsimile IS 'Fax number of the organiz
 
 
 --
--- TOC entry 262 (class 1259 OID 55703950)
+-- TOC entry 262 (class 1259 OID 55706795)
 -- Name: plot_plot_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3556,7 +3546,7 @@ ALTER TABLE soil_data.plot ALTER COLUMN plot_id ADD GENERATED BY DEFAULT AS IDEN
 
 
 --
--- TOC entry 263 (class 1259 OID 55703952)
+-- TOC entry 263 (class 1259 OID 55706797)
 -- Name: procedure_desc; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3570,7 +3560,7 @@ CREATE TABLE soil_data.procedure_desc (
 ALTER TABLE soil_data.procedure_desc OWNER TO sis;
 
 --
--- TOC entry 5615 (class 0 OID 0)
+-- TOC entry 5568 (class 0 OID 0)
 -- Dependencies: 263
 -- Name: TABLE procedure_desc; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3579,7 +3569,7 @@ COMMENT ON TABLE soil_data.procedure_desc IS 'Descriptive Procedures for all fea
 
 
 --
--- TOC entry 5616 (class 0 OID 0)
+-- TOC entry 5569 (class 0 OID 0)
 -- Dependencies: 263
 -- Name: COLUMN procedure_desc.procedure_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3588,7 +3578,7 @@ COMMENT ON COLUMN soil_data.procedure_desc.procedure_desc_id IS 'Synthetic prima
 
 
 --
--- TOC entry 5617 (class 0 OID 0)
+-- TOC entry 5570 (class 0 OID 0)
 -- Dependencies: 263
 -- Name: COLUMN procedure_desc.reference; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3597,7 +3587,7 @@ COMMENT ON COLUMN soil_data.procedure_desc.reference IS 'Long and human readable
 
 
 --
--- TOC entry 5618 (class 0 OID 0)
+-- TOC entry 5571 (class 0 OID 0)
 -- Dependencies: 263
 -- Name: COLUMN procedure_desc.uri; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3606,7 +3596,7 @@ COMMENT ON COLUMN soil_data.procedure_desc.uri IS 'URI to the corresponding publ
 
 
 --
--- TOC entry 264 (class 1259 OID 55703958)
+-- TOC entry 264 (class 1259 OID 55706803)
 -- Name: procedure_model; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3619,7 +3609,7 @@ CREATE TABLE soil_data.procedure_model (
 ALTER TABLE soil_data.procedure_model OWNER TO sis;
 
 --
--- TOC entry 265 (class 1259 OID 55703964)
+-- TOC entry 265 (class 1259 OID 55706809)
 -- Name: procedure_model_def; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3633,7 +3623,7 @@ CREATE TABLE soil_data.procedure_model_def (
 ALTER TABLE soil_data.procedure_model_def OWNER TO sis;
 
 --
--- TOC entry 266 (class 1259 OID 55703970)
+-- TOC entry 266 (class 1259 OID 55706815)
 -- Name: procedure_model_procedure_model_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3648,7 +3638,7 @@ ALTER TABLE soil_data.procedure_model ALTER COLUMN procedure_model_id ADD GENERA
 
 
 --
--- TOC entry 267 (class 1259 OID 55703972)
+-- TOC entry 267 (class 1259 OID 55706817)
 -- Name: procedure_num; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3665,7 +3655,7 @@ CREATE TABLE soil_data.procedure_num (
 ALTER TABLE soil_data.procedure_num OWNER TO sis;
 
 --
--- TOC entry 5620 (class 0 OID 0)
+-- TOC entry 5573 (class 0 OID 0)
 -- Dependencies: 267
 -- Name: TABLE procedure_num; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3674,7 +3664,7 @@ COMMENT ON TABLE soil_data.procedure_num IS 'Physio-chemical Procedures for the 
 
 
 --
--- TOC entry 5621 (class 0 OID 0)
+-- TOC entry 5574 (class 0 OID 0)
 -- Dependencies: 267
 -- Name: COLUMN procedure_num.procedure_num_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3683,7 +3673,7 @@ COMMENT ON COLUMN soil_data.procedure_num.procedure_num_id IS 'Synthetic primary
 
 
 --
--- TOC entry 5622 (class 0 OID 0)
+-- TOC entry 5575 (class 0 OID 0)
 -- Dependencies: 267
 -- Name: COLUMN procedure_num.broader_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3692,7 +3682,7 @@ COMMENT ON COLUMN soil_data.procedure_num.broader_id IS 'Foreign key to brader p
 
 
 --
--- TOC entry 268 (class 1259 OID 55703978)
+-- TOC entry 268 (class 1259 OID 55706823)
 -- Name: procedure_spectrometer; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3705,7 +3695,7 @@ CREATE TABLE soil_data.procedure_spectrometer (
 ALTER TABLE soil_data.procedure_spectrometer OWNER TO sis;
 
 --
--- TOC entry 269 (class 1259 OID 55703984)
+-- TOC entry 269 (class 1259 OID 55706829)
 -- Name: procedure_spectrometer_def; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3719,7 +3709,7 @@ CREATE TABLE soil_data.procedure_spectrometer_def (
 ALTER TABLE soil_data.procedure_spectrometer_def OWNER TO sis;
 
 --
--- TOC entry 270 (class 1259 OID 55703990)
+-- TOC entry 270 (class 1259 OID 55706835)
 -- Name: procedure_spectrometer_procedure_spectrometer_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3734,7 +3724,7 @@ ALTER TABLE soil_data.procedure_spectrometer ALTER COLUMN procedure_spectrometer
 
 
 --
--- TOC entry 271 (class 1259 OID 55703992)
+-- TOC entry 271 (class 1259 OID 55706837)
 -- Name: profile_profile_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -3749,7 +3739,7 @@ ALTER TABLE soil_data.profile ALTER COLUMN profile_id ADD GENERATED BY DEFAULT A
 
 
 --
--- TOC entry 272 (class 1259 OID 55703994)
+-- TOC entry 272 (class 1259 OID 55706839)
 -- Name: proj_x_org_x_ind; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3769,7 +3759,7 @@ CREATE TABLE soil_data.proj_x_org_x_ind (
 ALTER TABLE soil_data.proj_x_org_x_ind OWNER TO sis;
 
 --
--- TOC entry 5625 (class 0 OID 0)
+-- TOC entry 5578 (class 0 OID 0)
 -- Dependencies: 272
 -- Name: TABLE proj_x_org_x_ind; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3778,7 +3768,7 @@ COMMENT ON TABLE soil_data.proj_x_org_x_ind IS 'Junction table linking projects,
 
 
 --
--- TOC entry 5626 (class 0 OID 0)
+-- TOC entry 5579 (class 0 OID 0)
 -- Dependencies: 272
 -- Name: COLUMN proj_x_org_x_ind.project_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3787,7 +3777,7 @@ COMMENT ON COLUMN soil_data.proj_x_org_x_ind.project_id IS 'Reference to the pro
 
 
 --
--- TOC entry 5627 (class 0 OID 0)
+-- TOC entry 5580 (class 0 OID 0)
 -- Dependencies: 272
 -- Name: COLUMN proj_x_org_x_ind.organisation_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3796,7 +3786,7 @@ COMMENT ON COLUMN soil_data.proj_x_org_x_ind.organisation_id IS 'Reference to th
 
 
 --
--- TOC entry 5628 (class 0 OID 0)
+-- TOC entry 5581 (class 0 OID 0)
 -- Dependencies: 272
 -- Name: COLUMN proj_x_org_x_ind.individual_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3805,7 +3795,7 @@ COMMENT ON COLUMN soil_data.proj_x_org_x_ind.individual_id IS 'Reference to the 
 
 
 --
--- TOC entry 5629 (class 0 OID 0)
+-- TOC entry 5582 (class 0 OID 0)
 -- Dependencies: 272
 -- Name: COLUMN proj_x_org_x_ind."position"; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3814,7 +3804,7 @@ COMMENT ON COLUMN soil_data.proj_x_org_x_ind."position" IS 'Position or job titl
 
 
 --
--- TOC entry 5630 (class 0 OID 0)
+-- TOC entry 5583 (class 0 OID 0)
 -- Dependencies: 272
 -- Name: COLUMN proj_x_org_x_ind.tag; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3823,7 +3813,7 @@ COMMENT ON COLUMN soil_data.proj_x_org_x_ind.tag IS 'Contact type: contact or po
 
 
 --
--- TOC entry 5631 (class 0 OID 0)
+-- TOC entry 5584 (class 0 OID 0)
 -- Dependencies: 272
 -- Name: COLUMN proj_x_org_x_ind.role; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3832,7 +3822,7 @@ COMMENT ON COLUMN soil_data.proj_x_org_x_ind.role IS 'ISO 19115 CI_RoleCode: aut
 
 
 --
--- TOC entry 273 (class 1259 OID 55704002)
+-- TOC entry 273 (class 1259 OID 55706847)
 -- Name: project_soil_map; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3847,7 +3837,7 @@ CREATE TABLE soil_data.project_soil_map (
 ALTER TABLE soil_data.project_soil_map OWNER TO sis;
 
 --
--- TOC entry 5633 (class 0 OID 0)
+-- TOC entry 5586 (class 0 OID 0)
 -- Dependencies: 273
 -- Name: TABLE project_soil_map; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3856,7 +3846,7 @@ COMMENT ON TABLE soil_data.project_soil_map IS 'Links soil maps to projects (rel
 
 
 --
--- TOC entry 5634 (class 0 OID 0)
+-- TOC entry 5587 (class 0 OID 0)
 -- Dependencies: 273
 -- Name: COLUMN project_soil_map.project_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3865,7 +3855,7 @@ COMMENT ON COLUMN soil_data.project_soil_map.project_id IS 'Reference to the pro
 
 
 --
--- TOC entry 5635 (class 0 OID 0)
+-- TOC entry 5588 (class 0 OID 0)
 -- Dependencies: 273
 -- Name: COLUMN project_soil_map.soil_map_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3874,7 +3864,7 @@ COMMENT ON COLUMN soil_data.project_soil_map.soil_map_id IS 'Reference to the so
 
 
 --
--- TOC entry 5636 (class 0 OID 0)
+-- TOC entry 5589 (class 0 OID 0)
 -- Dependencies: 273
 -- Name: COLUMN project_soil_map.remarks; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3883,7 +3873,7 @@ COMMENT ON COLUMN soil_data.project_soil_map.remarks IS 'Additional remarks or n
 
 
 --
--- TOC entry 274 (class 1259 OID 55704008)
+-- TOC entry 274 (class 1259 OID 55706853)
 -- Name: property_desc; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3898,7 +3888,7 @@ CREATE TABLE soil_data.property_desc (
 ALTER TABLE soil_data.property_desc OWNER TO sis;
 
 --
--- TOC entry 5638 (class 0 OID 0)
+-- TOC entry 5591 (class 0 OID 0)
 -- Dependencies: 274
 -- Name: TABLE property_desc; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3907,7 +3897,7 @@ COMMENT ON TABLE soil_data.property_desc IS 'Descriptive soil properties used fo
 
 
 --
--- TOC entry 5639 (class 0 OID 0)
+-- TOC entry 5592 (class 0 OID 0)
 -- Dependencies: 274
 -- Name: COLUMN property_desc.property_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3916,7 +3906,7 @@ COMMENT ON COLUMN soil_data.property_desc.property_desc_id IS 'Primary key ident
 
 
 --
--- TOC entry 5640 (class 0 OID 0)
+-- TOC entry 5593 (class 0 OID 0)
 -- Dependencies: 274
 -- Name: COLUMN property_desc.property_name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3925,7 +3915,7 @@ COMMENT ON COLUMN soil_data.property_desc.property_name IS 'Human-readable displ
 
 
 --
--- TOC entry 275 (class 1259 OID 55704014)
+-- TOC entry 275 (class 1259 OID 55706859)
 -- Name: property_num; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3940,7 +3930,7 @@ CREATE TABLE soil_data.property_num (
 ALTER TABLE soil_data.property_num OWNER TO sis;
 
 --
--- TOC entry 5642 (class 0 OID 0)
+-- TOC entry 5595 (class 0 OID 0)
 -- Dependencies: 275
 -- Name: TABLE property_num; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3949,7 +3939,7 @@ COMMENT ON TABLE soil_data.property_num IS 'Physio-chemical properties for the E
 
 
 --
--- TOC entry 5643 (class 0 OID 0)
+-- TOC entry 5596 (class 0 OID 0)
 -- Dependencies: 275
 -- Name: COLUMN property_num.property_num_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3958,7 +3948,7 @@ COMMENT ON COLUMN soil_data.property_num.property_num_id IS 'Synthetic primary k
 
 
 --
--- TOC entry 276 (class 1259 OID 55704020)
+-- TOC entry 276 (class 1259 OID 55706865)
 -- Name: result_desc_element; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -3972,7 +3962,7 @@ CREATE TABLE soil_data.result_desc_element (
 ALTER TABLE soil_data.result_desc_element OWNER TO sis;
 
 --
--- TOC entry 5645 (class 0 OID 0)
+-- TOC entry 5598 (class 0 OID 0)
 -- Dependencies: 276
 -- Name: TABLE result_desc_element; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3981,7 +3971,7 @@ COMMENT ON TABLE soil_data.result_desc_element IS 'Descriptive results for the E
 
 
 --
--- TOC entry 5646 (class 0 OID 0)
+-- TOC entry 5599 (class 0 OID 0)
 -- Dependencies: 276
 -- Name: COLUMN result_desc_element.element_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3990,7 +3980,7 @@ COMMENT ON COLUMN soil_data.result_desc_element.element_id IS 'Foreign key to th
 
 
 --
--- TOC entry 5647 (class 0 OID 0)
+-- TOC entry 5600 (class 0 OID 0)
 -- Dependencies: 276
 -- Name: COLUMN result_desc_element.property_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -3999,7 +3989,7 @@ COMMENT ON COLUMN soil_data.result_desc_element.property_desc_id IS 'Foreign key
 
 
 --
--- TOC entry 5648 (class 0 OID 0)
+-- TOC entry 5601 (class 0 OID 0)
 -- Dependencies: 276
 -- Name: COLUMN result_desc_element.category_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4008,7 +3998,7 @@ COMMENT ON COLUMN soil_data.result_desc_element.category_desc_id IS 'Foreign key
 
 
 --
--- TOC entry 277 (class 1259 OID 55704026)
+-- TOC entry 277 (class 1259 OID 55706871)
 -- Name: result_desc_plot; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4022,7 +4012,7 @@ CREATE TABLE soil_data.result_desc_plot (
 ALTER TABLE soil_data.result_desc_plot OWNER TO sis;
 
 --
--- TOC entry 5650 (class 0 OID 0)
+-- TOC entry 5603 (class 0 OID 0)
 -- Dependencies: 277
 -- Name: TABLE result_desc_plot; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4031,7 +4021,7 @@ COMMENT ON TABLE soil_data.result_desc_plot IS 'Descriptive results for the Plot
 
 
 --
--- TOC entry 5651 (class 0 OID 0)
+-- TOC entry 5604 (class 0 OID 0)
 -- Dependencies: 277
 -- Name: COLUMN result_desc_plot.plot_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4040,7 +4030,7 @@ COMMENT ON COLUMN soil_data.result_desc_plot.plot_id IS 'Foreign key to the corr
 
 
 --
--- TOC entry 5652 (class 0 OID 0)
+-- TOC entry 5605 (class 0 OID 0)
 -- Dependencies: 277
 -- Name: COLUMN result_desc_plot.property_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4049,7 +4039,7 @@ COMMENT ON COLUMN soil_data.result_desc_plot.property_desc_id IS 'Foreign key to
 
 
 --
--- TOC entry 5653 (class 0 OID 0)
+-- TOC entry 5606 (class 0 OID 0)
 -- Dependencies: 277
 -- Name: COLUMN result_desc_plot.category_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4058,7 +4048,7 @@ COMMENT ON COLUMN soil_data.result_desc_plot.category_desc_id IS 'Foreign key to
 
 
 --
--- TOC entry 278 (class 1259 OID 55704032)
+-- TOC entry 278 (class 1259 OID 55706877)
 -- Name: result_desc_profile; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4072,7 +4062,7 @@ CREATE TABLE soil_data.result_desc_profile (
 ALTER TABLE soil_data.result_desc_profile OWNER TO sis;
 
 --
--- TOC entry 5655 (class 0 OID 0)
+-- TOC entry 5608 (class 0 OID 0)
 -- Dependencies: 278
 -- Name: TABLE result_desc_profile; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4081,7 +4071,7 @@ COMMENT ON TABLE soil_data.result_desc_profile IS 'Descriptive results for the P
 
 
 --
--- TOC entry 5656 (class 0 OID 0)
+-- TOC entry 5609 (class 0 OID 0)
 -- Dependencies: 278
 -- Name: COLUMN result_desc_profile.profile_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4090,7 +4080,7 @@ COMMENT ON COLUMN soil_data.result_desc_profile.profile_id IS 'Foreign key to th
 
 
 --
--- TOC entry 5657 (class 0 OID 0)
+-- TOC entry 5610 (class 0 OID 0)
 -- Dependencies: 278
 -- Name: COLUMN result_desc_profile.property_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4099,7 +4089,7 @@ COMMENT ON COLUMN soil_data.result_desc_profile.property_desc_id IS 'Foreign key
 
 
 --
--- TOC entry 5658 (class 0 OID 0)
+-- TOC entry 5611 (class 0 OID 0)
 -- Dependencies: 278
 -- Name: COLUMN result_desc_profile.category_desc_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4108,7 +4098,7 @@ COMMENT ON COLUMN soil_data.result_desc_profile.category_desc_id IS 'Foreign key
 
 
 --
--- TOC entry 279 (class 1259 OID 55704038)
+-- TOC entry 279 (class 1259 OID 55706883)
 -- Name: result_desc_surface; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4122,7 +4112,7 @@ CREATE TABLE soil_data.result_desc_surface (
 ALTER TABLE soil_data.result_desc_surface OWNER TO sis;
 
 --
--- TOC entry 280 (class 1259 OID 55704044)
+-- TOC entry 280 (class 1259 OID 55706889)
 -- Name: result_spectral; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4137,7 +4127,7 @@ CREATE TABLE soil_data.result_spectral (
 ALTER TABLE soil_data.result_spectral OWNER TO sis;
 
 --
--- TOC entry 281 (class 1259 OID 55704047)
+-- TOC entry 281 (class 1259 OID 55706892)
 -- Name: result_spectral_result_spectral_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -4152,7 +4142,7 @@ ALTER TABLE soil_data.result_spectral ALTER COLUMN result_spectral_id ADD GENERA
 
 
 --
--- TOC entry 282 (class 1259 OID 55704049)
+-- TOC entry 282 (class 1259 OID 55706894)
 -- Name: soil_map; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4171,7 +4161,7 @@ CREATE TABLE soil_data.soil_map (
 ALTER TABLE soil_data.soil_map OWNER TO sis;
 
 --
--- TOC entry 5660 (class 0 OID 0)
+-- TOC entry 5613 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: TABLE soil_map; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4180,7 +4170,7 @@ COMMENT ON TABLE soil_data.soil_map IS 'A soil map containing delineated mapping
 
 
 --
--- TOC entry 5661 (class 0 OID 0)
+-- TOC entry 5614 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: COLUMN soil_map.soil_map_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4189,7 +4179,7 @@ COMMENT ON COLUMN soil_data.soil_map.soil_map_id IS 'Unique identifier for the s
 
 
 --
--- TOC entry 5662 (class 0 OID 0)
+-- TOC entry 5615 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: COLUMN soil_map.name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4198,7 +4188,7 @@ COMMENT ON COLUMN soil_data.soil_map.name IS 'Name of the soil map';
 
 
 --
--- TOC entry 5663 (class 0 OID 0)
+-- TOC entry 5616 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: COLUMN soil_map.description; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4207,7 +4197,7 @@ COMMENT ON COLUMN soil_data.soil_map.description IS 'Detailed description of the
 
 
 --
--- TOC entry 5664 (class 0 OID 0)
+-- TOC entry 5617 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: COLUMN soil_map.scale_denominator; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4216,7 +4206,7 @@ COMMENT ON COLUMN soil_data.soil_map.scale_denominator IS 'Map scale denominator
 
 
 --
--- TOC entry 5665 (class 0 OID 0)
+-- TOC entry 5618 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: COLUMN soil_map.spatial_resolution_m; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4225,7 +4215,7 @@ COMMENT ON COLUMN soil_data.soil_map.spatial_resolution_m IS 'Spatial resolution
 
 
 --
--- TOC entry 5666 (class 0 OID 0)
+-- TOC entry 5619 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: COLUMN soil_map.publication_date; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4234,7 +4224,7 @@ COMMENT ON COLUMN soil_data.soil_map.publication_date IS 'Date when the map was 
 
 
 --
--- TOC entry 5667 (class 0 OID 0)
+-- TOC entry 5620 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: COLUMN soil_map.remarks; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4243,7 +4233,7 @@ COMMENT ON COLUMN soil_data.soil_map.remarks IS 'Additional remarks or notes';
 
 
 --
--- TOC entry 5668 (class 0 OID 0)
+-- TOC entry 5621 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: COLUMN soil_map.geom; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4252,7 +4242,7 @@ COMMENT ON COLUMN soil_data.soil_map.geom IS 'Polygon geometry representing the 
 
 
 --
--- TOC entry 283 (class 1259 OID 55704055)
+-- TOC entry 283 (class 1259 OID 55706900)
 -- Name: soil_map_soil_map_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -4267,7 +4257,7 @@ ALTER TABLE soil_data.soil_map ALTER COLUMN soil_map_id ADD GENERATED BY DEFAULT
 
 
 --
--- TOC entry 284 (class 1259 OID 55704057)
+-- TOC entry 284 (class 1259 OID 55706902)
 -- Name: soil_mapping_unit; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4283,7 +4273,7 @@ CREATE TABLE soil_data.soil_mapping_unit (
 ALTER TABLE soil_data.soil_mapping_unit OWNER TO sis;
 
 --
--- TOC entry 5671 (class 0 OID 0)
+-- TOC entry 5624 (class 0 OID 0)
 -- Dependencies: 284
 -- Name: TABLE soil_mapping_unit; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4292,7 +4282,7 @@ COMMENT ON TABLE soil_data.soil_mapping_unit IS 'Delineated polygon on a soil ma
 
 
 --
--- TOC entry 5672 (class 0 OID 0)
+-- TOC entry 5625 (class 0 OID 0)
 -- Dependencies: 284
 -- Name: COLUMN soil_mapping_unit.mapping_unit_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4301,7 +4291,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit.mapping_unit_id IS 'Unique identif
 
 
 --
--- TOC entry 5673 (class 0 OID 0)
+-- TOC entry 5626 (class 0 OID 0)
 -- Dependencies: 284
 -- Name: COLUMN soil_mapping_unit.category_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4310,7 +4300,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit.category_id IS 'Reference to the m
 
 
 --
--- TOC entry 5674 (class 0 OID 0)
+-- TOC entry 5627 (class 0 OID 0)
 -- Dependencies: 284
 -- Name: COLUMN soil_mapping_unit.explanation; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4319,7 +4309,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit.explanation IS 'Explanation or des
 
 
 --
--- TOC entry 5675 (class 0 OID 0)
+-- TOC entry 5628 (class 0 OID 0)
 -- Dependencies: 284
 -- Name: COLUMN soil_mapping_unit.remarks; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4328,7 +4318,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit.remarks IS 'Additional remarks or 
 
 
 --
--- TOC entry 5676 (class 0 OID 0)
+-- TOC entry 5629 (class 0 OID 0)
 -- Dependencies: 284
 -- Name: COLUMN soil_mapping_unit.geom; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4337,7 +4327,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit.geom IS 'MultiPolygon geometry of 
 
 
 --
--- TOC entry 285 (class 1259 OID 55704063)
+-- TOC entry 285 (class 1259 OID 55706908)
 -- Name: soil_mapping_unit_category; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4357,7 +4347,7 @@ CREATE TABLE soil_data.soil_mapping_unit_category (
 ALTER TABLE soil_data.soil_mapping_unit_category OWNER TO sis;
 
 --
--- TOC entry 5678 (class 0 OID 0)
+-- TOC entry 5631 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: TABLE soil_mapping_unit_category; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4366,7 +4356,7 @@ COMMENT ON TABLE soil_data.soil_mapping_unit_category IS 'Legend category descri
 
 
 --
--- TOC entry 5679 (class 0 OID 0)
+-- TOC entry 5632 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.category_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4375,7 +4365,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.category_id IS 'Unique id
 
 
 --
--- TOC entry 5680 (class 0 OID 0)
+-- TOC entry 5633 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.soil_map_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4384,7 +4374,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.soil_map_id IS 'Reference
 
 
 --
--- TOC entry 5681 (class 0 OID 0)
+-- TOC entry 5634 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.parent_category_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4393,7 +4383,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.parent_category_id IS 'Re
 
 
 --
--- TOC entry 5682 (class 0 OID 0)
+-- TOC entry 5635 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4402,7 +4392,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.name IS 'Name of the mapp
 
 
 --
--- TOC entry 5683 (class 0 OID 0)
+-- TOC entry 5636 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.description; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4411,7 +4401,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.description IS 'Detailed 
 
 
 --
--- TOC entry 5684 (class 0 OID 0)
+-- TOC entry 5637 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.legend_order; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4420,7 +4410,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.legend_order IS 'Order in
 
 
 --
--- TOC entry 5685 (class 0 OID 0)
+-- TOC entry 5638 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.symbol; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4429,7 +4419,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.symbol IS 'Symbol used in
 
 
 --
--- TOC entry 5686 (class 0 OID 0)
+-- TOC entry 5639 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.colour_rgb; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4438,7 +4428,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.colour_rgb IS 'RGB colour
 
 
 --
--- TOC entry 5687 (class 0 OID 0)
+-- TOC entry 5640 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: COLUMN soil_mapping_unit_category.remarks; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4447,7 +4437,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_category.remarks IS 'Additional re
 
 
 --
--- TOC entry 286 (class 1259 OID 55704069)
+-- TOC entry 286 (class 1259 OID 55706914)
 -- Name: soil_mapping_unit_category_category_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -4462,7 +4452,7 @@ ALTER TABLE soil_data.soil_mapping_unit_category ALTER COLUMN category_id ADD GE
 
 
 --
--- TOC entry 287 (class 1259 OID 55704071)
+-- TOC entry 287 (class 1259 OID 55706916)
 -- Name: soil_mapping_unit_mapping_unit_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -4477,7 +4467,7 @@ ALTER TABLE soil_data.soil_mapping_unit ALTER COLUMN mapping_unit_id ADD GENERAT
 
 
 --
--- TOC entry 288 (class 1259 OID 55704073)
+-- TOC entry 288 (class 1259 OID 55706918)
 -- Name: soil_mapping_unit_profile; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4492,7 +4482,7 @@ CREATE TABLE soil_data.soil_mapping_unit_profile (
 ALTER TABLE soil_data.soil_mapping_unit_profile OWNER TO sis;
 
 --
--- TOC entry 5691 (class 0 OID 0)
+-- TOC entry 5644 (class 0 OID 0)
 -- Dependencies: 288
 -- Name: TABLE soil_mapping_unit_profile; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4501,7 +4491,7 @@ COMMENT ON TABLE soil_data.soil_mapping_unit_profile IS 'Links profiles to mappi
 
 
 --
--- TOC entry 5692 (class 0 OID 0)
+-- TOC entry 5645 (class 0 OID 0)
 -- Dependencies: 288
 -- Name: COLUMN soil_mapping_unit_profile.mapping_unit_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4510,7 +4500,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_profile.mapping_unit_id IS 'Refere
 
 
 --
--- TOC entry 5693 (class 0 OID 0)
+-- TOC entry 5646 (class 0 OID 0)
 -- Dependencies: 288
 -- Name: COLUMN soil_mapping_unit_profile.profile_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4519,7 +4509,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_profile.profile_id IS 'Reference t
 
 
 --
--- TOC entry 5694 (class 0 OID 0)
+-- TOC entry 5647 (class 0 OID 0)
 -- Dependencies: 288
 -- Name: COLUMN soil_mapping_unit_profile.is_representative; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4528,7 +4518,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_profile.is_representative IS 'Whet
 
 
 --
--- TOC entry 5695 (class 0 OID 0)
+-- TOC entry 5648 (class 0 OID 0)
 -- Dependencies: 288
 -- Name: COLUMN soil_mapping_unit_profile.remarks; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4537,7 +4527,7 @@ COMMENT ON COLUMN soil_data.soil_mapping_unit_profile.remarks IS 'Additional rem
 
 
 --
--- TOC entry 289 (class 1259 OID 55704080)
+-- TOC entry 289 (class 1259 OID 55706925)
 -- Name: soil_typological_unit; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4554,7 +4544,7 @@ CREATE TABLE soil_data.soil_typological_unit (
 ALTER TABLE soil_data.soil_typological_unit OWNER TO sis;
 
 --
--- TOC entry 5697 (class 0 OID 0)
+-- TOC entry 5650 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: TABLE soil_typological_unit; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4563,7 +4553,7 @@ COMMENT ON TABLE soil_data.soil_typological_unit IS 'Soil type classification un
 
 
 --
--- TOC entry 5698 (class 0 OID 0)
+-- TOC entry 5651 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: COLUMN soil_typological_unit.typological_unit_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4572,7 +4562,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit.typological_unit_id IS 'Unique
 
 
 --
--- TOC entry 5699 (class 0 OID 0)
+-- TOC entry 5652 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: COLUMN soil_typological_unit.name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4581,7 +4571,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit.name IS 'Name of the soil typo
 
 
 --
--- TOC entry 5700 (class 0 OID 0)
+-- TOC entry 5653 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: COLUMN soil_typological_unit.classification_scheme; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4590,7 +4580,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit.classification_scheme IS 'Clas
 
 
 --
--- TOC entry 5701 (class 0 OID 0)
+-- TOC entry 5654 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: COLUMN soil_typological_unit.classification_version; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4599,7 +4589,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit.classification_version IS 'Ver
 
 
 --
--- TOC entry 5702 (class 0 OID 0)
+-- TOC entry 5655 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: COLUMN soil_typological_unit.description; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4608,7 +4598,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit.description IS 'Detailed descr
 
 
 --
--- TOC entry 5703 (class 0 OID 0)
+-- TOC entry 5656 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: COLUMN soil_typological_unit.remarks; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4617,7 +4607,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit.remarks IS 'Additional remarks
 
 
 --
--- TOC entry 290 (class 1259 OID 55704086)
+-- TOC entry 290 (class 1259 OID 55706931)
 -- Name: soil_typological_unit_mapping_unit; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4633,7 +4623,7 @@ CREATE TABLE soil_data.soil_typological_unit_mapping_unit (
 ALTER TABLE soil_data.soil_typological_unit_mapping_unit OWNER TO sis;
 
 --
--- TOC entry 5705 (class 0 OID 0)
+-- TOC entry 5658 (class 0 OID 0)
 -- Dependencies: 290
 -- Name: TABLE soil_typological_unit_mapping_unit; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4642,7 +4632,7 @@ COMMENT ON TABLE soil_data.soil_typological_unit_mapping_unit IS 'Links typologi
 
 
 --
--- TOC entry 5706 (class 0 OID 0)
+-- TOC entry 5659 (class 0 OID 0)
 -- Dependencies: 290
 -- Name: COLUMN soil_typological_unit_mapping_unit.typological_unit_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4651,7 +4641,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_mapping_unit.typological_unit_
 
 
 --
--- TOC entry 5707 (class 0 OID 0)
+-- TOC entry 5660 (class 0 OID 0)
 -- Dependencies: 290
 -- Name: COLUMN soil_typological_unit_mapping_unit.mapping_unit_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4660,7 +4650,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_mapping_unit.mapping_unit_id I
 
 
 --
--- TOC entry 5708 (class 0 OID 0)
+-- TOC entry 5661 (class 0 OID 0)
 -- Dependencies: 290
 -- Name: COLUMN soil_typological_unit_mapping_unit.percentage; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4669,7 +4659,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_mapping_unit.percentage IS 'Pe
 
 
 --
--- TOC entry 5709 (class 0 OID 0)
+-- TOC entry 5662 (class 0 OID 0)
 -- Dependencies: 290
 -- Name: COLUMN soil_typological_unit_mapping_unit.remarks; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4678,7 +4668,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_mapping_unit.remarks IS 'Addit
 
 
 --
--- TOC entry 291 (class 1259 OID 55704093)
+-- TOC entry 291 (class 1259 OID 55706938)
 -- Name: soil_typological_unit_profile; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4693,7 +4683,7 @@ CREATE TABLE soil_data.soil_typological_unit_profile (
 ALTER TABLE soil_data.soil_typological_unit_profile OWNER TO sis;
 
 --
--- TOC entry 5711 (class 0 OID 0)
+-- TOC entry 5664 (class 0 OID 0)
 -- Dependencies: 291
 -- Name: TABLE soil_typological_unit_profile; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4702,7 +4692,7 @@ COMMENT ON TABLE soil_data.soil_typological_unit_profile IS 'Links profiles to t
 
 
 --
--- TOC entry 5712 (class 0 OID 0)
+-- TOC entry 5665 (class 0 OID 0)
 -- Dependencies: 291
 -- Name: COLUMN soil_typological_unit_profile.typological_unit_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4711,7 +4701,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_profile.typological_unit_id IS
 
 
 --
--- TOC entry 5713 (class 0 OID 0)
+-- TOC entry 5666 (class 0 OID 0)
 -- Dependencies: 291
 -- Name: COLUMN soil_typological_unit_profile.profile_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4720,7 +4710,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_profile.profile_id IS 'Referen
 
 
 --
--- TOC entry 5714 (class 0 OID 0)
+-- TOC entry 5667 (class 0 OID 0)
 -- Dependencies: 291
 -- Name: COLUMN soil_typological_unit_profile.is_typical; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4729,7 +4719,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_profile.is_typical IS 'Whether
 
 
 --
--- TOC entry 5715 (class 0 OID 0)
+-- TOC entry 5668 (class 0 OID 0)
 -- Dependencies: 291
 -- Name: COLUMN soil_typological_unit_profile.remarks; Type: COMMENT; Schema: soil_data; Owner: sis
 --
@@ -4738,7 +4728,7 @@ COMMENT ON COLUMN soil_data.soil_typological_unit_profile.remarks IS 'Additional
 
 
 --
--- TOC entry 292 (class 1259 OID 55704100)
+-- TOC entry 292 (class 1259 OID 55706945)
 -- Name: soil_typological_unit_typological_unit_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -4753,82 +4743,7 @@ ALTER TABLE soil_data.soil_typological_unit ALTER COLUMN typological_unit_id ADD
 
 
 --
--- TOC entry 293 (class 1259 OID 55704102)
--- Name: specimen_prep_process; Type: TABLE; Schema: soil_data; Owner: sis
---
-
-CREATE TABLE soil_data.specimen_prep_process (
-    specimen_prep_process_id integer NOT NULL,
-    specimen_transport_id integer,
-    specimen_storage_id integer,
-    definition character varying NOT NULL
-);
-
-
-ALTER TABLE soil_data.specimen_prep_process OWNER TO sis;
-
---
--- TOC entry 5718 (class 0 OID 0)
--- Dependencies: 293
--- Name: TABLE specimen_prep_process; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON TABLE soil_data.specimen_prep_process IS 'Describes the preparation process of a soil Specimen. Contains information that does not result from observation(s).';
-
-
---
--- TOC entry 5719 (class 0 OID 0)
--- Dependencies: 293
--- Name: COLUMN specimen_prep_process.specimen_prep_process_id; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_prep_process.specimen_prep_process_id IS 'Synthetic primary key.';
-
-
---
--- TOC entry 5720 (class 0 OID 0)
--- Dependencies: 293
--- Name: COLUMN specimen_prep_process.specimen_transport_id; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_prep_process.specimen_transport_id IS 'Foreign key for the corresponding mode of transport';
-
-
---
--- TOC entry 5721 (class 0 OID 0)
--- Dependencies: 293
--- Name: COLUMN specimen_prep_process.specimen_storage_id; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_prep_process.specimen_storage_id IS 'Foreign key for the corresponding mode of storage';
-
-
---
--- TOC entry 5722 (class 0 OID 0)
--- Dependencies: 293
--- Name: COLUMN specimen_prep_process.definition; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_prep_process.definition IS 'Further details necessary to define the preparation process.';
-
-
---
--- TOC entry 294 (class 1259 OID 55704108)
--- Name: specimen_prep_process_specimen_prep_process_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE soil_data.specimen_prep_process ALTER COLUMN specimen_prep_process_id ADD GENERATED BY DEFAULT AS IDENTITY (
-    SEQUENCE NAME soil_data.specimen_prep_process_specimen_prep_process_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
---
--- TOC entry 295 (class 1259 OID 55704110)
+-- TOC entry 293 (class 1259 OID 55706947)
 -- Name: specimen_specimen_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -4843,137 +4758,7 @@ ALTER TABLE soil_data.specimen ALTER COLUMN specimen_id ADD GENERATED BY DEFAULT
 
 
 --
--- TOC entry 296 (class 1259 OID 55704112)
--- Name: specimen_storage; Type: TABLE; Schema: soil_data; Owner: sis
---
-
-CREATE TABLE soil_data.specimen_storage (
-    specimen_storage_id integer NOT NULL,
-    label character varying NOT NULL,
-    definition character varying
-);
-
-
-ALTER TABLE soil_data.specimen_storage OWNER TO sis;
-
---
--- TOC entry 5726 (class 0 OID 0)
--- Dependencies: 296
--- Name: TABLE specimen_storage; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON TABLE soil_data.specimen_storage IS 'Modes of storage of a soil Specimen, part of the Specimen preparation process.';
-
-
---
--- TOC entry 5727 (class 0 OID 0)
--- Dependencies: 296
--- Name: COLUMN specimen_storage.specimen_storage_id; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_storage.specimen_storage_id IS 'Synthetic primary key.';
-
-
---
--- TOC entry 5728 (class 0 OID 0)
--- Dependencies: 296
--- Name: COLUMN specimen_storage.label; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_storage.label IS 'Short label for the storage mode.';
-
-
---
--- TOC entry 5729 (class 0 OID 0)
--- Dependencies: 296
--- Name: COLUMN specimen_storage.definition; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_storage.definition IS 'Long definition providing all the necessary details for the storage mode.';
-
-
---
--- TOC entry 297 (class 1259 OID 55704118)
--- Name: specimen_storage_specimen_storage_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE soil_data.specimen_storage ALTER COLUMN specimen_storage_id ADD GENERATED BY DEFAULT AS IDENTITY (
-    SEQUENCE NAME soil_data.specimen_storage_specimen_storage_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
---
--- TOC entry 298 (class 1259 OID 55704120)
--- Name: specimen_transport; Type: TABLE; Schema: soil_data; Owner: sis
---
-
-CREATE TABLE soil_data.specimen_transport (
-    specimen_transport_id integer NOT NULL,
-    label character varying NOT NULL,
-    definition character varying
-);
-
-
-ALTER TABLE soil_data.specimen_transport OWNER TO sis;
-
---
--- TOC entry 5732 (class 0 OID 0)
--- Dependencies: 298
--- Name: TABLE specimen_transport; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON TABLE soil_data.specimen_transport IS 'Modes of transport of a soil Specimen, part of the Specimen preparation process.';
-
-
---
--- TOC entry 5733 (class 0 OID 0)
--- Dependencies: 298
--- Name: COLUMN specimen_transport.specimen_transport_id; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_transport.specimen_transport_id IS 'Synthetic primary key.';
-
-
---
--- TOC entry 5734 (class 0 OID 0)
--- Dependencies: 298
--- Name: COLUMN specimen_transport.label; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_transport.label IS 'Short label for the transport mode.';
-
-
---
--- TOC entry 5735 (class 0 OID 0)
--- Dependencies: 298
--- Name: COLUMN specimen_transport.definition; Type: COMMENT; Schema: soil_data; Owner: sis
---
-
-COMMENT ON COLUMN soil_data.specimen_transport.definition IS 'Long definition providing all the necessary details for the transport mode.';
-
-
---
--- TOC entry 299 (class 1259 OID 55704126)
--- Name: specimen_transport_specimen_transport_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE soil_data.specimen_transport ALTER COLUMN specimen_transport_id ADD GENERATED BY DEFAULT AS IDENTITY (
-    SEQUENCE NAME soil_data.specimen_transport_specimen_transport_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
---
--- TOC entry 300 (class 1259 OID 55704128)
+-- TOC entry 294 (class 1259 OID 55706949)
 -- Name: spectral_sample; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -4986,7 +4771,7 @@ CREATE TABLE soil_data.spectral_sample (
 ALTER TABLE soil_data.spectral_sample OWNER TO sis;
 
 --
--- TOC entry 301 (class 1259 OID 55704134)
+-- TOC entry 295 (class 1259 OID 55706955)
 -- Name: spectrum; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -5001,7 +4786,7 @@ CREATE TABLE soil_data.spectrum (
 ALTER TABLE soil_data.spectrum OWNER TO sis;
 
 --
--- TOC entry 302 (class 1259 OID 55704140)
+-- TOC entry 296 (class 1259 OID 55706961)
 -- Name: spectrum_spectrum_id_seq; Type: SEQUENCE; Schema: soil_data; Owner: sis
 --
 
@@ -5016,7 +4801,7 @@ ALTER TABLE soil_data.spectrum ALTER COLUMN spectrum_id ADD GENERATED BY DEFAULT
 
 
 --
--- TOC entry 303 (class 1259 OID 55704142)
+-- TOC entry 297 (class 1259 OID 55706963)
 -- Name: spectrum_x_result_spectral; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -5029,7 +4814,7 @@ CREATE TABLE soil_data.spectrum_x_result_spectral (
 ALTER TABLE soil_data.spectrum_x_result_spectral OWNER TO sis;
 
 --
--- TOC entry 304 (class 1259 OID 55704145)
+-- TOC entry 298 (class 1259 OID 55706966)
 -- Name: translate; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -5045,8 +4830,8 @@ CREATE TABLE soil_data.translate (
 ALTER TABLE soil_data.translate OWNER TO sis;
 
 --
--- TOC entry 5738 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 5672 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: TABLE translate; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5054,8 +4839,8 @@ COMMENT ON TABLE soil_data.translate IS 'Multilingual translations for database 
 
 
 --
--- TOC entry 5739 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 5673 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN translate.table_name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5063,8 +4848,8 @@ COMMENT ON COLUMN soil_data.translate.table_name IS 'Name of the source table co
 
 
 --
--- TOC entry 5740 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 5674 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN translate.column_name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5072,8 +4857,8 @@ COMMENT ON COLUMN soil_data.translate.column_name IS 'Name of the column contain
 
 
 --
--- TOC entry 5741 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 5675 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN translate.language_code; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5081,8 +4866,8 @@ COMMENT ON COLUMN soil_data.translate.language_code IS 'Target language code (IS
 
 
 --
--- TOC entry 5742 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 5676 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN translate.string; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5090,8 +4875,8 @@ COMMENT ON COLUMN soil_data.translate.string IS 'Original string to be translate
 
 
 --
--- TOC entry 5743 (class 0 OID 0)
--- Dependencies: 304
+-- TOC entry 5677 (class 0 OID 0)
+-- Dependencies: 298
 -- Name: COLUMN translate.translation; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5099,7 +4884,7 @@ COMMENT ON COLUMN soil_data.translate.translation IS 'Translated string in the t
 
 
 --
--- TOC entry 305 (class 1259 OID 55704151)
+-- TOC entry 299 (class 1259 OID 55706972)
 -- Name: unit_conversion; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -5116,7 +4901,7 @@ CREATE TABLE soil_data.unit_conversion (
 ALTER TABLE soil_data.unit_conversion OWNER TO sis;
 
 --
--- TOC entry 306 (class 1259 OID 55704159)
+-- TOC entry 300 (class 1259 OID 55706980)
 -- Name: unit_of_measure; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -5131,8 +4916,8 @@ CREATE TABLE soil_data.unit_of_measure (
 ALTER TABLE soil_data.unit_of_measure OWNER TO sis;
 
 --
--- TOC entry 5746 (class 0 OID 0)
--- Dependencies: 306
+-- TOC entry 5680 (class 0 OID 0)
+-- Dependencies: 300
 -- Name: TABLE unit_of_measure; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5140,8 +4925,8 @@ COMMENT ON TABLE soil_data.unit_of_measure IS 'Unit of measure';
 
 
 --
--- TOC entry 5747 (class 0 OID 0)
--- Dependencies: 306
+-- TOC entry 5681 (class 0 OID 0)
+-- Dependencies: 300
 -- Name: COLUMN unit_of_measure.unit_of_measure_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5149,8 +4934,8 @@ COMMENT ON COLUMN soil_data.unit_of_measure.unit_of_measure_id IS 'Synthetic pri
 
 
 --
--- TOC entry 5748 (class 0 OID 0)
--- Dependencies: 306
+-- TOC entry 5682 (class 0 OID 0)
+-- Dependencies: 300
 -- Name: COLUMN unit_of_measure.unit_name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5158,7 +4943,7 @@ COMMENT ON COLUMN soil_data.unit_of_measure.unit_name IS 'Short label for this u
 
 
 --
--- TOC entry 307 (class 1259 OID 55704165)
+-- TOC entry 301 (class 1259 OID 55706986)
 -- Name: url; Type: TABLE; Schema: soil_data; Owner: sis
 --
 
@@ -5175,8 +4960,8 @@ CREATE TABLE soil_data.url (
 ALTER TABLE soil_data.url OWNER TO sis;
 
 --
--- TOC entry 5750 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 5684 (class 0 OID 0)
+-- Dependencies: 301
 -- Name: TABLE url; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5184,8 +4969,8 @@ COMMENT ON TABLE soil_data.url IS 'Online resource URLs for mapsets (download, W
 
 
 --
--- TOC entry 5751 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 5685 (class 0 OID 0)
+-- Dependencies: 301
 -- Name: COLUMN url.mapset_id; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5193,8 +4978,8 @@ COMMENT ON COLUMN soil_data.url.mapset_id IS 'Reference to the mapset';
 
 
 --
--- TOC entry 5752 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 5686 (class 0 OID 0)
+-- Dependencies: 301
 -- Name: COLUMN url.protocol; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5202,8 +4987,8 @@ COMMENT ON COLUMN soil_data.url.protocol IS 'OGC or WWW protocol identifier';
 
 
 --
--- TOC entry 5753 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 5687 (class 0 OID 0)
+-- Dependencies: 301
 -- Name: COLUMN url.url; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5211,8 +4996,8 @@ COMMENT ON COLUMN soil_data.url.url IS 'Full URL to the resource';
 
 
 --
--- TOC entry 5754 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 5688 (class 0 OID 0)
+-- Dependencies: 301
 -- Name: COLUMN url.url_name; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5220,8 +5005,8 @@ COMMENT ON COLUMN soil_data.url.url_name IS 'Display name for the URL';
 
 
 --
--- TOC entry 5755 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 5689 (class 0 OID 0)
+-- Dependencies: 301
 -- Name: COLUMN url.url_description; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -5229,7 +5014,7 @@ COMMENT ON COLUMN soil_data.url.url_description IS 'Description of what the URL 
 
 
 --
--- TOC entry 4813 (class 2604 OID 55704172)
+-- TOC entry 4792 (class 2604 OID 55706993)
 -- Name: dst_run run_id; Type: DEFAULT; Schema: api; Owner: sis
 --
 
@@ -5237,7 +5022,7 @@ ALTER TABLE ONLY api.dst_run ALTER COLUMN run_id SET DEFAULT nextval('api.dst_ru
 
 
 --
--- TOC entry 4818 (class 2604 OID 55704173)
+-- TOC entry 4797 (class 2604 OID 55706994)
 -- Name: uploaded_dataset_edit edit_id; Type: DEFAULT; Schema: api; Owner: sis
 --
 
@@ -5245,7 +5030,7 @@ ALTER TABLE ONLY api.uploaded_dataset_edit ALTER COLUMN edit_id SET DEFAULT next
 
 
 --
--- TOC entry 5258 (class 0 OID 55703695)
+-- TOC entry 5218 (class 0 OID 55706540)
 -- Dependencies: 225
 -- Data for Name: api_client; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5255,7 +5040,7 @@ COPY api.api_client (api_client_id, api_key, is_active, created_at, expires_at, 
 
 
 --
--- TOC entry 5259 (class 0 OID 55703704)
+-- TOC entry 5219 (class 0 OID 55706549)
 -- Dependencies: 226
 -- Data for Name: audit; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5265,7 +5050,7 @@ COPY api.audit (audit_id, user_id, api_client_id, action, details, ip_address, c
 
 
 --
--- TOC entry 5261 (class 0 OID 55703713)
+-- TOC entry 5221 (class 0 OID 55706558)
 -- Dependencies: 228
 -- Data for Name: dst_recipe; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5275,7 +5060,7 @@ COPY api.dst_recipe (recipe_id, name, description, recipe, output_layer_id, crea
 
 
 --
--- TOC entry 5262 (class 0 OID 55703721)
+-- TOC entry 5222 (class 0 OID 55706566)
 -- Dependencies: 229
 -- Data for Name: dst_run; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5285,7 +5070,7 @@ COPY api.dst_run (run_id, recipe_id, status, metadata_status, metadata_error, st
 
 
 --
--- TOC entry 5264 (class 0 OID 55703732)
+-- TOC entry 5224 (class 0 OID 55706577)
 -- Dependencies: 231
 -- Data for Name: setting; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5295,7 +5080,7 @@ COPY api.setting (key, value) FROM stdin;
 
 
 --
--- TOC entry 5265 (class 0 OID 55703738)
+-- TOC entry 5225 (class 0 OID 55706583)
 -- Dependencies: 232
 -- Data for Name: uploaded_dataset; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5305,7 +5090,7 @@ COPY api.uploaded_dataset (user_id, project_id, table_name, file_name, upload_da
 
 
 --
--- TOC entry 5266 (class 0 OID 55703747)
+-- TOC entry 5226 (class 0 OID 55706592)
 -- Dependencies: 233
 -- Data for Name: uploaded_dataset_column; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5315,7 +5100,7 @@ COPY api.uploaded_dataset_column (table_name, column_name, destination_table, de
 
 
 --
--- TOC entry 5267 (class 0 OID 55703754)
+-- TOC entry 5227 (class 0 OID 55706599)
 -- Dependencies: 234
 -- Data for Name: uploaded_dataset_edit; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5325,7 +5110,7 @@ COPY api.uploaded_dataset_edit (edit_id, table_name, row_id, column_name, old_va
 
 
 --
--- TOC entry 5269 (class 0 OID 55703763)
+-- TOC entry 5229 (class 0 OID 55706608)
 -- Dependencies: 236
 -- Data for Name: user; Type: TABLE DATA; Schema: api; Owner: sis
 --
@@ -5335,7 +5120,7 @@ COPY api."user" (user_id, password_hash, is_active, is_admin, created_at, update
 
 
 --
--- TOC entry 4806 (class 0 OID 55702265)
+-- TOC entry 4785 (class 0 OID 55705087)
 -- Dependencies: 211
 -- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: sis
 --
@@ -5345,7 +5130,7 @@ COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM
 
 
 --
--- TOC entry 5281 (class 0 OID 55703897)
+-- TOC entry 5241 (class 0 OID 55706742)
 -- Dependencies: 252
 -- Data for Name: category_desc; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6148,7 +5933,7 @@ voidsClassificationValueCode-V	V	Vughs	Mostly irregular, equidimensional voids o
 
 
 --
--- TOC entry 5282 (class 0 OID 55703903)
+-- TOC entry 5242 (class 0 OID 55706748)
 -- Dependencies: 253
 -- Data for Name: class; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6158,7 +5943,7 @@ COPY soil_data.class (mapset_id, value, code, label, color, opacity, publish) FR
 
 
 --
--- TOC entry 5283 (class 0 OID 55703909)
+-- TOC entry 5243 (class 0 OID 55706754)
 -- Dependencies: 254
 -- Data for Name: country; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6427,7 +6212,7 @@ HR	HRV	62	HRV	كرواتيا	Croatia	Croacia	Croatie	Croácia	Хорватия	�
 
 
 --
--- TOC entry 5270 (class 0 OID 55703775)
+-- TOC entry 5230 (class 0 OID 55706620)
 -- Dependencies: 237
 -- Data for Name: element; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6437,7 +6222,7 @@ COPY soil_data.element (element_id, profile_id, order_element, upper_depth, lowe
 
 
 --
--- TOC entry 5285 (class 0 OID 55703917)
+-- TOC entry 5245 (class 0 OID 55706762)
 -- Dependencies: 256
 -- Data for Name: individual; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6447,7 +6232,7 @@ COPY soil_data.individual (individual_id, email) FROM stdin;
 
 
 --
--- TOC entry 5286 (class 0 OID 55703923)
+-- TOC entry 5246 (class 0 OID 55706768)
 -- Dependencies: 257
 -- Data for Name: languages; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6457,7 +6242,7 @@ COPY soil_data.languages (language_code, language_name) FROM stdin;
 
 
 --
--- TOC entry 5271 (class 0 OID 55703786)
+-- TOC entry 5231 (class 0 OID 55706631)
 -- Dependencies: 238
 -- Data for Name: layer; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6467,7 +6252,7 @@ COPY soil_data.layer (mapset_id, dimension_depth, dimension_stats, layer_id, fil
 
 
 --
--- TOC entry 5287 (class 0 OID 55703929)
+-- TOC entry 5247 (class 0 OID 55706774)
 -- Dependencies: 258
 -- Data for Name: mapped_property; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6562,7 +6347,7 @@ ZNTOT	Zinc (Zn) - total	ZIN	\N	\N	quantitative	10	#F4E7D3	#5C4033	{soil,"digital
 
 
 --
--- TOC entry 5272 (class 0 OID 55703797)
+-- TOC entry 5232 (class 0 OID 55706642)
 -- Dependencies: 239
 -- Data for Name: mapset; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -6572,7 +6357,7 @@ COPY soil_data.mapset (country_id, project_id, mapped_property_id, mapset_id, co
 
 
 --
--- TOC entry 5288 (class 0 OID 55703936)
+-- TOC entry 5248 (class 0 OID 55706781)
 -- Dependencies: 259
 -- Data for Name: observation_desc; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -7589,7 +7374,7 @@ ISRIC Report 2019/01	fragmentsClassProperty	fragmentsClassValueCode-FVT	\N	\N	\N
 
 
 --
--- TOC entry 5273 (class 0 OID 55703830)
+-- TOC entry 5233 (class 0 OID 55706675)
 -- Dependencies: 240
 -- Data for Name: observation_num; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8516,7 +8301,7 @@ COPY soil_data.observation_num (observation_num_id, property_num_id, procedure_n
 
 
 --
--- TOC entry 5290 (class 0 OID 55703944)
+-- TOC entry 5250 (class 0 OID 55706789)
 -- Dependencies: 261
 -- Data for Name: organisation; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8526,7 +8311,7 @@ COPY soil_data.organisation (organisation_id, url, email, country, city, postal_
 
 
 --
--- TOC entry 5274 (class 0 OID 55703837)
+-- TOC entry 5234 (class 0 OID 55706682)
 -- Dependencies: 241
 -- Data for Name: plot; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8536,7 +8321,7 @@ COPY soil_data.plot (plot_id, site_id, plot_code, parent_plot_id, type, altitude
 
 
 --
--- TOC entry 5292 (class 0 OID 55703952)
+-- TOC entry 5252 (class 0 OID 55706797)
 -- Dependencies: 263
 -- Data for Name: procedure_desc; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8553,7 +8338,7 @@ WRB fourth edition 2022	WRB fourth edition 2022	https://www.fao.org/soils-portal
 
 
 --
--- TOC entry 5293 (class 0 OID 55703958)
+-- TOC entry 5253 (class 0 OID 55706803)
 -- Dependencies: 264
 -- Data for Name: procedure_model; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8563,7 +8348,7 @@ COPY soil_data.procedure_model (procedure_model_id, procedure_name) FROM stdin;
 
 
 --
--- TOC entry 5294 (class 0 OID 55703964)
+-- TOC entry 5254 (class 0 OID 55706809)
 -- Dependencies: 265
 -- Data for Name: procedure_model_def; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8573,7 +8358,7 @@ COPY soil_data.procedure_model_def (procedure_model_id, key, value) FROM stdin;
 
 
 --
--- TOC entry 5296 (class 0 OID 55703972)
+-- TOC entry 5256 (class 0 OID 55706817)
 -- Dependencies: 267
 -- Data for Name: procedure_num; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8858,7 +8643,7 @@ TOTALN_H2SO4	\N	H2SO4			http://w3id.org/glosis/model/procedure/nitrogenTotalProc
 
 
 --
--- TOC entry 5297 (class 0 OID 55703978)
+-- TOC entry 5257 (class 0 OID 55706823)
 -- Dependencies: 268
 -- Data for Name: procedure_spectrometer; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8868,7 +8653,7 @@ COPY soil_data.procedure_spectrometer (procedure_spectrometer_id, procedure_name
 
 
 --
--- TOC entry 5298 (class 0 OID 55703984)
+-- TOC entry 5258 (class 0 OID 55706829)
 -- Dependencies: 269
 -- Data for Name: procedure_spectrometer_def; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8878,7 +8663,7 @@ COPY soil_data.procedure_spectrometer_def (procedure_spectrometer_id, key, value
 
 
 --
--- TOC entry 5275 (class 0 OID 55703845)
+-- TOC entry 5235 (class 0 OID 55706690)
 -- Dependencies: 242
 -- Data for Name: profile; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8888,7 +8673,7 @@ COPY soil_data.profile (profile_id, plot_id, profile_code) FROM stdin;
 
 
 --
--- TOC entry 5301 (class 0 OID 55703994)
+-- TOC entry 5261 (class 0 OID 55706839)
 -- Dependencies: 272
 -- Data for Name: proj_x_org_x_ind; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8898,7 +8683,7 @@ COPY soil_data.proj_x_org_x_ind (country_id, project_id, organisation_id, indivi
 
 
 --
--- TOC entry 5276 (class 0 OID 55703851)
+-- TOC entry 5236 (class 0 OID 55706696)
 -- Dependencies: 243
 -- Data for Name: project; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8908,7 +8693,7 @@ COPY soil_data.project (country_id, project_id, name, description) FROM stdin;
 
 
 --
--- TOC entry 5277 (class 0 OID 55703857)
+-- TOC entry 5237 (class 0 OID 55706702)
 -- Dependencies: 244
 -- Data for Name: project_site; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8918,7 +8703,7 @@ COPY soil_data.project_site (country_id, project_id, site_id) FROM stdin;
 
 
 --
--- TOC entry 5302 (class 0 OID 55704002)
+-- TOC entry 5262 (class 0 OID 55706847)
 -- Dependencies: 273
 -- Data for Name: project_soil_map; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -8928,7 +8713,7 @@ COPY soil_data.project_soil_map (country_id, project_id, soil_map_id, remarks) F
 
 
 --
--- TOC entry 5303 (class 0 OID 55704008)
+-- TOC entry 5263 (class 0 OID 55706853)
 -- Dependencies: 274
 -- Data for Name: property_desc; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9031,7 +8816,7 @@ voidsDiameterProperty	Voids Diameter	Voids include all empty spaces in the soil.
 
 
 --
--- TOC entry 5304 (class 0 OID 55704014)
+-- TOC entry 5264 (class 0 OID 55706859)
 -- Dependencies: 275
 -- Data for Name: property_num; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9096,7 +8881,7 @@ BULDWHOLE	Bulk Density whole soil	\N	http://w3id.org/glosis/model/layerhorizon/b
 
 
 --
--- TOC entry 5305 (class 0 OID 55704020)
+-- TOC entry 5265 (class 0 OID 55706865)
 -- Dependencies: 276
 -- Data for Name: result_desc_element; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9106,7 +8891,7 @@ COPY soil_data.result_desc_element (element_id, property_desc_id, category_desc_
 
 
 --
--- TOC entry 5306 (class 0 OID 55704026)
+-- TOC entry 5266 (class 0 OID 55706871)
 -- Dependencies: 277
 -- Data for Name: result_desc_plot; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9116,7 +8901,7 @@ COPY soil_data.result_desc_plot (plot_id, property_desc_id, category_desc_id) FR
 
 
 --
--- TOC entry 5307 (class 0 OID 55704032)
+-- TOC entry 5267 (class 0 OID 55706877)
 -- Dependencies: 278
 -- Data for Name: result_desc_profile; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9126,7 +8911,7 @@ COPY soil_data.result_desc_profile (profile_id, property_desc_id, category_desc_
 
 
 --
--- TOC entry 5308 (class 0 OID 55704038)
+-- TOC entry 5268 (class 0 OID 55706883)
 -- Dependencies: 279
 -- Data for Name: result_desc_surface; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9136,7 +8921,7 @@ COPY soil_data.result_desc_surface (surface_id, property_desc_id, category_desc_
 
 
 --
--- TOC entry 5278 (class 0 OID 55703863)
+-- TOC entry 5238 (class 0 OID 55706708)
 -- Dependencies: 245
 -- Data for Name: result_num; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9146,7 +8931,7 @@ COPY soil_data.result_num (observation_num_id, specimen_id, value) FROM stdin;
 
 
 --
--- TOC entry 5309 (class 0 OID 55704044)
+-- TOC entry 5269 (class 0 OID 55706889)
 -- Dependencies: 280
 -- Data for Name: result_spectral; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9156,7 +8941,7 @@ COPY soil_data.result_spectral (result_spectral_id, observation_num_id, procedur
 
 
 --
--- TOC entry 5279 (class 0 OID 55703866)
+-- TOC entry 5239 (class 0 OID 55706711)
 -- Dependencies: 246
 -- Data for Name: site; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9166,7 +8951,7 @@ COPY soil_data.site (site_id, geom) FROM stdin;
 
 
 --
--- TOC entry 5311 (class 0 OID 55704049)
+-- TOC entry 5271 (class 0 OID 55706894)
 -- Dependencies: 282
 -- Data for Name: soil_map; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9176,7 +8961,7 @@ COPY soil_data.soil_map (soil_map_id, name, description, scale_denominator, spat
 
 
 --
--- TOC entry 5313 (class 0 OID 55704057)
+-- TOC entry 5273 (class 0 OID 55706902)
 -- Dependencies: 284
 -- Data for Name: soil_mapping_unit; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9186,7 +8971,7 @@ COPY soil_data.soil_mapping_unit (mapping_unit_id, category_id, explanation, rem
 
 
 --
--- TOC entry 5314 (class 0 OID 55704063)
+-- TOC entry 5274 (class 0 OID 55706908)
 -- Dependencies: 285
 -- Data for Name: soil_mapping_unit_category; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9196,7 +8981,7 @@ COPY soil_data.soil_mapping_unit_category (category_id, soil_map_id, parent_cate
 
 
 --
--- TOC entry 5317 (class 0 OID 55704073)
+-- TOC entry 5277 (class 0 OID 55706918)
 -- Dependencies: 288
 -- Data for Name: soil_mapping_unit_profile; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9206,7 +8991,7 @@ COPY soil_data.soil_mapping_unit_profile (mapping_unit_id, profile_id, is_repres
 
 
 --
--- TOC entry 5318 (class 0 OID 55704080)
+-- TOC entry 5278 (class 0 OID 55706925)
 -- Dependencies: 289
 -- Data for Name: soil_typological_unit; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9216,7 +9001,7 @@ COPY soil_data.soil_typological_unit (typological_unit_id, name, classification_
 
 
 --
--- TOC entry 5319 (class 0 OID 55704086)
+-- TOC entry 5279 (class 0 OID 55706931)
 -- Dependencies: 290
 -- Data for Name: soil_typological_unit_mapping_unit; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9226,7 +9011,7 @@ COPY soil_data.soil_typological_unit_mapping_unit (typological_unit_id, mapping_
 
 
 --
--- TOC entry 5320 (class 0 OID 55704093)
+-- TOC entry 5280 (class 0 OID 55706938)
 -- Dependencies: 291
 -- Data for Name: soil_typological_unit_profile; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
@@ -9236,48 +9021,18 @@ COPY soil_data.soil_typological_unit_profile (typological_unit_id, profile_id, i
 
 
 --
--- TOC entry 5280 (class 0 OID 55703872)
+-- TOC entry 5240 (class 0 OID 55706717)
 -- Dependencies: 247
 -- Data for Name: specimen; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
 
-COPY soil_data.specimen (specimen_id, element_id, specimen_prep_process_id, code) FROM stdin;
+COPY soil_data.specimen (specimen_id, element_id, code) FROM stdin;
 \.
 
 
 --
--- TOC entry 5322 (class 0 OID 55704102)
--- Dependencies: 293
--- Data for Name: specimen_prep_process; Type: TABLE DATA; Schema: soil_data; Owner: sis
---
-
-COPY soil_data.specimen_prep_process (specimen_prep_process_id, specimen_transport_id, specimen_storage_id, definition) FROM stdin;
-\.
-
-
---
--- TOC entry 5325 (class 0 OID 55704112)
--- Dependencies: 296
--- Data for Name: specimen_storage; Type: TABLE DATA; Schema: soil_data; Owner: sis
---
-
-COPY soil_data.specimen_storage (specimen_storage_id, label, definition) FROM stdin;
-\.
-
-
---
--- TOC entry 5327 (class 0 OID 55704120)
--- Dependencies: 298
--- Data for Name: specimen_transport; Type: TABLE DATA; Schema: soil_data; Owner: sis
---
-
-COPY soil_data.specimen_transport (specimen_transport_id, label, definition) FROM stdin;
-\.
-
-
---
--- TOC entry 5329 (class 0 OID 55704128)
--- Dependencies: 300
+-- TOC entry 5283 (class 0 OID 55706949)
+-- Dependencies: 294
 -- Data for Name: spectral_sample; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
 
@@ -9286,8 +9041,8 @@ COPY soil_data.spectral_sample (spectral_sample_id, specimen_id) FROM stdin;
 
 
 --
--- TOC entry 5330 (class 0 OID 55704134)
--- Dependencies: 301
+-- TOC entry 5284 (class 0 OID 55706955)
+-- Dependencies: 295
 -- Data for Name: spectrum; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
 
@@ -9296,8 +9051,8 @@ COPY soil_data.spectrum (spectrum_id, spectral_sample_id, procedure_spectrometer
 
 
 --
--- TOC entry 5332 (class 0 OID 55704142)
--- Dependencies: 303
+-- TOC entry 5286 (class 0 OID 55706963)
+-- Dependencies: 297
 -- Data for Name: spectrum_x_result_spectral; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
 
@@ -9306,8 +9061,8 @@ COPY soil_data.spectrum_x_result_spectral (result_spectral_id, spectrum_id) FROM
 
 
 --
--- TOC entry 5333 (class 0 OID 55704145)
--- Dependencies: 304
+-- TOC entry 5287 (class 0 OID 55706966)
+-- Dependencies: 298
 -- Data for Name: translate; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
 
@@ -9316,8 +9071,8 @@ COPY soil_data.translate (table_name, column_name, language_code, string, transl
 
 
 --
--- TOC entry 5334 (class 0 OID 55704151)
--- Dependencies: 305
+-- TOC entry 5288 (class 0 OID 55706972)
+-- Dependencies: 299
 -- Data for Name: unit_conversion; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
 
@@ -9360,12 +9115,14 @@ mm/day	/	240	cm/h
 cm/day	/	24	cm/h
 m/day	*	4.1667	cm/h
 in/h	*	2.54	cm/h
+t/(ha·a)	*	1000	kg/(ha·a)
+kg/(ha·a)	/	1000	t/(ha·a)
 \.
 
 
 --
--- TOC entry 5335 (class 0 OID 55704159)
--- Dependencies: 306
+-- TOC entry 5289 (class 0 OID 55706980)
+-- Dependencies: 300
 -- Data for Name: unit_of_measure; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
 
@@ -9382,6 +9139,8 @@ mg/kg	Miligram per kilogram (also ppm)	Mass fraction	http://qudt.org/vocab/unit/
 cmol(c)/L	Centimole per litre	Charge per volume	https://qudt.org/vocab/unit/CentiMOL-PER-L.html
 g/100g	Gram per hundred grams	Mass fraction	http://qudt.org/vocab/unit/GM-PER-HectoGM
 t/(ha·a)	Tonne per hectare per year	Areal mass rate	https://qudt.org/vocab/unit/TONNE-PER-HA-YR
+kg/(ha·a)	Kilogram per hectare per year	Areal mass rate	https://qudt.org/vocab/unit/KiloGM-PER-HA-YR
+keq(ha.a)	Kilo-equivalents H+ per hectare per year	Areal mass rate	https://qudt.org/vocab/unit/keq(ha.a)
 class	Categorical	Dimensionless	https://qudt.org/vocab/unit/class
 dimensionless	No dimension	Dimensionless	https://qudt.org/vocab/unit/dimensionless
 cm	Centimetre	Length	http://qudt.org/vocab/unit/CentiM
@@ -9414,8 +9173,8 @@ in/h	Inch per hour	Rate	http://qudt.org/vocab/unit/IN-PER-HR
 
 
 --
--- TOC entry 5336 (class 0 OID 55704165)
--- Dependencies: 307
+-- TOC entry 5290 (class 0 OID 55706986)
+-- Dependencies: 301
 -- Data for Name: url; Type: TABLE DATA; Schema: soil_data; Owner: sis
 --
 
@@ -9424,7 +9183,7 @@ COPY soil_data.url (mapset_id, protocol, url, url_name, url_description) FROM st
 
 
 --
--- TOC entry 5757 (class 0 OID 0)
+-- TOC entry 5691 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: audit_audit_id_seq; Type: SEQUENCE SET; Schema: api; Owner: sis
 --
@@ -9433,7 +9192,7 @@ SELECT pg_catalog.setval('api.audit_audit_id_seq', 1, false);
 
 
 --
--- TOC entry 5758 (class 0 OID 0)
+-- TOC entry 5692 (class 0 OID 0)
 -- Dependencies: 230
 -- Name: dst_run_run_id_seq; Type: SEQUENCE SET; Schema: api; Owner: sis
 --
@@ -9442,7 +9201,7 @@ SELECT pg_catalog.setval('api.dst_run_run_id_seq', 1, false);
 
 
 --
--- TOC entry 5759 (class 0 OID 0)
+-- TOC entry 5693 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: uploaded_dataset_edit_edit_id_seq; Type: SEQUENCE SET; Schema: api; Owner: sis
 --
@@ -9451,7 +9210,7 @@ SELECT pg_catalog.setval('api.uploaded_dataset_edit_edit_id_seq', 1, false);
 
 
 --
--- TOC entry 5760 (class 0 OID 0)
+-- TOC entry 5694 (class 0 OID 0)
 -- Dependencies: 255
 -- Name: element_element_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9460,7 +9219,7 @@ SELECT pg_catalog.setval('soil_data.element_element_id_seq', 1, false);
 
 
 --
--- TOC entry 5761 (class 0 OID 0)
+-- TOC entry 5695 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: observation_num_observation_num_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9469,7 +9228,7 @@ SELECT pg_catalog.setval('soil_data.observation_num_observation_num_id_seq', 928
 
 
 --
--- TOC entry 5762 (class 0 OID 0)
+-- TOC entry 5696 (class 0 OID 0)
 -- Dependencies: 262
 -- Name: plot_plot_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9478,7 +9237,7 @@ SELECT pg_catalog.setval('soil_data.plot_plot_id_seq', 1, false);
 
 
 --
--- TOC entry 5763 (class 0 OID 0)
+-- TOC entry 5697 (class 0 OID 0)
 -- Dependencies: 266
 -- Name: procedure_model_procedure_model_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9487,7 +9246,7 @@ SELECT pg_catalog.setval('soil_data.procedure_model_procedure_model_id_seq', 1, 
 
 
 --
--- TOC entry 5764 (class 0 OID 0)
+-- TOC entry 5698 (class 0 OID 0)
 -- Dependencies: 270
 -- Name: procedure_spectrometer_procedure_spectrometer_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9496,7 +9255,7 @@ SELECT pg_catalog.setval('soil_data.procedure_spectrometer_procedure_spectromete
 
 
 --
--- TOC entry 5765 (class 0 OID 0)
+-- TOC entry 5699 (class 0 OID 0)
 -- Dependencies: 271
 -- Name: profile_profile_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9505,7 +9264,7 @@ SELECT pg_catalog.setval('soil_data.profile_profile_id_seq', 1, false);
 
 
 --
--- TOC entry 5766 (class 0 OID 0)
+-- TOC entry 5700 (class 0 OID 0)
 -- Dependencies: 281
 -- Name: result_spectral_result_spectral_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9514,7 +9273,7 @@ SELECT pg_catalog.setval('soil_data.result_spectral_result_spectral_id_seq', 1, 
 
 
 --
--- TOC entry 5767 (class 0 OID 0)
+-- TOC entry 5701 (class 0 OID 0)
 -- Dependencies: 283
 -- Name: soil_map_soil_map_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9523,7 +9282,7 @@ SELECT pg_catalog.setval('soil_data.soil_map_soil_map_id_seq', 1, false);
 
 
 --
--- TOC entry 5768 (class 0 OID 0)
+-- TOC entry 5702 (class 0 OID 0)
 -- Dependencies: 286
 -- Name: soil_mapping_unit_category_category_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9532,7 +9291,7 @@ SELECT pg_catalog.setval('soil_data.soil_mapping_unit_category_category_id_seq',
 
 
 --
--- TOC entry 5769 (class 0 OID 0)
+-- TOC entry 5703 (class 0 OID 0)
 -- Dependencies: 287
 -- Name: soil_mapping_unit_mapping_unit_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9541,7 +9300,7 @@ SELECT pg_catalog.setval('soil_data.soil_mapping_unit_mapping_unit_id_seq', 1, f
 
 
 --
--- TOC entry 5770 (class 0 OID 0)
+-- TOC entry 5704 (class 0 OID 0)
 -- Dependencies: 292
 -- Name: soil_typological_unit_typological_unit_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
@@ -9550,17 +9309,8 @@ SELECT pg_catalog.setval('soil_data.soil_typological_unit_typological_unit_id_se
 
 
 --
--- TOC entry 5771 (class 0 OID 0)
--- Dependencies: 294
--- Name: specimen_prep_process_specimen_prep_process_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
---
-
-SELECT pg_catalog.setval('soil_data.specimen_prep_process_specimen_prep_process_id_seq', 1, false);
-
-
---
--- TOC entry 5772 (class 0 OID 0)
--- Dependencies: 295
+-- TOC entry 5705 (class 0 OID 0)
+-- Dependencies: 293
 -- Name: specimen_specimen_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
 
@@ -9568,26 +9318,8 @@ SELECT pg_catalog.setval('soil_data.specimen_specimen_id_seq', 1, false);
 
 
 --
--- TOC entry 5773 (class 0 OID 0)
--- Dependencies: 297
--- Name: specimen_storage_specimen_storage_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
---
-
-SELECT pg_catalog.setval('soil_data.specimen_storage_specimen_storage_id_seq', 1, false);
-
-
---
--- TOC entry 5774 (class 0 OID 0)
--- Dependencies: 299
--- Name: specimen_transport_specimen_transport_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
---
-
-SELECT pg_catalog.setval('soil_data.specimen_transport_specimen_transport_id_seq', 1, false);
-
-
---
--- TOC entry 5775 (class 0 OID 0)
--- Dependencies: 302
+-- TOC entry 5706 (class 0 OID 0)
+-- Dependencies: 296
 -- Name: spectrum_spectrum_id_seq; Type: SEQUENCE SET; Schema: soil_data; Owner: sis
 --
 
@@ -9595,7 +9327,7 @@ SELECT pg_catalog.setval('soil_data.spectrum_spectrum_id_seq', 1, false);
 
 
 --
--- TOC entry 4882 (class 2606 OID 55704175)
+-- TOC entry 4861 (class 2606 OID 55706996)
 -- Name: api_client api_client_api_key_key; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9604,7 +9336,7 @@ ALTER TABLE ONLY api.api_client
 
 
 --
--- TOC entry 4884 (class 2606 OID 55704177)
+-- TOC entry 4863 (class 2606 OID 55706998)
 -- Name: api_client api_client_id_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9613,7 +9345,7 @@ ALTER TABLE ONLY api.api_client
 
 
 --
--- TOC entry 4886 (class 2606 OID 55704179)
+-- TOC entry 4865 (class 2606 OID 55707000)
 -- Name: audit audit_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9622,7 +9354,7 @@ ALTER TABLE ONLY api.audit
 
 
 --
--- TOC entry 4888 (class 2606 OID 55704181)
+-- TOC entry 4867 (class 2606 OID 55707002)
 -- Name: dst_recipe dst_recipe_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9631,7 +9363,7 @@ ALTER TABLE ONLY api.dst_recipe
 
 
 --
--- TOC entry 4890 (class 2606 OID 55704183)
+-- TOC entry 4869 (class 2606 OID 55707004)
 -- Name: dst_run dst_run_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9640,7 +9372,7 @@ ALTER TABLE ONLY api.dst_run
 
 
 --
--- TOC entry 4893 (class 2606 OID 55704185)
+-- TOC entry 4872 (class 2606 OID 55707006)
 -- Name: setting setting_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9649,7 +9381,7 @@ ALTER TABLE ONLY api.setting
 
 
 --
--- TOC entry 4897 (class 2606 OID 55704187)
+-- TOC entry 4876 (class 2606 OID 55707008)
 -- Name: uploaded_dataset_column uploaded_dataset_column_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9658,7 +9390,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 4900 (class 2606 OID 55704189)
+-- TOC entry 4879 (class 2606 OID 55707010)
 -- Name: uploaded_dataset_edit uploaded_dataset_edit_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9667,7 +9399,7 @@ ALTER TABLE ONLY api.uploaded_dataset_edit
 
 
 --
--- TOC entry 4895 (class 2606 OID 55704191)
+-- TOC entry 4874 (class 2606 OID 55707012)
 -- Name: uploaded_dataset uploaded_dataset_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9676,7 +9408,7 @@ ALTER TABLE ONLY api.uploaded_dataset
 
 
 --
--- TOC entry 4902 (class 2606 OID 55704193)
+-- TOC entry 4881 (class 2606 OID 55707014)
 -- Name: user user_pkey; Type: CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -9685,7 +9417,7 @@ ALTER TABLE ONLY api."user"
 
 
 --
--- TOC entry 4942 (class 2606 OID 55704195)
+-- TOC entry 4921 (class 2606 OID 55707016)
 -- Name: category_desc category_desc_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9694,7 +9426,7 @@ ALTER TABLE ONLY soil_data.category_desc
 
 
 --
--- TOC entry 4944 (class 2606 OID 55704197)
+-- TOC entry 4923 (class 2606 OID 55707018)
 -- Name: class class_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9703,7 +9435,7 @@ ALTER TABLE ONLY soil_data.class
 
 
 --
--- TOC entry 4948 (class 2606 OID 55704199)
+-- TOC entry 4927 (class 2606 OID 55707020)
 -- Name: country country_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9712,7 +9444,7 @@ ALTER TABLE ONLY soil_data.country
 
 
 --
--- TOC entry 4904 (class 2606 OID 55704201)
+-- TOC entry 4883 (class 2606 OID 55707022)
 -- Name: element element_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9721,7 +9453,7 @@ ALTER TABLE ONLY soil_data.element
 
 
 --
--- TOC entry 4950 (class 2606 OID 55704203)
+-- TOC entry 4929 (class 2606 OID 55707024)
 -- Name: individual individual_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9730,7 +9462,7 @@ ALTER TABLE ONLY soil_data.individual
 
 
 --
--- TOC entry 4952 (class 2606 OID 55704205)
+-- TOC entry 4931 (class 2606 OID 55707026)
 -- Name: languages languages_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9739,7 +9471,7 @@ ALTER TABLE ONLY soil_data.languages
 
 
 --
--- TOC entry 4908 (class 2606 OID 55704207)
+-- TOC entry 4887 (class 2606 OID 55707028)
 -- Name: layer layer_file_orig_name_unique; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9748,7 +9480,7 @@ ALTER TABLE ONLY soil_data.layer
 
 
 --
--- TOC entry 4910 (class 2606 OID 55704209)
+-- TOC entry 4889 (class 2606 OID 55707030)
 -- Name: layer layer_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9757,7 +9489,7 @@ ALTER TABLE ONLY soil_data.layer
 
 
 --
--- TOC entry 4912 (class 2606 OID 55704211)
+-- TOC entry 4891 (class 2606 OID 55707032)
 -- Name: mapset mapset_mapset_id_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9766,7 +9498,7 @@ ALTER TABLE ONLY soil_data.mapset
 
 
 --
--- TOC entry 4956 (class 2606 OID 55704213)
+-- TOC entry 4935 (class 2606 OID 55707034)
 -- Name: observation_desc observation_desc_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9775,7 +9507,7 @@ ALTER TABLE ONLY soil_data.observation_desc
 
 
 --
--- TOC entry 4914 (class 2606 OID 55704215)
+-- TOC entry 4893 (class 2606 OID 55707036)
 -- Name: observation_num observation_num_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9784,7 +9516,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 4916 (class 2606 OID 55704217)
+-- TOC entry 4895 (class 2606 OID 55707038)
 -- Name: observation_num observation_num_property_num_id_procedure_num_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9793,7 +9525,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 4958 (class 2606 OID 55704219)
+-- TOC entry 4937 (class 2606 OID 55707040)
 -- Name: organisation organisation_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9802,7 +9534,7 @@ ALTER TABLE ONLY soil_data.organisation
 
 
 --
--- TOC entry 4918 (class 2606 OID 55704221)
+-- TOC entry 4897 (class 2606 OID 55707042)
 -- Name: plot plot_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9811,7 +9543,7 @@ ALTER TABLE ONLY soil_data.plot
 
 
 --
--- TOC entry 4960 (class 2606 OID 55704223)
+-- TOC entry 4939 (class 2606 OID 55707044)
 -- Name: procedure_desc procedure_desc_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9820,7 +9552,7 @@ ALTER TABLE ONLY soil_data.procedure_desc
 
 
 --
--- TOC entry 4962 (class 2606 OID 55704225)
+-- TOC entry 4941 (class 2606 OID 55707046)
 -- Name: procedure_desc procedure_desc_uri_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9829,7 +9561,7 @@ ALTER TABLE ONLY soil_data.procedure_desc
 
 
 --
--- TOC entry 4966 (class 2606 OID 55704229)
+-- TOC entry 4945 (class 2606 OID 55707048)
 -- Name: procedure_model_def procedure_model_def_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9838,7 +9570,7 @@ ALTER TABLE ONLY soil_data.procedure_model_def
 
 
 --
--- TOC entry 4964 (class 2606 OID 55704233)
+-- TOC entry 4943 (class 2606 OID 55707050)
 -- Name: procedure_model procedure_model_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9847,7 +9579,7 @@ ALTER TABLE ONLY soil_data.procedure_model
 
 
 --
--- TOC entry 4968 (class 2606 OID 55704236)
+-- TOC entry 4947 (class 2606 OID 55707052)
 -- Name: procedure_num procedure_num_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9856,7 +9588,7 @@ ALTER TABLE ONLY soil_data.procedure_num
 
 
 --
--- TOC entry 4972 (class 2606 OID 55704238)
+-- TOC entry 4951 (class 2606 OID 55707054)
 -- Name: procedure_spectrometer_def procedure_spectrometer_def_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9865,7 +9597,7 @@ ALTER TABLE ONLY soil_data.procedure_spectrometer_def
 
 
 --
--- TOC entry 4970 (class 2606 OID 55704240)
+-- TOC entry 4949 (class 2606 OID 55707056)
 -- Name: procedure_spectrometer procedure_spectrometer_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9874,7 +9606,7 @@ ALTER TABLE ONLY soil_data.procedure_spectrometer
 
 
 --
--- TOC entry 4922 (class 2606 OID 55704242)
+-- TOC entry 4901 (class 2606 OID 55707058)
 -- Name: profile profile_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9883,7 +9615,7 @@ ALTER TABLE ONLY soil_data.profile
 
 
 --
--- TOC entry 4974 (class 2606 OID 55704245)
+-- TOC entry 4953 (class 2606 OID 55707060)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9892,7 +9624,7 @@ ALTER TABLE ONLY soil_data.proj_x_org_x_ind
 
 
 --
--- TOC entry 4928 (class 2606 OID 55704248)
+-- TOC entry 4907 (class 2606 OID 55707062)
 -- Name: project project_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9901,7 +9633,7 @@ ALTER TABLE ONLY soil_data.project
 
 
 --
--- TOC entry 4932 (class 2606 OID 55704250)
+-- TOC entry 4911 (class 2606 OID 55707064)
 -- Name: project_site project_site_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9910,7 +9642,7 @@ ALTER TABLE ONLY soil_data.project_site
 
 
 --
--- TOC entry 4976 (class 2606 OID 55704252)
+-- TOC entry 4955 (class 2606 OID 55707066)
 -- Name: project_soil_map project_soil_map_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9919,7 +9651,7 @@ ALTER TABLE ONLY soil_data.project_soil_map
 
 
 --
--- TOC entry 4978 (class 2606 OID 55704254)
+-- TOC entry 4957 (class 2606 OID 55707068)
 -- Name: property_desc property_desc_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9928,7 +9660,7 @@ ALTER TABLE ONLY soil_data.property_desc
 
 
 --
--- TOC entry 4980 (class 2606 OID 55704256)
+-- TOC entry 4959 (class 2606 OID 55707070)
 -- Name: property_num property_num_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9937,7 +9669,7 @@ ALTER TABLE ONLY soil_data.property_num
 
 
 --
--- TOC entry 4954 (class 2606 OID 55704258)
+-- TOC entry 4933 (class 2606 OID 55707072)
 -- Name: mapped_property property_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9946,7 +9678,7 @@ ALTER TABLE ONLY soil_data.mapped_property
 
 
 --
--- TOC entry 4982 (class 2606 OID 55704260)
+-- TOC entry 4961 (class 2606 OID 55707074)
 -- Name: result_desc_element result_desc_element_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9955,7 +9687,7 @@ ALTER TABLE ONLY soil_data.result_desc_element
 
 
 --
--- TOC entry 4984 (class 2606 OID 55704265)
+-- TOC entry 4963 (class 2606 OID 55707076)
 -- Name: result_desc_plot result_desc_plot_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9964,7 +9696,7 @@ ALTER TABLE ONLY soil_data.result_desc_plot
 
 
 --
--- TOC entry 4986 (class 2606 OID 55704267)
+-- TOC entry 4965 (class 2606 OID 55707078)
 -- Name: result_desc_profile result_desc_profile_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9973,7 +9705,7 @@ ALTER TABLE ONLY soil_data.result_desc_profile
 
 
 --
--- TOC entry 4988 (class 2606 OID 55704269)
+-- TOC entry 4967 (class 2606 OID 55707080)
 -- Name: result_desc_surface result_desc_surface_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9982,7 +9714,7 @@ ALTER TABLE ONLY soil_data.result_desc_surface
 
 
 --
--- TOC entry 4934 (class 2606 OID 55704271)
+-- TOC entry 4913 (class 2606 OID 55707082)
 -- Name: result_num result_num_specimen_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -9991,7 +9723,7 @@ ALTER TABLE ONLY soil_data.result_num
 
 
 --
--- TOC entry 4990 (class 2606 OID 55704273)
+-- TOC entry 4969 (class 2606 OID 55707084)
 -- Name: result_spectral result_spectral_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10000,7 +9732,7 @@ ALTER TABLE ONLY soil_data.result_spectral
 
 
 --
--- TOC entry 4936 (class 2606 OID 55704275)
+-- TOC entry 4915 (class 2606 OID 55707086)
 -- Name: site site_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10009,7 +9741,7 @@ ALTER TABLE ONLY soil_data.site
 
 
 --
--- TOC entry 4993 (class 2606 OID 55704277)
+-- TOC entry 4972 (class 2606 OID 55707088)
 -- Name: soil_map soil_map_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10018,7 +9750,7 @@ ALTER TABLE ONLY soil_data.soil_map
 
 
 --
--- TOC entry 5001 (class 2606 OID 55704279)
+-- TOC entry 4980 (class 2606 OID 55707090)
 -- Name: soil_mapping_unit_category soil_mapping_unit_category_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10027,7 +9759,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_category
 
 
 --
--- TOC entry 4997 (class 2606 OID 55704281)
+-- TOC entry 4976 (class 2606 OID 55707092)
 -- Name: soil_mapping_unit soil_mapping_unit_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10036,7 +9768,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit
 
 
 --
--- TOC entry 5003 (class 2606 OID 55704289)
+-- TOC entry 4982 (class 2606 OID 55707094)
 -- Name: soil_mapping_unit_profile soil_mapping_unit_profile_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10045,7 +9777,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_profile
 
 
 --
--- TOC entry 5007 (class 2606 OID 55704295)
+-- TOC entry 4986 (class 2606 OID 55707096)
 -- Name: soil_typological_unit_mapping_unit soil_typological_unit_mapping_unit_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10054,7 +9786,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_mapping_unit
 
 
 --
--- TOC entry 5005 (class 2606 OID 55704299)
+-- TOC entry 4984 (class 2606 OID 55707098)
 -- Name: soil_typological_unit soil_typological_unit_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10063,7 +9795,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit
 
 
 --
--- TOC entry 5009 (class 2606 OID 55704301)
+-- TOC entry 4988 (class 2606 OID 55707100)
 -- Name: soil_typological_unit_profile soil_typological_unit_profile_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10072,7 +9804,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_profile
 
 
 --
--- TOC entry 4938 (class 2606 OID 55704303)
+-- TOC entry 4917 (class 2606 OID 55707102)
 -- Name: specimen specimen_code_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10081,7 +9813,7 @@ ALTER TABLE ONLY soil_data.specimen
 
 
 --
--- TOC entry 4940 (class 2606 OID 55704305)
+-- TOC entry 4919 (class 2606 OID 55707104)
 -- Name: specimen specimen_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10090,61 +9822,7 @@ ALTER TABLE ONLY soil_data.specimen
 
 
 --
--- TOC entry 5011 (class 2606 OID 55704310)
--- Name: specimen_prep_process specimen_prep_process_definition_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_prep_process
-    ADD CONSTRAINT specimen_prep_process_definition_key UNIQUE (definition);
-
-
---
--- TOC entry 5013 (class 2606 OID 55704312)
--- Name: specimen_prep_process specimen_prep_process_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_prep_process
-    ADD CONSTRAINT specimen_prep_process_pkey PRIMARY KEY (specimen_prep_process_id);
-
-
---
--- TOC entry 5015 (class 2606 OID 55704314)
--- Name: specimen_storage specimen_storage_definition_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_storage
-    ADD CONSTRAINT specimen_storage_definition_key UNIQUE (definition);
-
-
---
--- TOC entry 5017 (class 2606 OID 55704319)
--- Name: specimen_storage specimen_storage_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_storage
-    ADD CONSTRAINT specimen_storage_pkey PRIMARY KEY (specimen_storage_id);
-
-
---
--- TOC entry 5021 (class 2606 OID 55704321)
--- Name: specimen_transport specimen_transport_definition_key; Type: CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_transport
-    ADD CONSTRAINT specimen_transport_definition_key UNIQUE (definition);
-
-
---
--- TOC entry 5023 (class 2606 OID 55704323)
--- Name: specimen_transport specimen_transport_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_transport
-    ADD CONSTRAINT specimen_transport_pkey PRIMARY KEY (specimen_transport_id);
-
-
---
--- TOC entry 5027 (class 2606 OID 55704325)
+-- TOC entry 4990 (class 2606 OID 55707106)
 -- Name: spectral_sample spectral_sample_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10153,7 +9831,7 @@ ALTER TABLE ONLY soil_data.spectral_sample
 
 
 --
--- TOC entry 5029 (class 2606 OID 55704327)
+-- TOC entry 4992 (class 2606 OID 55707108)
 -- Name: spectrum spectrum_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10162,7 +9840,7 @@ ALTER TABLE ONLY soil_data.spectrum
 
 
 --
--- TOC entry 5031 (class 2606 OID 55704329)
+-- TOC entry 4994 (class 2606 OID 55707110)
 -- Name: spectrum_x_result_spectral spectrum_x_result_spectral_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10171,7 +9849,7 @@ ALTER TABLE ONLY soil_data.spectrum_x_result_spectral
 
 
 --
--- TOC entry 5033 (class 2606 OID 55704331)
+-- TOC entry 4996 (class 2606 OID 55707112)
 -- Name: translate translate_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10180,7 +9858,7 @@ ALTER TABLE ONLY soil_data.translate
 
 
 --
--- TOC entry 4920 (class 2606 OID 55704333)
+-- TOC entry 4899 (class 2606 OID 55707114)
 -- Name: plot uk_plot_code; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10189,7 +9867,7 @@ ALTER TABLE ONLY soil_data.plot
 
 
 --
--- TOC entry 4924 (class 2606 OID 55704338)
+-- TOC entry 4903 (class 2606 OID 55707116)
 -- Name: profile uk_profile_code; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10198,7 +9876,7 @@ ALTER TABLE ONLY soil_data.profile
 
 
 --
--- TOC entry 5035 (class 2606 OID 55704340)
+-- TOC entry 4998 (class 2606 OID 55707118)
 -- Name: unit_conversion unit_conversion_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10207,7 +9885,7 @@ ALTER TABLE ONLY soil_data.unit_conversion
 
 
 --
--- TOC entry 5037 (class 2606 OID 55704342)
+-- TOC entry 5000 (class 2606 OID 55707120)
 -- Name: unit_of_measure unit_of_measure_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10216,7 +9894,7 @@ ALTER TABLE ONLY soil_data.unit_of_measure
 
 
 --
--- TOC entry 4906 (class 2606 OID 55704344)
+-- TOC entry 4885 (class 2606 OID 55707122)
 -- Name: element unq_element_profile_order_element; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10225,7 +9903,7 @@ ALTER TABLE ONLY soil_data.element
 
 
 --
--- TOC entry 4926 (class 2606 OID 55704346)
+-- TOC entry 4905 (class 2606 OID 55707124)
 -- Name: profile unq_profile_code; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10234,7 +9912,7 @@ ALTER TABLE ONLY soil_data.profile
 
 
 --
--- TOC entry 4930 (class 2606 OID 55704348)
+-- TOC entry 4909 (class 2606 OID 55707126)
 -- Name: project unq_project_name; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10243,25 +9921,7 @@ ALTER TABLE ONLY soil_data.project
 
 
 --
--- TOC entry 5019 (class 2606 OID 55704350)
--- Name: specimen_storage unq_specimen_storage_label; Type: CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_storage
-    ADD CONSTRAINT unq_specimen_storage_label UNIQUE (label);
-
-
---
--- TOC entry 5025 (class 2606 OID 55704352)
--- Name: specimen_transport unq_specimen_transport_label; Type: CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_transport
-    ADD CONSTRAINT unq_specimen_transport_label UNIQUE (label);
-
-
---
--- TOC entry 5039 (class 2606 OID 55704354)
+-- TOC entry 5002 (class 2606 OID 55707128)
 -- Name: unit_of_measure unq_unit_of_measure_uri; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10270,7 +9930,7 @@ ALTER TABLE ONLY soil_data.unit_of_measure
 
 
 --
--- TOC entry 5041 (class 2606 OID 55704356)
+-- TOC entry 5004 (class 2606 OID 55707130)
 -- Name: url url_pkey; Type: CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10279,7 +9939,7 @@ ALTER TABLE ONLY soil_data.url
 
 
 --
--- TOC entry 4891 (class 1259 OID 55704358)
+-- TOC entry 4870 (class 1259 OID 55707131)
 -- Name: dst_run_recipe_idx; Type: INDEX; Schema: api; Owner: sis
 --
 
@@ -10287,7 +9947,7 @@ CREATE INDEX dst_run_recipe_idx ON api.dst_run USING btree (recipe_id, started_a
 
 
 --
--- TOC entry 4898 (class 1259 OID 55704359)
+-- TOC entry 4877 (class 1259 OID 55707132)
 -- Name: idx_uploaded_dataset_edit_table; Type: INDEX; Schema: api; Owner: sis
 --
 
@@ -10295,7 +9955,7 @@ CREATE INDEX idx_uploaded_dataset_edit_table ON api.uploaded_dataset_edit USING 
 
 
 --
--- TOC entry 4945 (class 1259 OID 55704360)
+-- TOC entry 4924 (class 1259 OID 55707133)
 -- Name: country_geom_centroid_idx; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10303,7 +9963,7 @@ CREATE INDEX country_geom_centroid_idx ON soil_data.country USING gist (geom_cen
 
 
 --
--- TOC entry 4946 (class 1259 OID 55704361)
+-- TOC entry 4925 (class 1259 OID 55707134)
 -- Name: country_geom_convexhull_idx; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10311,7 +9971,7 @@ CREATE INDEX country_geom_convexhull_idx ON soil_data.country USING gist (geom_c
 
 
 --
--- TOC entry 4998 (class 1259 OID 55704362)
+-- TOC entry 4977 (class 1259 OID 55707135)
 -- Name: idx_category_map; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10319,8 +9979,8 @@ CREATE INDEX idx_category_map ON soil_data.soil_mapping_unit_category USING btre
 
 
 --
--- TOC entry 5776 (class 0 OID 0)
--- Dependencies: 4998
+-- TOC entry 5707 (class 0 OID 0)
+-- Dependencies: 4977
 -- Name: INDEX idx_category_map; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -10328,7 +9988,7 @@ COMMENT ON INDEX soil_data.idx_category_map IS 'Index on soil map for root categ
 
 
 --
--- TOC entry 4999 (class 1259 OID 55704363)
+-- TOC entry 4978 (class 1259 OID 55707136)
 -- Name: idx_category_parent; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10336,8 +9996,8 @@ CREATE INDEX idx_category_parent ON soil_data.soil_mapping_unit_category USING b
 
 
 --
--- TOC entry 5777 (class 0 OID 0)
--- Dependencies: 4999
+-- TOC entry 5708 (class 0 OID 0)
+-- Dependencies: 4978
 -- Name: INDEX idx_category_parent; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -10345,7 +10005,7 @@ COMMENT ON INDEX soil_data.idx_category_parent IS 'Index on parent category for 
 
 
 --
--- TOC entry 4994 (class 1259 OID 55704364)
+-- TOC entry 4973 (class 1259 OID 55707137)
 -- Name: idx_mapping_unit_category; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10353,8 +10013,8 @@ CREATE INDEX idx_mapping_unit_category ON soil_data.soil_mapping_unit USING btre
 
 
 --
--- TOC entry 5778 (class 0 OID 0)
--- Dependencies: 4994
+-- TOC entry 5709 (class 0 OID 0)
+-- Dependencies: 4973
 -- Name: INDEX idx_mapping_unit_category; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -10362,7 +10022,7 @@ COMMENT ON INDEX soil_data.idx_mapping_unit_category IS 'Index on category for j
 
 
 --
--- TOC entry 4995 (class 1259 OID 55704365)
+-- TOC entry 4974 (class 1259 OID 55707138)
 -- Name: idx_mapping_unit_geom; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10370,8 +10030,8 @@ CREATE INDEX idx_mapping_unit_geom ON soil_data.soil_mapping_unit USING gist (ge
 
 
 --
--- TOC entry 5779 (class 0 OID 0)
--- Dependencies: 4995
+-- TOC entry 5710 (class 0 OID 0)
+-- Dependencies: 4974
 -- Name: INDEX idx_mapping_unit_geom; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -10379,7 +10039,7 @@ COMMENT ON INDEX soil_data.idx_mapping_unit_geom IS 'Spatial index on mapping un
 
 
 --
--- TOC entry 4991 (class 1259 OID 55704366)
+-- TOC entry 4970 (class 1259 OID 55707139)
 -- Name: idx_soil_map_geom; Type: INDEX; Schema: soil_data; Owner: sis
 --
 
@@ -10387,8 +10047,8 @@ CREATE INDEX idx_soil_map_geom ON soil_data.soil_map USING gist (geom);
 
 
 --
--- TOC entry 5780 (class 0 OID 0)
--- Dependencies: 4991
+-- TOC entry 5711 (class 0 OID 0)
+-- Dependencies: 4970
 -- Name: INDEX idx_soil_map_geom; Type: COMMENT; Schema: soil_data; Owner: sis
 --
 
@@ -10396,7 +10056,7 @@ COMMENT ON INDEX soil_data.idx_soil_map_geom IS 'Spatial index on soil map exten
 
 
 --
--- TOC entry 5114 (class 2620 OID 55704367)
+-- TOC entry 5074 (class 2620 OID 55707140)
 -- Name: audit audit_no_delete; Type: TRIGGER; Schema: api; Owner: sis
 --
 
@@ -10404,7 +10064,7 @@ CREATE TRIGGER audit_no_delete BEFORE DELETE ON api.audit FOR EACH ROW EXECUTE F
 
 
 --
--- TOC entry 5115 (class 2620 OID 55704368)
+-- TOC entry 5075 (class 2620 OID 55707141)
 -- Name: audit audit_no_update; Type: TRIGGER; Schema: api; Owner: sis
 --
 
@@ -10412,7 +10072,7 @@ CREATE TRIGGER audit_no_update BEFORE UPDATE ON api.audit FOR EACH ROW EXECUTE F
 
 
 --
--- TOC entry 5116 (class 2620 OID 55704369)
+-- TOC entry 5076 (class 2620 OID 55707142)
 -- Name: layer class_func_on_layer_table; Type: TRIGGER; Schema: soil_data; Owner: sis
 --
 
@@ -10420,7 +10080,7 @@ CREATE TRIGGER class_func_on_layer_table AFTER UPDATE OF stats_minimum, stats_ma
 
 
 --
--- TOC entry 5117 (class 2620 OID 55704370)
+-- TOC entry 5077 (class 2620 OID 55707143)
 -- Name: layer map_func_on_layer_table; Type: TRIGGER; Schema: soil_data; Owner: sis
 --
 
@@ -10428,7 +10088,7 @@ CREATE TRIGGER map_func_on_layer_table AFTER UPDATE OF layer_id, mapset_id, dist
 
 
 --
--- TOC entry 5118 (class 2620 OID 55704371)
+-- TOC entry 5078 (class 2620 OID 55707144)
 -- Name: mapset mapset_publication_not_future_trg; Type: TRIGGER; Schema: soil_data; Owner: sis
 --
 
@@ -10436,7 +10096,7 @@ CREATE TRIGGER mapset_publication_not_future_trg BEFORE INSERT OR UPDATE OF publ
 
 
 --
--- TOC entry 5120 (class 2620 OID 55704372)
+-- TOC entry 5080 (class 2620 OID 55707145)
 -- Name: class sld_func_on_class_table; Type: TRIGGER; Schema: soil_data; Owner: sis
 --
 
@@ -10444,7 +10104,7 @@ CREATE TRIGGER sld_func_on_class_table AFTER INSERT OR UPDATE ON soil_data.class
 
 
 --
--- TOC entry 5119 (class 2620 OID 55704373)
+-- TOC entry 5079 (class 2620 OID 55707146)
 -- Name: result_num trg_check_result_value; Type: TRIGGER; Schema: soil_data; Owner: sis
 --
 
@@ -10452,7 +10112,7 @@ CREATE TRIGGER trg_check_result_value BEFORE INSERT OR UPDATE ON soil_data.resul
 
 
 --
--- TOC entry 5042 (class 2606 OID 55704374)
+-- TOC entry 5005 (class 2606 OID 55707147)
 -- Name: audit audit_api_client_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10461,7 +10121,7 @@ ALTER TABLE ONLY api.audit
 
 
 --
--- TOC entry 5043 (class 2606 OID 55704379)
+-- TOC entry 5006 (class 2606 OID 55707152)
 -- Name: audit audit_user_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10470,7 +10130,7 @@ ALTER TABLE ONLY api.audit
 
 
 --
--- TOC entry 5044 (class 2606 OID 55704384)
+-- TOC entry 5007 (class 2606 OID 55707157)
 -- Name: dst_recipe dst_recipe_created_by_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10479,7 +10139,7 @@ ALTER TABLE ONLY api.dst_recipe
 
 
 --
--- TOC entry 5045 (class 2606 OID 55704389)
+-- TOC entry 5008 (class 2606 OID 55707162)
 -- Name: dst_run dst_run_recipe_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10488,7 +10148,7 @@ ALTER TABLE ONLY api.dst_run
 
 
 --
--- TOC entry 5046 (class 2606 OID 55704394)
+-- TOC entry 5009 (class 2606 OID 55707167)
 -- Name: dst_run dst_run_triggered_by_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10497,7 +10157,7 @@ ALTER TABLE ONLY api.dst_run
 
 
 --
--- TOC entry 5049 (class 2606 OID 55704399)
+-- TOC entry 5012 (class 2606 OID 55707172)
 -- Name: uploaded_dataset_column uploaded_dataset_column_procedure_num_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10506,7 +10166,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 5050 (class 2606 OID 55704404)
+-- TOC entry 5013 (class 2606 OID 55707177)
 -- Name: uploaded_dataset_column uploaded_dataset_column_property_num_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10515,7 +10175,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 5051 (class 2606 OID 55704409)
+-- TOC entry 5014 (class 2606 OID 55707182)
 -- Name: uploaded_dataset_column uploaded_dataset_column_table_name_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10524,7 +10184,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 5052 (class 2606 OID 55704414)
+-- TOC entry 5015 (class 2606 OID 55707187)
 -- Name: uploaded_dataset_column uploaded_dataset_column_unit_of_measure_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10533,7 +10193,7 @@ ALTER TABLE ONLY api.uploaded_dataset_column
 
 
 --
--- TOC entry 5053 (class 2606 OID 55704419)
+-- TOC entry 5016 (class 2606 OID 55707192)
 -- Name: uploaded_dataset_edit uploaded_dataset_edit_table_name_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10542,7 +10202,7 @@ ALTER TABLE ONLY api.uploaded_dataset_edit
 
 
 --
--- TOC entry 5047 (class 2606 OID 55704424)
+-- TOC entry 5010 (class 2606 OID 55707197)
 -- Name: uploaded_dataset uploaded_dataset_project_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10551,7 +10211,7 @@ ALTER TABLE ONLY api.uploaded_dataset
 
 
 --
--- TOC entry 5048 (class 2606 OID 55704429)
+-- TOC entry 5011 (class 2606 OID 55707202)
 -- Name: uploaded_dataset uploaded_dataset_user_id_fkey; Type: FK CONSTRAINT; Schema: api; Owner: sis
 --
 
@@ -10560,7 +10220,7 @@ ALTER TABLE ONLY api.uploaded_dataset
 
 
 --
--- TOC entry 5071 (class 2606 OID 55704434)
+-- TOC entry 5033 (class 2606 OID 55707207)
 -- Name: class class_mapset_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10569,7 +10229,7 @@ ALTER TABLE ONLY soil_data.class
 
 
 --
--- TOC entry 5054 (class 2606 OID 55704439)
+-- TOC entry 5017 (class 2606 OID 55707212)
 -- Name: element element_profile_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10578,7 +10238,7 @@ ALTER TABLE ONLY soil_data.element
 
 
 --
--- TOC entry 5084 (class 2606 OID 55704444)
+-- TOC entry 5046 (class 2606 OID 55707217)
 -- Name: result_desc_element fk_element; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10587,7 +10247,7 @@ ALTER TABLE ONLY soil_data.result_desc_element
 
 
 --
--- TOC entry 5086 (class 2606 OID 55704449)
+-- TOC entry 5048 (class 2606 OID 55707222)
 -- Name: result_desc_plot fk_plot; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10596,7 +10256,7 @@ ALTER TABLE ONLY soil_data.result_desc_plot
 
 
 --
--- TOC entry 5088 (class 2606 OID 55704454)
+-- TOC entry 5050 (class 2606 OID 55707227)
 -- Name: result_desc_profile fk_profile; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10605,7 +10265,7 @@ ALTER TABLE ONLY soil_data.result_desc_profile
 
 
 --
--- TOC entry 5065 (class 2606 OID 55704459)
+-- TOC entry 5028 (class 2606 OID 55707232)
 -- Name: project_site fk_project; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10614,7 +10274,7 @@ ALTER TABLE ONLY soil_data.project_site
 
 
 --
--- TOC entry 5066 (class 2606 OID 55704464)
+-- TOC entry 5029 (class 2606 OID 55707237)
 -- Name: project_site fk_site; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10623,25 +10283,7 @@ ALTER TABLE ONLY soil_data.project_site
 
 
 --
--- TOC entry 5103 (class 2606 OID 55704469)
--- Name: specimen_prep_process fk_specimen_storage; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_prep_process
-    ADD CONSTRAINT fk_specimen_storage FOREIGN KEY (specimen_storage_id) REFERENCES soil_data.specimen_storage(specimen_storage_id);
-
-
---
--- TOC entry 5104 (class 2606 OID 55704474)
--- Name: specimen_prep_process fk_specimen_transport; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen_prep_process
-    ADD CONSTRAINT fk_specimen_transport FOREIGN KEY (specimen_transport_id) REFERENCES soil_data.specimen_transport(specimen_transport_id);
-
-
---
--- TOC entry 5090 (class 2606 OID 55704479)
+-- TOC entry 5052 (class 2606 OID 55707242)
 -- Name: result_desc_surface fk_surface; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10650,7 +10292,7 @@ ALTER TABLE ONLY soil_data.result_desc_surface
 
 
 --
--- TOC entry 5055 (class 2606 OID 55704484)
+-- TOC entry 5018 (class 2606 OID 55707247)
 -- Name: layer layer_mapset_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10659,7 +10301,7 @@ ALTER TABLE ONLY soil_data.layer
 
 
 --
--- TOC entry 5072 (class 2606 OID 55704489)
+-- TOC entry 5034 (class 2606 OID 55707252)
 -- Name: mapped_property mapped_property_property_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10668,7 +10310,7 @@ ALTER TABLE ONLY soil_data.mapped_property
 
 
 --
--- TOC entry 5056 (class 2606 OID 55704494)
+-- TOC entry 5019 (class 2606 OID 55707257)
 -- Name: mapset mapset_country_id_project_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10677,7 +10319,7 @@ ALTER TABLE ONLY soil_data.mapset
 
 
 --
--- TOC entry 5057 (class 2606 OID 55704499)
+-- TOC entry 5020 (class 2606 OID 55707262)
 -- Name: mapset mapset_mapped_property_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10686,7 +10328,7 @@ ALTER TABLE ONLY soil_data.mapset
 
 
 --
--- TOC entry 5058 (class 2606 OID 55704504)
+-- TOC entry 5021 (class 2606 OID 55707267)
 -- Name: observation_num observation_bum_unit_of_measure_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10695,7 +10337,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 5073 (class 2606 OID 55704509)
+-- TOC entry 5035 (class 2606 OID 55707272)
 -- Name: observation_desc observation_desc_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10704,7 +10346,7 @@ ALTER TABLE ONLY soil_data.observation_desc
 
 
 --
--- TOC entry 5074 (class 2606 OID 55704514)
+-- TOC entry 5036 (class 2606 OID 55707277)
 -- Name: observation_desc observation_desc_procedure_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10713,7 +10355,7 @@ ALTER TABLE ONLY soil_data.observation_desc
 
 
 --
--- TOC entry 5075 (class 2606 OID 55704519)
+-- TOC entry 5037 (class 2606 OID 55707282)
 -- Name: observation_desc observation_desc_property_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10722,7 +10364,7 @@ ALTER TABLE ONLY soil_data.observation_desc
 
 
 --
--- TOC entry 5059 (class 2606 OID 55704524)
+-- TOC entry 5022 (class 2606 OID 55707287)
 -- Name: observation_num observation_num_procedure_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10731,7 +10373,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 5060 (class 2606 OID 55704529)
+-- TOC entry 5023 (class 2606 OID 55707292)
 -- Name: observation_num observation_num_property_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10740,7 +10382,7 @@ ALTER TABLE ONLY soil_data.observation_num
 
 
 --
--- TOC entry 5061 (class 2606 OID 55704534)
+-- TOC entry 5024 (class 2606 OID 55707297)
 -- Name: plot plot_parent_plot_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10749,7 +10391,7 @@ ALTER TABLE ONLY soil_data.plot
 
 
 --
--- TOC entry 5062 (class 2606 OID 55704539)
+-- TOC entry 5025 (class 2606 OID 55707302)
 -- Name: plot plot_site_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10758,7 +10400,7 @@ ALTER TABLE ONLY soil_data.plot
 
 
 --
--- TOC entry 5076 (class 2606 OID 55704544)
+-- TOC entry 5038 (class 2606 OID 55707307)
 -- Name: procedure_model_def procedure_model_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10767,7 +10409,7 @@ ALTER TABLE ONLY soil_data.procedure_model_def
 
 
 --
--- TOC entry 5077 (class 2606 OID 55704549)
+-- TOC entry 5039 (class 2606 OID 55707312)
 -- Name: procedure_num procedure_num_broader_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10776,7 +10418,7 @@ ALTER TABLE ONLY soil_data.procedure_num
 
 
 --
--- TOC entry 5078 (class 2606 OID 55704554)
+-- TOC entry 5040 (class 2606 OID 55707317)
 -- Name: procedure_spectrometer_def procedure_spectrometer_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10785,7 +10427,7 @@ ALTER TABLE ONLY soil_data.procedure_spectrometer_def
 
 
 --
--- TOC entry 5063 (class 2606 OID 55704559)
+-- TOC entry 5026 (class 2606 OID 55707322)
 -- Name: profile profile_plot_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10794,7 +10436,7 @@ ALTER TABLE ONLY soil_data.profile
 
 
 --
--- TOC entry 5079 (class 2606 OID 55704564)
+-- TOC entry 5041 (class 2606 OID 55707327)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_country_id_project_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10803,7 +10445,7 @@ ALTER TABLE ONLY soil_data.proj_x_org_x_ind
 
 
 --
--- TOC entry 5080 (class 2606 OID 55704569)
+-- TOC entry 5042 (class 2606 OID 55707332)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_individual_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10812,7 +10454,7 @@ ALTER TABLE ONLY soil_data.proj_x_org_x_ind
 
 
 --
--- TOC entry 5081 (class 2606 OID 55704574)
+-- TOC entry 5043 (class 2606 OID 55707337)
 -- Name: proj_x_org_x_ind proj_x_org_x_ind_organisation_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10821,7 +10463,7 @@ ALTER TABLE ONLY soil_data.proj_x_org_x_ind
 
 
 --
--- TOC entry 5064 (class 2606 OID 55704579)
+-- TOC entry 5027 (class 2606 OID 55707342)
 -- Name: project project_country_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10830,7 +10472,7 @@ ALTER TABLE ONLY soil_data.project
 
 
 --
--- TOC entry 5082 (class 2606 OID 55704584)
+-- TOC entry 5044 (class 2606 OID 55707347)
 -- Name: project_soil_map project_soil_map_project_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10839,7 +10481,7 @@ ALTER TABLE ONLY soil_data.project_soil_map
 
 
 --
--- TOC entry 5083 (class 2606 OID 55704589)
+-- TOC entry 5045 (class 2606 OID 55707352)
 -- Name: project_soil_map project_soil_map_soil_map_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10848,7 +10490,7 @@ ALTER TABLE ONLY soil_data.project_soil_map
 
 
 --
--- TOC entry 5085 (class 2606 OID 55704594)
+-- TOC entry 5047 (class 2606 OID 55707357)
 -- Name: result_desc_element result_desc_element_property_desc_id_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10857,7 +10499,7 @@ ALTER TABLE ONLY soil_data.result_desc_element
 
 
 --
--- TOC entry 5087 (class 2606 OID 55704599)
+-- TOC entry 5049 (class 2606 OID 55707362)
 -- Name: result_desc_plot result_desc_plot_property_desc_id_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10866,7 +10508,7 @@ ALTER TABLE ONLY soil_data.result_desc_plot
 
 
 --
--- TOC entry 5089 (class 2606 OID 55704604)
+-- TOC entry 5051 (class 2606 OID 55707367)
 -- Name: result_desc_profile result_desc_profile_property_desc_id_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10875,7 +10517,7 @@ ALTER TABLE ONLY soil_data.result_desc_profile
 
 
 --
--- TOC entry 5091 (class 2606 OID 55704609)
+-- TOC entry 5053 (class 2606 OID 55707372)
 -- Name: result_desc_surface result_desc_surface_property_desc_id_category_desc_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10884,7 +10526,7 @@ ALTER TABLE ONLY soil_data.result_desc_surface
 
 
 --
--- TOC entry 5067 (class 2606 OID 55704614)
+-- TOC entry 5030 (class 2606 OID 55707377)
 -- Name: result_num result_num_observation_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10893,7 +10535,7 @@ ALTER TABLE ONLY soil_data.result_num
 
 
 --
--- TOC entry 5068 (class 2606 OID 55704619)
+-- TOC entry 5031 (class 2606 OID 55707382)
 -- Name: result_num result_num_specimen_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10902,7 +10544,7 @@ ALTER TABLE ONLY soil_data.result_num
 
 
 --
--- TOC entry 5092 (class 2606 OID 55704624)
+-- TOC entry 5054 (class 2606 OID 55707387)
 -- Name: result_spectral result_spectral_observation_num_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10911,7 +10553,7 @@ ALTER TABLE ONLY soil_data.result_spectral
 
 
 --
--- TOC entry 5093 (class 2606 OID 55704629)
+-- TOC entry 5055 (class 2606 OID 55707392)
 -- Name: result_spectral result_spectral_procedure_model_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10920,7 +10562,7 @@ ALTER TABLE ONLY soil_data.result_spectral
 
 
 --
--- TOC entry 5094 (class 2606 OID 55704634)
+-- TOC entry 5056 (class 2606 OID 55707397)
 -- Name: soil_mapping_unit soil_mapping_unit_category_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10929,7 +10571,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit
 
 
 --
--- TOC entry 5095 (class 2606 OID 55704639)
+-- TOC entry 5057 (class 2606 OID 55707402)
 -- Name: soil_mapping_unit_category soil_mapping_unit_category_parent_category_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10938,7 +10580,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_category
 
 
 --
--- TOC entry 5096 (class 2606 OID 55704644)
+-- TOC entry 5058 (class 2606 OID 55707407)
 -- Name: soil_mapping_unit_category soil_mapping_unit_category_soil_map_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10947,7 +10589,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_category
 
 
 --
--- TOC entry 5097 (class 2606 OID 55704649)
+-- TOC entry 5059 (class 2606 OID 55707412)
 -- Name: soil_mapping_unit_profile soil_mapping_unit_profile_mapping_unit_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10956,7 +10598,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_profile
 
 
 --
--- TOC entry 5098 (class 2606 OID 55704654)
+-- TOC entry 5060 (class 2606 OID 55707417)
 -- Name: soil_mapping_unit_profile soil_mapping_unit_profile_profile_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10965,7 +10607,7 @@ ALTER TABLE ONLY soil_data.soil_mapping_unit_profile
 
 
 --
--- TOC entry 5099 (class 2606 OID 55704659)
+-- TOC entry 5061 (class 2606 OID 55707422)
 -- Name: soil_typological_unit_mapping_unit soil_typological_unit_mapping_unit_mapping_unit_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10974,7 +10616,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_mapping_unit
 
 
 --
--- TOC entry 5100 (class 2606 OID 55704664)
+-- TOC entry 5062 (class 2606 OID 55707427)
 -- Name: soil_typological_unit_mapping_unit soil_typological_unit_mapping_unit_typological_unit_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10983,7 +10625,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_mapping_unit
 
 
 --
--- TOC entry 5101 (class 2606 OID 55704669)
+-- TOC entry 5063 (class 2606 OID 55707432)
 -- Name: soil_typological_unit_profile soil_typological_unit_profile_profile_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -10992,7 +10634,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_profile
 
 
 --
--- TOC entry 5102 (class 2606 OID 55704674)
+-- TOC entry 5064 (class 2606 OID 55707437)
 -- Name: soil_typological_unit_profile soil_typological_unit_profile_typological_unit_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11001,7 +10643,7 @@ ALTER TABLE ONLY soil_data.soil_typological_unit_profile
 
 
 --
--- TOC entry 5069 (class 2606 OID 55704679)
+-- TOC entry 5032 (class 2606 OID 55707442)
 -- Name: specimen specimen_element_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11010,16 +10652,7 @@ ALTER TABLE ONLY soil_data.specimen
 
 
 --
--- TOC entry 5070 (class 2606 OID 55704684)
--- Name: specimen specimen_specimen_prep_process_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
---
-
-ALTER TABLE ONLY soil_data.specimen
-    ADD CONSTRAINT specimen_specimen_prep_process_id_fkey FOREIGN KEY (specimen_prep_process_id) REFERENCES soil_data.specimen_prep_process(specimen_prep_process_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- TOC entry 5105 (class 2606 OID 55704689)
+-- TOC entry 5065 (class 2606 OID 55707447)
 -- Name: spectral_sample spectral_sample_specimen_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11028,7 +10661,7 @@ ALTER TABLE ONLY soil_data.spectral_sample
 
 
 --
--- TOC entry 5106 (class 2606 OID 55704694)
+-- TOC entry 5066 (class 2606 OID 55707452)
 -- Name: spectrum spectrum_procedure_spectrometer_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11037,7 +10670,7 @@ ALTER TABLE ONLY soil_data.spectrum
 
 
 --
--- TOC entry 5107 (class 2606 OID 55704699)
+-- TOC entry 5067 (class 2606 OID 55707457)
 -- Name: spectrum spectrum_spectral_sample_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11046,7 +10679,7 @@ ALTER TABLE ONLY soil_data.spectrum
 
 
 --
--- TOC entry 5108 (class 2606 OID 55704704)
+-- TOC entry 5068 (class 2606 OID 55707462)
 -- Name: spectrum_x_result_spectral spectrum_x_result_spectral_result_spectral_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11055,7 +10688,7 @@ ALTER TABLE ONLY soil_data.spectrum_x_result_spectral
 
 
 --
--- TOC entry 5109 (class 2606 OID 55704709)
+-- TOC entry 5069 (class 2606 OID 55707467)
 -- Name: spectrum_x_result_spectral spectrum_x_result_spectral_spectrum_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11064,7 +10697,7 @@ ALTER TABLE ONLY soil_data.spectrum_x_result_spectral
 
 
 --
--- TOC entry 5110 (class 2606 OID 55704714)
+-- TOC entry 5070 (class 2606 OID 55707472)
 -- Name: translate translate_language_code_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11073,7 +10706,7 @@ ALTER TABLE ONLY soil_data.translate
 
 
 --
--- TOC entry 5111 (class 2606 OID 55704719)
+-- TOC entry 5071 (class 2606 OID 55707477)
 -- Name: unit_conversion unit_conversion_unit_from_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11082,7 +10715,7 @@ ALTER TABLE ONLY soil_data.unit_conversion
 
 
 --
--- TOC entry 5112 (class 2606 OID 55704724)
+-- TOC entry 5072 (class 2606 OID 55707482)
 -- Name: unit_conversion unit_conversion_unit_to_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11091,7 +10724,7 @@ ALTER TABLE ONLY soil_data.unit_conversion
 
 
 --
--- TOC entry 5113 (class 2606 OID 55704729)
+-- TOC entry 5073 (class 2606 OID 55707487)
 -- Name: url url_mapset_id_fkey; Type: FK CONSTRAINT; Schema: soil_data; Owner: sis
 --
 
@@ -11100,7 +10733,7 @@ ALTER TABLE ONLY soil_data.url
 
 
 --
--- TOC entry 5343 (class 0 OID 0)
+-- TOC entry 5297 (class 0 OID 0)
 -- Dependencies: 11
 -- Name: SCHEMA api; Type: ACL; Schema: -; Owner: sis
 --
@@ -11110,7 +10743,7 @@ GRANT USAGE ON SCHEMA api TO sis_glosis;
 
 
 --
--- TOC entry 5345 (class 0 OID 0)
+-- TOC entry 5299 (class 0 OID 0)
 -- Dependencies: 12
 -- Name: SCHEMA kobo; Type: ACL; Schema: -; Owner: sis
 --
@@ -11120,7 +10753,7 @@ GRANT ALL ON SCHEMA kobo TO kobo;
 
 
 --
--- TOC entry 5346 (class 0 OID 0)
+-- TOC entry 5300 (class 0 OID 0)
 -- Dependencies: 13
 -- Name: SCHEMA public; Type: ACL; Schema: -; Owner: sis
 --
@@ -11130,7 +10763,7 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
 --
--- TOC entry 5348 (class 0 OID 0)
+-- TOC entry 5302 (class 0 OID 0)
 -- Dependencies: 14
 -- Name: SCHEMA soil_data; Type: ACL; Schema: -; Owner: sis
 --
@@ -11139,7 +10772,7 @@ GRANT USAGE ON SCHEMA soil_data TO sis_r;
 
 
 --
--- TOC entry 5350 (class 0 OID 0)
+-- TOC entry 5304 (class 0 OID 0)
 -- Dependencies: 15
 -- Name: SCHEMA soil_data_upload; Type: ACL; Schema: -; Owner: sis
 --
@@ -11148,8 +10781,8 @@ GRANT USAGE ON SCHEMA soil_data_upload TO sis_r;
 
 
 --
--- TOC entry 5357 (class 0 OID 0)
--- Dependencies: 1645
+-- TOC entry 5311 (class 0 OID 0)
+-- Dependencies: 1639
 -- Name: FUNCTION check_result_value(); Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11157,8 +10790,8 @@ GRANT ALL ON FUNCTION soil_data.check_result_value() TO sis_r;
 
 
 --
--- TOC entry 5359 (class 0 OID 0)
--- Dependencies: 1646
+-- TOC entry 5313 (class 0 OID 0)
+-- Dependencies: 1640
 -- Name: FUNCTION class(); Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11166,8 +10799,8 @@ GRANT ALL ON FUNCTION soil_data.class() TO sis_r;
 
 
 --
--- TOC entry 5361 (class 0 OID 0)
--- Dependencies: 1647
+-- TOC entry 5315 (class 0 OID 0)
+-- Dependencies: 1641
 -- Name: FUNCTION map(); Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11175,8 +10808,8 @@ GRANT ALL ON FUNCTION soil_data.map() TO sis_r;
 
 
 --
--- TOC entry 5363 (class 0 OID 0)
--- Dependencies: 1649
+-- TOC entry 5317 (class 0 OID 0)
+-- Dependencies: 1643
 -- Name: FUNCTION sld(); Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11184,7 +10817,7 @@ GRANT ALL ON FUNCTION soil_data.sld() TO sis_r;
 
 
 --
--- TOC entry 5372 (class 0 OID 0)
+-- TOC entry 5326 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: TABLE api_client; Type: ACL; Schema: api; Owner: sis
 --
@@ -11193,7 +10826,7 @@ GRANT SELECT ON TABLE api.api_client TO sis_r;
 
 
 --
--- TOC entry 5381 (class 0 OID 0)
+-- TOC entry 5335 (class 0 OID 0)
 -- Dependencies: 226
 -- Name: TABLE audit; Type: ACL; Schema: api; Owner: sis
 --
@@ -11203,7 +10836,7 @@ GRANT INSERT ON TABLE api.audit TO sis_glosis;
 
 
 --
--- TOC entry 5382 (class 0 OID 0)
+-- TOC entry 5336 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: TABLE dst_recipe; Type: ACL; Schema: api; Owner: sis
 --
@@ -11212,7 +10845,7 @@ GRANT SELECT ON TABLE api.dst_recipe TO sis_r;
 
 
 --
--- TOC entry 5383 (class 0 OID 0)
+-- TOC entry 5337 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: TABLE dst_run; Type: ACL; Schema: api; Owner: sis
 --
@@ -11221,7 +10854,7 @@ GRANT SELECT ON TABLE api.dst_run TO sis_r;
 
 
 --
--- TOC entry 5388 (class 0 OID 0)
+-- TOC entry 5342 (class 0 OID 0)
 -- Dependencies: 231
 -- Name: TABLE setting; Type: ACL; Schema: api; Owner: sis
 --
@@ -11231,7 +10864,7 @@ GRANT SELECT ON TABLE api.setting TO sis_glosis;
 
 
 --
--- TOC entry 5404 (class 0 OID 0)
+-- TOC entry 5358 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: TABLE uploaded_dataset; Type: ACL; Schema: api; Owner: sis
 --
@@ -11240,7 +10873,7 @@ GRANT SELECT ON TABLE api.uploaded_dataset TO sis_r;
 
 
 --
--- TOC entry 5413 (class 0 OID 0)
+-- TOC entry 5367 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: TABLE uploaded_dataset_column; Type: ACL; Schema: api; Owner: sis
 --
@@ -11249,7 +10882,7 @@ GRANT SELECT ON TABLE api.uploaded_dataset_column TO sis_r;
 
 
 --
--- TOC entry 5414 (class 0 OID 0)
+-- TOC entry 5368 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: TABLE uploaded_dataset_edit; Type: ACL; Schema: api; Owner: sis
 --
@@ -11258,7 +10891,7 @@ GRANT SELECT ON TABLE api.uploaded_dataset_edit TO sis_r;
 
 
 --
--- TOC entry 5424 (class 0 OID 0)
+-- TOC entry 5378 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: TABLE "user"; Type: ACL; Schema: api; Owner: sis
 --
@@ -11267,7 +10900,7 @@ GRANT SELECT ON TABLE api."user" TO sis_r;
 
 
 --
--- TOC entry 5432 (class 0 OID 0)
+-- TOC entry 5386 (class 0 OID 0)
 -- Dependencies: 237
 -- Name: TABLE element; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11276,7 +10909,7 @@ GRANT SELECT ON TABLE soil_data.element TO sis_r;
 
 
 --
--- TOC entry 5470 (class 0 OID 0)
+-- TOC entry 5424 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: TABLE layer; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11285,7 +10918,7 @@ GRANT SELECT ON TABLE soil_data.layer TO sis_r;
 
 
 --
--- TOC entry 5511 (class 0 OID 0)
+-- TOC entry 5465 (class 0 OID 0)
 -- Dependencies: 239
 -- Name: TABLE mapset; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11294,7 +10927,7 @@ GRANT SELECT ON TABLE soil_data.mapset TO sis_r;
 
 
 --
--- TOC entry 5519 (class 0 OID 0)
+-- TOC entry 5473 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: TABLE observation_num; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11303,7 +10936,7 @@ GRANT SELECT ON TABLE soil_data.observation_num TO sis_r;
 
 
 --
--- TOC entry 5523 (class 0 OID 0)
+-- TOC entry 5477 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: TABLE plot; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11312,7 +10945,7 @@ GRANT SELECT ON TABLE soil_data.plot TO sis_r;
 
 
 --
--- TOC entry 5528 (class 0 OID 0)
+-- TOC entry 5482 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: TABLE profile; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11321,7 +10954,7 @@ GRANT SELECT ON TABLE soil_data.profile TO sis_r;
 
 
 --
--- TOC entry 5532 (class 0 OID 0)
+-- TOC entry 5486 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: TABLE project; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11330,7 +10963,7 @@ GRANT SELECT ON TABLE soil_data.project TO sis_r;
 
 
 --
--- TOC entry 5536 (class 0 OID 0)
+-- TOC entry 5490 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: TABLE project_site; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11339,7 +10972,7 @@ GRANT SELECT ON TABLE soil_data.project_site TO sis_r;
 
 
 --
--- TOC entry 5540 (class 0 OID 0)
+-- TOC entry 5494 (class 0 OID 0)
 -- Dependencies: 246
 -- Name: TABLE site; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11348,7 +10981,7 @@ GRANT SELECT ON TABLE soil_data.site TO sis_r;
 
 
 --
--- TOC entry 5546 (class 0 OID 0)
+-- TOC entry 5499 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: TABLE specimen; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11357,7 +10990,7 @@ GRANT SELECT ON TABLE soil_data.specimen TO sis_r;
 
 
 --
--- TOC entry 5547 (class 0 OID 0)
+-- TOC entry 5500 (class 0 OID 0)
 -- Dependencies: 248
 -- Name: TABLE vw_api_manifest; Type: ACL; Schema: api; Owner: sis
 --
@@ -11366,7 +10999,7 @@ GRANT SELECT ON TABLE api.vw_api_manifest TO sis_r;
 
 
 --
--- TOC entry 5548 (class 0 OID 0)
+-- TOC entry 5501 (class 0 OID 0)
 -- Dependencies: 249
 -- Name: TABLE vw_api_observation; Type: ACL; Schema: api; Owner: sis
 --
@@ -11375,7 +11008,7 @@ GRANT SELECT ON TABLE api.vw_api_observation TO sis_r;
 
 
 --
--- TOC entry 5549 (class 0 OID 0)
+-- TOC entry 5502 (class 0 OID 0)
 -- Dependencies: 250
 -- Name: TABLE vw_api_profile; Type: ACL; Schema: api; Owner: sis
 --
@@ -11384,7 +11017,7 @@ GRANT SELECT ON TABLE api.vw_api_profile TO sis_r;
 
 
 --
--- TOC entry 5550 (class 0 OID 0)
+-- TOC entry 5503 (class 0 OID 0)
 -- Dependencies: 251
 -- Name: TABLE vw_glosis_federation_token; Type: ACL; Schema: api; Owner: sis
 --
@@ -11394,7 +11027,7 @@ GRANT SELECT ON TABLE api.vw_glosis_federation_token TO sis_glosis;
 
 
 --
--- TOC entry 5553 (class 0 OID 0)
+-- TOC entry 5506 (class 0 OID 0)
 -- Dependencies: 252
 -- Name: TABLE category_desc; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11403,7 +11036,7 @@ GRANT SELECT ON TABLE soil_data.category_desc TO sis_r;
 
 
 --
--- TOC entry 5562 (class 0 OID 0)
+-- TOC entry 5515 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: TABLE class; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11412,7 +11045,7 @@ GRANT SELECT ON TABLE soil_data.class TO sis_r;
 
 
 --
--- TOC entry 5580 (class 0 OID 0)
+-- TOC entry 5533 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: TABLE country; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11421,7 +11054,7 @@ GRANT SELECT ON TABLE soil_data.country TO sis_r;
 
 
 --
--- TOC entry 5581 (class 0 OID 0)
+-- TOC entry 5534 (class 0 OID 0)
 -- Dependencies: 255
 -- Name: SEQUENCE element_element_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11430,7 +11063,7 @@ GRANT SELECT ON SEQUENCE soil_data.element_element_id_seq TO sis_r;
 
 
 --
--- TOC entry 5585 (class 0 OID 0)
+-- TOC entry 5538 (class 0 OID 0)
 -- Dependencies: 256
 -- Name: TABLE individual; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11439,7 +11072,7 @@ GRANT SELECT ON TABLE soil_data.individual TO sis_r;
 
 
 --
--- TOC entry 5589 (class 0 OID 0)
+-- TOC entry 5542 (class 0 OID 0)
 -- Dependencies: 257
 -- Name: TABLE languages; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11448,7 +11081,7 @@ GRANT SELECT ON TABLE soil_data.languages TO sis_r;
 
 
 --
--- TOC entry 5601 (class 0 OID 0)
+-- TOC entry 5554 (class 0 OID 0)
 -- Dependencies: 258
 -- Name: TABLE mapped_property; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11457,7 +11090,7 @@ GRANT SELECT ON TABLE soil_data.mapped_property TO sis_r;
 
 
 --
--- TOC entry 5602 (class 0 OID 0)
+-- TOC entry 5555 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: SEQUENCE observation_num_observation_num_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11466,7 +11099,7 @@ GRANT SELECT ON SEQUENCE soil_data.observation_num_observation_num_id_seq TO sis
 
 
 --
--- TOC entry 5613 (class 0 OID 0)
+-- TOC entry 5566 (class 0 OID 0)
 -- Dependencies: 261
 -- Name: TABLE organisation; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11475,7 +11108,7 @@ GRANT SELECT ON TABLE soil_data.organisation TO sis_r;
 
 
 --
--- TOC entry 5614 (class 0 OID 0)
+-- TOC entry 5567 (class 0 OID 0)
 -- Dependencies: 262
 -- Name: SEQUENCE plot_plot_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11484,7 +11117,7 @@ GRANT SELECT ON SEQUENCE soil_data.plot_plot_id_seq TO sis_r;
 
 
 --
--- TOC entry 5619 (class 0 OID 0)
+-- TOC entry 5572 (class 0 OID 0)
 -- Dependencies: 263
 -- Name: TABLE procedure_desc; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11493,7 +11126,7 @@ GRANT SELECT ON TABLE soil_data.procedure_desc TO sis_r;
 
 
 --
--- TOC entry 5623 (class 0 OID 0)
+-- TOC entry 5576 (class 0 OID 0)
 -- Dependencies: 267
 -- Name: TABLE procedure_num; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11502,7 +11135,7 @@ GRANT SELECT ON TABLE soil_data.procedure_num TO sis_r;
 
 
 --
--- TOC entry 5624 (class 0 OID 0)
+-- TOC entry 5577 (class 0 OID 0)
 -- Dependencies: 271
 -- Name: SEQUENCE profile_profile_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11511,7 +11144,7 @@ GRANT SELECT ON SEQUENCE soil_data.profile_profile_id_seq TO sis_r;
 
 
 --
--- TOC entry 5632 (class 0 OID 0)
+-- TOC entry 5585 (class 0 OID 0)
 -- Dependencies: 272
 -- Name: TABLE proj_x_org_x_ind; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11520,7 +11153,7 @@ GRANT SELECT ON TABLE soil_data.proj_x_org_x_ind TO sis_r;
 
 
 --
--- TOC entry 5637 (class 0 OID 0)
+-- TOC entry 5590 (class 0 OID 0)
 -- Dependencies: 273
 -- Name: TABLE project_soil_map; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11529,7 +11162,7 @@ GRANT SELECT ON TABLE soil_data.project_soil_map TO sis_r;
 
 
 --
--- TOC entry 5641 (class 0 OID 0)
+-- TOC entry 5594 (class 0 OID 0)
 -- Dependencies: 274
 -- Name: TABLE property_desc; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11538,7 +11171,7 @@ GRANT SELECT ON TABLE soil_data.property_desc TO sis_r;
 
 
 --
--- TOC entry 5644 (class 0 OID 0)
+-- TOC entry 5597 (class 0 OID 0)
 -- Dependencies: 275
 -- Name: TABLE property_num; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11547,7 +11180,7 @@ GRANT SELECT ON TABLE soil_data.property_num TO sis_r;
 
 
 --
--- TOC entry 5649 (class 0 OID 0)
+-- TOC entry 5602 (class 0 OID 0)
 -- Dependencies: 276
 -- Name: TABLE result_desc_element; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11556,7 +11189,7 @@ GRANT SELECT ON TABLE soil_data.result_desc_element TO sis_r;
 
 
 --
--- TOC entry 5654 (class 0 OID 0)
+-- TOC entry 5607 (class 0 OID 0)
 -- Dependencies: 277
 -- Name: TABLE result_desc_plot; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11565,7 +11198,7 @@ GRANT SELECT ON TABLE soil_data.result_desc_plot TO sis_r;
 
 
 --
--- TOC entry 5659 (class 0 OID 0)
+-- TOC entry 5612 (class 0 OID 0)
 -- Dependencies: 278
 -- Name: TABLE result_desc_profile; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11574,7 +11207,7 @@ GRANT SELECT ON TABLE soil_data.result_desc_profile TO sis_r;
 
 
 --
--- TOC entry 5669 (class 0 OID 0)
+-- TOC entry 5622 (class 0 OID 0)
 -- Dependencies: 282
 -- Name: TABLE soil_map; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11583,7 +11216,7 @@ GRANT SELECT ON TABLE soil_data.soil_map TO sis_r;
 
 
 --
--- TOC entry 5670 (class 0 OID 0)
+-- TOC entry 5623 (class 0 OID 0)
 -- Dependencies: 283
 -- Name: SEQUENCE soil_map_soil_map_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11592,7 +11225,7 @@ GRANT SELECT ON SEQUENCE soil_data.soil_map_soil_map_id_seq TO sis_r;
 
 
 --
--- TOC entry 5677 (class 0 OID 0)
+-- TOC entry 5630 (class 0 OID 0)
 -- Dependencies: 284
 -- Name: TABLE soil_mapping_unit; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11601,7 +11234,7 @@ GRANT SELECT ON TABLE soil_data.soil_mapping_unit TO sis_r;
 
 
 --
--- TOC entry 5688 (class 0 OID 0)
+-- TOC entry 5641 (class 0 OID 0)
 -- Dependencies: 285
 -- Name: TABLE soil_mapping_unit_category; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11610,7 +11243,7 @@ GRANT SELECT ON TABLE soil_data.soil_mapping_unit_category TO sis_r;
 
 
 --
--- TOC entry 5689 (class 0 OID 0)
+-- TOC entry 5642 (class 0 OID 0)
 -- Dependencies: 286
 -- Name: SEQUENCE soil_mapping_unit_category_category_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11619,7 +11252,7 @@ GRANT SELECT ON SEQUENCE soil_data.soil_mapping_unit_category_category_id_seq TO
 
 
 --
--- TOC entry 5690 (class 0 OID 0)
+-- TOC entry 5643 (class 0 OID 0)
 -- Dependencies: 287
 -- Name: SEQUENCE soil_mapping_unit_mapping_unit_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11628,7 +11261,7 @@ GRANT SELECT ON SEQUENCE soil_data.soil_mapping_unit_mapping_unit_id_seq TO sis_
 
 
 --
--- TOC entry 5696 (class 0 OID 0)
+-- TOC entry 5649 (class 0 OID 0)
 -- Dependencies: 288
 -- Name: TABLE soil_mapping_unit_profile; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11637,7 +11270,7 @@ GRANT SELECT ON TABLE soil_data.soil_mapping_unit_profile TO sis_r;
 
 
 --
--- TOC entry 5704 (class 0 OID 0)
+-- TOC entry 5657 (class 0 OID 0)
 -- Dependencies: 289
 -- Name: TABLE soil_typological_unit; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11646,7 +11279,7 @@ GRANT SELECT ON TABLE soil_data.soil_typological_unit TO sis_r;
 
 
 --
--- TOC entry 5710 (class 0 OID 0)
+-- TOC entry 5663 (class 0 OID 0)
 -- Dependencies: 290
 -- Name: TABLE soil_typological_unit_mapping_unit; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11655,7 +11288,7 @@ GRANT SELECT ON TABLE soil_data.soil_typological_unit_mapping_unit TO sis_r;
 
 
 --
--- TOC entry 5716 (class 0 OID 0)
+-- TOC entry 5669 (class 0 OID 0)
 -- Dependencies: 291
 -- Name: TABLE soil_typological_unit_profile; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11664,7 +11297,7 @@ GRANT SELECT ON TABLE soil_data.soil_typological_unit_profile TO sis_r;
 
 
 --
--- TOC entry 5717 (class 0 OID 0)
+-- TOC entry 5670 (class 0 OID 0)
 -- Dependencies: 292
 -- Name: SEQUENCE soil_typological_unit_typological_unit_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
@@ -11673,26 +11306,8 @@ GRANT SELECT ON SEQUENCE soil_data.soil_typological_unit_typological_unit_id_seq
 
 
 --
--- TOC entry 5723 (class 0 OID 0)
+-- TOC entry 5671 (class 0 OID 0)
 -- Dependencies: 293
--- Name: TABLE specimen_prep_process; Type: ACL; Schema: soil_data; Owner: sis
---
-
-GRANT SELECT ON TABLE soil_data.specimen_prep_process TO sis_r;
-
-
---
--- TOC entry 5724 (class 0 OID 0)
--- Dependencies: 294
--- Name: SEQUENCE specimen_prep_process_specimen_prep_process_id_seq; Type: ACL; Schema: soil_data; Owner: sis
---
-
-GRANT SELECT ON SEQUENCE soil_data.specimen_prep_process_specimen_prep_process_id_seq TO sis_r;
-
-
---
--- TOC entry 5725 (class 0 OID 0)
--- Dependencies: 295
 -- Name: SEQUENCE specimen_specimen_id_seq; Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11700,44 +11315,8 @@ GRANT SELECT ON SEQUENCE soil_data.specimen_specimen_id_seq TO sis_r;
 
 
 --
--- TOC entry 5730 (class 0 OID 0)
--- Dependencies: 296
--- Name: TABLE specimen_storage; Type: ACL; Schema: soil_data; Owner: sis
---
-
-GRANT SELECT ON TABLE soil_data.specimen_storage TO sis_r;
-
-
---
--- TOC entry 5731 (class 0 OID 0)
--- Dependencies: 297
--- Name: SEQUENCE specimen_storage_specimen_storage_id_seq; Type: ACL; Schema: soil_data; Owner: sis
---
-
-GRANT SELECT ON SEQUENCE soil_data.specimen_storage_specimen_storage_id_seq TO sis_r;
-
-
---
--- TOC entry 5736 (class 0 OID 0)
+-- TOC entry 5678 (class 0 OID 0)
 -- Dependencies: 298
--- Name: TABLE specimen_transport; Type: ACL; Schema: soil_data; Owner: sis
---
-
-GRANT SELECT ON TABLE soil_data.specimen_transport TO sis_r;
-
-
---
--- TOC entry 5737 (class 0 OID 0)
--- Dependencies: 299
--- Name: SEQUENCE specimen_transport_specimen_transport_id_seq; Type: ACL; Schema: soil_data; Owner: sis
---
-
-GRANT SELECT ON SEQUENCE soil_data.specimen_transport_specimen_transport_id_seq TO sis_r;
-
-
---
--- TOC entry 5744 (class 0 OID 0)
--- Dependencies: 304
 -- Name: TABLE translate; Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11745,8 +11324,8 @@ GRANT SELECT ON TABLE soil_data.translate TO sis_r;
 
 
 --
--- TOC entry 5745 (class 0 OID 0)
--- Dependencies: 305
+-- TOC entry 5679 (class 0 OID 0)
+-- Dependencies: 299
 -- Name: TABLE unit_conversion; Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11754,8 +11333,8 @@ GRANT SELECT ON TABLE soil_data.unit_conversion TO sis_r;
 
 
 --
--- TOC entry 5749 (class 0 OID 0)
--- Dependencies: 306
+-- TOC entry 5683 (class 0 OID 0)
+-- Dependencies: 300
 -- Name: TABLE unit_of_measure; Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11763,8 +11342,8 @@ GRANT SELECT ON TABLE soil_data.unit_of_measure TO sis_r;
 
 
 --
--- TOC entry 5756 (class 0 OID 0)
--- Dependencies: 307
+-- TOC entry 5690 (class 0 OID 0)
+-- Dependencies: 301
 -- Name: TABLE url; Type: ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11772,7 +11351,7 @@ GRANT SELECT ON TABLE soil_data.url TO sis_r;
 
 
 --
--- TOC entry 3596 (class 826 OID 55704734)
+-- TOC entry 3575 (class 826 OID 55707492)
 -- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: api; Owner: sis
 --
 
@@ -11780,7 +11359,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA api GRANT SELECT ON TABLES TO si
 
 
 --
--- TOC entry 3597 (class 826 OID 55704735)
+-- TOC entry 3576 (class 826 OID 55707493)
 -- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: soil_data; Owner: sis
 --
 
@@ -11788,18 +11367,18 @@ ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data GRANT SELECT ON TABLES
 
 
 --
--- TOC entry 3598 (class 826 OID 55704736)
+-- TOC entry 3577 (class 826 OID 55707494)
 -- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: soil_data_upload; Owner: sis
 --
 
 ALTER DEFAULT PRIVILEGES FOR ROLE sis IN SCHEMA soil_data_upload GRANT SELECT ON TABLES TO sis_r;
 
 
--- Completed on 2026-05-26 12:32:51 CEST
+-- Completed on 2026-06-08 11:28:48 CEST
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict PcJR6awRK9llobKC9DCNadIRxlbpoIAYxSCHfX9q0aGjW8tx1vJAGIwsCn2EZEZ
+\unrestrict 98ZwR7TZmb6tx6Ti2Ulo8QGWE0HETMh9vWumjb0JXbiRnoOwZbkw2TX2cuOiO64
 
