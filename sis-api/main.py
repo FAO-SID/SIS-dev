@@ -14,6 +14,8 @@ import os
 import re
 import csv
 import io
+import glob
+import time
 import secrets
 import psycopg2
 import psycopg2.extras
@@ -450,18 +452,18 @@ async def clear_default_layer(current_user: dict = Depends(get_current_user)):
             log_audit(current_user['user_id'], None, "layer_default_cleared", None, None)
             return {"message": "Default layer cleared"}
 
-@app.delete("/api/layer/{layer_id}")
-async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_admin_user)):
-    """Delete a layer + all derived state.
-
-    Wipes, in order:
+def _delete_layer_full(layer_id: str, user_id: str, *, missing_ok: bool = False) -> dict:
+    """End-to-end raster cleanup used by both DELETE /api/layer/{id} and the
+    DST recipe DELETE path. Wipes, in order:
       1. soil_data.layer row (cascades to class / map / sld via FKs)
       2. soil_data.mapset row if no other layers reference it
       3. pyCSW record (CSW-T Delete by file_identifier)
-      4. on-disk artifacts in /srv/rasters and /srv/pycsw-records
+      4. on-disk artifacts: <layer_id>.tif/.map in /srv/rasters
+         and <layer_id>.xml in /srv/pycsw-records
 
-    Best-effort on filesystem + pyCSW — DB state is authoritative. Failures
-    in those steps are returned as warnings, not 5xx.
+    Filesystem + pyCSW failures are returned as warnings, not raised.
+    When `missing_ok=True`, returns a 'not_found' result instead of raising
+    when the layer doesn't exist.
     """
     from raster_registry.pycsw_load import delete_record as pycsw_delete_record
 
@@ -470,6 +472,11 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_a
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("SELECT layer_id FROM soil_data.layer WHERE layer_id = %s", (layer_id,))
             if not cur.fetchone():
+                if missing_ok:
+                    return {"message": "Layer not found", "layer_id": layer_id,
+                            "found": False, "warnings": [],
+                            "removed_files": [], "mapset_deleted": False,
+                            "pycsw_deleted": False}
                 raise HTTPException(status_code=404, detail="Layer not found")
 
             cur.execute("""
@@ -507,6 +514,7 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_a
     if file_path:
         candidates.append(os.path.join(file_path, f"{layer_id}.{file_ext}"))
     candidates.append(os.path.join("/srv/rasters", f"{layer_id}.{file_ext}"))
+    candidates.append(os.path.join("/srv/rasters", f"{layer_id}.map"))
     candidates.append(os.path.join("/srv/pycsw-records", f"{layer_id}.xml"))
     for p in candidates:
         try:
@@ -516,7 +524,7 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_a
         except OSError as e:
             warnings.append(f"unlink {p}: {e}")
 
-    log_audit(current_user["user_id"], None, "layer_deleted",
+    log_audit(user_id, None, "layer_deleted",
               {"layer_id": layer_id, "mapset_deleted": mapset_deleted,
                "pycsw_deleted": pycsw_deleted, "removed_files": removed_files,
                "warnings": warnings}, None)
@@ -524,11 +532,18 @@ async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_a
     return {
         "message": "Layer deleted",
         "layer_id": layer_id,
+        "found": True,
         "mapset_deleted": mapset_deleted,
         "pycsw_deleted": pycsw_deleted,
         "removed_files": removed_files,
         "warnings": warnings,
     }
+
+
+@app.delete("/api/layer/{layer_id}")
+async def delete_layer(layer_id: str, current_user: dict = Depends(get_current_admin_user)):
+    """Admin endpoint — defers to the shared _delete_layer_full helper."""
+    return _delete_layer_full(layer_id, current_user["user_id"])
 
 @app.get("/api/layer/all")
 async def get_all_layers(current_user: dict = Depends(get_current_user)):
@@ -556,7 +571,13 @@ async def get_all_layers(current_user: dict = Depends(get_current_user)):
                     NULLIF(CONCAT_WS(' ',
                       m.title, m.unit_of_measure_id,
                       l.dimension_depth, l.dimension_stats), '')
-                  ) AS property_name
+                  ) AS property_name,
+                  -- A short token that mutates whenever the engine writes
+                  -- new pixels: stats_min/max + the embedded MapServer .map
+                  -- text hash. Used as the WMS cache-buster.
+                  md5(COALESCE(l.stats_minimum::text,'') ||
+                      COALESCE(l.stats_maximum::text,'') ||
+                      COALESCE(l.map,''))::text AS cache_token
                 FROM soil_data.layer l
                 LEFT JOIN soil_data.mapset       m  ON m.mapset_id          = l.mapset_id
                 WHERE m.spatial_representation_type_code = 'grid'
@@ -567,7 +588,8 @@ async def get_all_layers(current_user: dict = Depends(get_current_user)):
     map_dir = "/etc/mapserver"
     for r in rows:
         map_path = f"{map_dir}/{r['layer_id']}.map"
-        gm, gl, gf = _build_wms_urls(map_path, r["layer_id"])
+        token = _wms_cache_token(r["layer_id"], r.get("cache_token"))
+        gm, gl, gf = _build_wms_urls(map_path, r["layer_id"], cache_token=token)
         r["get_map_url"] = gm
         r["get_legend_url"] = gl
         r["get_feature_info_url"] = gf
@@ -668,7 +690,15 @@ async def get_published_layers(
                   l.dimension_depth    AS dimension,
                   l.is_default,
                   m.unit_of_measure_id,
-                  m.keyword_theme      AS keywords
+                  m.keyword_theme      AS keywords,
+                  -- DST outputs get a richer click popup (per-input breakdown).
+                  EXISTS (SELECT 1 FROM api.dst_recipe d
+                          WHERE d.output_layer_id = l.layer_id) AS is_dst,
+                  -- Cache-buster: changes whenever pixel values or the .map
+                  -- text on the layer row mutate.
+                  md5(COALESCE(l.stats_minimum::text,'') ||
+                      COALESCE(l.stats_maximum::text,'') ||
+                      COALESCE(l.map,''))::text AS cache_token
                 FROM soil_data.layer l
                 LEFT JOIN soil_data.mapset m ON m.mapset_id = l.mapset_id
                 WHERE l.is_published = TRUE
@@ -681,7 +711,9 @@ async def get_published_layers(
     for r in rows:
         layer_id = r["layer_id"]
         map_path = f"{map_dir}/{layer_id}.map"
-        get_map, get_legend, get_feature_info = _build_wms_urls(map_path, layer_id)
+        token = _wms_cache_token(layer_id, r.get("cache_token"))
+        get_map, get_legend, get_feature_info = _build_wms_urls(
+            map_path, layer_id, cache_token=token)
         # Route the SPA at the SIS rich-metadata endpoint, not pyCSW's slim
         # OGC API Records JSON. Federation harvesters still hit pyCSW for
         # the full ISO 19139 record at /collections/metadata:main/items/...
@@ -697,6 +729,7 @@ async def get_published_layers(
             "version": None,
             "unit_of_measure_id": r.get("unit_of_measure_id"),
             "keywords": r.get("keywords"),
+            "is_dst": bool(r.get("is_dst")),
             "metadata_url": metadata_url,
             "download_url": f"{download_base}{layer_id}.tif",
             "get_map_url": get_map,
@@ -821,12 +854,39 @@ def _parse_layer_id(info_href: str):
     return layer_id, map_path
 
 
-def _build_wms_urls(map_path: str, layer_id: str):
+def _wms_cache_token(layer_id: str, db_token: Optional[str] = None) -> str:
+    """Cache-buster that *actually* changes when the engine rewrites a layer.
+
+    The DB-side fallback (md5 of stats_min/max + .map text) misses the
+    common case where reclassified DST outputs keep the same value range
+    across reruns. We layer the on-disk GeoTIFF mtime on top — that always
+    bumps when the engine rewrites the file."""
+    mtime = 0
+    candidate = f"/srv/rasters/{layer_id}.tif"
+    try:
+        mtime = int(os.path.getmtime(candidate))
+    except OSError:
+        pass
+    if not db_token:
+        return str(mtime)
+    return f"{db_token}{mtime}"
+
+
+def _build_wms_urls(map_path: str, layer_id: str, cache_token: Optional[str] = None):
+    """Build WMS GetMap / GetLegendGraphic / GetFeatureInfo URLs.
+
+    `cache_token` is appended as a `_v=…` parameter on GetMap + legend so
+    browsers (and any intermediate caches) treat re-rendered tiles as a
+    fresh resource. MapServer ignores the parameter. Callers typically pass
+    a value that mutates whenever the underlying layer is regenerated
+    (e.g. soil_data.layer.stats_minimum+max, or the DST run finished_at).
+    """
     base = MAPSERVER_WMS_URL
+    cb = f"&_v={cache_token}" if cache_token else ""
     get_map = (f"{base}/?map={map_path}&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
-               f"&LAYERS={layer_id}&STYLES=&FORMAT=image%2Fpng&TRANSPARENT=TRUE")
+               f"&LAYERS={layer_id}&STYLES=&FORMAT=image%2Fpng&TRANSPARENT=TRUE{cb}")
     get_legend = (f"{base}/?map={map_path}&SERVICE=WMS&VERSION=1.1.1"
-                  f"&LAYER={layer_id}&REQUEST=getlegendgraphic&FORMAT=image/png")
+                  f"&LAYER={layer_id}&REQUEST=getlegendgraphic&FORMAT=image/png{cb}")
     get_feature_info = (f"{base}/?map={map_path}&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo"
                         f"&LAYERS={layer_id}&QUERY_LAYERS={layer_id}&INFO_FORMAT=text%2Fhtml")
     return get_map, get_legend, get_feature_info
@@ -3097,6 +3157,108 @@ async def list_dst_inputs(current_user: dict = Depends(get_current_user)):
             return cur.fetchall()
 
 
+@app.get("/api/dst/pixel/{layer_id}")
+async def dst_pixel_breakdown(
+    layer_id: str,
+    lon: float,
+    lat: float,
+    request: Request,
+    api_client: dict = Depends(verify_api_key),
+):
+    """Per-input breakdown for a DST output at a clicked point (lon/lat WGS84).
+
+    Used by the SPA's map popup: for a DST raster it lists each input raster
+    used in the recipe, its value at that pixel, and the reclassified score
+    (value >= threshold ? above : below), alongside the aggregated output.
+    """
+    import rasterio
+    from rasterio.warp import transform as warp_transform
+    from raster_registry.dst_engine import _resolve_input_path
+
+    with get_db() as conn:
+        # _resolve_input_path unpacks its row positionally, so it needs a
+        # plain (tuple) cursor, not the RealDictCursor used for metadata.
+        path_cur = conn.cursor()
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("SELECT recipe FROM api.dst_recipe WHERE output_layer_id = %s",
+                        (layer_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(status_code=404,
+                                    detail="Not a DST output layer")
+            recipe = row["recipe"] or {}
+
+            def _sample(path):
+                """Read the band-1 value at (lon,lat), reprojecting the point
+                into the raster's CRS. Returns None on nodata / out of bounds."""
+                if not path:
+                    return None
+                try:
+                    with rasterio.open(path) as src:
+                        xs, ys = warp_transform("EPSG:4326", src.crs, [lon], [lat])
+                        val = next(src.sample([(xs[0], ys[0])], indexes=1))[0]
+                        nd = src.nodata
+                        if val is None:
+                            return None
+                        fv = float(val)
+                        if nd is not None and fv == float(nd):
+                            return None
+                        if fv != fv:   # NaN
+                            return None
+                        return fv
+                except Exception:
+                    return None
+
+            # Output value.
+            out_path = _resolve_input_path(path_cur, layer_id)
+            output_value = _sample(out_path)
+
+            # Per-input rows. Labels come from each input layer's row.
+            inputs = []
+            for step in (recipe.get("steps") or []):
+                in_id = step.get("layer_id")
+                if not in_id:
+                    continue
+                cur.execute("""
+                    SELECT COALESCE(l.costum_name, m.title, l.layer_id) AS label,
+                           m.unit_of_measure_id
+                    FROM soil_data.layer l
+                    LEFT JOIN soil_data.mapset m ON m.mapset_id = l.mapset_id
+                    WHERE l.layer_id = %s
+                """, (in_id,))
+                meta = cur.fetchone() or {}
+                val = _sample(_resolve_input_path(path_cur, in_id))
+                threshold = step.get("threshold")
+                above = step.get("true_score", 1)
+                below = step.get("false_score", 0)
+                # Reclassify (engine op is '>='). NULL input → no contribution.
+                if val is None or threshold is None:
+                    reclass = None
+                else:
+                    reclass = above if val >= float(threshold) else below
+                inputs.append({
+                    "layer_id": in_id,
+                    "label": meta.get("label") or in_id,
+                    "unit_of_measure_id": meta.get("unit_of_measure_id"),
+                    "value": val,
+                    "threshold": threshold,
+                    "below": below,
+                    "above": above,
+                    "reclass": reclass,
+                })
+
+    log_audit(None, api_client["api_client_id"], "dst_pixel_breakdown",
+              {"layer_id": layer_id, "lon": lon, "lat": lat}, get_client_ip(request))
+    return {
+        "layer_id": layer_id,
+        "lon": lon,
+        "lat": lat,
+        "aggregation": recipe.get("aggregation", "sum"),
+        "output_value": output_value,
+        "inputs": inputs,
+    }
+
+
 @app.get("/api/dst/recipes")
 async def list_dst_recipes(current_user: dict = Depends(get_current_user)):
     with get_db() as conn:
@@ -3182,42 +3344,115 @@ async def update_dst_recipe(
 
 @app.delete("/api/dst/recipes/{recipe_id}")
 async def delete_dst_recipe(recipe_id: str, current_user: dict = Depends(get_current_user)):
+    # Look up the produced layer first so we can clean up the raster + map
+    # + pyCSW XML + soil_data rows along with the recipe row itself.
     with get_db() as conn:
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM api.dst_recipe WHERE recipe_id = %s", (recipe_id,))
-            if cur.rowcount == 0:
+            cur.execute("""
+                SELECT output_layer_id FROM api.dst_recipe WHERE recipe_id = %s
+            """, (recipe_id,))
+            row = cur.fetchone()
+            if not row:
                 raise HTTPException(status_code=404, detail="Recipe not found")
-    log_audit(current_user["user_id"], None, "dst_recipe_deleted", {"recipe_id": recipe_id}, None)
-    return {"message": "Recipe deleted"}
+            output_layer_id = row[0]
+            cur.execute("DELETE FROM api.dst_recipe WHERE recipe_id = %s", (recipe_id,))
+
+    layer_cleanup = None
+    if output_layer_id:
+        layer_cleanup = _delete_layer_full(
+            output_layer_id, current_user["user_id"], missing_ok=True)
+
+    log_audit(current_user["user_id"], None, "dst_recipe_deleted",
+              {"recipe_id": recipe_id, "output_layer_id": output_layer_id,
+               "layer_cleanup": layer_cleanup}, None)
+    return {
+        "message": "Recipe deleted",
+        "recipe_id": recipe_id,
+        "output_layer_id": output_layer_id,
+        "layer_cleanup": layer_cleanup,
+    }
 
 
 # ==================== DST: validate / run / runs ====================
 
 def _output_layer_id_for_recipe(recipe_id: str, recipe: dict, conn=None) -> str:
-    """Derive the output layer_id from the recipe's metadata block, falling
-    back to the recipe_id itself. The result must satisfy the SIS layer_id
-    convention well enough that _parse_layer_id can decompose it.
-
-    Country comes from api.setting.COUNTRY_CODE (which is what every other
-    write path reads); falls back to the COUNTRY_CODE env var, then "XX".
+    """The output layer_id IS the recipe_id. The SPA pre-fills the recipe_id
+    input with <CC>-<PROJ>-<PROP>-<tail> so the user sees the same string
+    they're saving. We sanitise to the characters that survive the SIS
+    layer_id parser (A-Z, 0-9, dash, underscore) and uppercase for
+    consistency.
     """
-    md = (recipe or {}).get("metadata", {}) or {}
-    country = None
-    if conn is not None:
-        try:
-            with conn.cursor() as cur:
-                cur.execute("SELECT value FROM api.setting WHERE key = 'COUNTRY_CODE'")
-                row = cur.fetchone()
-                if row and row[0]:
-                    country = row[0].strip().upper()
-        except Exception:
-            pass
-    if not country:
-        country = (os.getenv("COUNTRY_CODE") or "XX").upper()
-    proj = md.get("spatial_metadata_project_id") or "DST"
-    prop = md.get("spatial_metadata_property_id") or "SUITABILITY"
-    safe_id = re.sub(r"[^A-Za-z0-9]+", "", recipe_id).upper() or "OUT"
-    return f"{country}-{proj}-{prop}-{safe_id}"
+    safe_id = re.sub(r"[^A-Za-z0-9_-]+", "", recipe_id or "").upper().strip("-")
+    return safe_id or "OUT"
+
+
+def _dst_version_map_data(layer_id: str, raster_dir: str = "/srv/rasters") -> None:
+    """Rewrite a DST layer's .map so its raster DATA points at a fresh,
+    per-run filename — sidestepping MapServer's per-worker GDAL dataset
+    cache (which is keyed by path and would otherwise keep serving the
+    previous render after a re-run).
+
+    Mechanism:
+      * hardlink  <layer_id>.tif  →  <layer_id>.r<token>.tif  (same inode,
+        new path; the download endpoint keeps using the canonical name)
+      * rewrite the DATA "<layer_id>.tif" line in <layer_id>.map to the
+        versioned name
+      * remove stale <layer_id>.r*.tif hardlinks from earlier runs
+
+    The .map is regenerated from scratch on every run (the DB trigger emits
+    the canonical DATA, register dumps it to disk), so this post-step is
+    idempotent per run.
+    """
+    map_path = os.path.join(raster_dir, f"{layer_id}.map")
+    if not os.path.isfile(map_path):
+        return
+    with open(map_path, "r", encoding="utf-8") as fh:
+        content = fh.read()
+
+    # Find the layer's DATA line. Anchor on the start of a line so we don't
+    # match the "DATA" inside "METADATA". The value it points at may be the
+    # canonical <layer_id>.tif (fresh from register) OR a stale versioned
+    # name left by a previous call — we ignore it and ALWAYS hardlink from
+    # the canonical raster the engine just wrote.
+    m = re.search(r'^\s*DATA\s+"([^"]+)"', content, re.MULTILINE)
+    if not m:
+        return
+    current_data_name = m.group(1)
+    ext = current_data_name.rsplit(".", 1)[-1] if "." in current_data_name else "tif"
+
+    # The engine writes the canonical <layer_id>.<ext>; that's our hardlink
+    # source (NOT whatever DATA currently says, which can be stale).
+    canonical_path = os.path.join(raster_dir, f"{layer_id}.{ext}")
+    if not os.path.isfile(canonical_path):
+        return
+
+    token = int(time.time() * 1000)
+    versioned_name = f"{layer_id}.r{token}.{ext}"
+    versioned_path = os.path.join(raster_dir, versioned_name)
+
+    # Hardlink the freshly-written canonical raster under the versioned name.
+    try:
+        if not os.path.exists(versioned_path):
+            os.link(canonical_path, versioned_path)
+    except OSError:
+        # Hardlink failed (e.g. cross-device) → fall back to a copy.
+        import shutil
+        shutil.copy2(canonical_path, versioned_path)
+
+    # Point the .map's DATA line at the versioned file and persist.
+    new_content = re.sub(r'(^\s*DATA\s+)"[^"]+"',
+                         lambda mm: f'{mm.group(1)}"{versioned_name}"',
+                         content, count=1, flags=re.MULTILINE)
+    with open(map_path, "w", encoding="utf-8") as fh:
+        fh.write(new_content)
+
+    # Drop stale versioned hardlinks from earlier runs.
+    for old in glob.glob(os.path.join(raster_dir, f"{layer_id}.r*.{ext}")):
+        if os.path.abspath(old) != os.path.abspath(versioned_path):
+            try:
+                os.remove(old)
+            except OSError:
+                pass
 
 
 def _execute_dst_run(recipe_id: str, triggered_by: str):
@@ -3261,6 +3496,44 @@ def _execute_dst_run(recipe_id: str, triggered_by: str):
                 conn, recipe, output_layer_id=output_layer_id)
 
             md = (recipe or {}).get("metadata", {}) or {}
+
+            # Derive catalogue fields from the input layers' mapsets so the
+            # generated output inherits sensible defaults:
+            #   * time_period_begin = MIN over inputs
+            #   * time_period_end   = MAX over inputs
+            #   * other_constraints = license of the first input (inputs
+            #     usually share the same license inside a recipe).
+            input_layer_ids = [
+                s.get("layer_id") for s in (recipe.get("steps") or [])
+                if s.get("layer_id")
+            ]
+            dst_time_begin = None
+            dst_time_end = None
+            dst_license = None
+            if input_layer_ids:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        SELECT MIN(m.time_period_begin) AS time_begin,
+                               MAX(m.time_period_end)   AS time_end,
+                               (
+                                 SELECT m2.other_constraints
+                                 FROM soil_data.layer l2
+                                 JOIN soil_data.mapset m2 ON m2.mapset_id = l2.mapset_id
+                                 WHERE l2.layer_id = ANY(%s)
+                                   AND m2.other_constraints IS NOT NULL
+                                 ORDER BY l2.layer_id
+                                 LIMIT 1
+                               ) AS license
+                        FROM soil_data.layer l
+                        JOIN soil_data.mapset m ON m.mapset_id = l.mapset_id
+                        WHERE l.layer_id = ANY(%s)
+                    """, (input_layer_ids, input_layer_ids))
+                    row = cur.fetchone()
+                    if row:
+                        dst_time_begin = row[0].isoformat() if row[0] else None
+                        dst_time_end   = row[1].isoformat() if row[1] else None
+                        dst_license    = row[2]
+
             try:
                 # DST outputs have no upstream user-picked filename. Synthesise
                 # one from the output_layer_id so soil_data.layer.file_orig_name
@@ -3273,12 +3546,58 @@ def _execute_dst_run(recipe_id: str, triggered_by: str):
                     publish=bool(md.get("publish_to_catalogue", True)),
                     dst_recipe_id=recipe_id,
                     file_orig_name=f"{output_layer_id}.tif",
+                    unit_of_measure_id="dimensionless",
+                    publication_date=datetime.utcnow().date().isoformat(),
+                    time_period_begin=dst_time_begin,
+                    time_period_end=dst_time_end,
+                    license=dst_license,
                 )
                 conn.commit()
                 metadata_status = "succeeded" if registered.xml_published else "failed"
                 metadata_error = (
                     "; ".join(registered.warnings) if registered.warnings else None
                 )
+                # For DST outputs 0 is the nodata sentinel (the .map carries
+                # PROCESSING "NODATA=0"). inspect() therefore reports
+                # stats_minimum=0, which would put nodata inside the colour
+                # ramp (DATARANGE 0 …). Recompute the minimum over the
+                # non-zero values and write it back — that re-fires the map +
+                # class triggers so DATARANGE / class intervals span the real
+                # data — then re-dump the .map to disk before versioning it.
+                try:
+                    import rasterio as _rio
+                    import numpy as _np
+                    with _rio.open(out_path) as _src:
+                        _band = _src.read(1, masked=True)
+                    _nz = _band.compressed()
+                    _nz = _nz[_nz != 0]
+                    if _nz.size:
+                        _real_min = float(_nz.min())
+                        with conn.cursor() as _cur:
+                            _cur.execute(
+                                "UPDATE soil_data.layer SET stats_minimum = %s WHERE layer_id = %s",
+                                (_real_min, output_layer_id))
+                            _cur.execute(
+                                "SELECT map FROM soil_data.layer WHERE layer_id = %s",
+                                (output_layer_id,))
+                            _row = _cur.fetchone()
+                        conn.commit()
+                        if _row and _row[0]:
+                            with open(os.path.join("/srv/rasters", f"{output_layer_id}.map"),
+                                      "w", encoding="utf-8") as _fh:
+                                _fh.write(_row[0])
+                except Exception:
+                    log.exception("DST recipe %s: stats_minimum (non-zero) refresh failed",
+                                  recipe_id)
+                # Defeat MapServer's per-worker GDAL dataset cache: point the
+                # .map's DATA at a fresh, per-run filename (a hardlink to the
+                # canonical <layer_id>.tif). GDAL caches by path, so a new
+                # path forces a fresh read of the just-written raster without
+                # restarting MapServer workers.
+                try:
+                    _dst_version_map_data(output_layer_id)
+                except Exception:
+                    log.exception("DST recipe %s: map cache-version failed", recipe_id)
             except Exception as e:
                 conn.rollback()
                 log.exception("DST recipe %s: registrar failed", recipe_id)
@@ -3934,12 +4253,17 @@ async def create_smd_mapped_soil_property(
     if not name:
         raise HTTPException(status_code=400, detail="name is required")
     # Both ramps default to 10 buckets; colour ramps differ to match the
-    # convention in the seed data.
+    # convention in the seed data. Callers (e.g. the DST tab) can override
+    # the colours by passing explicit start_color / end_color hex strings.
     num_intervals = 10
     if property_type == "quantitative":
         start_color, end_color = "#a50026", "#1a9850"
     else:
         start_color, end_color = "#CA0020", "#3F68E2"
+    if payload.get("start_color"):
+        start_color = str(payload["start_color"]).strip()
+    if payload.get("end_color"):
+        end_color = str(payload["end_color"]).strip()
     with get_db() as conn:
         with conn.cursor() as cur:
             try:

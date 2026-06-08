@@ -387,13 +387,17 @@ function switchLayer(layerConfig) {
 }
 
 function createWMSLayer(layerConfig) {
-  // Parse the get_map_url to extract the map parameter
+  // Parse the get_map_url to extract the map parameter AND the cache-buster
+  // token (_v) the API stamps on so re-rendered tiles aren't served from
+  // browser / proxy cache.
   let mapParam = null;
-  
+  let cacheToken = null;
+
   if (layerConfig.get_map_url) {
     try {
       const url = new URL(layerConfig.get_map_url);
       mapParam = url.searchParams.get('map');
+      cacheToken = url.searchParams.get('_v');
     } catch (e) {
       console.warn('Could not parse get_map_url:', layerConfig.get_map_url);
     }
@@ -401,7 +405,7 @@ function createWMSLayer(layerConfig) {
 
   // MapServer base URL
   const mapServerUrl = MAPSERVER_URL;
-  
+
   const params = {
     'LAYERS': layerConfig.layer_id,
     'FORMAT': 'image/png',
@@ -411,6 +415,9 @@ function createWMSLayer(layerConfig) {
   // Add map parameter if found
   if (mapParam) {
     params['map'] = mapParam;
+  }
+  if (cacheToken) {
+    params['_v'] = cacheToken;
   }
 
   const layer = new ImageLayer({
@@ -1040,6 +1047,15 @@ function addProfileLayerControl() {
 // ==================== GetFeatureInfo ====================
 
 async function showRasterInfo(evt, popup) {
+  // DST outputs get a richer popup: a breakdown of every input raster used
+  // in the recipe, its value at the clicked pixel, and the reclassification.
+  const activeId = activeLayer.get('layerId');
+  const activeConfig = currentLayers[activeId];
+  if (activeConfig && activeConfig.is_dst) {
+    await showDstPixelInfo(evt, popup, activeId, activeConfig);
+    return;
+  }
+
   const viewResolution = map.getView().getResolution();
   const source = activeLayer.getSource();
   const url = source.getFeatureInfoUrl(
@@ -1091,6 +1107,58 @@ async function showRasterInfo(evt, popup) {
       console.error('Failed to get feature info:', error);
       popup.setPosition(undefined);
     }
+  }
+}
+
+
+// DST output popup — a table of each input raster used in the recipe with
+// its pixel value and the reclassified score, plus the aggregated output.
+async function showDstPixelInfo(evt, popup, layerId, layerConfig) {
+  const lonLat = toLonLat(evt.coordinate);
+  const lon = lonLat[0];
+  const lat = lonLat[1];
+  try {
+    const data = await api.getDstPixel(layerId, lon, lat);
+    const title = (layerConfig && layerConfig.property_name) || layerId;
+    const fmt = (v) => (v == null) ? '—' : (Number.isInteger(v) ? v : Number(v).toFixed(3));
+    const rows = (data.inputs || []).map(i => `
+      <tr>
+        <td style="padding:2px 6px;">${escapeHtml(i.label || i.layer_id)}</td>
+        <td style="padding:2px 6px;text-align:right;">${fmt(i.value)} ${escapeHtml(i.unit_of_measure_id || '')}</td>
+        <td style="padding:2px 6px;text-align:center;color:#666;">≥ ${fmt(i.threshold)}</td>
+        <td style="padding:2px 6px;text-align:right;font-weight:600;">${fmt(i.reclass)}</td>
+      </tr>`).join('');
+    const agg = escapeHtml(data.aggregation || 'sum');
+    const html = `
+      <div class="feature-info-layer">
+        <h3>${escapeHtml(title)}</h3>
+        <table style="border-collapse:collapse;font-size:12px;width:100%;min-width:510px;">
+          <thead>
+            <tr style="border-bottom:1px solid #ccc;color:#555;">
+              <th style="padding:2px 6px;text-align:left;width:54%;">Raster</th>
+              <th style="padding:2px 6px;text-align:right;width:25%;">Value</th>
+              <th style="padding:2px 6px;text-align:center;">Threshold</th>
+              <th style="padding:2px 6px;text-align:right;">Reclass</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="4" style="padding:4px 6px;color:#888;">No inputs</td></tr>'}</tbody>
+          <tfoot>
+            <tr style="border-top:2px solid #999;font-weight:700;">
+              <td style="padding:4px 6px;" colspan="3">Output (${agg})</td>
+              <td style="padding:4px 6px;text-align:right;">${fmt(data.output_value)}</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="feature-info-item" style="margin-top:6px;color:#666;font-size:11px;">
+          <div><strong>Latitude:</strong> ${lat.toFixed(6)}°</div>
+          <div><strong>Longitude:</strong> ${lon.toFixed(6)}°</div>
+        </div>
+      </div>`;
+    document.getElementById('popup-content').innerHTML = html;
+    popup.setPosition(evt.coordinate);
+  } catch (error) {
+    console.error('Failed to get DST pixel info:', error);
+    popup.setPosition(undefined);
   }
 }
 

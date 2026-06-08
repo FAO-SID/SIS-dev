@@ -126,6 +126,11 @@ class SISApiClient {
     return this.request('/api/layer');
   }
 
+  async getDstPixel(layerId, lon, lat) {
+    return this.request(
+      `/api/dst/pixel/${encodeURIComponent(layerId)}?lon=${lon}&lat=${lat}`);
+  }
+
   async getProfiles() {
     return this.request('/api/profile');
   }

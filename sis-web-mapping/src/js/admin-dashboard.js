@@ -706,25 +706,19 @@ class AdminDashboard {
 
             <!-- DST Tab -->
             <div id="dst-tab" class="tab-pane">
-              <section style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);">
+              <section style="display:flex;flex-direction:column;gap:var(--sp-4);">
                 <div>
                   <h3>Recipes</h3>
                   <button type="button" class="btn btn-sm btn-primary" id="dst-new-btn" style="margin-bottom:var(--sp-3);">+ New Recipe</button>
                   <table class="admin-table" id="dst-recipes-table" style="width:100%;">
-                    <thead><tr><th>ID</th><th>Name</th><th>Status</th><th>Output</th><th>Last run</th></tr></thead>
+                    <thead><tr><th>Raster ID</th><th>Name</th><th>Status</th><th>Last run</th><th>Actions</th></tr></thead>
                     <tbody id="dst-recipes-tbody"><tr><td colspan="5" class="loading">Loading...</td></tr></tbody>
                   </table>
                 </div>
-                <div>
+                <div id="dst-editor-wrap" style="display:none;">
                   <h3>Editor <span id="dst-editor-id" style="font-weight:normal;color:#666;font-size:var(--fs-sm);"></span></h3>
                   <div id="dst-editor" style="display:none;">
                     <div style="display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-3);align-items:center;">
-                      <label>recipe_id</label>
-                      <input type="text" id="dst-recipe-id" placeholder="e.g. potato-suitability">
-                      <label>name</label>
-                      <input type="text" id="dst-recipe-name">
-                      <label>description</label>
-                      <textarea id="dst-recipe-description" rows="2"></textarea>
                       <label>Project</label>
                       <div>
                         <select id="dst-output-project" style="width:320px;"><option value="DST">DST</option></select>
@@ -766,6 +760,14 @@ class AdminDashboard {
                           </div>
                         </div>
                       </div>
+                      <!-- recipe_id and description are populated by the
+                           builder (recipe_id = output_layer_id, description =
+                           auto-summary). Kept in the DOM but hidden so the
+                           existing helpers still read/write them. -->
+                      <label style="display:none;">recipe_id</label>
+                      <input type="text" id="dst-recipe-id" style="display:none;">
+                      <label style="display:none;">description</label>
+                      <textarea id="dst-recipe-description" rows="2" style="display:none;"></textarea>
                     </div>
                     <h4 style="margin-top:var(--sp-4);margin-bottom:var(--sp-2);">Input layers</h4>
                     <p style="font-size:var(--fs-xs);color:#666;margin:0 0 var(--sp-2) 0;">
@@ -773,15 +775,15 @@ class AdminDashboard {
                       become the <em>above</em> value, below become the <em>below</em> value.
                       Defaults are 0 / 1 — overwrite for custom scoring.
                     </p>
-                    <table class="admin-table" id="dst-rows-table" style="width:100%;font-size:var(--fs-sm);">
+                    <table class="admin-table" id="dst-rows-table" style="width:auto;font-size:var(--fs-sm);">
                       <thead>
                         <tr>
                           <th>Layer</th>
-                          <th style="text-align:right;">Min</th>
-                          <th style="text-align:right;">Max</th>
-                          <th>Threshold</th>
-                          <th>Below</th>
-                          <th>Above</th>
+                          <th style="text-align:right;padding-right:6px;">Min</th>
+                          <th style="text-align:right;padding-left:6px;padding-right:56px;">Max</th>
+                          <th style="padding-right:6px;">Below</th>
+                          <th style="padding-left:6px;padding-right:6px;text-align:center;">Threshold</th>
+                          <th style="padding-left:6px;">Above</th>
                           <th style="width:30px;"></th>
                         </tr>
                       </thead>
@@ -792,24 +794,10 @@ class AdminDashboard {
                     <div style="margin-top:var(--sp-2);">
                       <button type="button" class="btn btn-sm btn-secondary" id="dst-add-row-btn">+ Add layer</button>
                     </div>
-                    <div style="margin-top:var(--sp-3);display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-3);align-items:center;">
-                      <label>Aggregation</label>
-                      <select id="dst-aggregation" style="width:160px;">
-                        <option value="sum" selected>sum</option>
-                        <option value="min">min</option>
-                        <option value="max">max</option>
-                        <option value="mean">mean</option>
-                        <option value="product">product</option>
-                      </select>
-                    </div>
                     <div style="margin-top:var(--sp-3);display:flex;gap:var(--sp-2);align-items:center;">
-                      <button type="button" class="btn btn-sm btn-primary" id="dst-save-btn">Save</button>
-                      <button type="button" class="btn btn-sm" id="dst-validate-btn">Validate</button>
                       <button type="button" class="btn btn-sm" id="dst-run-btn" style="background:#28a745;color:#fff;">Run</button>
-                      <button type="button" class="btn btn-sm" id="dst-delete-btn" style="background:#dc3545;color:#fff;">Delete</button>
                       <span id="dst-status" style="font-size:var(--fs-sm);"></span>
                     </div>
-                    <pre id="dst-output" style="margin-top:var(--sp-3);max-height:200px;overflow:auto;background:#f7f7f7;padding:8px;font-size:11px;"></pre>
                   </div>
                 </div>
               </section>
@@ -1397,14 +1385,19 @@ class AdminDashboard {
     status.textContent = 'Adding…';
     try {
       // DST outputs don't have an inspected raster yet — min/max stay NULL.
+      // Override the catalogue's default ramp with blue → red for DST-minted
+      // properties (suitability/score scale convention).
       await api.createRasterMappedSoilProperty({
         mapped_property_id: pid, name: pname, property_type,
+        start_color: '#2c7bb6',  // blue
+        end_color:   '#d7191c',  // red
       });
       this._rasterPropertyNums = await api.listRasterMappedSoilProperties();
       this._dstRenderOutputPropertyOptions(pid);
       document.getElementById('dst-output-property-new').style.display = 'none';
       document.getElementById('dst-new-output-property-id').value = '';
       document.getElementById('dst-new-output-property-name').value = '';
+      // Mirror the new mapped_property's display name into the recipe Name.
       status.textContent = '';
       // Keep the Upload GeoTIFF dropdown in sync too if it's already been
       // rendered (it shares the cache).
@@ -1965,15 +1958,18 @@ class AdminDashboard {
   // ==================== DST ====================
 
   async initDstTab() {
-    document.getElementById('dst-new-btn').addEventListener('click', () => this.dstNewRecipe());
-    document.getElementById('dst-save-btn').addEventListener('click', () => this.dstSaveRecipe());
-    document.getElementById('dst-validate-btn').addEventListener('click', () => this.dstValidate());
-    document.getElementById('dst-run-btn').addEventListener('click', () => this.dstRun());
-    document.getElementById('dst-delete-btn').addEventListener('click', () => this.dstDelete());
+    // "+ New Recipe" doubles as "Close" while a NEW (unsaved) editor is open.
+    // If a different (existing) recipe editor is open, persist+close it
+    // first, then start a fresh one.
+    document.getElementById('dst-new-btn').addEventListener('click', async () => {
+      const wasNew = this._dstOpenRecipeId === '__new__';
+      if (this._dstOpenRecipeId) await this.dstCloseEditor();  // save + hide whatever's open
+      if (!wasNew) this.dstNewRecipe();
+    });
     document.getElementById('dst-add-row-btn').addEventListener('click', () => this.dstAddRow());
-    // Aggregation change → refresh the auto-description.
-    document.getElementById('dst-aggregation').addEventListener('change',
-      () => this._dstRefreshAutoDescription());
+    // Editor Run — persists the editor (create new / update / rename) then
+    // runs. This is the only Run affordance for an unsaved new recipe.
+    document.getElementById('dst-run-btn').addEventListener('click', () => this.dstRun());
 
     // Output project + property dropdowns — same catalogues + same "+ Add new"
     // flows as the Upload GeoTIFF form so the user picks from soil_data.project
@@ -2006,8 +2002,15 @@ class AdminDashboard {
       if (isNew) {
         const idInput = document.getElementById('dst-new-output-property-id');
         if (!idInput.value) idInput.value = this._nextRasterMapPropertyId();
+        return;
       }
+      // Mirror the picked mapped_property's display name into the recipe
+      // Name field — the user can still edit it after.
+      this._dstRefreshRecipeId();
     });
+    // Project change also refreshes the recipe_id prefix.
+    document.getElementById('dst-output-project').addEventListener('change',
+      () => this._dstRefreshRecipeId());
     document.getElementById('dst-add-output-property-btn')
       .addEventListener('click', () => this.dstAddOutputProperty());
     // Preload available input rasters so the row builder's dropdowns can be
@@ -2029,26 +2032,47 @@ class AdminDashboard {
         tb.innerHTML = '<tr><td colspan="5" class="empty-state">No recipes yet</td></tr>';
         return;
       }
+      // Stable order by Raster ID — the API sorts by updated_at, which would
+      // reshuffle the list every time a recipe is opened/saved.
+      recipes.sort((a, b) =>
+        String(a.recipe_id).localeCompare(String(b.recipe_id)));
       const fmtDate = (s) => s ? String(s).replace('T', ' ').slice(0, 16) : '';
       tb.innerHTML = recipes.map(r => {
         const lr = r.latest_run;
         const status = lr ? this.escapeHtml(lr.status || '') : '—';
-        const output = lr && lr.output_layer_id ? this.escapeHtml(lr.output_layer_id) : '—';
         const started = lr ? this.escapeHtml(fmtDate(lr.started_at)) : '—';
+        const rid = this.escapeHtml(r.recipe_id);
+        // The Open button doubles as Close while this recipe's editor is open.
+        const isOpen = this._dstOpenRecipeId === r.recipe_id;
+        const openLabel = isOpen ? 'Close' : 'Open';
         return `
         <tr>
-          <td><a href="#" data-recipe="${this.escapeHtml(r.recipe_id)}">${this.escapeHtml(r.recipe_id)}</a></td>
+          <td>${rid}</td>
           <td>${this.escapeHtml(r.name || '')}</td>
           <td>${status}</td>
-          <td>${output}</td>
           <td>${started}</td>
+          <td style="white-space:nowrap;">
+            <button type="button" class="btn btn-sm btn-primary dst-row-open" data-recipe="${rid}">${openLabel}</button>
+            ${this.isAdmin ? `<button type="button" class="btn btn-sm dst-row-del"  data-recipe="${rid}" style="background:#dc3545;color:#fff;margin-left:4px;">Delete</button>` : ''}
+          </td>
         </tr>`;
       }).join('');
-      tb.querySelectorAll('a[data-recipe]').forEach(a =>
-        a.addEventListener('click', ev => {
-          ev.preventDefault();
-          this.dstLoadRecipe(a.dataset.recipe);
+      tb.querySelectorAll('.dst-row-open').forEach(b =>
+        b.addEventListener('click', async () => {
+          const id = b.dataset.recipe;
+          if (this._dstOpenRecipeId === id) {
+            await this.dstCloseEditor();            // saves + hides + reloads
+          } else {
+            // Persist whatever editor is currently open before switching.
+            if (this._dstOpenRecipeId) {
+              try { await this._dstPersistEditor(); } catch (e) { /* incomplete → skip */ }
+            }
+            await this.dstLoadRecipe(id);           // sets _dstOpenRecipeId
+            await this.dstReloadRecipes();          // re-render so it shows Close
+          }
         }));
+      tb.querySelectorAll('.dst-row-del').forEach(b =>
+        b.addEventListener('click', () => this.dstDeleteRecipeById(b.dataset.recipe)));
     } catch (e) {
       tb.innerHTML = `<tr><td colspan="5">${this.escapeHtml(e.message)}</td></tr>`;
     }
@@ -2056,23 +2080,73 @@ class AdminDashboard {
 
 
   dstNewRecipe() {
+    document.getElementById('dst-editor-wrap').style.display = '';
     document.getElementById('dst-editor').style.display = 'block';
     document.getElementById('dst-editor-id').textContent = '(new)';
     document.getElementById('dst-recipe-id').value = '';
     document.getElementById('dst-recipe-id').disabled = false;
-    document.getElementById('dst-recipe-name').value = '';
+    this._dstLoadedRecipeId = null;
+    this._dstOpenRecipeId = '__new__';
+    this._dstSyncNewButton();
     this._dstSetDescription('', /*resetAuto=*/true);
     this._dstLastAutoDesc = '';
     this._dstRenderOutputProjectOptions('DST');
     document.getElementById('dst-output-project-new').style.display = 'none';
     this._dstRenderOutputPropertyOptions('SUITABILITY');
     document.getElementById('dst-output-property-new').style.display = 'none';
-    document.getElementById('dst-aggregation').value = 'sum';
+    // Prime recipe_id with the <CC>-<PROJ>-<PROP>- prefix.
+    document.getElementById('dst-recipe-id').value = '';
+    this._dstRefreshRecipeId();
     // Wipe rows back to the empty state.
     document.getElementById('dst-rows-tbody').innerHTML =
       '<tr><td colspan="7" class="empty-state">No inputs yet — click "+ Add layer".</td></tr>';
     document.getElementById('dst-status').textContent = '';
-    document.getElementById('dst-output').textContent = '';
+  }
+
+  // Recipe ID = output layer_id. The prefix is rebuilt from the
+  // COUNTRY_CODE country + selected Project + selected Mapped property;
+  // the user appends the tail. Empty input → just the prefix.
+  _dstBuildRecipeIdPrefix() {
+    const country = (this._rasterCountries && this._rasterCountries[0])
+      ? this._rasterCountries[0].country_id : 'BT';
+    const proj = document.getElementById('dst-output-project').value || 'DST';
+    const prop = document.getElementById('dst-output-property').value || 'SUITABILITY';
+    return `${country}-${proj}-${prop}-`;
+  }
+
+  // recipe_id IS the output layer_id and follows the standard SIS
+  // convention: <CC>-<PROJ>-<PROP>-<YEAR>-<upper>-<lower>-MEAN.
+  //   * Year   = current year
+  //   * Depth  = MIN(upper) / MAX(lower) across the picked input layers'
+  //              dimension_depth (e.g. inputs 0-30 + 45-80 → 0-80)
+  //   * Stats  = always MEAN for DST outputs.
+  _dstRefreshRecipeId() {
+    const idEl = document.getElementById('dst-recipe-id');
+    if (!idEl) return;
+    const country = (this._rasterCountries && this._rasterCountries[0])
+      ? this._rasterCountries[0].country_id : 'BT';
+    const proj = document.getElementById('dst-output-project').value || 'DST';
+    const prop = document.getElementById('dst-output-property').value || 'SUITABILITY';
+    const year = new Date().getFullYear();
+
+    const inputs = this._dstInputs || [];
+    let uppers = [], lowers = [];
+    document.querySelectorAll('tr.dst-row .dst-row-layer').forEach(sel => {
+      const layerId = sel.value;
+      if (!layerId) return;
+      const ipt = inputs.find(i => i.layer_id === layerId);
+      const depth = ipt && ipt.dimension_depth;
+      const m = /^(\d+)-(\d+)$/.exec(depth || '');
+      if (m) { uppers.push(+m[1]); lowers.push(+m[2]); }
+    });
+    const upper = uppers.length ? Math.min(...uppers) : 0;
+    const lower = lowers.length ? Math.max(...lowers) : 0;
+
+    const prev = idEl.value;
+    idEl.value = `${country}-${proj}-${prop}-${year}-${upper}-${lower}-MEAN`;
+    // The output layer is excluded from the row dropdowns; if it changed,
+    // refresh them. Guard against recursion (rebuild doesn't call this).
+    if (prev !== idEl.value) this._dstRebuildRowLayerOptions();
   }
 
   // Programmatically set the description and remember the auto-generated
@@ -2093,8 +2167,7 @@ class AdminDashboard {
     const tbody = document.getElementById('dst-rows-tbody');
     const rows = Array.from(tbody.querySelectorAll('tr.dst-row'));
     if (!rows.length) return '';
-    const agg = document.getElementById('dst-aggregation').value || 'sum';
-    const lines = [`${agg} of the following:`];
+    const lines = [`sum of the following:`];
     rows.forEach(tr => {
       const layerSel = tr.querySelector('.dst-row-layer');
       const layer = layerSel.value || '(no layer)';
@@ -2122,28 +2195,32 @@ class AdminDashboard {
   async dstLoadRecipe(id) {
     try {
       const r = await api.getDstRecipe(id);
+      document.getElementById('dst-editor-wrap').style.display = '';
       document.getElementById('dst-editor').style.display = 'block';
       document.getElementById('dst-editor-id').textContent = id;
       document.getElementById('dst-recipe-id').value = r.recipe_id;
-      document.getElementById('dst-recipe-id').disabled = true;
-      document.getElementById('dst-recipe-name').value = r.name || '';
-      // _dstLastAutoDesc is intentionally empty: if the recipe already had
-      // a description, the textarea value won't match the empty marker so
-      // the next refresh leaves it alone; if it was empty, the next
-      // refresh's "el.value &&" check fails and auto-fill kicks in.
+      // recipe_id is now auto-computed from the dropdowns + depth — keep it
+      // editable so changing Mapped property / Project actually refreshes
+      // it. We remember the loaded id separately to detect renames on Save.
+      document.getElementById('dst-recipe-id').disabled = false;
+      this._dstLoadedRecipeId = r.recipe_id;
+      this._dstOpenRecipeId = r.recipe_id;
+      this._dstSyncNewButton();
+      // Prime _dstLastAutoDesc with the saved description so the next
+      // refresh sees the textarea value == _dstLastAutoDesc and re-runs
+      // the auto-generator. (Setting it to '' here would leave any saved
+      // description frozen as "user-customised".)
       const recipe = r.recipe || {};
       this._dstSetDescription(r.description || '', false);
-      this._dstLastAutoDesc = '';
+      this._dstLastAutoDesc = r.description || '';
       const md = recipe.metadata || {};
       this._dstRenderOutputProjectOptions(md.spatial_metadata_project_id || 'DST');
       document.getElementById('dst-output-project-new').style.display = 'none';
       this._dstRenderOutputPropertyOptions(md.spatial_metadata_property_id || 'SUITABILITY');
       document.getElementById('dst-output-property-new').style.display = 'none';
-      document.getElementById('dst-aggregation').value = recipe.aggregation || 'sum';
       this._dstPopulateRows(recipe.steps || []);
       document.getElementById('dst-status').textContent = '';
-      document.getElementById('dst-output').textContent = '';
-    } catch (e) {
+      } catch (e) {
       document.getElementById('dst-status').textContent = e.message;
     }
   }
@@ -2151,41 +2228,111 @@ class AdminDashboard {
   // Build a single <tr> for the row builder. The threshold splits the
   // layer: pixels >= threshold get `above`, pixels < threshold get `below`.
   // This maps to the engine's op:">=", true_score=above, false_score=below.
+  // Build the <option> list for a row's layer dropdown, hiding layers
+  // already chosen in OTHER rows and the output layer being produced. The
+  // row's own current selection (`ownId`) is always kept so it stays valid.
+  _dstLayerOptionsHtml(ownId) {
+    const inputs = this._dstInputs || [];
+    const outputId = (document.getElementById('dst-recipe-id').value || '').trim();
+    const usedElsewhere = new Set(
+      Array.from(document.querySelectorAll('tr.dst-row .dst-row-layer'))
+        .map(s => s.value)
+        .filter(v => v && v !== ownId)
+    );
+    return ['<option value="">-- pick a layer --</option>'].concat(
+      inputs
+        .filter(i => i.layer_id === ownId ||
+                     (!usedElsewhere.has(i.layer_id) && i.layer_id !== outputId))
+        .map(i => {
+          const sel = i.layer_id === ownId ? ' selected' : '';
+          const label = (i.label && i.label !== i.layer_id)
+            ? `${i.layer_id} — ${i.label}`
+            : i.layer_id;
+          return `<option value="${this.escapeHtml(i.layer_id)}" data-min="${i.stats_minimum ?? ''}" data-max="${i.stats_maximum ?? ''}"${sel}>${this.escapeHtml(label)}</option>`;
+        })
+    ).join('');
+  }
+
+  // Re-render every row's layer dropdown so newly-used layers disappear
+  // from the others (and freed ones reappear), preserving each selection.
+  _dstRebuildRowLayerOptions() {
+    document.querySelectorAll('tr.dst-row .dst-row-layer').forEach(sel => {
+      const own = sel.value;
+      sel.innerHTML = this._dstLayerOptionsHtml(own);
+      if (own) sel.value = own;
+    });
+  }
+
+  // Apply a layer's Min/Max to a row's threshold slider: set bounds, a fine
+  // step, clamp the current value into range (defaulting to the midpoint),
+  // and refresh the readout. Called on render and whenever the layer changes.
+  _dstApplyThresholdRange(tr, mn, mx, preferredVal) {
+    const slider = tr.querySelector('.dst-row-threshold');
+    const readout = tr.querySelector('.dst-row-threshold-val');
+    const hasRange = (mn != null && mn !== '' && mx != null && mx !== '' && Number(mx) > Number(mn));
+    if (!hasRange) {
+      slider.min = 0; slider.max = 0; slider.step = 'any';
+      slider.value = ''; slider.disabled = true;
+      if (readout) readout.textContent = '—';
+      return;
+    }
+    const lo = Number(mn), hi = Number(mx);
+    slider.disabled = false;
+    slider.min = lo; slider.max = hi;
+    slider.step = (hi - lo) / 1000 || 'any';
+    let v = (preferredVal != null && preferredVal !== '') ? Number(preferredVal)
+          : (lo + (hi - lo) / 2);
+    if (v < lo) v = lo; if (v > hi) v = hi;
+    slider.value = v;
+    if (readout) readout.textContent = Number(v).toFixed(3);
+  }
+
   _dstRenderRow(step) {
     const inputs = this._dstInputs || [];
     const layerId = step.layer_id || '';
     const match = inputs.find(i => i.layer_id === layerId);
-    const opts = ['<option value="">-- pick a layer --</option>']
-      .concat(inputs.map(i => {
-        const sel = i.layer_id === layerId ? ' selected' : '';
-        const label = (i.label && i.label !== i.layer_id)
-          ? `${i.layer_id} — ${i.label}`
-          : i.layer_id;
-        return `<option value="${this.escapeHtml(i.layer_id)}" data-min="${i.stats_minimum ?? ''}" data-max="${i.stats_maximum ?? ''}"${sel}>${this.escapeHtml(label)}</option>`;
-      })).join('');
+    const opts = this._dstLayerOptionsHtml(layerId);
     const fmt = (v) => (v == null || v === '') ? '—' : Number(v).toFixed(3);
     const tr = document.createElement('tr');
     tr.className = 'dst-row';
     tr.innerHTML = `
       <td><select class="dst-row-layer" style="min-width:240px;">${opts}</select></td>
-      <td class="dst-row-min" style="text-align:right;color:#555;">${fmt(match?.stats_minimum)}</td>
-      <td class="dst-row-max" style="text-align:right;color:#555;">${fmt(match?.stats_maximum)}</td>
-      <td><input type="number" class="dst-row-threshold no-spinner" step="any" value="${step.threshold ?? ''}" style="width:90px;"></td>
-      <td><input type="number" class="dst-row-below no-spinner" step="any" value="${step.false_score ?? 0}" style="width:70px;"></td>
-      <td><input type="number" class="dst-row-above no-spinner" step="any" value="${step.true_score ?? 1}" style="width:70px;"></td>
+      <td class="dst-row-min" style="text-align:right;color:#555;padding-right:6px;">${fmt(match?.stats_minimum)}</td>
+      <td class="dst-row-max" style="text-align:right;color:#555;padding-left:6px;padding-right:56px;">${fmt(match?.stats_maximum)}</td>
+      <td style="padding-right:6px;"><input type="number" class="dst-row-below no-spinner" step="any" value="${step.false_score ?? 0}" style="width:35px;"></td>
+      <td style="padding-left:6px;padding-right:6px;text-align:center;white-space:nowrap;">
+        <div class="dst-row-threshold-val" style="color:#444;font-size:var(--fs-sm);font-weight:600;">—</div>
+        <input type="range" class="dst-row-threshold" style="width:120px;vertical-align:middle;">
+      </td>
+      <td style="padding-left:6px;"><input type="number" class="dst-row-above no-spinner" step="any" value="${step.true_score ?? 1}" style="width:35px;"></td>
       <td><button type="button" class="btn btn-sm dst-row-remove" style="background:#dc3545;color:#fff;" title="Remove">×</button></td>
     `;
-    // When the layer changes, refresh the min/max display.
+    // Initialise the slider bounds from the row's current layer.
+    this._dstApplyThresholdRange(tr, match?.stats_minimum, match?.stats_maximum, step.threshold);
+    // When the layer changes, refresh the min/max display + slider bounds.
     tr.querySelector('.dst-row-layer').addEventListener('change', (e) => {
       const opt = e.currentTarget.selectedOptions[0];
       const mn = opt?.dataset.min;
       const mx = opt?.dataset.max;
       tr.querySelector('.dst-row-min').textContent = mn ? Number(mn).toFixed(3) : '—';
       tr.querySelector('.dst-row-max').textContent = mx ? Number(mx).toFixed(3) : '—';
+      // Re-range the threshold slider to the new layer (default to midpoint).
+      this._dstApplyThresholdRange(tr, mn, mx, null);
+      this._dstRefreshAutoDescription();
+      // Depth aggregate may have changed → rebuild recipe_id/output layer_id.
+      this._dstRefreshRecipeId();
+      // This layer is now used here → drop it from the other rows' lists.
+      this._dstRebuildRowLayerOptions();
+    });
+    // Slider drag → update the readout and the auto-description.
+    tr.querySelector('.dst-row-threshold').addEventListener('input', (e) => {
+      const ro = tr.querySelector('.dst-row-threshold-val');
+      if (ro) ro.textContent = e.currentTarget.value === '' ? '—'
+        : Number(e.currentTarget.value).toFixed(3);
       this._dstRefreshAutoDescription();
     });
-    // Any threshold / below / above edit refreshes the auto-description.
-    ['.dst-row-threshold', '.dst-row-below', '.dst-row-above'].forEach(sel => {
+    // Below / above edits also refresh the auto-description.
+    ['.dst-row-below', '.dst-row-above'].forEach(sel => {
       tr.querySelector(sel).addEventListener('input', () => this._dstRefreshAutoDescription());
     });
     tr.querySelector('.dst-row-remove').addEventListener('click', () => {
@@ -2195,6 +2342,9 @@ class AdminDashboard {
         tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No inputs yet — click "+ Add layer".</td></tr>';
       }
       this._dstRefreshAutoDescription();
+      this._dstRefreshRecipeId();
+      // Freed layer should reappear in the remaining rows' lists.
+      this._dstRebuildRowLayerOptions();
     });
     return tr;
   }
@@ -2240,7 +2390,7 @@ class AdminDashboard {
     if (!steps.length) throw new Error('Add at least one input layer');
     const recipe = {
       steps,
-      aggregation: document.getElementById('dst-aggregation').value || 'sum',
+      aggregation: 'sum',
       no_data_handling: 'propagate',
       metadata: {
         publish_to_catalogue: true,
@@ -2250,68 +2400,103 @@ class AdminDashboard {
           document.getElementById('dst-output-property').value.trim() || 'SUITABILITY',
       },
     };
+    // api.dst_recipe.name is NOT NULL; derive it from the picked mapped
+    // property's display name. Falls back to the recipe_id so the save
+    // doesn't fail when nothing's picked yet.
+    const propId = document.getElementById('dst-output-property').value;
+    const propRow = (this._rasterPropertyNums || []).find(p => p.mapped_property_id === propId);
+    // recipe_id is auto-built by _dstRefreshRecipeId in the standard SIS
+    // layer-id format; just trim any accidental trailing dashes.
+    const recipeId = document.getElementById('dst-recipe-id').value.trim().replace(/-+$/, '');
     return {
-      recipe_id: document.getElementById('dst-recipe-id').value.trim(),
-      name: document.getElementById('dst-recipe-name').value.trim(),
+      recipe_id: recipeId,
+      name: (propRow && propRow.name) || recipeId,
       description: document.getElementById('dst-recipe-description').value || null,
       recipe,
     };
   }
 
+  // Persist the editor state to api.dst_recipe and return the recipe_id
+  // we ended up writing under. Handles three cases:
+  //   1. brand-new recipe        → POST
+  //   2. recipe_id unchanged     → PUT (overwrites existing row)
+  //   3. recipe_id renamed       → DELETE old (with its produced raster +
+  //                                metadata + map file) + POST new
+  // The last case is what triggers when the user changes Project /
+  // Mapped property / depth on an existing recipe — the layer_id encodes
+  // those fields so the old layer can no longer be the right target.
+  async _dstPersistEditor() {
+    const payload = this._dstReadEditor();
+    if (!payload.recipe_id) throw new Error('recipe_id required');
+    if (!payload.name) throw new Error('name required');
+    const newId = payload.recipe_id;
+    const oldId = this._dstLoadedRecipeId;
+    let layerCleanup = null;
+    if (oldId && oldId !== newId) {
+      // Tear down the old recipe row + its produced raster/.map/.xml.
+      // _delete_layer_full on the backend handles the on-disk + soil_data
+      // + pyCSW cleanup. Best-effort: surface any warning to the status
+      // line but keep going.
+      const res = await api.deleteDstRecipe(oldId);
+      layerCleanup = res && res.layer_cleanup;
+    }
+    if (oldId && oldId === newId) {
+      await api.updateDstRecipe(newId, payload);
+    } else {
+      await api.createDstRecipe(payload);
+    }
+    this._dstLoadedRecipeId = newId;
+    // The editor now reflects the saved recipe (new id after a create or
+    // rename) — keep the open-toggle state in sync.
+    if (this._dstOpenRecipeId !== null) {
+      this._dstOpenRecipeId = newId;
+      this._dstSyncNewButton();
+    }
+    document.getElementById('dst-editor-id').textContent = newId;
+    return { recipe_id: newId, renamed_from: (oldId && oldId !== newId) ? oldId : null, layerCleanup };
+  }
+
   async dstSaveRecipe() {
     const status = document.getElementById('dst-status');
     try {
-      const payload = this._dstReadEditor();
-      if (!payload.recipe_id) throw new Error('recipe_id required');
-      if (!payload.name) throw new Error('name required');
-      let saved;
-      if (document.getElementById('dst-recipe-id').disabled) {
-        saved = await api.updateDstRecipe(payload.recipe_id, payload);
-        status.textContent = 'Updated.';
-      } else {
-        saved = await api.createDstRecipe(payload);
-        document.getElementById('dst-recipe-id').disabled = true;
-        document.getElementById('dst-editor-id').textContent = saved.recipe_id;
-        status.textContent = 'Created.';
-      }
+      const res = await this._dstPersistEditor();
+      status.textContent = res.renamed_from
+        ? `Renamed from ${res.renamed_from} — old raster removed.`
+        : 'Saved.';
       await this.dstReloadRecipes();
+      // Rename → an old layer was deleted; refresh the admin Rasters table
+      // so it doesn't show the now-gone entry.
+      if (res.renamed_from && typeof this.loadLayers === 'function') {
+        await this.loadLayers();
+      }
     } catch (e) { status.textContent = e.message; }
   }
 
-  async dstValidate() {
-    const status = document.getElementById('dst-status');
-    const out = document.getElementById('dst-output');
-    const id = document.getElementById('dst-recipe-id').value.trim();
-    if (!id) { status.textContent = 'Save the recipe first.'; return; }
-    status.textContent = 'Validating...';
-    try {
-      const report = await api.validateDstRecipe(id);
-      out.textContent = JSON.stringify(report, null, 2);
-      status.textContent = report.ok ? 'Valid.' : `${report.errors.length} error(s).`;
-    } catch (e) { status.textContent = 'Validate failed: ' + e.message; }
-  }
 
   async dstRun() {
     const status = document.getElementById('dst-status');
-    const out = document.getElementById('dst-output');
-    const id = document.getElementById('dst-recipe-id').value.trim();
-    if (!id) { status.textContent = 'Save the recipe first.'; return; }
-    // Run reads from the saved recipe in the DB, so persist whatever the
-    // user has in the editor first — otherwise dropdown changes that
-    // weren't explicitly saved get silently ignored at run time.
+    // Persist editor state first (handles the rename → delete old +
+    // create new case), then run against the freshly-saved recipe.
     status.textContent = 'Saving…';
+    let persisted;
     try {
-      const payload = this._dstReadEditor();
-      await api.updateDstRecipe(id, payload);
+      persisted = await this._dstPersistEditor();
     } catch (e) {
       status.textContent = 'Save failed: ' + e.message;
       return;
     }
+    const id = persisted.recipe_id;
+    // Reflect the just-saved recipe in the list immediately (a new recipe's
+    // row appears now, showing "Close" since its editor stays open).
+    await this.dstReloadRecipes();
+    if (persisted.renamed_from && typeof this.loadLayers === 'function') {
+      // Refresh the admin Rasters table so the deleted old entry disappears.
+      await this.loadLayers();
+    }
     status.textContent = 'Queuing run...';
     try {
-      const run = await api.runDstRecipe(id);
-      out.textContent = JSON.stringify(run, null, 2);
-      status.textContent = `Queued; polling…`;
+      await api.runDstRecipe(id);
+      status.textContent = 'Queued; polling…';
       this._dstPollRun(id);
     } catch (e) { status.textContent = 'Run failed: ' + e.message; }
   }
@@ -2320,16 +2505,17 @@ class AdminDashboard {
   // endpoint until its latest_run.status hits a terminal value.
   async _dstPollRun(recipeId) {
     const status = document.getElementById('dst-status');
-    const out = document.getElementById('dst-output');
     for (let i = 0; i < 60; i++) {
       await new Promise(r => setTimeout(r, 2000));
       try {
         const r = await api.getDstRecipe(recipeId);
         const lr = r.latest_run || {};
-        out.textContent = JSON.stringify(lr, null, 2);
         status.textContent = `${recipeId}: ${lr.status || '?'}`;
         if (lr.status === 'succeeded' || lr.status === 'failed' || lr.status === 'cancelled') {
           await this.dstReloadRecipes();
+          if (lr.status === 'succeeded' && typeof this.loadLayers === 'function') {
+            await this.loadLayers();
+          }
           return;
         }
       } catch (e) { /* keep polling */ }
@@ -2337,13 +2523,84 @@ class AdminDashboard {
     status.textContent = `${recipeId}: still running (stopped polling)`;
   }
 
-  async dstDelete() {
-    const id = document.getElementById('dst-recipe-id').value.trim();
-    if (!id || !confirm(`Delete recipe ${id}?`)) return;
+  // Relabel the "+ New Recipe" button to "Close" while a NEW (unsaved)
+  // editor is open; the per-row Open/Close toggle is handled in the table.
+  _dstSyncNewButton() {
+    const b = document.getElementById('dst-new-btn');
+    if (b) b.textContent = (this._dstOpenRecipeId === '__new__') ? 'Close' : '+ New Recipe';
+  }
+
+  // Just hide the editor panel — no save. Used internally (e.g. after a
+  // delete, where saving would re-create the deleted recipe).
+  _dstHideEditor() {
+    this._dstOpenRecipeId = null;
+    this._dstSyncNewButton();
+    document.getElementById('dst-editor-wrap').style.display = 'none';
+    document.getElementById('dst-editor').style.display = 'none';
+    document.getElementById('dst-editor-id').textContent = '';
+    document.getElementById('dst-status').textContent = '';
+  }
+
+  // Close (via the row's toggle or the "+ New Recipe"→Close button):
+  // persist the editor first (there's no Save button — the recipe is always
+  // saved on Close and on Run), hide, then refresh the list so the toggle
+  // labels reset. If there's nothing valid to save we just close.
+  async dstCloseEditor() {
     try {
-      await api.deleteDstRecipe(id);
-      document.getElementById('dst-editor').style.display = 'none';
+      await this._dstPersistEditor();
+    } catch (e) {
+      console.warn('DST close: nothing saved —', e.message);
+    }
+    this._dstHideEditor();              // clears _dstOpenRecipeId
+    await this.dstReloadRecipes();      // re-render so rows show "Open"
+  }
+
+  // Recipes-row actions. Run uses the saved recipe straight from the DB —
+  // no editor-side state involved, so the user can run any recipe without
+  // opening it first.
+  async dstRunRecipeById(recipeId) {
+    const status = document.getElementById('dst-status');
+    // If the editor is currently showing this recipe, persist any pending
+    // edits first — otherwise the row Run would dispatch the last-saved
+    // values, not what the user just typed. Use the tracked open-id rather
+    // than the (possibly already-rewritten) recipe_id field so this still
+    // works after a Project/Mapped-property change.
+    if (this._dstOpenRecipeId && this._dstOpenRecipeId === recipeId) {
+      status.textContent = 'Saving…';
+      try {
+        const persisted = await this._dstPersistEditor();
+        recipeId = persisted.recipe_id;   // may have changed (rename)
+        await this.dstReloadRecipes();
+      } catch (e) {
+        status.textContent = 'Save failed: ' + e.message;
+        return;
+      }
+    }
+    status.textContent = `${recipeId}: queuing run…`;
+    try {
+      await api.runDstRecipe(recipeId);
+      this._dstPollRun(recipeId);
+    } catch (e) {
+      status.textContent = `Run failed: ${e.message}`;
+    }
+  }
+
+  async dstDeleteRecipeById(recipeId) {
+    if (!confirm(`Delete recipe ${recipeId}? Also removes the produced raster, metadata and map file.`)) return;
+    try {
+      await api.deleteDstRecipe(recipeId);
+      // If the editor was showing this recipe, close it too.
+      const editorId = document.getElementById('dst-recipe-id').value.trim();
+      if (editorId === recipeId) this._dstHideEditor();
       await this.dstReloadRecipes();
+      // The produced raster + its mapset/layer/pyCSW XML are now gone too —
+      // reload the admin Rasters table so it doesn't show a ghost entry.
+      // The public map viewer is a separate SPA; the user must refresh that
+      // page (or the /api/layer feed will reflect the deletion on its next
+      // poll).
+      if (typeof this.loadLayers === 'function') {
+        await this.loadLayers();
+      }
     } catch (e) {
       document.getElementById('dst-status').textContent = e.message;
     }

@@ -577,6 +577,8 @@ CREATE FUNCTION soil_data.map() RETURNS trigger
 DECLARE
   rec_property RECORD;
   rec_layer RECORD;
+  is_dst boolean;
+  nodata_block text := '';
 BEGIN
   SELECT l.layer_id,
     CASE
@@ -590,10 +592,20 @@ BEGIN
   FROM soil_data.layer l
   WHERE l.layer_id = NEW.layer_id;
 
-  SELECT m.mapset_id, p.start_color, p.end_color
+  SELECT p.start_color, p.end_color
   INTO rec_property
-  FROM soil_data.mapset m, soil_data.mapped_property p
-  WHERE m.mapped_property_id = split_part(NEW.layer_id,'-',3);
+  FROM soil_data.mapped_property p
+  WHERE p.mapped_property_id = split_part(NEW.layer_id,'-',3);
+
+  -- DST-produced layers use 0 as the off-area sentinel; hide it.
+  SELECT EXISTS (
+    SELECT 1 FROM api.dst_recipe WHERE output_layer_id = NEW.layer_id
+  ) INTO is_dst;
+  IF is_dst THEN
+    nodata_block := '      PROCESSING "NODATA=0"
+      OFFSITE 0 0 0
+';
+  END IF;
 
   UPDATE soil_data.layer l SET map = 'MAP
   NAME "'||rec_layer.layer_id||'"
@@ -620,7 +632,7 @@ BEGIN
       DATA "'||rec_layer.layer_id||'.'||rec_layer.file_extension||'"
       TYPE RASTER
       STATUS ON
-      METADATA
+'||nodata_block||'      METADATA
         "wms_include_items" "all"
         "gml_include_items" "all"
       END # METADATA

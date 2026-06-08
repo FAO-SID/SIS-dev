@@ -91,6 +91,7 @@ class Layer(BaseModel):
     get_feature_info_url: Optional[str] = None
     is_default: Optional[bool] = False
     keywords: Optional[List[str]] = None
+    is_dst: Optional[bool] = False
 
 class LayerCreate(BaseModel):
     project_id: Optional[str] = None

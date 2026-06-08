@@ -216,6 +216,11 @@ def execute_recipe(
 
     os.makedirs(output_dir, exist_ok=True)
     out_path = os.path.join(output_dir, f"{output_layer_id}.tif")
+    # Write to a temp file then atomic-rename. Overwriting in place keeps
+    # the same inode; GDAL (running inside MapServer) keeps serving from
+    # its block cache, which leaves the rendered WMS tiles stale even when
+    # the file bytes on disk are new. A new inode forces a re-read.
+    tmp_path = out_path + ".tmp"
 
     profile.update(
         dtype="float32",
@@ -227,8 +232,9 @@ def execute_recipe(
         blockysize=256,
     )
 
-    with rasterio.open(out_path, "w", **profile) as dst:
+    with rasterio.open(tmp_path, "w", **profile) as dst:
         dst.write(result, 1)
+    os.replace(tmp_path, out_path)
 
     log.info("DST engine wrote %s (%d steps, agg=%s)", out_path, len(steps), agg)
     return out_path
