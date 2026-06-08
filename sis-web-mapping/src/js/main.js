@@ -20,6 +20,13 @@ let profileLayers = {};
 let profileColors = {};
 let profileMapsetIds = {};
 let activeLayer = null;
+let activePopup = null;   // the map info-popup overlay (set in setupPopup)
+
+// Close the map info-popup if it's open. Called whenever the active raster
+// layer changes or is unselected, so a stale popup doesn't linger.
+function closeInfoPopup() {
+  if (activePopup) activePopup.setPosition(undefined);
+}
 
 // ==================== Initialization ====================
 
@@ -331,6 +338,7 @@ function createLayerItem(layer) {
     if (wasChecked) {
       e.preventDefault();
       radio.checked = false;
+      closeInfoPopup();   // layer unselected → drop any open info-popup
       if (activeLayer) {
         map.removeLayer(activeLayer);
         activeLayer = null;
@@ -366,6 +374,8 @@ function switchBasemap(basemapId) {
 }
 
 function switchLayer(layerConfig) {
+  // A different layer is being selected → drop any open info-popup.
+  closeInfoPopup();
   // Remove currently active layer
   if (activeLayer) {
     map.removeLayer(activeLayer);
@@ -1172,6 +1182,7 @@ function setupPopup() {
     autoPanAnimation: { duration: 250 }
   });
   map.addOverlay(popup);
+  activePopup = popup;   // expose for closeInfoPopup()
 
   // Close popup
   document.getElementById('popup-closer').addEventListener('click', () => {
