@@ -111,6 +111,7 @@ def register_raster(
     time_period_begin: Optional[str] = None,
     time_period_end: Optional[str] = None,
     file_orig_name: Optional[str] = None,
+    extra_keywords_theme: Optional[List[str]] = None,
 ) -> RegisteredLayer:
     """End-to-end registration of a GeoTIFF into the SIS catalogue.
 
@@ -138,6 +139,7 @@ def register_raster(
         time_period_begin=time_period_begin,
         time_period_end=time_period_end,
         file_orig_name=file_orig_name,
+        extra_keywords_theme=extra_keywords_theme,
     )
 
     # 2b. Materialise the .map file MapServer reads at runtime.

@@ -62,6 +62,7 @@ def populate_spatial_metadata(
     time_period_begin: Optional[str] = None,
     time_period_end: Optional[str] = None,
     file_orig_name: Optional[str] = None,
+    extra_keywords_theme: Optional[List[str]] = None,
 ) -> None:
     """Upsert into soil_data.project, mapset, layer (and optionally
     class). All-or-nothing transaction.
@@ -118,8 +119,14 @@ def populate_spatial_metadata(
                  unit_of_measure_id, time_period_begin, time_period_end,
                  costum_group, keyword_theme, keyword_place)
             VALUES (%s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s,
-                    (SELECT keyword_theme FROM soil_data.mapped_property
-                     WHERE mapped_property_id = %s),
+                    -- keyword_theme: the property's own keywords merged with
+                    -- any caller-supplied extras (e.g. DST adds 'soil' +
+                    -- 'digital support tool'), de-duplicated.
+                    ARRAY(SELECT DISTINCT k FROM unnest(
+                      COALESCE((SELECT keyword_theme FROM soil_data.mapped_property
+                                WHERE mapped_property_id = %s), '{}'::text[])
+                      || %s::text[]
+                    ) AS k),
                     (SELECT ARRAY_REMOVE(ARRAY[un_reg, en], NULL)
                      FROM soil_data.country
                      WHERE country_id = (SELECT value FROM api.setting WHERE key='COUNTRY_CODE')))
@@ -140,7 +147,8 @@ def populate_spatial_metadata(
               title, abstract, other_constraints,
               publication_date, publication_date,
               unit_of_measure_id, time_period_begin, time_period_end,
-              meta.project_id, meta.property_id))
+              meta.project_id, meta.property_id,
+              list(extra_keywords_theme or [])))
 
         # 3. layer — identity row first (upsert)
         cur.execute("""

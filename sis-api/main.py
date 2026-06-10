@@ -3551,6 +3551,8 @@ def _execute_dst_run(recipe_id: str, triggered_by: str):
                     time_period_begin=dst_time_begin,
                     time_period_end=dst_time_end,
                     license=dst_license,
+                    # Every DST output is tagged with these theme keywords.
+                    extra_keywords_theme=["soil", "digital support tool"],
                 )
                 conn.commit()
                 metadata_status = "succeeded" if registered.xml_published else "failed"
