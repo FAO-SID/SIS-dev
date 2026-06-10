@@ -1,0 +1,95 @@
+# Workshop-only override — NOT part of the one-country base deployment.
+#
+# Merge on top of the base compose to run many countries side by side on one
+# host, each on its own port. The base docker-compose.yml and deploy.sh are
+# never modified; everything multi-country lives here + deploy-workshop.sh.
+#
+# Usage (deploy-workshop.sh wraps this):
+#
+#   PROJECT=sis-bt HOST_PORT=8012 \
+#     docker compose -p sis-bt \
+#       -f docker-compose.yml \
+#       -f ops/workshop/docker-compose.workshop.yml up -d
+#
+# What it changes vs. the one-country base:
+#   * container_name + network name → project-scoped, so 13 stacks coexist
+#     (the base hardcodes `sis-database`, `name: sis-net`, … which collide).
+#   * every service's host port binding removed EXCEPT sis-nginx, which binds
+#     the per-country ${HOST_PORT}. So each country is reached at <IP>:<port>.
+#   * SPA built with relative URLs (API_URL="" / MAPSERVER_URL=/mapserver) so
+#     it talks to its own origin:port — one build recipe works on any port.
+#   * per-service memory limits so one country can't OOM a neighbour.
+#
+# Requires Docker Compose >= 2.24 for the `!override` tag (used to *replace*
+# the base's port lists rather than append to them). Ubuntu 24.04 + current
+# docker-ce ships newer — fine. `docker compose version` to confirm.
+#
+# ${PROJECT} and ${HOST_PORT} are exported by deploy-workshop.sh.
+
+services:
+  sis-database:
+    container_name: ${PROJECT}-database
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+
+  sis-api:
+    container_name: ${PROJECT}-api
+    ports: !override []
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  sis-api-glosis:
+    container_name: ${PROJECT}-api-glosis
+    ports: !override []
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  sis-metadata:
+    container_name: ${PROJECT}-metadata
+    ports: !override []
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  sis-web-services:
+    container_name: ${PROJECT}-web-services
+    ports: !override []
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  sis-web-mapping:
+    container_name: ${PROJECT}-web-mapping
+    ports: !override []
+    # NB: the relative-URL build args (API_URL="" / MAPSERVER_URL=/mapserver)
+    # are passed by deploy-workshop.sh via `docker compose build --build-arg`,
+    # not here — an empty-string arg in `build.args` is merged unreliably
+    # across compose versions. API_KEY still comes from the base .env arg.
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+  sis-nginx:
+    container_name: ${PROJECT}-nginx
+    # Only nginx is published. 443 dropped (workshop is http on a bare IP).
+    ports: !override
+      - "${HOST_PORT}:80"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+
+networks:
+  # Base sets a fixed `name: sis-net`, which would make all projects share one
+  # network (and collide on service names). Scope it per project instead.
+  sis-net:
+    name: ${PROJECT}-net
