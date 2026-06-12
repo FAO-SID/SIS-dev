@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soil Information Systems — Workshop</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --green: #2e7d32; --green-dark: #1b5e20; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f4f6f4; color: #222; min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  header {
+    background: linear-gradient(135deg, var(--green-dark), var(--green));
+    color: #fff; padding: 36px 20px; text-align: center;
+  }
+  header h1 { font-size: 1.7rem; font-weight: 600; }
+  header p  { margin-top: 8px; opacity: .85; font-size: .95rem; }
+  main { flex: 1; max-width: 1000px; margin: 0 auto; padding: 32px 20px; width: 100%; }
+  .grid {
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  }
+  a.card {
+    display: flex; align-items: center; gap: 12px;
+    background: #fff; border: 1px solid #dfe5df; border-radius: 10px;
+    padding: 16px 18px; text-decoration: none; color: #222;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  a.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+    border-color: var(--green);
+  }
+  .flag { font-size: 1.9rem; line-height: 1; }
+  .name { font-weight: 600; font-size: .98rem; }
+  .cc   { color: #777; font-size: .78rem; margin-top: 2px; }
+  footer {
+    text-align: center; padding: 18px; color: #888; font-size: .8rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Soil Information Systems</h1>
+  <p>Workshop &amp; demo — select your country</p>
+</header>
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+<footer>Each country runs an independent SIS instance. Demo environment — http only.</footer>
+<script>
+  // Build links against whatever host the visitor used (IP today, a domain
+  // later) — only the port differs per country.
+  const countries = [
+    ["Bangladesh",  "BD", 8011, "🇧🇩"],
+    ["Bhutan",      "BT", 8012, "🇧🇹"],
+    ["Cambodia",    "KH", 8015, "🇰🇭"],
+    ["Indonesia",   "ID", 8013, "🇮🇩"],
+    ["Kyrgyzstan",  "KG", 8014, "🇰🇬"],
+    ["Laos",        "LA", 8016, "🇱🇦"],
+    ["Mongolia",    "MN", 8018, "🇲🇳"],
+    ["Nepal",       "NP", 8019, "🇳🇵"],
+    ["Philippines", "PH", 8020, "🇵🇭"],
+    ["Sri Lanka",   "LK", 8017, "🇱🇰"],
+    ["Thailand",    "TH", 8021, "🇹🇭"],
+    ["Uzbekistan",  "UZ", 8022, "🇺🇿"],
+    ["Vietnam",     "VN", 8023, "🇻🇳"],
+  ];
+  const host = window.location.hostname;
+  document.getElementById("grid").innerHTML = countries.map(([name, cc, port, flag]) => `
+    <a class="card" href="http://${host}:${port}/">
+      <span class="flag">${flag}</span>
+      <span><div class="name">${name}</div><div class="cc">${cc} · :${port}</div></span>
+    </a>`).join("");
+</script>
+</body>
+</html>
