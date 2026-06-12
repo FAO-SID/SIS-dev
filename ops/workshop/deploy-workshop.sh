@@ -30,7 +30,7 @@ fi
 
 COUNTRY=$(echo "$1" | tr '[:lower:]' '[:upper:]')   # ISO 3166-1 alpha-2
 HOST_PORT="$2"
-ORG_LOGO_URL="${3:-https://www.fao.org/images/corporatelibraries/fao-logo/fao-logo-en.svg}"
+ORG_LOGO_URL="${3:-https://w7.pngwing.com/pngs/360/217/png-transparent-soil-test-computer-icons-soil-quality-soil-miscellaneous-logo-silhouette.png}"
 
 PROJECT="sis-$(echo "$COUNTRY" | tr '[:upper:]' '[:lower:]')"   # e.g. sis-bt
 
@@ -88,6 +88,14 @@ echo "============================================================"
 # Tear down ONLY this country's project; wipe its DB volume for a clean init.
 dc down -v --remove-orphans
 rm -rf "$PROJECT_DIR/sis-database/volume/"* 2>/dev/null || true
+
+# sis-api runs as uid 1000 (appuser) and writes rasters + pyCSW XML into
+# these bind mounts. On a server where the repo was cloned by root they're
+# root-owned → PermissionError on upload. Chown when we can (root on the
+# server); best-effort elsewhere (dev laptops usually already match uid 1000).
+chown -R 1000:1000 "$PROJECT_DIR/sis-web-services/volume" \
+                   "$PROJECT_DIR/sis-metadata/volume" 2>/dev/null \
+  || echo "NOTE: could not chown volumes to uid 1000 (not root?) — fine if your user is uid 1000."
 
 ####################
 #  sis-database    #

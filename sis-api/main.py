@@ -3823,6 +3823,10 @@ async def register_raster_endpoint(
             layer_id = os.path.splitext(file.filename or "")[0]
             target_path = os.path.join(base, f"{layer_id}.tif")
             shutil.move(tmp_path, target_path)
+            # mkstemp creates 0600 and move preserves it — but MapServer and
+            # nginx run as different uids and must read this file (WMS render
+            # + /downloads). World-readable like every other published raster.
+            os.chmod(target_path, 0o644)
             moved_from_tmp = None
         elif path:
             cand = os.path.realpath(os.path.join(base, path))
